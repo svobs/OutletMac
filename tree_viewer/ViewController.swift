@@ -60,6 +60,15 @@ extension ViewController: NSOutlineViewDelegate {
                                      options: nil)
                 cellView = view
             }
+        case .init("etc"):
+            if let view = outlineView.makeView(withIdentifier: identifier,
+                                               owner: outlineView.delegate) as? NSTableCellView {
+                view.textField?.bind(.value,
+                                     to: view,
+                                     withKeyPath: "objectValue.etc",
+                                     options: nil)
+                cellView = view
+            }
         default:
             return cellView
         }

@@ -15,6 +15,10 @@ import Foundation
         children.count
     }
 
+    @objc var etc: String {
+        "etcetera" // hard-coded for now
+    }
+
     @objc var isLeaf: Bool {
         children.isEmpty
     }
