@@ -42,12 +42,12 @@ extension ViewController: NSOutlineViewDelegate {
         guard let identifier = tableColumn?.identifier else { return cellView }
 
         switch identifier {
-        case .init("node"):
+        case .init("name"):
             if let view = outlineView.makeView(withIdentifier: identifier,
                                                owner: outlineView.delegate) as? NSTableCellView {
                 view.textField?.bind(.value,
                                      to: view,
-                                     withKeyPath: "objectValue.value",
+                                     withKeyPath: "objectValue.name",
                                      options: nil)
                 cellView = view
             }

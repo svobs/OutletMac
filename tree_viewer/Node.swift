@@ -2,7 +2,7 @@ import Foundation
 
 @objc public class Node: NSObject {
 
-    @objc let value: String
+    @objc let name: String
     @objc var children: [Node]
 
     @objc var childrenCount: String? {
@@ -23,8 +23,8 @@ import Foundation
         children.isEmpty
     }
 
-    init(value: String, children: [Node] = []) {
-        self.value = value
+    init(name: String, children: [Node] = []) {
+        self.name = name
         self.children = children
     }
 }
