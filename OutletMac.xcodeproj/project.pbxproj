@@ -18,13 +18,13 @@
 /* Begin PBXFileReference section */
 		1127502023C7EF2B00AC62AE /* NodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFactory.swift; sourceTree = "<group>"; };
 		1127502223C7EF3D00AC62AE /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		11DDEECB23A6F9580014C2A6 /* tree_viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tree_viewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11DDEECE23A6F9580014C2A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		11DDEED023A6F9580014C2A6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		11DDEED223A6F9580014C2A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11DDEED523A6F9580014C2A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		11DDEED723A6F9580014C2A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		11DDEED823A6F9590014C2A6 /* tree_viewer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = tree_viewer.entitlements; sourceTree = "<group>"; };
+		11DDEED823A6F9590014C2A6 /* OutletMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,7 +41,7 @@
 		11DDEEC223A6F9580014C2A6 = {
 			isa = PBXGroup;
 			children = (
-				11DDEECD23A6F9580014C2A6 /* tree_viewer */,
+				11DDEECD23A6F9580014C2A6 /* outlet */,
 				11DDEECC23A6F9580014C2A6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,12 +49,12 @@
 		11DDEECC23A6F9580014C2A6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				11DDEECB23A6F9580014C2A6 /* tree_viewer.app */,
+				11DDEECB23A6F9580014C2A6 /* OutletMac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		11DDEECD23A6F9580014C2A6 /* tree_viewer */ = {
+		11DDEECD23A6F9580014C2A6 /* outlet */ = {
 			isa = PBXGroup;
 			children = (
 				11DDEECE23A6F9580014C2A6 /* AppDelegate.swift */,
@@ -62,19 +62,19 @@
 				11DDEED223A6F9580014C2A6 /* Assets.xcassets */,
 				11DDEED423A6F9580014C2A6 /* Main.storyboard */,
 				11DDEED723A6F9580014C2A6 /* Info.plist */,
-				11DDEED823A6F9590014C2A6 /* tree_viewer.entitlements */,
+				11DDEED823A6F9590014C2A6 /* OutletMac.entitlements */,
 				1127502023C7EF2B00AC62AE /* NodeFactory.swift */,
 				1127502223C7EF3D00AC62AE /* Node.swift */,
 			);
-			path = tree_viewer;
+			path = outlet;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		11DDEECA23A6F9580014C2A6 /* tree_viewer */ = {
+		11DDEECA23A6F9580014C2A6 /* OutletMac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 11DDEEDB23A6F9590014C2A6 /* Build configuration list for PBXNativeTarget "tree_viewer" */;
+			buildConfigurationList = 11DDEEDB23A6F9590014C2A6 /* Build configuration list for PBXNativeTarget "OutletMac" */;
 			buildPhases = (
 				11DDEEC723A6F9580014C2A6 /* Sources */,
 				11DDEEC823A6F9580014C2A6 /* Frameworks */,
@@ -84,9 +84,9 @@
 			);
 			dependencies = (
 			);
-			name = tree_viewer;
+			name = OutletMac;
 			productName = tree_viewer;
-			productReference = 11DDEECB23A6F9580014C2A6 /* tree_viewer.app */;
+			productReference = 11DDEECB23A6F9580014C2A6 /* OutletMac.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -104,7 +104,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 11DDEEC623A6F9580014C2A6 /* Build configuration list for PBXProject "tree_viewer" */;
+			buildConfigurationList = 11DDEEC623A6F9580014C2A6 /* Build configuration list for PBXProject "OutletMac" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -117,7 +117,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				11DDEECA23A6F9580014C2A6 /* tree_viewer */,
+				11DDEECA23A6F9580014C2A6 /* OutletMac */,
 			);
 		};
 /* End PBXProject section */
@@ -282,7 +282,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = tree_viewer/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/outlet/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -302,7 +302,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = tree_viewer/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/outlet/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -316,7 +316,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		11DDEEC623A6F9580014C2A6 /* Build configuration list for PBXProject "tree_viewer" */ = {
+		11DDEEC623A6F9580014C2A6 /* Build configuration list for PBXProject "OutletMac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11DDEED923A6F9590014C2A6 /* Debug */,
@@ -325,7 +325,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		11DDEEDB23A6F9590014C2A6 /* Build configuration list for PBXNativeTarget "tree_viewer" */ = {
+		11DDEEDB23A6F9590014C2A6 /* Build configuration list for PBXNativeTarget "OutletMac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				11DDEEDC23A6F9590014C2A6 /* Debug */,

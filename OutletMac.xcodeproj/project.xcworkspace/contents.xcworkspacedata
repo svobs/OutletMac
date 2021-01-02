@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:tree_viewer.xcodeproj">
+      location = "self:/Users/msvoboda/LocalDevel/MacDEV/tree_viewer-master/OutletMac.xcodeproj">
    </FileRef>
 </Workspace>
