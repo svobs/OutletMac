@@ -1,4 +1,8 @@
 import Cocoa
+import os
+
+let log = OSLog.init(subsystem: "com.msvoboda.Outlet", category: "Root")
+
 
 final class ViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
@@ -30,10 +34,24 @@ final class ViewController: NSViewController {
                          options: nil)
 
         content.append(contentsOf: NodeFactory().nodes())
+        
+        let prog = "Outlet"
+        os_log("Finished loading %{public}@", log: log, type: .error, prog)
     }
 }
 
 extension ViewController: NSOutlineViewDelegate {
+    func bindField(_ outlineView: NSOutlineView, _ identifier: NSUserInterfaceItemIdentifier, _ keyPath: String) -> NSTableCellView? {
+        if let view = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView {
+            view.textField?.bind(.value,
+                                 to: view,
+                                 withKeyPath: keyPath,
+                                 options: nil)
+            return view
+        }
+        return nil
+    }
+    
     public func outlineView(_ outlineView: NSOutlineView,
                             viewFor tableColumn: NSTableColumn?,
                             item: Any) -> NSView? {
@@ -43,50 +61,15 @@ extension ViewController: NSOutlineViewDelegate {
 
         switch identifier {
         case .init("name"):
-            if let view = outlineView.makeView(withIdentifier: identifier,
-                                               owner: outlineView.delegate) as? NSTableCellView {
-                view.textField?.bind(.value,
-                                     to: view,
-                                     withKeyPath: "objectValue.name",
-                                     options: nil)
-                cellView = view
-            }
+            cellView = bindField(outlineView, identifier, "objectValue.name")
         case .init("size_bytes"):
-            if let view = outlineView.makeView(withIdentifier: identifier,
-                                               owner: outlineView.delegate) as? NSTableCellView {
-                view.textField?.bind(.value,
-                                     to: view,
-                                     withKeyPath: "objectValue.size_bytes",
-                                     options: nil)
-                cellView = view
-            }
+            cellView = bindField(outlineView, identifier, "objectValue.size_bytes")
         case .init("etc"):
-            if let view = outlineView.makeView(withIdentifier: identifier,
-                                               owner: outlineView.delegate) as? NSTableCellView {
-                view.textField?.bind(.value,
-                                     to: view,
-                                     withKeyPath: "objectValue.etc",
-                                     options: nil)
-                cellView = view
-            }
+            cellView = bindField(outlineView, identifier, "objectValue.etc")
         case .init("modify_ts"):
-            if let view = outlineView.makeView(withIdentifier: identifier,
-                                               owner: outlineView.delegate) as? NSTableCellView {
-                view.textField?.bind(.value,
-                                     to: view,
-                                     withKeyPath: "objectValue.modify_ts",
-                                     options: nil)
-                cellView = view
-            }
+            cellView = bindField(outlineView, identifier, "objectValue.modify_ts")
         case .init("change_ts"):
-            if let view = outlineView.makeView(withIdentifier: identifier,
-                                               owner: outlineView.delegate) as? NSTableCellView {
-                view.textField?.bind(.value,
-                                     to: view,
-                                     withKeyPath: "objectValue.change_ts",
-                                     options: nil)
-                cellView = view
-            }
+            cellView = bindField(outlineView, identifier, "objectValue.change_ts")
         default:
             return cellView
         }
