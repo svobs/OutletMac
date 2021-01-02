@@ -11,12 +11,24 @@ import Foundation
         return "\(count) node\(count > 1 ? "s" : "")"
     }
 
+    @objc var size_bytes: Int {
+        99
+    }
+
     @objc var count: Int {
         children.count
     }
 
     @objc var etc: String {
         "etcetera" // hard-coded for now
+    }
+
+    @objc var modify_ts: String {
+        "Now"
+    }
+
+    @objc var change_ts: String {
+        "Now"
     }
 
     @objc var isLeaf: Bool {

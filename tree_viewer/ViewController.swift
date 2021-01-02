@@ -51,12 +51,12 @@ extension ViewController: NSOutlineViewDelegate {
                                      options: nil)
                 cellView = view
             }
-        case .init("count"):
+        case .init("size_bytes"):
             if let view = outlineView.makeView(withIdentifier: identifier,
                                                owner: outlineView.delegate) as? NSTableCellView {
                 view.textField?.bind(.value,
                                      to: view,
-                                     withKeyPath: "objectValue.childrenCount",
+                                     withKeyPath: "objectValue.size_bytes",
                                      options: nil)
                 cellView = view
             }
@@ -66,6 +66,24 @@ extension ViewController: NSOutlineViewDelegate {
                 view.textField?.bind(.value,
                                      to: view,
                                      withKeyPath: "objectValue.etc",
+                                     options: nil)
+                cellView = view
+            }
+        case .init("modify_ts"):
+            if let view = outlineView.makeView(withIdentifier: identifier,
+                                               owner: outlineView.delegate) as? NSTableCellView {
+                view.textField?.bind(.value,
+                                     to: view,
+                                     withKeyPath: "objectValue.modify_ts",
+                                     options: nil)
+                cellView = view
+            }
+        case .init("change_ts"):
+            if let view = outlineView.makeView(withIdentifier: identifier,
+                                               owner: outlineView.delegate) as? NSTableCellView {
+                view.textField?.bind(.value,
+                                     to: view,
+                                     withKeyPath: "objectValue.change_ts",
                                      options: nil)
                 cellView = view
             }
