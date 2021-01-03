@@ -26,10 +26,9 @@ struct SplitView: View {
     }
 }
 
-// struct SplitView_Previews: PreviewProvider {
-//     static var previews: some View {
-//         let item = exampleData()
-//         
-//         return SplitView(rootItem: item)
-//     }
-// }
+ struct SplitView_Previews: PreviewProvider {
+     static var previews: some View {
+        let items: [ExampleClass] = exampleArray()
+        return SplitView(items: items)
+     }
+ }
