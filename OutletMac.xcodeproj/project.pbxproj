@@ -21,7 +21,6 @@
 
 /* Begin PBXFileReference section */
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1BAC55425A193C600D951A2 /* OutletMac-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OutletMac-Bridging-Header.h"; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55725A193C800D951A2 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		D1BAC55825A193C800D951A2 /* ExampleData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleData.swift; sourceTree = "<group>"; };
@@ -49,7 +48,7 @@
 		11DDEEC223A6F9580014C2A6 = {
 			isa = PBXGroup;
 			children = (
-				11DDEECD23A6F9580014C2A6 /* outlet */,
+				11DDEECD23A6F9580014C2A6 /* OutletMac */,
 				11DDEECC23A6F9580014C2A6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,7 +61,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		11DDEECD23A6F9580014C2A6 /* outlet */ = {
+		11DDEECD23A6F9580014C2A6 /* OutletMac */ = {
 			isa = PBXGroup;
 			children = (
 				D1BAC56B25A1954800D951A2 /* Main.storyboard */,
@@ -72,9 +71,8 @@
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
 				D1BAC55625A193C800D951A2 /* OutlineView */,
-				D1BAC55425A193C600D951A2 /* OutletMac-Bridging-Header.h */,
 			);
-			path = outlet;
+			path = OutletMac;
 			sourceTree = "<group>";
 		};
 		D1BAC55625A193C800D951A2 /* OutlineView */ = {
@@ -297,14 +295,14 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/outlet/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/OutletMac/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ibotta.tree-viewer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "outlet/OutletMac-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -320,14 +318,14 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/outlet/Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/OutletMac/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ibotta.tree-viewer";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "outlet/OutletMac-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
