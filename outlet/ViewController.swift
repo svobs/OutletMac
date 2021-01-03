@@ -1,10 +1,13 @@
 import Cocoa
+import Foundation
+import AppKit
+import SwiftUI
 import os
 
 let log = OSLog.init(subsystem: "com.msvoboda.Outlet", category: "Root")
 
 
-final class ViewController: NSViewController {
+final class TreeViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
     private let treeController = NSTreeController()
     @objc dynamic var content = [Node]()
@@ -40,7 +43,7 @@ final class ViewController: NSViewController {
     }
 }
 
-extension ViewController: NSOutlineViewDelegate {
+extension TreeViewController: NSOutlineViewDelegate {
     func bindField(_ outlineView: NSOutlineView, _ identifier: NSUserInterfaceItemIdentifier, _ keyPath: String) -> NSTableCellView? {
         if let view = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView {
             view.textField?.bind(.value,
@@ -76,3 +79,53 @@ extension ViewController: NSOutlineViewDelegate {
         return cellView
     }
 }
+//
+//struct NodesNSTable: NSViewControllerRepresentable {
+//
+//    // This is a bridge passing data between the SwiftUI and AppKit worlds
+//    @Binding var nodes: Array<Node>?
+//
+//    typealias NSViewControllerType = TreeViewController
+//
+//    func makeNSViewController(
+//        context: NSViewControllerRepresentableContext<PlayerNSTable>
+//    ) -> TreeViewController {
+//        return TreeViewController()
+//    }
+//
+//    func updateNSViewController(_ nsViewController: TreeViewController, context: NSViewControllerRepresentableContext<PlayerNSTable>) {
+//
+//        if let nodes = nodes {
+//            nsViewController.refresh(nodes)
+//        }
+//
+//        return
+//
+//    }
+//
+//}
+//
+//struct PlayerTable: View {
+//
+//    @State var players: Array<Node>? = nil
+//
+//    var body: some View {
+//        PlayerNSTable(
+//            players: self.$players
+//        )
+//            .frame(alignment: .topLeading)
+//            .onAppear(perform: retrievePlayers)
+//    }
+//
+//    func retrievePlayers() -> Void {
+//        self.players = nil
+//        Player.retrieveMany(
+//            season: Season(publicId: "2020")
+//        ) { (error, players) in
+//            guard let players = players else {
+//                fatalError("No players")
+//            }
+//            self.players = players
+//        }
+//    }
+//}
