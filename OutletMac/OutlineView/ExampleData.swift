@@ -10,18 +10,17 @@ import Foundation
 
 
 final class ExampleClass: OutlineRepresentable, ObservableObject, Identifiable, Hashable {
+    let size_bytes: Int64
+    
     let id: UUID = UUID()
     let name: String
     var children: [OutlineRepresentable]?
     var parent: OutlineRepresentable?
     let hasContent: Bool
     
-    static func == (lhs: ExampleClass, rhs: ExampleClass) -> Bool {
-        return lhs.id == rhs.id
-    }
-
     init(name: String, children: [ExampleClass] = []) {
         self.name = name
+        self.size_bytes = 99 // TODO
         self.children = children
         self.parent = nil
         if children.count == 0 {
@@ -33,16 +32,15 @@ final class ExampleClass: OutlineRepresentable, ObservableObject, Identifiable, 
             child.parent = self
         }
     }
+    
+    static func == (lhs: ExampleClass, rhs: ExampleClass) -> Bool {
+        return lhs.id == rhs.id
+    }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 
-    // init(name: String, children: [ExampleClass]) {
-    //     self.name = name
-    //     self.children = children
-    //     self.hasContent = false
-    // }
 }
 
 

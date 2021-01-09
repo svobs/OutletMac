@@ -12,6 +12,7 @@ let foldersHaveContent: Bool = false
 
 protocol OutlineRepresentable {
     var name: String { get }
+    var size_bytes: Int64 { get }
     var children: [OutlineRepresentable]? { get }
     var parent: OutlineRepresentable? { get }
     var hasContent: Bool { get }
@@ -39,6 +40,12 @@ class OutlineNode<T: OutlineRepresentable>: ObservableObject, Identifiable, Hash
     var name: String {
         get {
             return self.representedObject?.name ?? ""
+        }
+    }
+    
+    var size_bytes: Int64 {
+        get {
+            return self.representedObject?.size_bytes ?? -1
         }
     }
     

@@ -42,6 +42,12 @@ struct OutlineRow<T: OutlineRepresentable>: View where T: Identifiable, T: Hasha
                 .truncationMode(.tail)
                 .allowsTightening(true)
             
+            let size_bytes_str = String(node.size_bytes)
+            Text(size_bytes_str)
+                .lineLimit(1) // If lineLimit is not specified, non-leaf names will wrap
+                .truncationMode(.tail)
+                .allowsTightening(true)
+            
             Spacer()
         }
         .padding(.vertical, 4)
