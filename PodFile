@@ -1,0 +1,5 @@
+use_frameworks!
+target 'OutletMac' do
+	platform :osx, '10.15'
+    pod 'SwiftProtobuf', '~> 1.14'
+end
