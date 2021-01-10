@@ -9,15 +9,18 @@
 import SwiftUI
 
 
+@available(OSX 11.0, *)
 struct ContentView: View {
     let items: [ExampleClass] = exampleArray()
     
     var body: some View {
-        SplitView(items: items)
+        TwoPaneView()
+//        SplitView(items: items)
     }
 }
 
 
+@available(OSX 11.0, *)
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()

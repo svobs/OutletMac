@@ -9,6 +9,7 @@
 import Cocoa
 import SwiftUI
 
+@available(OSX 11.0, *)
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 

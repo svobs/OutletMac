@@ -40,8 +40,17 @@ struct FilterPanel: View {
 }
 
 struct TreeView: View {
+  
+  var outlineTree: OutlineTree<ExampleClass, [ExampleClass]>
+  @State var selectedItem: OutlineNode<ExampleClass>? = nil
+  
+  init(items: [ExampleClass]) {
+      outlineTree = OutlineTree(representedObjects: items)
+  }
+  
     var body: some View {
-        TodoPlaceholder("<TODO: TreeView>")
+      OutlineSection<ExampleClass, [ExampleClass]>(selectedItem: $selectedItem).environmentObject(outlineTree)
+          .frame(minWidth: 200, minHeight: 200, maxHeight: .infinity)
     }
 }
 
@@ -54,7 +63,7 @@ struct StatusPanel: View {
 struct TreePanel {
     let root_dir_panel = RootDirPanel()
     let filter_panel = FilterPanel()
-    let tree_view = TreeView()
+  let tree_view = TreeView(items:  exampleArray())
     let status_panel = StatusPanel()
 }
 
@@ -69,13 +78,7 @@ struct TwoPaneView: View {
     private var left_tree_panel = TreePanel()
     private var right_tree_panel = TreePanel()
     
-    private var leftItemList: [Int]
-    
-    private var rightItemList: [Int]
-    
-    init(_ leftItemList: [Int], _ rightItemList: [Int]) {
-        self.leftItemList = leftItemList
-        self.rightItemList = rightItemList
+    init() {
     }
     private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
     private var colors: [Color] = [.yellow, .purple, .green]
@@ -127,8 +130,6 @@ struct TwoPaneView: View {
 @available(OSX 11.0, *)
 struct TwoPaneView_Previews: PreviewProvider {
     static var previews: some View {
-        let cells_left:[Int] = [2]
-        let cells_right:[Int] = [4]
-        TwoPaneView(cells_left, cells_right)
+        TwoPaneView()
     }
 }
