@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
+   <Group
+      location = "group:../OutletMac/grpc"
+      name = "grpc">
+   </Group>
    <FileRef
-      location = "self:/Users/msvoboda/LocalDevel/MacDEV/tree_viewer-master/OutletMac.xcodeproj">
+      location = "self:">
    </FileRef>
 </Workspace>
