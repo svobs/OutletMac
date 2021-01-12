@@ -1,0 +1,234 @@
+syntax = "proto3";
+
+//import public "outlet/backend/daemon/grpc/generated/Node.proto";
+import public "Node.proto";
+
+option java_package = "com.msvoboda.outlet";
+option go_package = "msvoboda.com/outlet/proto";
+option java_multiple_files = true;
+
+package outlet.backend.daemon.grpc.generated;
+
+message Empty {
+	// nothing
+}
+
+message GetLastPendingOp_Request {
+	int32 node_uid = 1;
+}
+
+message DownloadFromGDrive_Request {
+	int32 node_uid = 1;
+	string requestor_id = 2;
+}
+
+message GetLastPendingOp_Response {
+	UserOp user_op = 1;
+}
+
+message Subscribe_Request {
+	// nothing
+}
+
+message GetOpExecPlayState_Request {
+	// nothing
+}
+
+message ToggleUiEnablement {
+	bool enable = 1;
+}
+
+message GenerateMergeTree_Request {
+	string tree_id_left = 1;
+	string tree_id_right = 2;
+	repeated SPIDNodePair change_list_left = 3;
+	repeated SPIDNodePair change_list_right = 4;
+}
+
+message DragDrop_Request {
+	string src_tree_id = 1;
+	string dst_tree_id = 2;
+	repeated SPIDNodePair src_sn_list = 3;
+	SPIDNodePair dst_sn = 4;
+	bool is_into = 5;
+}
+
+message RefreshSubtree_Request {
+	NodeIdentifier node_identifier = 1;
+	string tree_id = 2;
+}
+
+message RefreshSubtreeStats_Request {
+	int32 root_uid = 1;
+	string tree_id = 2;
+}
+
+message DeleteSubtree_Request {
+	repeated int32 node_uid_list = 1;
+}
+
+message ErrorOccurred {
+	string msg = 1;
+	string secondary_msg = 2;
+}
+
+message UidContainer {
+	int32 uid = 1;
+}
+
+message StartDiffTrees_Request {
+	string tree_id_left = 1;
+	string tree_id_right = 2;
+}
+
+message StartDiffTrees_Response {
+	string tree_id_left = 1;
+	string tree_id_right = 2;
+}
+
+message DragDrop_Response {
+	// nothing
+}
+
+message SignalMsg {
+	int32 sig_int = 1;
+	string sender = 2;
+
+	oneof signal_data {
+		Empty empty = 10;
+		ErrorOccurred error_occurred = 11;
+		DisplayTreeUiState display_tree_ui_state = 12;
+		PlayState play_state = 13;
+		ToggleUiEnablement ui_enablement = 14;
+		Node node = 15;
+		SrcDstNodeList src_dst_node_list = 16;
+		StatusMsg status_msg = 17;
+		DownloadMsg download_msg = 18;
+	}
+}
+
+message DownloadMsg {
+	string filename = 1;
+}
+
+message StatusMsg {
+	string msg = 1;
+}
+
+message SendSignalResponse {
+	// nothing
+}
+
+message GetChildList_Request {
+	Node parent_node = 1;
+	FilterCriteria filter_criteria = 2;
+	string tree_id = 3;
+}
+
+message GetChildList_Response {
+	repeated Node node_list = 1;
+}
+
+message GetAncestorList_Request {
+	NodeIdentifier spid = 1;
+	string stop_at_path = 2;
+}
+
+message GetAncestorList_Response {
+	repeated Node node_list = 1;
+}
+
+message PlayState {
+	bool is_enabled = 1;
+}
+
+message StartSubtreeLoad_Request {
+	string tree_id = 1;
+}
+
+message StartSubtreeLoad_Response {
+	// nothing
+}
+
+message DisplayTreeUiState {
+	string tree_id = 1;
+	SPIDNodePair root_sn = 2;
+	bool root_exists = 3;
+	string offending_path = 4;
+	bool needs_manual_load = 5;
+	int32 tree_display_mode = 6;
+	bool has_checkboxes = 7;
+}
+
+message RequestDisplayTree_Request {
+	bool is_startup = 1;
+	string tree_id = 2;
+	bool return_async = 3;
+	string user_path = 4;
+	NodeIdentifier spid = 5;
+	int32 tree_display_mode = 6;
+}
+
+message RequestDisplayTree_Response {
+		DisplayTreeUiState display_tree_ui_state = 1;
+}
+
+message SingleNode_Response {
+	Node node = 1;
+}
+
+message GetUidForLocalPath_Request {
+	string full_path = 1;
+	int32 uid_suggestion = 2;
+}
+
+message GetUidForLocalPath_Response {
+	int32 uid = 1;
+}
+
+message GetNodeForUid_Request {
+	int32 uid = 1;
+	int32 tree_type = 2; // optional
+}
+
+message GetNodeForLocalPath_Request {
+	string full_path = 1;
+}
+
+message GetNextUid_Request {
+	// nothing
+}
+
+message GetNextUid_Response {
+	int32 uid = 1;
+}
+
+service Outlet {
+	rpc subscribe_to_signals(Subscribe_Request) returns (stream SignalMsg);
+	rpc send_signal(SignalMsg) returns (SendSignalResponse);
+
+	rpc get_node_for_uid(GetNodeForUid_Request) returns (SingleNode_Response);
+	rpc get_node_for_local_path(GetNodeForLocalPath_Request) returns (SingleNode_Response);
+	rpc get_child_list_for_node(GetChildList_Request) returns (GetChildList_Response);
+	rpc get_ancestor_list_for_spid(GetAncestorList_Request) returns (GetAncestorList_Response);
+
+	rpc request_display_tree_ui_state(RequestDisplayTree_Request) returns (RequestDisplayTree_Response);
+	rpc start_subtree_load(StartSubtreeLoad_Request) returns (StartSubtreeLoad_Response);
+	rpc get_op_exec_play_state(GetOpExecPlayState_Request) returns (PlayState);
+	rpc start_diff_trees(StartDiffTrees_Request) returns (StartDiffTrees_Response);
+
+	rpc refresh_subtree(RefreshSubtree_Request) returns (Empty);
+	rpc refresh_subtree_stats(RefreshSubtreeStats_Request) returns (Empty);
+
+	rpc get_next_uid(GetNextUid_Request) returns (GetNextUid_Response);
+	rpc get_uid_for_local_path(GetUidForLocalPath_Request) returns (GetUidForLocalPath_Response);
+
+	rpc generate_merge_tree(GenerateMergeTree_Request) returns (Empty);
+	rpc drop_dragged_nodes(DragDrop_Request) returns (DragDrop_Response);
+
+	rpc get_last_pending_op_for_node(GetLastPendingOp_Request) returns (GetLastPendingOp_Response);
+	rpc download_file_from_gdrive(DownloadFromGDrive_Request) returns (Empty);
+	rpc delete_subtree(DeleteSubtree_Request) returns (Empty);
+}
+
+

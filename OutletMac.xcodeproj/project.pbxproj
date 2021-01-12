@@ -3,11 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
+		D132963225ABE10D002047BC /* Node.proto in Sources */ = {isa = PBXBuildFile; fileRef = D132963025ABE10D002047BC /* Node.proto */; };
+		D132963325ABE10D002047BC /* Outlet.proto in Sources */ = {isa = PBXBuildFile; fileRef = D132963125ABE10D002047BC /* Outlet.proto */; };
 		D19C531225AADB3700A90474 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* Node.swift */; };
 		D19C531525AADB4300A90474 /* NodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* NodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
@@ -28,6 +30,8 @@
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
+		D132963025ABE10D002047BC /* Node.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = Node.proto; sourceTree = "<group>"; };
+		D132963125ABE10D002047BC /* Outlet.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.protobuf; path = Outlet.proto; sourceTree = "<group>"; };
 		D19C531125AADB3700A90474 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		D19C531425AADB4300A90474 /* NodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -62,6 +66,7 @@
 		11DDEEC223A6F9580014C2A6 = {
 			isa = PBXGroup;
 			children = (
+				D132962A25ABE0D2002047BC /* proto */,
 				11DDEECD23A6F9580014C2A6 /* OutletMac */,
 				11DDEECC23A6F9580014C2A6 /* Products */,
 				AF70D03E5BE3D869EFAED087 /* Pods */,
@@ -107,8 +112,56 @@
 				E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */,
 				7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D132962A25ABE0D2002047BC /* proto */ = {
+			isa = PBXGroup;
+			children = (
+				D132962B25ABE10D002047BC /* outlet */,
+			);
+			path = proto;
+			sourceTree = "<group>";
+		};
+		D132962B25ABE10D002047BC /* outlet */ = {
+			isa = PBXGroup;
+			children = (
+				D132962C25ABE10D002047BC /* backend */,
+			);
+			path = outlet;
+			sourceTree = "<group>";
+		};
+		D132962C25ABE10D002047BC /* backend */ = {
+			isa = PBXGroup;
+			children = (
+				D132962D25ABE10D002047BC /* daemon */,
+			);
+			path = backend;
+			sourceTree = "<group>";
+		};
+		D132962D25ABE10D002047BC /* daemon */ = {
+			isa = PBXGroup;
+			children = (
+				D132962E25ABE10D002047BC /* grpc */,
+			);
+			path = daemon;
+			sourceTree = "<group>";
+		};
+		D132962E25ABE10D002047BC /* grpc */ = {
+			isa = PBXGroup;
+			children = (
+				D132962F25ABE10D002047BC /* generated */,
+			);
+			path = grpc;
+			sourceTree = "<group>";
+		};
+		D132962F25ABE10D002047BC /* generated */ = {
+			isa = PBXGroup;
+			children = (
+				D132963025ABE10D002047BC /* Node.proto */,
+				D132963125ABE10D002047BC /* Outlet.proto */,
+			);
+			path = generated;
 			sourceTree = "<group>";
 		};
 		D1BAC55625A193C800D951A2 /* OutlineView */ = {
@@ -260,7 +313,9 @@
 				D1BAC56325A193C800D951A2 /* OutlineNode.swift in Sources */,
 				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,
 				D1BAC56525A193C800D951A2 /* OutlineView.swift in Sources */,
+				D132963325ABE10D002047BC /* Outlet.proto in Sources */,
 				D1BAC56125A193C800D951A2 /* DetailView.swift in Sources */,
+				D132963225ABE10D002047BC /* Node.proto in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
