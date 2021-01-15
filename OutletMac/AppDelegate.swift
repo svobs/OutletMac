@@ -30,8 +30,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentView = NSHostingView(rootView: contentView)
         window.makeKeyAndOrderFront(nil)
       
-      var grpcClient: Outlet_Backend_Daemon_Grpc_Generated_OutletClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
-      grpcClient.
+      var grpcClient: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
+      NSLog("gRPC client connected!")
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

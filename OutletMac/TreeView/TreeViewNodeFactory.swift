@@ -1,5 +1,5 @@
-final class NodeFactory {
-    func nodes() -> [Node] {
+final class TreeViewNodeFactory {
+    func nodes() -> [TreeViewNode] {
         return [
             .init(value: "💰 Offers", children: [
                 .init(value: "🍦 Ice Cream", children: [

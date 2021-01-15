@@ -21,14 +21,14 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
 final class TreeViewController: NSViewController {
     @IBOutlet weak var outlineView: NSOutlineView!
     private let treeController = NSTreeController()
-    @objc dynamic var content = [Node]()
+    @objc dynamic var content = [TreeViewNode]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         outlineView.delegate = self
 
-        treeController.objectClass = Node.self
+        treeController.objectClass = TreeViewNode.self
       
         treeController.childrenKeyPath = "children"
         treeController.countKeyPath = "count"
@@ -48,7 +48,7 @@ final class TreeViewController: NSViewController {
                          withKeyPath: "arrangedObjects",
                          options: nil)
 
-        content.append(contentsOf: NodeFactory().nodes())
+        content.append(contentsOf: TreeViewNodeFactory().nodes())
     }
 }
 

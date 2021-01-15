@@ -1,9 +1,9 @@
 import Foundation
 
-@objc public class Node: NSObject {
+@objc public class TreeViewNode: NSObject {
 
     @objc let value: String
-    @objc var children: [Node]
+    @objc var children: [TreeViewNode]
 
     @objc var childrenCount: String? {
         let count = children.count
@@ -19,7 +19,7 @@ import Foundation
         children.isEmpty
     }
 
-    init(value: String, children: [Node] = []) {
+    init(value: String, children: [TreeViewNode] = []) {
         self.value = value
         self.children = children
     }
