@@ -8,43 +8,18 @@
 
 import Foundation
 
-enum TreeType: UInt {
-  case NA = 0
-  case MIXED = 1
-  case LOCAL_DISK = 2
-  case GDRIVE = 3
-  
-  static func display(code: UInt) -> String {
-      guard let treeType = TreeType(rawValue: code) else {
-          return "UNKNOWN"
-      }
-
-      switch treeType {
-      case .NA:
-          return "✪"
-      case .MIXED:
-          return "M"
-      case .LOCAL_DISK:
-          return "L"
-      case .GDRIVE:
-          return "G"
-      }
-  }
-}
-
-enum TreeDisplayMode: Int {
-  case ONE_TREE_ALL_ITEMS = 1
-  case CHANGES_ONE_TREE_PER_CATEGORY = 2
-}
-
-class NodeIdentifier {
+class NodeIdentifier: CustomStringConvertible {
   let uid: UID
   // TODO: when I get better with Swift, pursue union type
-  let pathList: [String]
+  var pathList: [String]
   
   init(_ uid: UID, _ pathList: [String]) {
     self.uid = uid
     self.pathList = pathList
+  }
+  
+  public var description: String {
+    return "\(self.getTreeType().rawValue)-\(uid)⩨\(pathList)∣"
   }
   
   func getTreeType() -> TreeType {

@@ -10,10 +10,6 @@ import GRPC
 import Logging
 import NIO
 
-typealias UID = Int64
-
-let NULL_UID: UID = 0
-
 enum OutletError: Error {
   case invalidOperation
 }
@@ -43,7 +39,7 @@ class OutletGRPCClient {
     grpcRequest.treeID = request.treeId
     grpcRequest.userPath = request.userPath ?? ""
     
-    GRPCConverter.fromNodeIdentifierToGRPC(spid: request.spid, grpcSPID: grpcRequest.spid)
+    GRPCConverter.spidToGRPC(spid: request.spid, spidGRPC: grpcRequest.spid)
 
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
 
