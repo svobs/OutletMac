@@ -8,86 +8,138 @@
 
 import Foundation
 
-class Node {
+class Node: CustomStringConvertible {
   var nodeIdentifier: NodeIdentifier
   var parentList: [UID]
   var trashed: TrashStatus
   var _icon: IconId?
   
+  public var description: String {
+    return "Node(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
+  }
+  
   var isFile: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var isDir: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var isDisplayOnly: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var isLive: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var isEphemeral: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var hasTuple: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var isShared: Bool {
-    false
+    get {
+      false
+    }
   }
   
   var name: String {
-    return URL(fileURLWithPath: self.nodeIdentifier.pathList[0]).lastPathComponent
+    get {
+      return URL(fileURLWithPath: self.nodeIdentifier.pathList[0]).lastPathComponent
+    }
   }
   
   var etc: String {
-    return ""
+    get {
+      ""
+    }
   }
   
   var md5: MD5? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var sha256: SHA256? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var sizeBytes: UInt64? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var syncTS: UInt64? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var modifyTS: UInt64? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var changeTS: UInt64? {
-    return nil
+    get {
+      return nil
+    }
   }
   
   var uid: UID {
-    return self.nodeIdentifier.uid
+    get {
+      return self.nodeIdentifier.uid
+    }
   }
   
   var defaultIcon: IconId {
-    if self.isLive {
-      return .ICON_GENERIC_FILE
-    } else {
-      return .ICON_FILE_CP_DST
+    get {
+      if self.isLive {
+        return .ICON_GENERIC_FILE
+      } else {
+        return .ICON_FILE_CP_DST
+      }
     }
   }
   
   var icon: IconId {
-    return self._icon ?? self.defaultIcon
+    get {
+      return self._icon ?? self.defaultIcon
+    }
+  }
+  
+  var treeType: TreeType {
+    get {
+      return self.nodeIdentifier.getTreeType()
+    }
+  }
+  
+  var tag: String {
+    get {
+      return "\(nodeIdentifier)"
+    }
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
@@ -95,14 +147,6 @@ class Node {
     self.parentList = parentList
     self.trashed = trashed
     self._icon = nil
-  }
-  
-  func getTreeType() -> TreeType {
-    return self.nodeIdentifier.getTreeType()
-  }
-  
-  func getTag() -> String {
-    return "\(nodeIdentifier)"
   }
   
   func toTuple() throws {
@@ -117,3 +161,22 @@ class Node {
 }
 
 typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
+
+
+//protocol HasChildStats {
+//  var fileCount: UInt { get set }
+//  var trashedFileCount: UInt { get set }
+//
+//  var dirCount: UInt { get set }
+//  var trashedDirCount: UInt { get set }
+//
+//  var sizeBytes: UInt { get set }
+//  var trashedBytes: UInt { get set }
+//
+//}
+//
+//extension HasChildStats {
+//  func updateFrom(_ other: HasChildStats) {
+//    self.fileCount = other.fileCount
+//  }
+//}
