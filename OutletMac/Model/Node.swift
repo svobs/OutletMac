@@ -163,20 +163,20 @@ class Node: CustomStringConvertible {
 typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
 
 
-//protocol HasChildStats {
-//  var fileCount: UInt { get set }
-//  var trashedFileCount: UInt { get set }
-//
-//  var dirCount: UInt { get set }
-//  var trashedDirCount: UInt { get set }
-//
-//  var sizeBytes: UInt { get set }
-//  var trashedBytes: UInt { get set }
-//
-//}
-//
-//extension HasChildStats {
-//  func updateFrom(_ other: HasChildStats) {
-//    self.fileCount = other.fileCount
-//  }
-//}
+class ChildStats {
+  var fileCount: UInt64 = 0
+  var trashedFileCount: UInt64 = 0
+  var dirCount: UInt64 = 0
+  var trashedDirCount: UInt64 = 0
+  var trashedBytes: UInt64 = 0
+  var sizeBytes: UInt64 = 0
+  
+  func clear() {
+    self.fileCount = 0
+    self.trashedFileCount = 0
+    self.dirCount = 0
+    self.trashedDirCount = 0
+    self.trashedBytes = 0
+    self.sizeBytes = 0
+  }
+}

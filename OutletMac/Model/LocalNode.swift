@@ -114,10 +114,11 @@ class LocaFilelNode: LocalNode {
     self._changeTS = changeTS
     super.init(nodeIdentifer, parentUID, trashed, isLive: isLive)
   }
-  
 }
 
 class LocalDirNode: LocalNode {
+  var _childStats: ChildStats? = nil
+  
   // TODO: HasChildStats
   override var isDir: Bool {
     get {
@@ -135,5 +136,32 @@ class LocalDirNode: LocalNode {
     return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
   }
   
+  override var etc: String {
+    get {
+      ""
+    }
+  }
+  
+  override var sizeBytes: UInt64? {
+    get {
+      self._childStats!.sizeBytes
+    }
+    set (sizeBytes) {
+      if self._childStats == nil {
+        self._childStats = ChildStats()
+      }
+      self._childStats!.sizeBytes = sizeBytes!
+    }
+  }
+  
+  func zeroOutStats() {
+    if (self._childStats != nil) {
+      self._childStats!.clear()
+    }
+  }
+  
+  func isStatsLoaded() -> Bool {
+    return self._childStats != nil
+  }
 }
 
