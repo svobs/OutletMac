@@ -8,6 +8,9 @@
 
 import Foundation
 
+/**
+ CLASS LocalNode
+ */
 class LocalNode: Node {
   var _isLive: Bool
   override var isLive: Bool {
@@ -33,6 +36,9 @@ class LocalNode: Node {
   }
 }
 
+/**
+ CLASS LocaFilelNode
+ */
 class LocaFilelNode: LocalNode {
   var _md5: MD5?
   override var md5: MD5? {
@@ -116,10 +122,13 @@ class LocaFilelNode: LocalNode {
   }
 }
 
+/**
+ CLASS LocalDirNode
+ */
 class LocalDirNode: LocalNode {
-  var _childStats: ChildStats? = nil
+  var _dirStats: DirectoryStats? = nil
   
-  // TODO: HasChildStats
+  // TODO: HasDirectoryStats
   override var isDir: Bool {
     get {
       true
@@ -138,30 +147,44 @@ class LocalDirNode: LocalNode {
   
   override var etc: String {
     get {
-      ""
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.etc
+      }
+    }
+  }
+  
+  override var summary: String {
+    get {
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.summary
+      }
     }
   }
   
   override var sizeBytes: UInt64? {
     get {
-      self._childStats!.sizeBytes
+      self._dirStats!.sizeBytes
     }
     set (sizeBytes) {
-      if self._childStats == nil {
-        self._childStats = ChildStats()
+      if self._dirStats == nil {
+        self._dirStats = DirectoryStats()
       }
-      self._childStats!.sizeBytes = sizeBytes!
+      self._dirStats!.sizeBytes = sizeBytes!
     }
   }
   
   func zeroOutStats() {
-    if (self._childStats != nil) {
-      self._childStats!.clear()
+    if (self._dirStats != nil) {
+      self._dirStats!.clear()
     }
   }
   
   func isStatsLoaded() -> Bool {
-    return self._childStats != nil
+    return self._dirStats != nil
   }
 }
 

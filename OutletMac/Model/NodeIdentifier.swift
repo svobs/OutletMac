@@ -8,6 +8,10 @@
 
 import Foundation
 
+/**
+ CLASS NodeIdentifier
+ "Abstract" base class. Should not be instantiated.
+ */
 class NodeIdentifier: CustomStringConvertible {
   let uid: UID
   // TODO: when I get better with Swift, pursue union type
@@ -42,12 +46,18 @@ class NodeIdentifier: CustomStringConvertible {
   
 }
 
+/**
+ CLASS NullNodeIdentifier
+ */
 class NullNodeIdentifier: NodeIdentifier {
   init() {
     super.init(NULL_UID, [])
   }
 }
 
+/**
+ CLASS SinglePathNodeIdentifier
+ */
 class SinglePathNodeIdentifier: NodeIdentifier {
   let treeType: TreeType
   init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
@@ -75,6 +85,9 @@ class SinglePathNodeIdentifier: NodeIdentifier {
 typealias SPID = SinglePathNodeIdentifier
 
 
+/**
+ CLASS GDriveIdentifier
+ */
 class GDriveIdentifier: NodeIdentifier {
   let treeType: TreeType
   init(_ uid: UID, _ pathList: [String], _ treeType: TreeType) {
@@ -87,6 +100,9 @@ class GDriveIdentifier: NodeIdentifier {
   }
 }
 
+/**
+ CLASS LocalNodeIdentifier
+ */
 class LocalNodeIdentifier: SinglePathNodeIdentifier {
   override init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
     super.init(uid, singlePath, .LOCAL_DISK)

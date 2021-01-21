@@ -72,6 +72,12 @@ class Node: CustomStringConvertible {
     }
   }
   
+  var summary: String {
+    get {
+      ""
+    }
+  }
+  
   var md5: MD5? {
     get {
       return nil
@@ -163,7 +169,11 @@ class Node: CustomStringConvertible {
 typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
 
 
-class ChildStats {
+/**
+ CLASS DirectoryStats
+ Encapsulates stats for a directory node
+ */
+class DirectoryStats {
   var fileCount: UInt64 = 0
   var trashedFileCount: UInt64 = 0
   var dirCount: UInt64 = 0
@@ -179,4 +189,32 @@ class ChildStats {
     self.trashedBytes = 0
     self.sizeBytes = 0
   }
+  
+  var etc: String {
+    get {
+      let files = self.fileCount + self.trashedFileCount
+      let dirs = self.dirCount + self.trashedDirCount
+      
+      var filesString: String = ""
+      let multi = files == 1 ? "" : "s"
+      filesString = "\(files) file\(multi)"
+      
+      var dirsString: String = ""
+      if dirs > 0 {
+        let multi = dirs == 1 ? "" : "s"
+        dirsString = "\(dirs) file\(multi)"
+      }
+      
+      return "\(filesString), \(dirsString)"
+    }
+  }
+  
+  var summary: String {
+    if self.sizeBytes == 0 && self.fileCount == 0 {
+      return ""
+    }
+    let size: String = String(sizeBytes)  // TODO: formatting!
+    return "\(size) in \(self.fileCount) files and \(self.dirCount) dirs"  // TODO: formatting with commas, similar to Python's :n
+  }
+  
 }

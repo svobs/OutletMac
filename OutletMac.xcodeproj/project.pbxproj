@@ -13,6 +13,7 @@
 		D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A125AD532800D76169 /* Outlet.grpc.swift */; };
 		D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */; };
 		D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839E725AD8D0600D76169 /* SignalConstants.swift */; };
+		D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */; };
 		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
 		D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
@@ -43,6 +44,7 @@
 		D16839A325AD532800D76169 /* Node.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.pb.swift; sourceTree = "<group>"; };
 		D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletGRPCClient.swift; sourceTree = "<group>"; };
 		D16839E725AD8D0600D76169 /* SignalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
+		D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveNode.swift; sourceTree = "<group>"; };
 		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
 		D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 				D1CB049D25B182B500556B28 /* NodeIdentifier.swift */,
 				D1CB04A325B184C100556B28 /* Node.swift */,
 				D1F36C3E25B59153009498D8 /* LocalNode.swift */,
+				D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -321,6 +324,7 @@
 				D1BAC56525A193C800D951A2 /* OutlineView.swift in Sources */,
 				D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */,
 				D16839A925AD532800D76169 /* Node.pb.swift in Sources */,
+				D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */,
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,
 				D1BAC56125A193C800D951A2 /* DetailView.swift in Sources */,
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,

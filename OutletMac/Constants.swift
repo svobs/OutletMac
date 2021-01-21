@@ -21,8 +21,13 @@ let V_PAD = 5
 
 let LARGE_NUMBER_OF_CHILDREN = 10000
 
-// File icon names:
-enum IconNasme: String {
+/**
+ ENUM IconNames
+ 
+ Used for locating files in the filesystem.
+ */
+enum IconNames: String {
+  // File icon names:
   case ICON_GENERIC_FILE = "backend/store/local"
   case ICON_FILE_RM = "file-rm"
   case ICON_FILE_MV_SRC = "file-mv-src"
@@ -66,7 +71,11 @@ enum IconNasme: String {
   case BTN_LOCAL_DISK_LINUX = "localdisk-linux-btn"
 }
 
-/** Used for identifying icons in a more compact way, mainly for serialization for RPC*/
+/**
+ ENUM IconId
+ 
+ Used for identifying icons in a more compact way, mainly for serialization for RPC
+ */
 enum IconId: UInt {
   case NONE = 0
 
@@ -121,6 +130,11 @@ let ZEROCONF_SERVICE_TYPE = "_outlet._tcp.local."
 
 typealias UID = UInt64
 
+/**
+ ENUM TrashStatus
+ 
+ Indicates whether a node is in the trash. Note: IMPLICITLY_TRASHED only applies to GDrive nodes.
+ */
 enum TrashStatus: UInt {
   case NOT_TRASHED = 0
   case EXPLICITLY_TRASHED = 1
@@ -131,7 +145,11 @@ enum TrashStatus: UInt {
     return self == TrashStatus.NOT_TRASHED
   }
   
-  static func display(code: UInt) -> String {
+  func toString() -> String {
+    return TrashStatus.display(self.rawValue)
+  }
+  
+  static func display(_ code: UInt) -> String {
       guard let status = TrashStatus(rawValue: code) else {
           return "UNKNOWN"
       }
@@ -149,6 +167,12 @@ enum TrashStatus: UInt {
   }
 }
 
+/**
+ ENUM TreeType
+ 
+ The type of node, or DisplayTree. DisplayTree of type MIXED can contain nodes of different TreeType, but all other DisplayTree tree types must
+ be homogenous with respect to their nodes' tree types.
+ */
 enum TreeType: UID {
   case NA = 0
   case MIXED = 1
@@ -182,6 +206,11 @@ let GDRIVE_ROOT_UID = TreeType.GDRIVE.rawValue
 let MIN_FREE_UID: UID = 100
 
 
+/**
+ ENUM TreeDisplayMode
+ 
+ Indicates the current behavior of a displayed tree in the UI. ONE_TREE_ALL_ITEMS is the default. CHANGES_ONE_TREE_PER_CATEGORY is for diffs.
+ */
 enum TreeDisplayMode: UInt {
   case ONE_TREE_ALL_ITEMS = 1
   case CHANGES_ONE_TREE_PER_CATEGORY = 2
