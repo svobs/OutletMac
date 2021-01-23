@@ -122,20 +122,22 @@ enum IconId: UInt {
 
 // --- FE + BE SHARED ---
 
+let ROOT_PATH = "/"
+
 let LOOPBACK_ADDRESS = "127.0.0.1"
 
 let ZEROCONF_SERVICE_NAME = "OutletService"
 let ZEROCONF_SERVICE_VERSION = "1.0.0"
 let ZEROCONF_SERVICE_TYPE = "_outlet._tcp.local."
 
-typealias UID = UInt64
+typealias UID = UInt32
 
 /**
  ENUM TrashStatus
  
  Indicates whether a node is in the trash. Note: IMPLICITLY_TRASHED only applies to GDrive nodes.
  */
-enum TrashStatus: UInt {
+enum TrashStatus: UInt32 {
   case NOT_TRASHED = 0
   case EXPLICITLY_TRASHED = 1
   case IMPLICITLY_TRASHED = 2
@@ -149,7 +151,7 @@ enum TrashStatus: UInt {
     return TrashStatus.display(self.rawValue)
   }
   
-  static func display(_ code: UInt) -> String {
+  static func display(_ code: UInt32) -> String {
       guard let status = TrashStatus(rawValue: code) else {
           return "UNKNOWN"
       }

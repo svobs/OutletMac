@@ -36,7 +36,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeUid: Int32 = 0
+  public var nodeUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -48,7 +48,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeUid: Int32 = 0
+  public var nodeUid: UInt32 = 0
 
   public var requestorID: String = String()
 
@@ -187,7 +187,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var rootUid: Int32 = 0
+  public var rootUid: UInt32 = 0
 
   public var treeID: String = String()
 
@@ -201,7 +201,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeUidList: [Int32] = []
+  public var nodeUidList: [UInt32] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -227,7 +227,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UidContainer {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 = 0
+  public var uid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -278,7 +278,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var sigInt: Int32 = 0
+  public var sigInt: UInt32 = 0
 
   public var sender: String = String()
 
@@ -592,7 +592,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState {
 
   public var needsManualLoad: Bool = false
 
-  public var treeDisplayMode: Int32 = 0
+  public var treeDisplayMode: UInt32 = 0
 
   public var hasCheckboxes_p: Bool = false
 
@@ -625,7 +625,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request {
   /// Clears the value of `spid`. Subsequent reads from it will return its default value.
   public mutating func clearSpid() {self._spid = nil}
 
-  public var treeDisplayMode: Int32 = 0
+  public var treeDisplayMode: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -683,7 +683,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request {
 
   public var fullPath: String = String()
 
-  public var uidSuggestion: Int32 = 0
+  public var uidSuggestion: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -695,7 +695,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 = 0
+  public var uid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -707,10 +707,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 = 0
+  public var uid: UInt32 = 0
 
   /// optional
-  public var treeType: Int32 = 0
+  public var treeType: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -745,7 +745,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 = 0
+  public var uid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -787,7 +787,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request: SwiftPr
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.nodeUid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
       default: break
       }
     }
@@ -795,7 +795,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request: SwiftPr
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.nodeUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.nodeUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -820,7 +820,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request: Swift
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.nodeUid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.requestorID) }()
       default: break
       }
@@ -829,7 +829,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request: Swift
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.nodeUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.nodeUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
     }
     if !self.requestorID.isEmpty {
       try visitor.visitSingularStringField(value: self.requestorID, fieldNumber: 2)
@@ -1104,7 +1104,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request: Swif
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.rootUid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.rootUid) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
       default: break
       }
@@ -1113,7 +1113,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request: Swif
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.rootUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.rootUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.rootUid, fieldNumber: 1)
     }
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
@@ -1141,7 +1141,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request: SwiftProto
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedInt32Field(value: &self.nodeUidList) }()
+      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.nodeUidList) }()
       default: break
       }
     }
@@ -1149,7 +1149,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request: SwiftProto
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.nodeUidList.isEmpty {
-      try visitor.visitPackedInt32Field(value: self.nodeUidList, fieldNumber: 1)
+      try visitor.visitPackedUInt32Field(value: self.nodeUidList, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1211,7 +1211,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UidContainer: SwiftProtobuf.Messa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.uid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
       default: break
       }
     }
@@ -1219,7 +1219,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UidContainer: SwiftProtobuf.Messa
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1348,7 +1348,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.sigInt) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.sigInt) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.sender) }()
       case 10: try {
         var v: Outlet_Backend_Daemon_Grpc_Generated_Empty?
@@ -1438,7 +1438,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.sigInt != 0 {
-      try visitor.visitSingularInt32Field(value: self.sigInt, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.sigInt, fieldNumber: 1)
     }
     if !self.sender.isEmpty {
       try visitor.visitSingularStringField(value: self.sender, fieldNumber: 2)
@@ -1832,7 +1832,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf
       case 3: try { try decoder.decodeSingularBoolField(value: &self.rootExists) }()
       case 4: try { try decoder.decodeSingularStringField(value: &self.offendingPath) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.needsManualLoad) }()
-      case 6: try { try decoder.decodeSingularInt32Field(value: &self.treeDisplayMode) }()
+      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.treeDisplayMode) }()
       case 7: try { try decoder.decodeSingularBoolField(value: &self.hasCheckboxes_p) }()
       default: break
       }
@@ -1856,7 +1856,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf
       try visitor.visitSingularBoolField(value: self.needsManualLoad, fieldNumber: 5)
     }
     if self.treeDisplayMode != 0 {
-      try visitor.visitSingularInt32Field(value: self.treeDisplayMode, fieldNumber: 6)
+      try visitor.visitSingularUInt32Field(value: self.treeDisplayMode, fieldNumber: 6)
     }
     if self.hasCheckboxes_p != false {
       try visitor.visitSingularBoolField(value: self.hasCheckboxes_p, fieldNumber: 7)
@@ -1899,7 +1899,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request: Swift
       case 3: try { try decoder.decodeSingularBoolField(value: &self.returnAsync) }()
       case 4: try { try decoder.decodeSingularStringField(value: &self.userPath) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._spid) }()
-      case 6: try { try decoder.decodeSingularInt32Field(value: &self.treeDisplayMode) }()
+      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.treeDisplayMode) }()
       default: break
       }
     }
@@ -1922,7 +1922,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request: Swift
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     }
     if self.treeDisplayMode != 0 {
-      try visitor.visitSingularInt32Field(value: self.treeDisplayMode, fieldNumber: 6)
+      try visitor.visitSingularUInt32Field(value: self.treeDisplayMode, fieldNumber: 6)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2017,7 +2017,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request: Swift
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.fullPath) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.uidSuggestion) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.uidSuggestion) }()
       default: break
       }
     }
@@ -2028,7 +2028,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request: Swift
       try visitor.visitSingularStringField(value: self.fullPath, fieldNumber: 1)
     }
     if self.uidSuggestion != 0 {
-      try visitor.visitSingularInt32Field(value: self.uidSuggestion, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.uidSuggestion, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2053,7 +2053,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response: Swif
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.uid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
       default: break
       }
     }
@@ -2061,7 +2061,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response: Swif
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2086,8 +2086,8 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request: SwiftProto
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.treeType) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.treeType) }()
       default: break
       }
     }
@@ -2095,10 +2095,10 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request: SwiftProto
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
     if self.treeType != 0 {
-      try visitor.visitSingularInt32Field(value: self.treeType, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.treeType, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2174,7 +2174,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response: SwiftProtobu
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.uid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
       default: break
       }
     }
@@ -2182,7 +2182,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response: SwiftProtobu
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }

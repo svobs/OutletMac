@@ -14,6 +14,9 @@
 		D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */; };
 		D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839E725AD8D0600D76169 /* SignalConstants.swift */; };
 		D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */; };
+		D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCE25BA380E00B2A4F5 /* OutletError.swift */; };
+		D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */; };
+		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
 		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
 		D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
@@ -45,6 +48,9 @@
 		D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletGRPCClient.swift; sourceTree = "<group>"; };
 		D16839E725AD8D0600D76169 /* SignalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
 		D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveNode.swift; sourceTree = "<group>"; };
+		D1767FCE25BA380E00B2A4F5 /* OutletError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutletError.swift; sourceTree = "<group>"; };
+		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
+		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
 		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
 		D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -176,6 +182,9 @@
 				D1CB04A325B184C100556B28 /* Node.swift */,
 				D1F36C3E25B59153009498D8 /* LocalNode.swift */,
 				D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */,
+				D1767FCE25BA380E00B2A4F5 /* OutletError.swift */,
+				D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */,
+				D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -308,6 +317,8 @@
 				D1BAC56725A193C800D951A2 /* AppDelegate.swift in Sources */,
 				D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */,
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
+				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
+				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
@@ -318,6 +329,7 @@
 				D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
+				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,
 				D1BAC56425A193C800D951A2 /* SplitView.swift in Sources */,
 				D1BAC56325A193C800D951A2 /* OutlineNode.swift in Sources */,
 				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,

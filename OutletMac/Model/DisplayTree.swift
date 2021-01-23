@@ -1,0 +1,73 @@
+//
+//  DisplayTree.swift
+//  OutletMac
+//
+//  Created by Matthew Svoboda on 2021-01-21.
+//  Copyright © 2021 Ibotta. All rights reserved.
+//
+
+import Foundation
+
+
+/**
+ CLASS DisplayTree
+ */
+class DisplayTree {
+  let state: DisplayTreeUiState
+  
+  init(state: DisplayTreeUiState) {
+    self.state = state
+  }
+
+}
+
+/**
+ CLASS DisplayTreeRequest
+ Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
+ */
+class DisplayTreeRequest {
+  let treeId: String
+  let returnAsync: Bool
+  let userPath: String?
+  let spid: SPID
+  let isStartup: Bool
+  let treeDisplayMode: TreeDisplayMode
+  
+  init(treeId: String, returnAsync: Bool, userPath: String?, spid: SPID, isStartup: Bool = false, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
+    self.treeId = treeId
+    self.returnAsync = returnAsync
+    self.userPath = userPath
+    self.spid = spid
+    self.isStartup = isStartup
+    self.treeDisplayMode = treeDisplayMode
+  }
+}
+
+/**
+ CLASS DisplayTreeUiState
+ */
+class DisplayTreeUiState {
+  let treeId: String
+  let rootSN: SPIDNodePair
+  let rootExists: Bool
+  let offendingPath: String?
+  let treeDisplayMode: TreeDisplayMode
+  let hasCheckboxes: Bool
+  let needsManualLoad: Bool
+  
+  init(treeId: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
+    self.treeId = treeId
+    /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
+    Each display tree can only have one root path.*/
+    self.rootSN = rootSN
+    self.rootExists = rootExists
+    self.offendingPath = offendingPath
+    self.treeDisplayMode = treeDisplayMode
+    self.hasCheckboxes = hasCheckboxes
+    
+    /**If True, the UI should display a "Load" button in order to kick off the backend data load.
+    If False; the backend will automatically start loading in the background.*/
+    self.needsManualLoad = false
+  }
+
+}

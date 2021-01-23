@@ -36,11 +36,11 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var opUid: Int32 = 0
+  public var opUid: UInt32 = 0
 
-  public var batchUid: Int32 = 0
+  public var batchUid: UInt32 = 0
 
-  public var opType: Int32 = 0
+  public var opType: UInt32 = 0
 
   public var srcNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
     get {return _srcNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
@@ -61,7 +61,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
   public mutating func clearDstNode() {self._dstNode = nil}
 
   /// no support for result yet
-  public var syncTs: Int32 = 0
+  public var syncTs: UInt64 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -138,9 +138,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 = 0
+  public var uid: UInt32 = 0
 
-  public var treeType: Int32 = 0
+  public var treeType: UInt32 = 0
 
   public var pathList: [String] = []
 
@@ -156,12 +156,12 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: Int32 {
+  public var uid: UInt32 {
     get {return _storage._uid}
     set {_uniqueStorage()._uid = newValue}
   }
 
-  public var treeType: Int32 {
+  public var treeType: UInt32 {
     get {return _storage._treeType}
     set {_uniqueStorage()._treeType = newValue}
   }
@@ -171,7 +171,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
     set {_uniqueStorage()._pathList = newValue}
   }
 
-  public var trashed: Int32 {
+  public var trashed: UInt32 {
     get {return _storage._trashed}
     set {_uniqueStorage()._trashed = newValue}
   }
@@ -181,17 +181,17 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
     set {_uniqueStorage()._isShared = newValue}
   }
 
-  public var iconID: Int32 {
+  public var iconID: UInt32 {
     get {return _storage._iconID}
     set {_uniqueStorage()._iconID = newValue}
   }
 
-  public var decoratorNid: Int32 {
+  public var decoratorNid: UInt32 {
     get {return _storage._decoratorNid}
     set {_uniqueStorage()._decoratorNid = newValue}
   }
 
-  public var decoratorParentNid: Int32 {
+  public var decoratorParentNid: UInt32 {
     get {return _storage._decoratorParentNid}
     set {_uniqueStorage()._decoratorParentNid = newValue}
   }
@@ -320,9 +320,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
 
   public var searchQuery: String = String()
 
-  public var isTrashed: Int32 = 0
+  public var isTrashed: UInt32 = 0
 
-  public var isShared: Int32 = 0
+  public var isShared: UInt32 = 0
 
   public var isIgnoreCase: Bool = false
 
@@ -340,17 +340,17 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
 
   public var hasData_p: Bool = false
 
-  public var fileCount: Int32 = 0
+  public var fileCount: UInt32 = 0
 
-  public var dirCount: Int32 = 0
+  public var dirCount: UInt32 = 0
 
-  public var trashedFileCount: Int32 = 0
+  public var trashedFileCount: UInt32 = 0
 
-  public var trashedDirCount: Int32 = 0
+  public var trashedDirCount: UInt32 = 0
 
-  public var sizeBytes: Int64 = 0
+  public var sizeBytes: UInt64 = 0
 
-  public var trashedBytes: Int64 = 0
+  public var trashedBytes: UInt64 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -392,7 +392,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta {
   /// Clears the value of `dirMeta`. Subsequent reads from it will return its default value.
   public mutating func clearDirMeta() {self._dirMeta = nil}
 
-  public var opType: Int32 = 0
+  public var opType: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -438,7 +438,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta {
 
   public var isLive: Bool = false
 
-  public var parentUid: Int32 = 0
+  public var parentUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -466,7 +466,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta {
 
   public var sha256: String = String()
 
-  public var parentUid: Int32 = 0
+  public var parentUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -482,27 +482,27 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta {
 
   public var name: String = String()
 
-  public var ownerUid: Int32 = 0
+  public var ownerUid: UInt32 = 0
 
-  public var sharedByUserUid: Int32 = 0
+  public var sharedByUserUid: UInt32 = 0
 
   public var driveID: String = String()
 
-  public var parentUidList: [Int32] = []
+  public var parentUidList: [UInt32] = []
 
-  public var syncTs: Int64 = 0
+  public var syncTs: UInt64 = 0
 
-  public var modifyTs: Int64 = 0
+  public var modifyTs: UInt64 = 0
 
-  public var createTs: Int64 = 0
+  public var createTs: UInt64 = 0
 
   public var md5: String = String()
 
-  public var version: Int32 = 0
+  public var version: UInt32 = 0
 
-  public var sizeBytes: Int64 = 0
+  public var sizeBytes: UInt64 = 0
 
-  public var mimeTypeUid: Int32 = 0
+  public var mimeTypeUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -524,12 +524,12 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
     set {_uniqueStorage()._name = newValue}
   }
 
-  public var ownerUid: Int32 {
+  public var ownerUid: UInt32 {
     get {return _storage._ownerUid}
     set {_uniqueStorage()._ownerUid = newValue}
   }
 
-  public var sharedByUserUid: Int32 {
+  public var sharedByUserUid: UInt32 {
     get {return _storage._sharedByUserUid}
     set {_uniqueStorage()._sharedByUserUid = newValue}
   }
@@ -539,22 +539,22 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
     set {_uniqueStorage()._driveID = newValue}
   }
 
-  public var parentUidList: [Int32] {
+  public var parentUidList: [UInt32] {
     get {return _storage._parentUidList}
     set {_uniqueStorage()._parentUidList = newValue}
   }
 
-  public var syncTs: Int64 {
+  public var syncTs: UInt64 {
     get {return _storage._syncTs}
     set {_uniqueStorage()._syncTs = newValue}
   }
 
-  public var modifyTs: Int64 {
+  public var modifyTs: UInt64 {
     get {return _storage._modifyTs}
     set {_uniqueStorage()._modifyTs = newValue}
   }
 
-  public var createTs: Int64 {
+  public var createTs: UInt64 {
     get {return _storage._createTs}
     set {_uniqueStorage()._createTs = newValue}
   }
@@ -620,12 +620,12 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, Sw
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.opUid) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.batchUid) }()
-      case 3: try { try decoder.decodeSingularInt32Field(value: &self.opType) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.opUid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.batchUid) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
       case 4: try { try decoder.decodeSingularMessageField(value: &self._srcNode) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._dstNode) }()
-      case 6: try { try decoder.decodeSingularInt32Field(value: &self.syncTs) }()
+      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
       default: break
       }
     }
@@ -633,13 +633,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, Sw
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.opUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.opUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.opUid, fieldNumber: 1)
     }
     if self.batchUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.batchUid, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.batchUid, fieldNumber: 2)
     }
     if self.opType != 0 {
-      try visitor.visitSingularInt32Field(value: self.opType, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 3)
     }
     if let v = self._srcNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
@@ -648,7 +648,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, Sw
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     }
     if self.syncTs != 0 {
-      try visitor.visitSingularInt32Field(value: self.syncTs, fieldNumber: 6)
+      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 6)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -756,8 +756,8 @@ extension Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mes
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.treeType) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.treeType) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
       case 4: try { try decoder.decodeSingularBoolField(value: &self.isSinglePath) }()
       default: break
@@ -767,10 +767,10 @@ extension Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mes
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.uid != 0 {
-      try visitor.visitSingularInt32Field(value: self.uid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
     if self.treeType != 0 {
-      try visitor.visitSingularInt32Field(value: self.treeType, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.treeType, fieldNumber: 2)
     }
     if !self.pathList.isEmpty {
       try visitor.visitRepeatedStringField(value: self.pathList, fieldNumber: 3)
@@ -812,14 +812,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
   ]
 
   fileprivate class _StorageClass {
-    var _uid: Int32 = 0
-    var _treeType: Int32 = 0
+    var _uid: UInt32 = 0
+    var _treeType: UInt32 = 0
     var _pathList: [String] = []
-    var _trashed: Int32 = 0
+    var _trashed: UInt32 = 0
     var _isShared: Bool = false
-    var _iconID: Int32 = 0
-    var _decoratorNid: Int32 = 0
-    var _decoratorParentNid: Int32 = 0
+    var _iconID: UInt32 = 0
+    var _decoratorNid: UInt32 = 0
+    var _decoratorParentNid: UInt32 = 0
     var _nodeType: Outlet_Backend_Daemon_Grpc_Generated_Node.OneOf_NodeType?
 
     static let defaultInstance = _StorageClass()
@@ -854,14 +854,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
         // allocates stack space for every case branch when no optimizations are
         // enabled. https://github.com/apple/swift-protobuf/issues/1034
         switch fieldNumber {
-        case 1: try { try decoder.decodeSingularInt32Field(value: &_storage._uid) }()
-        case 2: try { try decoder.decodeSingularInt32Field(value: &_storage._treeType) }()
+        case 1: try { try decoder.decodeSingularUInt32Field(value: &_storage._uid) }()
+        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._treeType) }()
         case 3: try { try decoder.decodeRepeatedStringField(value: &_storage._pathList) }()
-        case 4: try { try decoder.decodeSingularInt32Field(value: &_storage._trashed) }()
+        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._trashed) }()
         case 5: try { try decoder.decodeSingularBoolField(value: &_storage._isShared) }()
-        case 6: try { try decoder.decodeSingularInt32Field(value: &_storage._iconID) }()
-        case 7: try { try decoder.decodeSingularInt32Field(value: &_storage._decoratorNid) }()
-        case 8: try { try decoder.decodeSingularInt32Field(value: &_storage._decoratorParentNid) }()
+        case 6: try { try decoder.decodeSingularUInt32Field(value: &_storage._iconID) }()
+        case 7: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorNid) }()
+        case 8: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorParentNid) }()
         case 10: try {
           var v: Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta?
           if let current = _storage._nodeType {
@@ -934,28 +934,28 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if _storage._uid != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._uid, fieldNumber: 1)
+        try visitor.visitSingularUInt32Field(value: _storage._uid, fieldNumber: 1)
       }
       if _storage._treeType != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._treeType, fieldNumber: 2)
+        try visitor.visitSingularUInt32Field(value: _storage._treeType, fieldNumber: 2)
       }
       if !_storage._pathList.isEmpty {
         try visitor.visitRepeatedStringField(value: _storage._pathList, fieldNumber: 3)
       }
       if _storage._trashed != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._trashed, fieldNumber: 4)
+        try visitor.visitSingularUInt32Field(value: _storage._trashed, fieldNumber: 4)
       }
       if _storage._isShared != false {
         try visitor.visitSingularBoolField(value: _storage._isShared, fieldNumber: 5)
       }
       if _storage._iconID != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._iconID, fieldNumber: 6)
+        try visitor.visitSingularUInt32Field(value: _storage._iconID, fieldNumber: 6)
       }
       if _storage._decoratorNid != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._decoratorNid, fieldNumber: 7)
+        try visitor.visitSingularUInt32Field(value: _storage._decoratorNid, fieldNumber: 7)
       }
       if _storage._decoratorParentNid != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._decoratorParentNid, fieldNumber: 8)
+        try visitor.visitSingularUInt32Field(value: _storage._decoratorParentNid, fieldNumber: 8)
       }
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1035,8 +1035,8 @@ extension Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria: SwiftProtobuf.Mes
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.searchQuery) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.isTrashed) }()
-      case 3: try { try decoder.decodeSingularInt32Field(value: &self.isShared) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.isTrashed) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.isShared) }()
       case 4: try { try decoder.decodeSingularBoolField(value: &self.isIgnoreCase) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.showSubtreesOfMatches) }()
       default: break
@@ -1049,10 +1049,10 @@ extension Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria: SwiftProtobuf.Mes
       try visitor.visitSingularStringField(value: self.searchQuery, fieldNumber: 1)
     }
     if self.isTrashed != 0 {
-      try visitor.visitSingularInt32Field(value: self.isTrashed, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.isTrashed, fieldNumber: 2)
     }
     if self.isShared != 0 {
-      try visitor.visitSingularInt32Field(value: self.isShared, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.isShared, fieldNumber: 3)
     }
     if self.isIgnoreCase != false {
       try visitor.visitSingularBoolField(value: self.isIgnoreCase, fieldNumber: 4)
@@ -1093,12 +1093,12 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMeta: SwiftProtobuf.Message, S
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularBoolField(value: &self.hasData_p) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.fileCount) }()
-      case 3: try { try decoder.decodeSingularInt32Field(value: &self.dirCount) }()
-      case 4: try { try decoder.decodeSingularInt32Field(value: &self.trashedFileCount) }()
-      case 5: try { try decoder.decodeSingularInt32Field(value: &self.trashedDirCount) }()
-      case 6: try { try decoder.decodeSingularInt64Field(value: &self.sizeBytes) }()
-      case 7: try { try decoder.decodeSingularInt64Field(value: &self.trashedBytes) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.fileCount) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.dirCount) }()
+      case 4: try { try decoder.decodeSingularUInt32Field(value: &self.trashedFileCount) }()
+      case 5: try { try decoder.decodeSingularUInt32Field(value: &self.trashedDirCount) }()
+      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
+      case 7: try { try decoder.decodeSingularUInt64Field(value: &self.trashedBytes) }()
       default: break
       }
     }
@@ -1109,22 +1109,22 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMeta: SwiftProtobuf.Message, S
       try visitor.visitSingularBoolField(value: self.hasData_p, fieldNumber: 1)
     }
     if self.fileCount != 0 {
-      try visitor.visitSingularInt32Field(value: self.fileCount, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.fileCount, fieldNumber: 2)
     }
     if self.dirCount != 0 {
-      try visitor.visitSingularInt32Field(value: self.dirCount, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.dirCount, fieldNumber: 3)
     }
     if self.trashedFileCount != 0 {
-      try visitor.visitSingularInt32Field(value: self.trashedFileCount, fieldNumber: 4)
+      try visitor.visitSingularUInt32Field(value: self.trashedFileCount, fieldNumber: 4)
     }
     if self.trashedDirCount != 0 {
-      try visitor.visitSingularInt32Field(value: self.trashedDirCount, fieldNumber: 5)
+      try visitor.visitSingularUInt32Field(value: self.trashedDirCount, fieldNumber: 5)
     }
     if self.sizeBytes != 0 {
-      try visitor.visitSingularInt64Field(value: self.sizeBytes, fieldNumber: 6)
+      try visitor.visitSingularUInt64Field(value: self.sizeBytes, fieldNumber: 6)
     }
     if self.trashedBytes != 0 {
-      try visitor.visitSingularInt64Field(value: self.trashedBytes, fieldNumber: 7)
+      try visitor.visitSingularUInt64Field(value: self.trashedBytes, fieldNumber: 7)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1188,7 +1188,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.M
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
-      case 2: try { try decoder.decodeSingularInt32Field(value: &self.opType) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
       default: break
       }
     }
@@ -1199,7 +1199,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.M
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     }
     if self.opType != 0 {
-      try visitor.visitSingularInt32Field(value: self.opType, fieldNumber: 2)
+      try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1260,7 +1260,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messa
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
-      case 3: try { try decoder.decodeSingularInt32Field(value: &self.parentUid) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
       default: break
       }
     }
@@ -1274,7 +1274,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messa
       try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 2)
     }
     if self.parentUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.parentUid, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1314,7 +1314,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
       case 6: try { try decoder.decodeSingularStringField(value: &self.md5) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
-      case 8: try { try decoder.decodeSingularInt32Field(value: &self.parentUid) }()
+      case 8: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
       default: break
       }
     }
@@ -1343,7 +1343,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
       try visitor.visitSingularStringField(value: self.sha256, fieldNumber: 7)
     }
     if self.parentUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.parentUid, fieldNumber: 8)
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 8)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1388,17 +1388,17 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Mes
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.googID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.name) }()
-      case 3: try { try decoder.decodeSingularInt32Field(value: &self.ownerUid) }()
-      case 4: try { try decoder.decodeSingularInt32Field(value: &self.sharedByUserUid) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.ownerUid) }()
+      case 4: try { try decoder.decodeSingularUInt32Field(value: &self.sharedByUserUid) }()
       case 5: try { try decoder.decodeSingularStringField(value: &self.driveID) }()
-      case 6: try { try decoder.decodeRepeatedInt32Field(value: &self.parentUidList) }()
-      case 7: try { try decoder.decodeSingularInt64Field(value: &self.syncTs) }()
-      case 8: try { try decoder.decodeSingularInt64Field(value: &self.modifyTs) }()
-      case 9: try { try decoder.decodeSingularInt64Field(value: &self.createTs) }()
+      case 6: try { try decoder.decodeRepeatedUInt32Field(value: &self.parentUidList) }()
+      case 7: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
+      case 8: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
+      case 9: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
       case 10: try { try decoder.decodeSingularStringField(value: &self.md5) }()
-      case 11: try { try decoder.decodeSingularInt32Field(value: &self.version) }()
-      case 12: try { try decoder.decodeSingularInt64Field(value: &self.sizeBytes) }()
-      case 13: try { try decoder.decodeSingularInt32Field(value: &self.mimeTypeUid) }()
+      case 11: try { try decoder.decodeSingularUInt32Field(value: &self.version) }()
+      case 12: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
+      case 13: try { try decoder.decodeSingularUInt32Field(value: &self.mimeTypeUid) }()
       default: break
       }
     }
@@ -1412,37 +1412,37 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Mes
       try visitor.visitSingularStringField(value: self.name, fieldNumber: 2)
     }
     if self.ownerUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.ownerUid, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.ownerUid, fieldNumber: 3)
     }
     if self.sharedByUserUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.sharedByUserUid, fieldNumber: 4)
+      try visitor.visitSingularUInt32Field(value: self.sharedByUserUid, fieldNumber: 4)
     }
     if !self.driveID.isEmpty {
       try visitor.visitSingularStringField(value: self.driveID, fieldNumber: 5)
     }
     if !self.parentUidList.isEmpty {
-      try visitor.visitPackedInt32Field(value: self.parentUidList, fieldNumber: 6)
+      try visitor.visitPackedUInt32Field(value: self.parentUidList, fieldNumber: 6)
     }
     if self.syncTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.syncTs, fieldNumber: 7)
+      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 7)
     }
     if self.modifyTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.modifyTs, fieldNumber: 8)
+      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 8)
     }
     if self.createTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.createTs, fieldNumber: 9)
+      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 9)
     }
     if !self.md5.isEmpty {
       try visitor.visitSingularStringField(value: self.md5, fieldNumber: 10)
     }
     if self.version != 0 {
-      try visitor.visitSingularInt32Field(value: self.version, fieldNumber: 11)
+      try visitor.visitSingularUInt32Field(value: self.version, fieldNumber: 11)
     }
     if self.sizeBytes != 0 {
-      try visitor.visitSingularInt64Field(value: self.sizeBytes, fieldNumber: 12)
+      try visitor.visitSingularUInt64Field(value: self.sizeBytes, fieldNumber: 12)
     }
     if self.mimeTypeUid != 0 {
-      try visitor.visitSingularInt32Field(value: self.mimeTypeUid, fieldNumber: 13)
+      try visitor.visitSingularUInt32Field(value: self.mimeTypeUid, fieldNumber: 13)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1485,13 +1485,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.M
   fileprivate class _StorageClass {
     var _googID: String = String()
     var _name: String = String()
-    var _ownerUid: Int32 = 0
-    var _sharedByUserUid: Int32 = 0
+    var _ownerUid: UInt32 = 0
+    var _sharedByUserUid: UInt32 = 0
     var _driveID: String = String()
-    var _parentUidList: [Int32] = []
-    var _syncTs: Int64 = 0
-    var _modifyTs: Int64 = 0
-    var _createTs: Int64 = 0
+    var _parentUidList: [UInt32] = []
+    var _syncTs: UInt64 = 0
+    var _modifyTs: UInt64 = 0
+    var _createTs: UInt64 = 0
     var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
     var _allChildrenFetched: Bool = false
 
@@ -1531,13 +1531,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.M
         switch fieldNumber {
         case 1: try { try decoder.decodeSingularStringField(value: &_storage._googID) }()
         case 2: try { try decoder.decodeSingularStringField(value: &_storage._name) }()
-        case 3: try { try decoder.decodeSingularInt32Field(value: &_storage._ownerUid) }()
-        case 4: try { try decoder.decodeSingularInt32Field(value: &_storage._sharedByUserUid) }()
+        case 3: try { try decoder.decodeSingularUInt32Field(value: &_storage._ownerUid) }()
+        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._sharedByUserUid) }()
         case 5: try { try decoder.decodeSingularStringField(value: &_storage._driveID) }()
-        case 6: try { try decoder.decodeRepeatedInt32Field(value: &_storage._parentUidList) }()
-        case 7: try { try decoder.decodeSingularInt64Field(value: &_storage._syncTs) }()
-        case 8: try { try decoder.decodeSingularInt64Field(value: &_storage._modifyTs) }()
-        case 9: try { try decoder.decodeSingularInt64Field(value: &_storage._createTs) }()
+        case 6: try { try decoder.decodeRepeatedUInt32Field(value: &_storage._parentUidList) }()
+        case 7: try { try decoder.decodeSingularUInt64Field(value: &_storage._syncTs) }()
+        case 8: try { try decoder.decodeSingularUInt64Field(value: &_storage._modifyTs) }()
+        case 9: try { try decoder.decodeSingularUInt64Field(value: &_storage._createTs) }()
         case 10: try { try decoder.decodeSingularMessageField(value: &_storage._dirMeta) }()
         case 11: try { try decoder.decodeSingularBoolField(value: &_storage._allChildrenFetched) }()
         default: break
@@ -1555,25 +1555,25 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.M
         try visitor.visitSingularStringField(value: _storage._name, fieldNumber: 2)
       }
       if _storage._ownerUid != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._ownerUid, fieldNumber: 3)
+        try visitor.visitSingularUInt32Field(value: _storage._ownerUid, fieldNumber: 3)
       }
       if _storage._sharedByUserUid != 0 {
-        try visitor.visitSingularInt32Field(value: _storage._sharedByUserUid, fieldNumber: 4)
+        try visitor.visitSingularUInt32Field(value: _storage._sharedByUserUid, fieldNumber: 4)
       }
       if !_storage._driveID.isEmpty {
         try visitor.visitSingularStringField(value: _storage._driveID, fieldNumber: 5)
       }
       if !_storage._parentUidList.isEmpty {
-        try visitor.visitPackedInt32Field(value: _storage._parentUidList, fieldNumber: 6)
+        try visitor.visitPackedUInt32Field(value: _storage._parentUidList, fieldNumber: 6)
       }
       if _storage._syncTs != 0 {
-        try visitor.visitSingularInt64Field(value: _storage._syncTs, fieldNumber: 7)
+        try visitor.visitSingularUInt64Field(value: _storage._syncTs, fieldNumber: 7)
       }
       if _storage._modifyTs != 0 {
-        try visitor.visitSingularInt64Field(value: _storage._modifyTs, fieldNumber: 8)
+        try visitor.visitSingularUInt64Field(value: _storage._modifyTs, fieldNumber: 8)
       }
       if _storage._createTs != 0 {
-        try visitor.visitSingularInt64Field(value: _storage._createTs, fieldNumber: 9)
+        try visitor.visitSingularUInt64Field(value: _storage._createTs, fieldNumber: 9)
       }
       if let v = _storage._dirMeta {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 10)

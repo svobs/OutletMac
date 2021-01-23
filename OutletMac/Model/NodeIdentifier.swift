@@ -89,14 +89,8 @@ typealias SPID = SinglePathNodeIdentifier
  CLASS GDriveIdentifier
  */
 class GDriveIdentifier: NodeIdentifier {
-  let treeType: TreeType
-  init(_ uid: UID, _ pathList: [String], _ treeType: TreeType) {
-    self.treeType = treeType
-    super.init(uid, pathList)
-  }
-  
   override func getTreeType() -> TreeType {
-    return self.treeType
+    return .GDRIVE
   }
 }
 
@@ -104,7 +98,7 @@ class GDriveIdentifier: NodeIdentifier {
  CLASS LocalNodeIdentifier
  */
 class LocalNodeIdentifier: SinglePathNodeIdentifier {
-  override init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
+  init(_ uid: UID, _ singlePath: String) {
     super.init(uid, singlePath, .LOCAL_DISK)
   }
   

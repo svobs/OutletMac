@@ -10,9 +10,9 @@ import Foundation
 
 class GRPCConverter {
   
-  static func snFromGRPC(_ snGRPC: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair) -> SPIDNodePair {
+  static func snFromGRPC(_ snGRPC: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair) throws -> SPIDNodePair {
     let node: Node = GRPCConverter.nodeFromGRPC(nodeGRPC: snGRPC.node)
-    let spid: SinglePathNodeIdentifier = GRPCConverter.spidFromGRPC(spidGRPC: snGRPC.spid)
+    let spid: SinglePathNodeIdentifier = try GRPCConverter.spidFromGRPC(spidGRPC: snGRPC.spid)
     return SPIDNodePair(spid: spid, node: node)
   }
   
@@ -24,20 +24,22 @@ class GRPCConverter {
     // TODO
   }
   
-  static func spidFromGRPC(spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) -> SPID {
-    // TODO
+  static func spidFromGRPC(spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> SinglePathNodeIdentifier {
+    let nodeIdentifier = try GRPCConverter.nodeIdentifierFromGRPC(spidGRPC)
+    return nodeIdentifier as! SinglePathNodeIdentifier
   }
   
-  static func nodeIdentifierFromGRPC(spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) -> NodeIdentifier {
-    // TODO
+  static func nodeIdentifierFromGRPC(_ spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
+    let treeType: TreeType = TreeType(rawValue: spidGRPC.treeType)!
+    return try NodeIdentifierFactory.forAllValues(spidGRPC.uid, treeType, spidGRPC.pathList, mustBeSinglePath: spidGRPC.isSinglePath)
   }
   
   static func nodeIdentifierToGRPC(nodeIdentifier: NodeIdentifier, nodeIdentifierGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) -> Void {
     // TODO
   }
   
-  static func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) -> DisplayTreeUiState {
-    let rootSn: SPIDNodePair = GRPCConverter.snFromGRPC(stateGRPC.rootSn)
+  static func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
+    let rootSn: SPIDNodePair = try GRPCConverter.snFromGRPC(stateGRPC.rootSn)
     return DisplayTreeUiState(treeId: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists)
   }
 }

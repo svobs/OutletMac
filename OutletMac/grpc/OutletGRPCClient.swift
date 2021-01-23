@@ -10,10 +10,6 @@ import GRPC
 import Logging
 import NIO
 
-enum OutletError: Error {
-  case invalidOperation
-}
-
 class OutletGRPCClient {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient) {
@@ -33,7 +29,7 @@ class OutletGRPCClient {
     return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
   }
   
-  func requestDisplayTree(_ request: DisplayTreeRequest) -> DisplayTree? {
+  func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
     var grpcRequest = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeId
@@ -43,11 +39,16 @@ class OutletGRPCClient {
 
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
 
-//    let response = try call.response.wait()
-//    if (response.hasDisplayTreeUiState) {
-//      let state: DisplayTreeUiState = GRPCConverter.toDisplayTreeUiStateFromGRPC(response.displayTreeUiState)
+    do {
+      let response = try call.response.wait()
+      if (response.hasDisplayTreeUiState) {
+        let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
 
-      return nil  // TODO
+        return nil  // TODO
+      }
+    } catch {
+      NSLog("RPC failed: \(error)")
+      throw OutletError.grpcFailure
     }
   }
 
@@ -75,61 +76,5 @@ class OutletGRPCClient {
        return tree
 
    */
-
-
-
-class DisplayTree {
-  let state: DisplayTreeUiState
-  
-  init(state: DisplayTreeUiState) {
-    self.state = state
-  }
-
-}
-
-/**
- Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
- */
-class DisplayTreeRequest {
-  let treeId: String
-  let returnAsync: Bool
-  let userPath: String?
-  let spid: SPID
-  let isStartup: Bool
-  let treeDisplayMode: TreeDisplayMode
-  
-  init(treeId: String, returnAsync: Bool, userPath: String?, spid: SPID, isStartup: Bool = false, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
-    self.treeId = treeId
-    self.returnAsync = returnAsync
-    self.userPath = userPath
-    self.spid = spid
-    self.isStartup = isStartup
-    self.treeDisplayMode = treeDisplayMode
-  }
-}
-
-class DisplayTreeUiState {
-  let treeId: String
-  let rootSN: SPIDNodePair
-  let rootExists: Bool
-  let offendingPath: String?
-  let treeDisplayMode: TreeDisplayMode
-  let hasCheckboxes: Bool
-  let needsManualLoad: Bool
-  
-  init(treeId: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
-    self.treeId = treeId
-    /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
-    Each display tree can only have one root path.*/
-    self.rootSN = rootSN
-    self.rootExists = rootExists
-    self.offendingPath = offendingPath
-    self.treeDisplayMode = treeDisplayMode
-    self.hasCheckboxes = hasCheckboxes
-    
-    /**If True, the UI should display a "Load" button in order to kick off the backend data load.
-    If False; the backend will automatically start loading in the background.*/
-    self.needsManualLoad = false
-  }
 
 }
