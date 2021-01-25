@@ -182,6 +182,10 @@ class GDriveFolder: GDriveNode {
     }
   }
   
+  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+    self._dirStats = dirStats
+  }
+  
   // TODO: override equals
   
 }
@@ -264,5 +268,4 @@ class GDriveFile: GDriveNode {
       return .ICON_FILE_TRASHED
     }
   }
-  
 }

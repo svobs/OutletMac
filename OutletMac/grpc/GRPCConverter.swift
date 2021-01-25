@@ -44,26 +44,31 @@ class GRPCConverter {
                              modifyTS: meta.modifyTs, name: meta.name, ownerUID: meta.ownerUid, driveID: meta.driveID, isShared:
                               nodeGRPC.isShared, sharedByUserUID: meta.sharedByUserUid, syncTS: meta.syncTs,
                              allChildrenFetched: meta.allChildrenFetched)
-         try GRPCConverter.dirMetaFromGRPC(node, meta.dirMeta)
+         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+         try node.setDirStats(dirStats)
        case .localDirMeta(let meta):
          let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
          let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
          node = LocalDirNode(localNodeIdentifier, meta.parentUid, trashed, isLive: meta.isLive)
-         try GRPCConverter.dirMetaFromGRPC(node, meta.dirMeta)
+         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+         try node.setDirStats(dirStats)
        case .localFileMeta(let meta):
-        let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
-        let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-        node = LocaFileNode(localNodeIdentifier, meta.parentUid, trashed: trashed, isLive: meta.isLive, md5: meta.md5, sha256: meta.sha256, sizeBytes: meta.sizeBytes, syncTS: meta.syncTs, modifyTS: meta.modifyTs, changeTS: meta.changeTs)
+         let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
+         let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
+         node = LocaFileNode(localNodeIdentifier, meta.parentUid, trashed: trashed, isLive: meta.isLive, md5: meta.md5, sha256: meta.sha256, sizeBytes: meta.sizeBytes, syncTS: meta.syncTs, modifyTS: meta.modifyTs, changeTS: meta.changeTs)
        case .containerMeta(let meta):
          node = ContainerNode(nodeIdentifier)
-        try GRPCConverter.dirMetaFromGRPC(node, meta.dirMeta)
+         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+         try node.setDirStats(dirStats)
        case .categoryMeta(let meta):
          let opType = UserOpType(rawValue: meta.opType)!
          node = CategoryNode(nodeIdentifier, opType)
-         try GRPCConverter.dirMetaFromGRPC(node, meta.dirMeta)
+         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+         try node.setDirStats(dirStats)
        case .rootTypeMeta(let meta):
          node = RootTypeNode(nodeIdentifier)
-         try GRPCConverter.dirMetaFromGRPC(node, meta.dirMeta)
+         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+         try node.setDirStats(dirStats)
        }
     }
     
@@ -75,8 +80,19 @@ class GRPCConverter {
     }
   }
   
-  static func dirMetaFromGRPC(_ node: Node, _ dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta) throws -> Void {
-    // TODO
+  static func dirMetaFromGRPC(_ dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta) throws -> DirectoryStats? {
+    if dirMeta.hasData_p {
+      let dirStats = DirectoryStats()
+      dirStats.fileCount = dirMeta.fileCount
+      dirStats.dirCount = dirMeta.dirCount
+      dirStats.trashedFileCount = dirMeta.trashedFileCount
+      dirStats.trashedDirCount = dirMeta.trashedDirCount
+      dirStats.sizeBytes = dirMeta.sizeBytes
+      dirStats.trashedBytes = dirMeta.trashedBytes
+      return dirStats
+    } else {
+      return nil
+    }
   }
   
   static func spidToGRPC(spid: SPID, spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> Void {

@@ -151,6 +151,10 @@ class Node: CustomStringConvertible {
     }
   }
   
+  func setDirStats(_ dirStats: DirectoryStats?) throws {
+    throw OutletError.invalidOperation
+  }
+  
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
     self.nodeIdentifier = nodeIdentifer
     self.parentList = parentList
@@ -177,10 +181,10 @@ typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
  Encapsulates stats for a directory node
  */
 class DirectoryStats {
-  var fileCount: UInt64 = 0
-  var trashedFileCount: UInt64 = 0
-  var dirCount: UInt64 = 0
-  var trashedDirCount: UInt64 = 0
+  var fileCount: UInt32 = 0
+  var trashedFileCount: UInt32 = 0
+  var dirCount: UInt32 = 0
+  var trashedDirCount: UInt32 = 0
   var trashedBytes: UInt64 = 0
   var sizeBytes: UInt64 = 0
   

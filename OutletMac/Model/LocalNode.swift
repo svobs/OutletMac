@@ -37,6 +37,76 @@ class LocalNode: Node {
 }
 
 /**
+ CLASS LocalDirNode
+ */
+class LocalDirNode: LocalNode {
+  var _dirStats: DirectoryStats? = nil
+  
+  // TODO: HasDirectoryStats
+  override var isDir: Bool {
+    get {
+      true
+    }
+  }
+  
+  override var defaultIcon: IconId {
+    get {
+      return .ICON_GENERIC_DIR
+    }
+  }
+  
+  override public var description: String {
+    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
+  }
+  
+  override var etc: String {
+    get {
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.etc
+      }
+    }
+  }
+  
+  override var summary: String {
+    get {
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.summary
+      }
+    }
+  }
+  
+  override var sizeBytes: UInt64? {
+    get {
+      self._dirStats!.sizeBytes
+    }
+    set (sizeBytes) {
+      if self._dirStats == nil {
+        self._dirStats = DirectoryStats()
+      }
+      self._dirStats!.sizeBytes = sizeBytes!
+    }
+  }
+  
+  func zeroOutStats() {
+    if (self._dirStats != nil) {
+      self._dirStats!.clear()
+    }
+  }
+  
+  func isStatsLoaded() -> Bool {
+    return self._dirStats != nil
+  }
+  
+  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+    self._dirStats = dirStats
+  }
+}
+
+/**
  CLASS LocaFileNode
  */
 class LocaFileNode: LocalNode {
@@ -119,72 +189,6 @@ class LocaFileNode: LocalNode {
     self._modifyTS = modifyTS
     self._changeTS = changeTS
     super.init(nodeIdentifer, parentUID, trashed, isLive: isLive)
-  }
-}
-
-/**
- CLASS LocalDirNode
- */
-class LocalDirNode: LocalNode {
-  var _dirStats: DirectoryStats? = nil
-  
-  // TODO: HasDirectoryStats
-  override var isDir: Bool {
-    get {
-      true
-    }
-  }
-  
-  override var defaultIcon: IconId {
-    get {
-      return .ICON_GENERIC_DIR
-    }
-  }
-  
-  override public var description: String {
-    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
-  }
-  
-  override var etc: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.etc
-      }
-    }
-  }
-  
-  override var summary: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.summary
-      }
-    }
-  }
-  
-  override var sizeBytes: UInt64? {
-    get {
-      self._dirStats!.sizeBytes
-    }
-    set (sizeBytes) {
-      if self._dirStats == nil {
-        self._dirStats = DirectoryStats()
-      }
-      self._dirStats!.sizeBytes = sizeBytes!
-    }
-  }
-  
-  func zeroOutStats() {
-    if (self._dirStats != nil) {
-      self._dirStats!.clear()
-    }
-  }
-  
-  func isStatsLoaded() -> Bool {
-    return self._dirStats != nil
   }
 }
 

@@ -6,6 +6,9 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 
+/**
+ CLASS ContainerNode
+ */
 class ContainerNode: Node {
   var _dirStats: DirectoryStats? = nil
   init(_ nodeIdentifer: NodeIdentifier) {
@@ -23,8 +26,15 @@ class ContainerNode: Node {
       true
     }
   }
+  
+  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+    self._dirStats = dirStats
+  }
 }
 
+/**
+ CLASS CategoryNode
+ */
 class CategoryNode: ContainerNode {
   var opType: UserOpType
   
@@ -46,6 +56,9 @@ class CategoryNode: ContainerNode {
   }
 }
 
+/**
+ CLASS RootTypeNode
+ */
 class RootTypeNode: ContainerNode {
   
   override var name: String {
