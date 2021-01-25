@@ -35,7 +35,7 @@ class OutletGRPCClient {
     grpcRequest.treeID = request.treeId
     grpcRequest.userPath = request.userPath ?? ""
     
-    GRPCConverter.spidToGRPC(spid: request.spid, spidGRPC: grpcRequest.spid)
+    try GRPCConverter.spidToGRPC(spid: request.spid, spidGRPC: grpcRequest.spid)
 
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
 
@@ -50,6 +50,8 @@ class OutletGRPCClient {
       NSLog("RPC failed: \(error)")
       throw OutletError.grpcFailure
     }
+    
+    return nil  // TODO
   }
 
   /*

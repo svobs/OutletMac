@@ -37,9 +37,9 @@ class LocalNode: Node {
 }
 
 /**
- CLASS LocaFilelNode
+ CLASS LocaFileNode
  */
-class LocaFilelNode: LocalNode {
+class LocaFileNode: LocalNode {
   var _md5: MD5?
   override var md5: MD5? {
     get {

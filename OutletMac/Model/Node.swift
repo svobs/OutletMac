@@ -134,6 +134,9 @@ class Node: CustomStringConvertible {
     get {
       return self._icon ?? self.defaultIcon
     }
+    set (icon) {
+      self._icon = icon
+    }
   }
   
   var treeType: TreeType {

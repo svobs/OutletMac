@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
+		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
+		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D168399F25AD532800D76169 /* Outlet.pb.swift */; };
 		D16839A925AD532800D76169 /* Node.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A325AD532800D76169 /* Node.pb.swift */; };
 		D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A125AD532800D76169 /* Outlet.grpc.swift */; };
@@ -42,6 +44,8 @@
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
+		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
+		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D168399F25AD532800D76169 /* Outlet.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.pb.swift; sourceTree = "<group>"; };
 		D16839A125AD532800D76169 /* Outlet.grpc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.grpc.swift; sourceTree = "<group>"; };
 		D16839A325AD532800D76169 /* Node.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.pb.swift; sourceTree = "<group>"; };
@@ -185,6 +189,8 @@
 				D1767FCE25BA380E00B2A4F5 /* OutletError.swift */,
 				D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */,
 				D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */,
+				D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */,
+				D138ADF425BE342000E4F9E4 /* UserOp.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -319,6 +325,7 @@
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
+				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
@@ -332,6 +339,7 @@
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,
 				D1BAC56425A193C800D951A2 /* SplitView.swift in Sources */,
 				D1BAC56325A193C800D951A2 /* OutlineNode.swift in Sources */,
+				D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */,
 				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,
 				D1BAC56525A193C800D951A2 /* OutlineView.swift in Sources */,
 				D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */,

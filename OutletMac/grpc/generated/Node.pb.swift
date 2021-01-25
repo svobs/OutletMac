@@ -452,13 +452,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var sizeBytes: Int64 = 0
+  public var sizeBytes: UInt64 = 0
 
-  public var syncTs: Int64 = 0
+  public var syncTs: UInt64 = 0
 
-  public var modifyTs: Int64 = 0
+  public var modifyTs: UInt64 = 0
 
-  public var changeTs: Int64 = 0
+  public var changeTs: UInt64 = 0
 
   public var isLive: Bool = false
 
@@ -1307,10 +1307,10 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularInt64Field(value: &self.sizeBytes) }()
-      case 2: try { try decoder.decodeSingularInt64Field(value: &self.syncTs) }()
-      case 3: try { try decoder.decodeSingularInt64Field(value: &self.modifyTs) }()
-      case 4: try { try decoder.decodeSingularInt64Field(value: &self.changeTs) }()
+      case 1: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
+      case 3: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
+      case 4: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
       case 6: try { try decoder.decodeSingularStringField(value: &self.md5) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
@@ -1322,16 +1322,16 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if self.sizeBytes != 0 {
-      try visitor.visitSingularInt64Field(value: self.sizeBytes, fieldNumber: 1)
+      try visitor.visitSingularUInt64Field(value: self.sizeBytes, fieldNumber: 1)
     }
     if self.syncTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.syncTs, fieldNumber: 2)
+      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 2)
     }
     if self.modifyTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.modifyTs, fieldNumber: 3)
+      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 3)
     }
     if self.changeTs != 0 {
-      try visitor.visitSingularInt64Field(value: self.changeTs, fieldNumber: 4)
+      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 4)
     }
     if self.isLive != false {
       try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 5)

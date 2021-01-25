@@ -190,7 +190,7 @@ class GDriveFolder: GDriveNode {
  CLASS GDriveFile
  */
 class GDriveFile: GDriveNode {
-  var version: UInt64?
+  var version: UInt32?
   var _md5: MD5?
   override var md5: MD5? {
     get {
@@ -222,7 +222,7 @@ class GDriveFile: GDriveNode {
   }
   
   init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?,
-       name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, version: UInt64?, md5: MD5?,
+       name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, version: UInt32?, md5: MD5?,
        mimeTypeUID: UID, sizeBytes: UInt64?) {
     self.version = version
     self._md5 = md5

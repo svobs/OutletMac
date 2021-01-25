@@ -1,7 +1,7 @@
 #!/bin/bash
 PY_PKG='outlet/backend/daemon/grpc/generated'
 PROTO_PATH="./$PY_PKG"
-OUT_DIR='../OutletMac/grpc'
+OUT_DIR='../OutletMac/grpc/generated'
 
 SCRIPT_DIR=$(cd "$(dirname "$0")"; pwd)
 REL_PATH=../Pods/gRPC-Swift-Plugins/bin

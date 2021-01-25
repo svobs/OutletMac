@@ -76,7 +76,7 @@ enum IconNames: String {
  
  Used for identifying icons in a more compact way, mainly for serialization for RPC
  */
-enum IconId: UInt {
+enum IconId: UInt32 {
   case NONE = 0
 
   case ICON_GENERIC_FILE = 1
@@ -180,6 +180,19 @@ enum TreeType: UID {
   case MIXED = 1
   case LOCAL_DISK = 2
   case GDRIVE = 3
+  
+  func getName() -> String {
+    switch self {
+    case .NA:
+      return "None"
+    case .MIXED:
+      return "Mixed"
+    case .LOCAL_DISK:
+      return "Local Disk"
+    case .GDRIVE:
+      return "Google Drive"
+    }
+  }
   
   static func display(code: UID) -> String {
       guard let treeType = TreeType(rawValue: code) else {
