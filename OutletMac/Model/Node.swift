@@ -36,6 +36,12 @@ class Node: CustomStringConvertible {
     }
   }
   
+  var isDecorator: Bool {
+    get {
+      false
+    }
+  }
+  
   var isLive: Bool {
     get {
       false
@@ -43,12 +49,6 @@ class Node: CustomStringConvertible {
   }
   
   var isEphemeral: Bool {
-    get {
-      false
-    }
-  }
-  
-  var hasTuple: Bool {
     get {
       false
     }
@@ -160,10 +160,6 @@ class Node: CustomStringConvertible {
     self.parentList = parentList
     self.trashed = trashed
     self._icon = nil
-  }
-  
-  func toTuple() throws {
-    throw OutletError.invalidOperation
   }
   
   func updateFrom(_ otherNode: Node) {

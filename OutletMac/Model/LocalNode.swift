@@ -42,7 +42,6 @@ class LocalNode: Node {
 class LocalDirNode: LocalNode {
   var _dirStats: DirectoryStats? = nil
   
-  // TODO: HasDirectoryStats
   override var isDir: Bool {
     get {
       true

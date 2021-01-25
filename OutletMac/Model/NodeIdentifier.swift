@@ -22,6 +22,11 @@ class NodeIdentifier: CustomStringConvertible {
     self.pathList = pathList
   }
   
+  func copy(with uid: UID? = nil) -> NodeIdentifier {
+    let uidToCopy: UID = uid ?? self.uid
+    return NodeIdentifier(uidToCopy, self.pathList)
+  }
+
   public var description: String {
     return "\(self.getTreeType().rawValue)-\(uid)⩨\(pathList)∣"
   }
@@ -65,6 +70,11 @@ class SinglePathNodeIdentifier: NodeIdentifier {
     super.init(uid, [singlePath])
   }
   
+  override func copy(with uid: UID? = nil) -> SinglePathNodeIdentifier {
+    let uidToCopy: UID = uid ?? self.uid
+    return SinglePathNodeIdentifier(uidToCopy, self.getSinglePath(), self.treeType)
+  }
+
   override func getTreeType() -> TreeType {
     return self.treeType
   }
@@ -92,6 +102,12 @@ class GDriveIdentifier: NodeIdentifier {
   override func getTreeType() -> TreeType {
     return .GDRIVE
   }
+  
+  override func copy(with uid: UID? = nil) -> GDriveIdentifier {
+    let uidToCopy: UID = uid ?? self.uid
+    return GDriveIdentifier(uidToCopy, self.pathList)
+  }
+
 }
 
 /**
@@ -102,4 +118,9 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
     super.init(uid, singlePath, .LOCAL_DISK)
   }
   
+  override func copy(with uid: UID? = nil) -> LocalNodeIdentifier {
+    let uidToCopy: UID = uid ?? self.uid
+    return LocalNodeIdentifier(uidToCopy, self.getSinglePath())
+  }
+
 }

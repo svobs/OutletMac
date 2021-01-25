@@ -70,14 +70,18 @@ class GRPCConverter {
          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
          try node.setDirStats(dirStats)
        }
+    } else {
+      throw OutletError.invalidState
     }
     
     node.icon = IconId(rawValue: nodeGRPC.iconID)!
     
     if nodeGRPC.decoratorNid > 0 {
       assert(nodeGRPC.decoratorParentNid > 0, "No parent_nid for decorator node! (decorator_nid=\(nodeGRPC.decoratorNid)")
-      node = DecoNode.decorate(node, nodeGRPC.decoratorNid, nodeGRPC.decoratorParentNid)
+      node = DecoratorFactory.decorate(node, nodeGRPC.decoratorNid, nodeGRPC.decoratorParentNid)
     }
+    
+    return node
   }
   
   static func dirMetaFromGRPC(_ dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta) throws -> DirectoryStats? {
@@ -96,6 +100,9 @@ class GRPCConverter {
   }
   
   static func spidToGRPC(spid: SPID, spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> Void {
+    
+    
+    
     // TODO
   }
   
@@ -117,6 +124,9 @@ class GRPCConverter {
   
   static func nodeIdentifierToGRPC(nodeIdentifier: NodeIdentifier, nodeIdentifierGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier)
       throws -> Void {
+    
+    
+    
     // TODO
   }
   
