@@ -16,15 +16,18 @@ class OutletGRPCClient {
     self.stub = client
   }
   
+  func shutdown() throws {
+    try self.stub.channel.close().wait()
+  }
+  
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
   static func makeClient(host: String, port: Int) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    defer {
-      try? group.syncShutdownGracefully()
-    }
+//    defer {
+//      try? group.syncShutdownGracefully()
+//    }
 
-    let channel = ClientConnection.insecure(group: group)
-      .connect(host: host, port: port)
+    let channel = ClientConnection.insecure(group: group).connect(host: host, port: port)
 
     return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
   }
@@ -35,7 +38,9 @@ class OutletGRPCClient {
     grpcRequest.treeID = request.treeId
     grpcRequest.userPath = request.userPath ?? ""
     
-    try GRPCConverter.spidToGRPC(spid: request.spid, spidGRPC: grpcRequest.spid)
+    if let spid = request.spid {
+      try GRPCConverter.spidToGRPC(spid: spid, spidGRPC: grpcRequest.spid)
+    }
 
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
 
@@ -43,12 +48,11 @@ class OutletGRPCClient {
       let response = try call.response.wait()
       if (response.hasDisplayTreeUiState) {
         let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-
+        NSLog("Got state: \(state.treeId), \(state.rootExists)")
         return nil  // TODO
       }
     } catch {
-      NSLog("RPC failed: \(error)")
-      throw OutletError.grpcFailure
+      throw OutletError.grpcFailure("RPC failed: \(error)")
     }
     
     return nil  // TODO

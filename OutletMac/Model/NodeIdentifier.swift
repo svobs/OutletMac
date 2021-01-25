@@ -42,11 +42,11 @@ class NodeIdentifier: CustomStringConvertible {
   }
   
   func isSinglePath() throws -> Bool {
-    throw OutletError.invalidOperation
+    throw OutletError.invalidOperation("Cannot call isSinglePath() for NodeIdentifier base class!")
   }
   
   func getSinglePath() throws -> String {
-    throw OutletError.invalidOperation
+    throw OutletError.invalidOperation("Cannot call getSinglePath() for NodeIdentifier base class!")
   }
   
 }

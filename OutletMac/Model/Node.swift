@@ -152,7 +152,7 @@ class Node: CustomStringConvertible {
   }
   
   func setDirStats(_ dirStats: DirectoryStats?) throws {
-    throw OutletError.invalidOperation
+    throw OutletError.invalidOperation("Cannot call setDirStats() for Node base class!")
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
@@ -169,7 +169,7 @@ class Node: CustomStringConvertible {
   }
 }
 
-typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
+typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node?)
 
 
 /**

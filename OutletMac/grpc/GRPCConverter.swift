@@ -18,11 +18,10 @@ class GRPCConverter {
   // Node
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
   
-//  static func optionalNodeFromGRPC(_ nodeContainer: ) throws -> Node {
-//
-//  }
-
   static func nodeFromGRPC(nodeGRPC: Outlet_Backend_Daemon_Grpc_Generated_Node) throws -> Node {
+    if nodeGRPC.treeType == 0 {
+      throw OutletError.invalidState("GRPC node does not exist or is invalid!")
+    }
     let treeType: TreeType = TreeType(rawValue: nodeGRPC.treeType)!
     let nodeIdentifier: NodeIdentifier = try NodeIdentifierFactory.forAllValues(nodeGRPC.uid, treeType, nodeGRPC.pathList, mustBeSinglePath: false)
     
@@ -71,7 +70,7 @@ class GRPCConverter {
          try node.setDirStats(dirStats)
        }
     } else {
-      throw OutletError.invalidState
+      throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
     
     node.icon = IconId(rawValue: nodeGRPC.iconID)!
@@ -107,8 +106,13 @@ class GRPCConverter {
   }
   
   static func snFromGRPC(_ snGRPC: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair) throws -> SPIDNodePair {
-    let node: Node = try GRPCConverter.nodeFromGRPC(nodeGRPC: snGRPC.node)
     let spid: SinglePathNodeIdentifier = try GRPCConverter.spidFromGRPC(spidGRPC: snGRPC.spid)
+    let node: Node?
+    if snGRPC.hasNode {
+      node = try GRPCConverter.nodeFromGRPC(nodeGRPC: snGRPC.node)
+    } else {
+      node = nil
+    }
     return SPIDNodePair(spid: spid, node: node)
   }
   
@@ -132,6 +136,7 @@ class GRPCConverter {
   
   static func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
     let rootSn: SPIDNodePair = try GRPCConverter.snFromGRPC(stateGRPC.rootSn)
+    NSLog("Got rootSN: \(rootSn)")
     return DisplayTreeUiState(treeId: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists)
   }
 }

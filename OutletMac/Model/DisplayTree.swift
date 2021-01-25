@@ -29,11 +29,11 @@ class DisplayTreeRequest {
   let treeId: String
   let returnAsync: Bool
   let userPath: String?
-  let spid: SPID
+  let spid: SPID?
   let isStartup: Bool
   let treeDisplayMode: TreeDisplayMode
   
-  init(treeId: String, returnAsync: Bool, userPath: String?, spid: SPID, isStartup: Bool = false, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
+  init(treeId: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
     self.treeId = treeId
     self.returnAsync = returnAsync
     self.userPath = userPath

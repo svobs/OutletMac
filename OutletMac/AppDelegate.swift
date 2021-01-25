@@ -30,8 +30,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentView = NSHostingView(rootView: contentView)
         window.makeKeyAndOrderFront(nil)
       
-      var grpcClient: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
-      NSLog("gRPC client connected!")
+      do {
+        let grpcClient: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
+        NSLog("gRPC client connected!")
+        
+        let request: DisplayTreeRequest = DisplayTreeRequest(treeId: ID_LEFT_TREE, returnAsync: false, isStartup: true)
+        let displayTree: DisplayTree = try grpcClient.requestDisplayTree(request)!
+        do {
+            sleep(4)
+        }
+      } catch {
+        NSLog("RPC failed: \(error)")
+        fatalError()
+      }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

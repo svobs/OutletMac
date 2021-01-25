@@ -22,7 +22,7 @@ class NodeIdentifierFactory {
     case .MIXED:
       return SinglePathNodeIdentifier(SUPER_ROOT_UID, ROOT_PATH, .MIXED)
     case .NA:
-      throw OutletError.invalidState
+      throw OutletError.invalidState("Invalid tree type for root constant SPID: \(treeType)")
     }
   }
   
@@ -42,14 +42,13 @@ class NodeIdentifierFactory {
       if pathList.count <= 1 {
         return SinglePathNodeIdentifier(uid, pathList[0], .MIXED)
       } else {
-        // TODO: informative error msg
-        throw OutletError.invalidState
+        throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): mustBeSinglePath=true but paths count is: \(pathList.count)")
       }
     } else if treeType == .GDRIVE {
       return GDriveIdentifier(uid, pathList)
     }
     
-    // TODO: informative error msg
-    throw OutletError.invalidState
+    throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), treeType=\(treeType), "
+      + "pathList=\(pathList), mustBeSinglePath=\(mustBeSinglePath)")
   }
 }
