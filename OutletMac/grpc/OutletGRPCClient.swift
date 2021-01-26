@@ -48,14 +48,14 @@ class OutletGRPCClient {
       let response = try call.response.wait()
       if (response.hasDisplayTreeUiState) {
         let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-        NSLog("Got state: \(state.treeId), \(state.rootExists)")
-        return nil  // TODO
+        NSLog("Got state: \(state)")
+        return state.toDisplayTree()
+      } else {
+        return nil
       }
     } catch {
       throw OutletError.grpcFailure("RPC failed: \(error)")
     }
-    
-    return nil  // TODO
   }
 
   /*

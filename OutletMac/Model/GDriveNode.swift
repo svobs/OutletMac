@@ -120,7 +120,8 @@ class GDriveNode: Node {
 class GDriveFolder: GDriveNode {
   var isAllChildrenFetched: Bool
   var _dirStats: DirectoryStats?
-  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?, name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, allChildrenFetched: Bool) {
+  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?,
+       name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, allChildrenFetched: Bool) {
     self.isAllChildrenFetched = allChildrenFetched
     
     super.init(nodeIdentifer, parentList, trashed: trashed, googID: googID, createTS: createTS, modifyTS: modifyTS, name: name,
@@ -184,6 +185,12 @@ class GDriveFolder: GDriveNode {
   
   override func setDirStats(_ dirStats: DirectoryStats?) throws {
     self._dirStats = dirStats
+  }
+  
+  override public var description: String {
+    return "GDriveFolder(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) trashed=\(trashed) " +
+      "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUID ?? 0) syncTS=\(syncTS ?? 0) " +
+      "allChildrenFetched=\(isAllChildrenFetched))"
   }
   
   // TODO: override equals
@@ -268,4 +275,16 @@ class GDriveFile: GDriveNode {
       return .ICON_FILE_TRASHED
     }
   }
+  
+  override public var description: String {
+    let sizeStr: String = sizeBytes == nil ? "null" : String(sizeBytes!)
+    let createTSStr: String = createTS == nil ? "null" : String(createTS!)
+    let modifyTSStr: String = modifyTS == nil ? "null" : String(modifyTS!)
+    let sharedByUserUIDStr: String = sharedByUserUID == nil ? "null" : String(sharedByUserUID!)
+    let syncTSStr: String = syncTS == nil ? "null" : String(syncTS!)
+    return "GDriveFile(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) MD5=\(md5 ?? "null") " +
+      "mimeTypeUID=\(mimeTypeUID) size=\(sizeStr) trashed=\(trashed) createTS=\(createTSStr) modifyTS=\(modifyTSStr) " +
+      "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUIDStr) syncTS=\(syncTSStr))"
+  }
+  
 }

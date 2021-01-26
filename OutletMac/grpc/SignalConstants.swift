@@ -6,7 +6,7 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 
-enum Signal: Int {
+enum Signal: UInt {
   // Tasks
   case ENQUEUE_UI_TASK = 1
   case START_CACHEMAN = 2

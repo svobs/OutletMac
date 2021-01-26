@@ -18,8 +18,28 @@ class DisplayTree {
   init(state: DisplayTreeUiState) {
     self.state = state
   }
-
 }
+
+/**
+ CLASS NullDisplayTree
+ */
+class NullDisplayTree: DisplayTree {
+  
+}
+
+/**
+ CLASS DiffResultTreeIDs
+ */
+class DiffResultTreeIDs {
+  let treeIDLeft: String
+  let treeIDRight: String
+  
+  init(left treeIDLeft: String, right treeIDRight: String) {
+    self.treeIDLeft = treeIDLeft
+    self.treeIDRight = treeIDRight
+  }
+}
+
 
 /**
  CLASS DisplayTreeRequest
@@ -33,7 +53,8 @@ class DisplayTreeRequest {
   let isStartup: Bool
   let treeDisplayMode: TreeDisplayMode
   
-  init(treeId: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
+  init(treeId: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
+       treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
     self.treeId = treeId
     self.returnAsync = returnAsync
     self.userPath = userPath
@@ -46,7 +67,8 @@ class DisplayTreeRequest {
 /**
  CLASS DisplayTreeUiState
  */
-class DisplayTreeUiState {
+class DisplayTreeUiState: CustomStringConvertible {
+  
   let treeId: String
   let rootSN: SPIDNodePair
   let rootExists: Bool
@@ -55,7 +77,8 @@ class DisplayTreeUiState {
   let hasCheckboxes: Bool
   let needsManualLoad: Bool
   
-  init(treeId: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil, treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
+  init(treeId: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
+       treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
     self.treeId = treeId
     /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
     Each display tree can only have one root path.*/
@@ -70,4 +93,17 @@ class DisplayTreeUiState {
     self.needsManualLoad = false
   }
 
+  var description: String {
+    get {
+      return "DisplayTreeUiState(treeID='\(self.treeId)' rootSN=\(self.rootSN) rootExists=\(self.rootExists) offendingPath='\(self.offendingPath ?? "null")' treeDisplayMode=\(self.treeDisplayMode) hasCheckboxes=\(self.hasCheckboxes))"
+    }
+  }
+  
+  func toDisplayTree() -> DisplayTree {
+    if self.rootExists {
+      return DisplayTree(state: self)
+    } else {
+      return NullDisplayTree(state: self)
+    }
+  }
 }

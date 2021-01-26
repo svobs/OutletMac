@@ -37,7 +37,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let request: DisplayTreeRequest = DisplayTreeRequest(treeId: ID_LEFT_TREE, returnAsync: false, isStartup: true)
         let displayTree: DisplayTree = try grpcClient.requestDisplayTree(request)!
         do {
-            sleep(4)
+          NSLog("Sleeping 4...")
+          sleep(4)
+          NSLog("Quitting")
+          exit(0)
         }
       } catch {
         NSLog("RPC failed: \(error)")
