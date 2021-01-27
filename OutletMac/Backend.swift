@@ -7,29 +7,29 @@
 //
 
 protocol OutletBackend {
-  func reportError(sender: String, msg: String, secondaryMsg: String?)
-  func getNodeForUID(uid: UID, treeType: TreeType?) -> Node?
-  func getNodeForLocalPath(fullPath: String) -> Node?
-  func nextUID() -> UID
-  func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) -> UID?
-  func startSubtreeLoad(treeID: String)
-  func getOpExecutionPlayState() -> Bool
-  func getChildList(parent: Node, treeID: String?, filterCriteria: FilterCriteria?) -> [Node]
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) -> [Node]
+//  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
+  func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
+  func getNodeForLocalPath(fullPath: String) throws -> Node?
+  func nextUID() throws -> UID
+  func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID?
+  func startSubtreeLoad(treeID: String) throws
+  func getOpExecutionPlayState() throws -> Bool
+  func getChildList(parent: Node, treeID: String?, filterCriteria: FilterCriteria?) throws -> [Node]
+  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node]
   
-  func createDisplayTreeForGDriveSelect() -> DisplayTree?
-  func createDisplayTreeFromConfig(treeID: String, isStartup: Bool?) -> DisplayTree?
-  func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) -> DisplayTree?
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String) -> DisplayTree?
-  func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) -> DisplayTree?
-  func requestDisplayTree(request: DisplayTreeRequest) -> DisplayTree?
+  func createDisplayTreeForGDriveSelect() throws -> DisplayTree?
+  func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree?
+  func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
+  func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree?
+  func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
+  func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree?
   
-  func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair)
-  func startDiffTrees(treeIDLeft: String, treeIDRight: String) -> DiffResultTreeIDs
-  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair])
-  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String)
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String)
-  func getLastPendingOp(nodeUID: UID) -> UserOp?
-  func downloadFileFromGDrive(nodeUID: UID, requestorID: String)
-  func deleteSubtree(nodeUIDList: [UID])
+  func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws
+  func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
+  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws
+  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws
+  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws
+  func getLastPendingOp(nodeUID: UID) throws -> UserOp?
+  func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
+  func deleteSubtree(nodeUIDList: [UID]) throws
 }

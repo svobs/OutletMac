@@ -123,7 +123,7 @@ class DecoNode : Node {
       return self.delegate.icon
     }
     set (icon) {
-      self.delegate.icon = icon
+      self.delegate.customIcon = icon
     }
   }
 }

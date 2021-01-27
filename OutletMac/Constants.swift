@@ -231,7 +231,7 @@ let GDRIVE_ME_USER_UID: UID = 1
  
  Indicates the current behavior of a displayed tree in the UI. ONE_TREE_ALL_ITEMS is the default. CHANGES_ONE_TREE_PER_CATEGORY is for diffs.
  */
-enum TreeDisplayMode: UInt {
+enum TreeDisplayMode: UInt32 {
   case ONE_TREE_ALL_ITEMS = 1
   case CHANGES_ONE_TREE_PER_CATEGORY = 2
 }

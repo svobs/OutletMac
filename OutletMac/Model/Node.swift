@@ -134,7 +134,13 @@ class Node: CustomStringConvertible {
     get {
       return self._icon ?? self.defaultIcon
     }
-    set (icon) {
+  }
+  
+  var customIcon: IconId? {
+    get {
+      return self._icon
+    }
+    set (customIcon) {
       self._icon = icon
     }
   }
@@ -155,6 +161,10 @@ class Node: CustomStringConvertible {
     throw OutletError.invalidOperation("Cannot call setDirStats() for Node base class!")
   }
   
+  func getDirStats() throws -> DirectoryStats? {
+    throw OutletError.invalidOperation("Cannot call getDirStats() for Node base class!")
+  }
+  
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
     self.nodeIdentifier = nodeIdentifer
     self.parentList = parentList
@@ -166,6 +176,13 @@ class Node: CustomStringConvertible {
     self.parentList = otherNode.parentList
     self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
     self.trashed = otherNode.trashed
+  }
+  
+  func getSingleParent() throws -> UID {
+    if self.parentList.count != 1 {
+      throw OutletError.invalidState("Node.getSingleParent(): expected exactly 1 parent but found \(self.parentList.count) (UID=\(self.uid)))")
+    }
+    return self.parentList[0]
   }
 }
 

@@ -10,7 +10,7 @@ import GRPC
 import Logging
 import NIO
 
-class OutletGRPCClient {
+class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient) {
     self.stub = client
@@ -37,9 +37,11 @@ class OutletGRPCClient {
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeId
     grpcRequest.userPath = request.userPath ?? ""
+    grpcRequest.returnAsync = request.returnAsync
+    grpcRequest.treeDisplayMode = request.treeDisplayMode.rawValue
     
     if let spid = request.spid {
-      try GRPCConverter.spidToGRPC(spid: spid, spidGRPC: grpcRequest.spid)
+      grpcRequest.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
     }
 
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
@@ -54,33 +56,316 @@ class OutletGRPCClient {
         return nil
       }
     } catch {
-      throw OutletError.grpcFailure("RPC failed: \(error)")
+      throw OutletError.grpcFailure("RPC 'requestDisplayTree' failed: \(error)")
     }
   }
 
-  /*
-   def request_display_tree(self, request: DisplayTreeRequest) -> Optional[DisplayTree]:
-       assert request.tree_id, f'No tree_id in: {request}'
-       grpc_req = RequestDisplayTree_Request()
-       grpc_req.is_startup = request.is_startup
-       if request.tree_id:
-           grpc_req.tree_id = request.tree_id
-       grpc_req.return_async = request.return_async
-       if request.user_path:
-           grpc_req.user_path = request.user_path
-       Converter.node_identifier_to_grpc(request.spid, grpc_req.spid)
-       grpc_req.tree_display_mode = request.tree_display_mode
+  func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request()
+    request.uid = uid
+    if let tt = treeType?.rawValue {
+      request.treeType = tt
+    }
+    let call = self.stub.get_node_for_uid(request)
+    do {
+      let response = try call.response.wait()
+      if (response.hasNode) {
+        return try GRPCConverter.nodeFromGRPC(response.node)
+      } else {
+        return nil
+      }
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getNodeForUID' failed: \(error)")
+    }
+  }
+  
+  func getNodeForLocalPath(fullPath: String) throws -> Node? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request()
+    request.fullPath = fullPath
+    let call = self.stub.get_node_for_local_path(request)
+    do {
+      let response = try call.response.wait()
+      if (response.hasNode) {
+        return try GRPCConverter.nodeFromGRPC(response.node)
+      } else {
+        return nil
+      }
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getNodeForLocalPath' failed: \(error)")
+    }
+  }
+  
+  func nextUID() throws -> UID {
+    let call = self.stub.get_next_uid(Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request())
+    do {
+      let response = try call.response.wait()
+      return response.uid
+    } catch {
+      throw OutletError.grpcFailure("RPC 'nextUID' failed: \(error)")
+    }
+  }
+  
+  func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request()
+    request.fullPath = fullPath
+    if uidSuggestion != nil {
+      request.uidSuggestion = uidSuggestion!
+    }
+    let call = self.stub.get_uid_for_local_path(request)
+    do {
+      let response = try call.response.wait()
+      return response.uid
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getUIDForLocalPath' failed: \(error)")
+    }
+  }
+  
+  func startSubtreeLoad(treeID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request()
+    request.treeID = treeID
+    let call = self.stub.start_subtree_load(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'startSubtreeLoad' failed: \(error)")
+    }
+  }
+  
+  func getOpExecutionPlayState() throws -> Bool {
+    let call = self.stub.get_op_exec_play_state(Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request())
+    do {
+      let response = try call.response.wait()
+      
+      return response.isEnabled
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getOpExecutionPlayState' failed: \(error)")
+    }
+  }
+  
+  func getChildList(parent: Node, treeID: String?, filterCriteria: FilterCriteria?) throws -> [Node] {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request()
+    if treeID != nil {
+      request.treeID = treeID!
+    }
+    request.parentNode = try GRPCConverter.nodeToGRPC(parent)
+    if filterCriteria != nil {
+      request.filterCriteria = try GRPCConverter.filterCriteriaToGRPC(filterCriteria!)
+    }
+    
+    let call = self.stub.get_child_list_for_node(request)
+    do {
+      let response = try call.response.wait()
+      return try GRPCConverter.nodeListFromGRPC(response.nodeList)
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getChildList' failed: \(error)")
+    }
+  }
+  
+  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node] {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request()
+    request.stopAtPath = stopAtPath ?? ""
+    request.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
+    
+    let call = self.stub.get_ancestor_list_for_spid(request)
+    do {
+      let response = try call.response.wait()
+      return try GRPCConverter.nodeListFromGRPC(response.nodeList)
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getAncestorList' failed: \(error)")
+    }
+  }
+  
+  func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
+    let spid = NodeIdentifierFactory.getRootConstantGDriveSPID()
+    let request = DisplayTreeRequest(treeId: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    return try self.requestDisplayTree(request)
+  }
+  
+  func createDisplayTreeFromConfig(treeID: String, isStartup: Bool = false) throws -> DisplayTree? {
+    let request = DisplayTreeRequest(treeId: ID_GDRIVE_DIR_SELECT, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    return try self.requestDisplayTree(request)
+  }
+  
+  func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
+    // Note: this shouldn't actually return anything, as returnAsync==true
+    let request = DisplayTreeRequest(treeId: treeID, returnAsync: true, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    return try self.requestDisplayTree(request)
+  }
+  
+  func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree? {
+    // Note: this shouldn't actually return anything, as returnAsync==true
+    let request = DisplayTreeRequest(treeId: treeID, returnAsync: true, userPath: userPath, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    return try self.requestDisplayTree(request)
+  }
+  
+  func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
+    let request = DisplayTreeRequest(treeId: treeID, returnAsync: false, treeDisplayMode: treeDisplayMode)
+    return try self.requestDisplayTree(request)
+  }
+  
+  /**
+   Notifies the backend that the tree was requested, and returns a display tree object, which the backend will also send via
+   notification (unless is_startup==True, in which case no notification will be sent). Also is_startup helps determine whether
+   to load it immediately.
 
-       response = self.grpc_stub.request_display_tree_ui_state(grpc_req)
-
-       if response.HasField('display_tree_ui_state'):
-           state = Converter.display_tree_ui_state_from_grpc(response.display_tree_ui_state)
-           tree = state.to_display_tree(backend=self)
-       else:
-           tree = None
-       logger.debug(f'Returning tree: {tree}')
-       return tree
-
+   The DisplayTree object is immediately created and returned even if the tree has not finished loading on the backend. The backend
+   will send a notification if/when it has finished loading.
    */
-
+  func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree? {
+    var requestGRPC = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
+    requestGRPC.isStartup = request.isStartup
+    requestGRPC.treeID = request.treeId
+    requestGRPC.returnAsync = request.returnAsync
+    requestGRPC.userPath = request.userPath ?? ""
+    if request.spid != nil {
+      requestGRPC.spid = try GRPCConverter.nodeIdentifierToGRPC(request.spid!)
+    }
+    requestGRPC.treeDisplayMode = request.treeDisplayMode.rawValue
+    
+    let call = self.stub.request_display_tree_ui_state(requestGRPC)
+    do {
+      let response = try call.response.wait()
+      
+      let tree: DisplayTree?
+      if response.hasDisplayTreeUiState {
+        let state = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
+        tree = state.toDisplayTree()
+        NSLog("Returning DisplayTree: \(tree!)")
+      } else {
+        tree = nil
+        NSLog("Returning DisplayTree==null")
+      }
+      
+      return tree
+    } catch {
+      throw OutletError.grpcFailure("RPC 'requestDisplayTree' failed: \(error)")
+    }
+  }
+  
+  func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request()
+    request.srcTreeID = srcTreeID
+    request.dstTreeID = dstTreeID
+    for srcSN in srcSNList {
+      request.srcSnList.append(try GRPCConverter.snToGRPC(srcSN))
+    }
+    request.isInto = isInto
+    request.dstSn = try GRPCConverter.snToGRPC(dstSN)
+    
+    let call = self.stub.drop_dragged_nodes(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'dropDraggedNodes' failed: \(error)")
+    }
+  }
+  
+  func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request()
+    request.treeIDLeft = treeIDLeft
+    request.treeIDRight = treeIDRight
+    
+    let call = self.stub.start_diff_trees(request)
+    do {
+      let response = try call.response.wait()
+      
+      let treeIds = DiffResultTreeIDs(left: response.treeIDLeft, right: response.treeIDRight)
+      return treeIds
+    } catch {
+      throw OutletError.grpcFailure("RPC 'startDiffTrees' failed: \(error)")
+    }
+  }
+  
+  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request()
+    request.treeIDLeft = treeIDLeft
+    request.treeIDRight = treeIDRight
+    for sn in selectedChangeListLeft {
+      request.changeListLeft.append(try GRPCConverter.snToGRPC(sn))
+    }
+    for sn in selectedChangeListRight {
+      request.changeListRight.append(try GRPCConverter.snToGRPC(sn))
+    }
+    
+    let call = self.stub.generate_merge_tree(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'generateMergeTree' failed: \(error)")
+    }
+  }
+  
+  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request()
+    request.nodeIdentifier = try GRPCConverter.nodeIdentifierToGRPC(nodeIdentifier)
+    request.treeID = treeID
+    let call = self.stub.refresh_subtree(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'enqueueRefreshSubtreeTask' failed: \(error)")
+    }
+  }
+  
+  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request()
+    request.rootUid = rootUID
+    request.treeID = treeID
+    let call = self.stub.refresh_subtree_stats(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'enqueueRefreshSubtreeStatsTask' failed: \(error)")
+    }
+  }
+  
+  func getLastPendingOp(nodeUID: UID) throws -> UserOp? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request()
+    request.nodeUid = nodeUID
+    
+    let call = self.stub.get_last_pending_op_for_node(request)
+    do {
+      let response = try call.response.wait()
+      
+      if !response.hasUserOp {
+        return nil
+      }
+      let srcNode = try GRPCConverter.nodeFromGRPC(response.userOp.srcNode)
+      let dstNode: Node?
+      if response.userOp.hasDstNode {
+        dstNode = try GRPCConverter.nodeFromGRPC(response.userOp.dstNode)
+      } else {
+        dstNode = nil
+      }
+      let opType = UserOpType(rawValue: response.userOp.opType)!
+      
+      return UserOp(opUID: response.userOp.opUid, batchUID: response.userOp.batchUid, opType: opType, srcNode: srcNode, dstNode: dstNode)
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getLastPendingOp' failed: \(error)")
+    }
+  }
+  
+  func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request()
+    request.nodeUid = nodeUID
+    request.requestorID = requestorID
+    let call = self.stub.download_file_from_gdrive(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'downloadFileFromGDrive' failed: \(error)")
+    }
+  }
+  
+  func deleteSubtree(nodeUIDList: [UID]) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request()
+    request.nodeUidList = nodeUIDList
+    let call = self.stub.delete_subtree(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'deleteSubtree' failed: \(error)")
+    }
+  }
+  
 }

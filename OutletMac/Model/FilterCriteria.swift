@@ -6,7 +6,7 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 
-enum Ternary : UInt {
+enum Ternary : UInt32 {
   case FALSE = 0
   case TRUE = 1
   case NOT_SPECIFIED = 2
@@ -14,17 +14,17 @@ enum Ternary : UInt {
 
 class FilterCriteria: CustomStringConvertible {
   let searchQuery: String
-  let ignoreCase: Bool
+  let isIgnoreCase: Bool
   let isTrashed: Ternary
   let isShared: Ternary
   let showSubtreesOfMatches: Bool
   
-  init(searchQuery: String = "", isTrashed: Ternary = .NOT_SPECIFIED, isShared: Ternary = .NOT_SPECIFIED, ignoreCase: Bool = false,
+  init(searchQuery: String = "", isTrashed: Ternary = .NOT_SPECIFIED, isShared: Ternary = .NOT_SPECIFIED, isIgnoreCase: Bool = false,
        showSubtreesOfMatches: Bool = false) {
     self.searchQuery = searchQuery
     self.isTrashed = isTrashed
     self.isShared = isShared
-    self.ignoreCase = ignoreCase
+    self.isIgnoreCase = isIgnoreCase
     self.showSubtreesOfMatches = showSubtreesOfMatches
   }
   
@@ -33,6 +33,6 @@ class FilterCriteria: CustomStringConvertible {
   }
   
   var description: String {
-    return "FilterCriteria(q=\"\(searchQuery)\" trashed=\(isTrashed) shared=\(isShared) ignoreCase=\(ignoreCase) showSubtrees=\(showSubtreesOfMatches))"
+    return "FilterCriteria(q=\"\(searchQuery)\" trashed=\(isTrashed) shared=\(isShared) ignoreCase=\(isIgnoreCase) showSubtrees=\(showSubtreesOfMatches))"
   }
 }

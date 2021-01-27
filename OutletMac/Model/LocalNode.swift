@@ -31,7 +31,7 @@ class LocalNode: Node {
     return URL(fileURLWithPath: try self.nodeIdentifier.getSinglePath()).deletingLastPathComponent().absoluteString
   }
   
-  func getSingleParent() -> UID {
+  override func getSingleParent() -> UID {
     return self.parentList[0]
   }
 }

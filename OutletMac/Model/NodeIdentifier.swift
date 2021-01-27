@@ -31,8 +31,14 @@ class NodeIdentifier: CustomStringConvertible {
     return "\(self.getTreeType().rawValue)-\(uid)⩨\(pathList)∣"
   }
   
+  var treeType: TreeType {
+    get {
+      return .NA
+    }
+  }
+  
   func getTreeType() -> TreeType {
-    return .NA
+    return self.treeType
   }
   
   // MARK: SPID
@@ -41,14 +47,9 @@ class NodeIdentifier: CustomStringConvertible {
     false
   }
   
-  func isSinglePath() throws -> Bool {
-    throw OutletError.invalidOperation("Cannot call isSinglePath() for NodeIdentifier base class!")
-  }
-  
   func getSinglePath() throws -> String {
     throw OutletError.invalidOperation("Cannot call getSinglePath() for NodeIdentifier base class!")
   }
-  
 }
 
 /**
@@ -64,15 +65,24 @@ class NullNodeIdentifier: NodeIdentifier {
  CLASS SinglePathNodeIdentifier
  */
 class SinglePathNodeIdentifier: NodeIdentifier {
-  let treeType: TreeType
+  var _treeType: TreeType
   init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
-    self.treeType = treeType
+    self._treeType = treeType
     super.init(uid, [singlePath])
   }
   
   override func copy(with uid: UID? = nil) -> SinglePathNodeIdentifier {
     let uidToCopy: UID = uid ?? self.uid
     return SinglePathNodeIdentifier(uidToCopy, self.getSinglePath(), self.treeType)
+  }
+  
+  override var treeType: TreeType {
+    get {
+      return self._treeType
+    }
+    set (treeType) {
+      self._treeType = treeType
+    }
   }
 
   override func getTreeType() -> TreeType {
@@ -81,10 +91,6 @@ class SinglePathNodeIdentifier: NodeIdentifier {
   
   override func isSpid() -> Bool {
     false
-  }
-  
-  override func isSinglePath() throws -> Bool {
-    return true
   }
   
   override func getSinglePath() -> String {
