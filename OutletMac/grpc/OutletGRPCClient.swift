@@ -57,11 +57,6 @@ class OutletGRPCClient: OutletBackend {
     return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
   }
   
-  func waitForConnect() -> Bool {
-//    self.stub.channel.
-    return true
-  }
-  
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
     var grpcRequest = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup

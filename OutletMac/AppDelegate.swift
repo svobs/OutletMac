@@ -33,6 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       do {
         let grpcClient: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
          NSLog("gRPC client connecting")
+        grpcClient.receiveServerSignals()
         
         let treeLeft: DisplayTree = try grpcClient.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
         let treeRight: DisplayTree = try grpcClient.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
