@@ -20,6 +20,28 @@ class OutletGRPCClient: OutletBackend {
     try self.stub.channel.close().wait()
   }
   
+  func receiveServerSignals() {
+    NSLog("Subscribing to server signals...")
+    let request = Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request()
+    let call = self.stub.subscribe_to_signals(request) { signalGRPC in
+      let signal = Signal(rawValue: signalGRPC.sigInt)!
+      NSLog("Got signal: \(signal)")
+      
+    }
+    
+    call.status.whenSuccess { status in
+      if status.code == .ok {
+        // this should never happen
+        NSLog("Server closed signal subscription")
+      } else {
+        NSLog("ReceiveSignals failed: \(status)")
+      }
+    }
+    
+    // Wait for the call to end.
+    _ = try! call.status.wait()
+  }
+  
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
   static func makeClient(host: String, port: Int) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
@@ -27,9 +49,17 @@ class OutletGRPCClient: OutletBackend {
 //      try? group.syncShutdownGracefully()
 //    }
 
-    let channel = ClientConnection.insecure(group: group).connect(host: host, port: port)
+    let channel = ClientConnection.insecure(group: group)
+      .withConnectionTimeout(minimum: TimeAmount.seconds(3))
+      .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
+      .connect(host: host, port: port)
 
     return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
+  }
+  
+  func waitForConnect() -> Bool {
+//    self.stub.channel.
+    return true
   }
   
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
@@ -182,7 +212,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func createDisplayTreeFromConfig(treeID: String, isStartup: Bool = false) throws -> DisplayTree? {
-    let request = DisplayTreeRequest(treeId: ID_GDRIVE_DIR_SELECT, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeId: treeID, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
   
