@@ -71,6 +71,16 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol: GRPCC
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response>
 
+  func get_filter(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response>
+
+  func update_filter(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>
+
   func request_display_tree_ui_state(
     _ request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request,
     callOptions: CallOptions?
@@ -286,6 +296,42 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeget_ancestor_list_for_spidInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to get_filter
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_filter.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_filter(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/get_filter",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to update_filter
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to update_filter.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func update_filter(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/update_filter",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
     )
   }
 
@@ -550,6 +596,12 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientInterceptorFact
   /// - Returns: Interceptors to use when invoking 'get_ancestor_list_for_spid'.
   func makeget_ancestor_list_for_spidInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response>]
 
+  /// - Returns: Interceptors to use when invoking 'get_filter'.
+  func makeget_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response>]
+
+  /// - Returns: Interceptors to use when invoking 'update_filter'.
+  func makeupdate_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>]
+
   /// - Returns: Interceptors to use when invoking 'request_display_tree_ui_state'.
   func makerequest_display_tree_ui_stateInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>]
 
@@ -631,6 +683,10 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletProvider: CallHandler
   func get_child_list_for_node(request: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response>
 
   func get_ancestor_list_for_spid(request: Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response>
+
+  func get_filter(request: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response>
+
+  func update_filter(request: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>
 
   func request_display_tree_ui_state(request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -746,6 +802,26 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.get_ancestor_list_for_spid(request: request, context: context)
+        }
+      }
+
+    case "get_filter":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.get_filter(request: request, context: context)
+        }
+      }
+
+    case "update_filter":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.update_filter(request: request, context: context)
         }
       }
 
@@ -918,6 +994,14 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletServerInterceptorFact
   /// - Returns: Interceptors to use when handling 'get_ancestor_list_for_spid'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeget_ancestor_list_for_spidInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_filter'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response>]
+
+  /// - Returns: Interceptors to use when handling 'update_filter'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeupdate_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree_ui_state'.
   ///   Defaults to calling `self.makeInterceptors()`.

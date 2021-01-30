@@ -393,4 +393,113 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
+  func getFilterCriteria(treeID: String) throws -> FilterCriteria? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request()
+    request.treeID = treeID
+    let call = self.stub.get_filter(request)
+    do {
+      let response = try call.response.wait()
+      if response.hasFilterCriteria {
+        return try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
+      } else {
+        return nil
+      }
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getFilterCriteria' failed: \(error)")
+    }
+  }
+  
+  func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request()
+    request.treeID = treeID
+    request.filterCriteria = try GRPCConverter.filterCriteriaToGRPC(filterCriteria)
+    let call = self.stub.update_filter(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'updateFilterCriteria' failed: \(error)")
+    }
+  }
+
+  func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request()
+    request.configKeyList.append(configKey)
+    let call = self.stub.get_config(request)
+    do {
+      let response = try call.response.wait()
+      if response.configList.count != 1 {
+        throw OutletError.invalidState("RPC 'getFilterCriteria' failed: got more than one value for config list")
+      } else {
+        assert(response.configList[0].key == configKey, "getConfig(): response key (\(response.configList[0].key)) != expected (\(configKey))")
+        return response.configList[0].val
+      }
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getConfig' failed: \(error)")
+    }
+  }
+  
+  func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
+    let defaultValStr: String?
+    if defaultVal == nil {
+      defaultValStr = nil
+    } else {
+      defaultValStr = String(defaultVal!)
+    }
+    let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
+    let configValInt = Int(configVal)
+    if configValInt == nil {
+      throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
+    } else {
+      return configValInt!
+    }
+  }
+  
+  func putConfig(_ configKey: String, _ configVal: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request()
+    var configEntry = Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry()
+    configEntry.key = configKey
+    configEntry.val = configVal
+    request.configList.append(configEntry)
+    let call = self.stub.put_config(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'putConfig' failed: \(error)")
+    }
+  }
+  
+  func getConfigList(_ configKeyList: [String]) throws -> [String: String] {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request()
+    request.configKeyList = configKeyList
+    let call = self.stub.get_config(request)
+    do {
+      let response = try call.response.wait()
+      assert(response.configList.count == configKeyList.count, "getConfigList(): response config count (\(response.configList.count)) "
+             + "does not match request config count (\(configKeyList.count))")
+      var configDict: [String: String] = [:]
+      for config in response.configList {
+        configDict[config.key] = config.val
+      }
+      return configDict
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getConfigList' failed: \(error)")
+    }
+  }
+  
+  func putConfigList(_ configDict: [String: String]) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request()
+    for (configKey, configVal) in configDict {
+      var configEntry = Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry()
+      configEntry.key = configKey
+      configEntry.val = configVal
+      request.configList.append(configEntry)
+    }
+    let call = self.stub.put_config(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'putConfig' failed: \(error)")
+    }
+  }
+  
 }

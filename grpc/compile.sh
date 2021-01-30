@@ -10,9 +10,12 @@ PROTOC_GRPC_EXE=protoc-gen-grpc-swift
 GRPC_COMPILE="$SCRIPT_DIR/$REL_PATH/$PROTOC_GRPC_EXE"
 PROTO_COMPILE="$SCRIPT_DIR/$REL_PATH/$PROTOC_EXE"
 
+export PATH=$PATH:$GRPC_COMPILE:$PROTO_COMPILE
+
+sed -i -e 's/.*PythonImport.*/import public "Node.proto"; \/\/ Swift/' "$PROTO_PATH/Outlet.proto"
+
 mkdir -p $OUT_DIR
 
-export PATH=$PATH:$GRPC_COMPILE:$PROTO_COMPILE
 protoc \
 	"$PROTO_PATH/Outlet.proto" \
 	"$PROTO_PATH/Node.proto" \

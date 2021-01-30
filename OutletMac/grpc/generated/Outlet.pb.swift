@@ -92,6 +92,73 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response {
   public init() {}
 }
 
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var treeID: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
+    get {return _filterCriteria ?? Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()}
+    set {_filterCriteria = newValue}
+  }
+  /// Returns true if `filterCriteria` has been explicitly set.
+  public var hasFilterCriteria: Bool {return self._filterCriteria != nil}
+  /// Clears the value of `filterCriteria`. Subsequent reads from it will return its default value.
+  public mutating func clearFilterCriteria() {self._filterCriteria = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria? = nil
+}
+
+public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var treeID: String = String()
+
+  public var filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
+    get {return _filterCriteria ?? Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()}
+    set {_filterCriteria = newValue}
+  }
+  /// Returns true if `filterCriteria` has been explicitly set.
+  public var hasFilterCriteria: Bool {return self._filterCriteria != nil}
+  /// Clears the value of `filterCriteria`. Subsequent reads from it will return its default value.
+  public mutating func clearFilterCriteria() {self._filterCriteria = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria? = nil
+}
+
+/// nothing
+public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -984,6 +1051,127 @@ extension Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response: SwiftProtobuf
   }
 
   public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetFilter_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "tree_id"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request) -> Bool {
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetFilter_Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "filter_criteria"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._filterCriteria) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if let v = self._filterCriteria {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response) -> Bool {
+    if lhs._filterCriteria != rhs._filterCriteria {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFilter_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "tree_id"),
+    2: .standard(proto: "filter_criteria"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._filterCriteria) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
+    }
+    if let v = self._filterCriteria {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request) -> Bool {
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs._filterCriteria != rhs._filterCriteria {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".UpdateFilter_Response"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let _ = try decoder.nextFieldNumber() {
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

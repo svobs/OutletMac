@@ -7,6 +7,12 @@
 //
 
 protocol OutletBackend {
+  func getConfig(_ configKey: String, defaultVal: String?) throws -> String
+  func putConfig(_ configKey: String, _ configVal: String) throws
+  func getConfigList(_ configKeyList: [String]) throws -> [String: String]
+  func putConfigList(_ configDict: [String: String]) throws
+  func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
+  
 //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
   func getNodeForLocalPath(fullPath: String) throws -> Node?
@@ -32,4 +38,6 @@ protocol OutletBackend {
   func getLastPendingOp(nodeUID: UID) throws -> UserOp?
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
   func deleteSubtree(nodeUIDList: [UID]) throws
+  func getFilterCriteria(treeID: String) throws -> FilterCriteria?
+  func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws
 }

@@ -31,12 +31,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.makeKeyAndOrderFront(nil)
       
       do {
-        let grpcClient: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
+        let backend: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
          NSLog("gRPC client connecting")
-        grpcClient.receiveServerSignals()
+        backend.receiveServerSignals()
         
-        let treeLeft: DisplayTree = try grpcClient.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-        let treeRight: DisplayTree = try grpcClient.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+        let win_id = ID_DIFF_WINDOW
+        let xLocConfigPath = "ui_state.\(win_id).x"
+        let yLocConfigPath = "ui_state.\(win_id).y"
+        let winX : Int = try backend.getIntConfig(xLocConfigPath)
+        let winY : Int = try backend.getIntConfig(yLocConfigPath)
+        
+        let widthConfigPath = "ui_state.\(win_id).width"
+        let heightConfigPath = "ui_state.\(win_id).height"
+        let winWidth : Int = try backend.getIntConfig(widthConfigPath)
+        let winHeight : Int = try backend.getIntConfig(heightConfigPath)
+        
+        let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
+        let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
         do {
           NSLog("Sleeping 2...")
           sleep(2)
