@@ -81,7 +81,7 @@ class DisplayTreeUiState: CustomStringConvertible {
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
     self.treeId = treeId
     /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
-    Each display tree can only have one root path.*/
+     Each display tree can only have one root path.*/
     self.rootSN = rootSN
     self.rootExists = rootExists
     self.offendingPath = offendingPath
@@ -89,7 +89,7 @@ class DisplayTreeUiState: CustomStringConvertible {
     self.hasCheckboxes = hasCheckboxes
     
     /**If True, the UI should display a "Load" button in order to kick off the backend data load.
-    If False; the backend will automatically start loading in the background.*/
+     If False; the backend will automatically start loading in the background.*/
     self.needsManualLoad = false
   }
 

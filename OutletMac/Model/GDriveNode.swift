@@ -165,11 +165,11 @@ class GDriveFolder: GDriveNode {
   
   override var etc: String {
     get {
-        if self._dirStats == nil {
-          return ""
-        } else {
-          return self._dirStats!.etc
-        }
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.etc
+      }
     }
   }
   
@@ -208,7 +208,7 @@ class GDriveFile: GDriveNode {
       return _md5
     }
     set (md5) {
-      self._md5 = md5
+      self._md5 = md5z
     }
   }
   

@@ -180,7 +180,7 @@ class LocaFileNode: LocalNode {
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,
-                sizeBytes: UInt64?, syncTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
+       sizeBytes: UInt64?, syncTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
     self._md5 = md5
     self._sha256 = sha256
     self._sizeBytes = sizeBytes

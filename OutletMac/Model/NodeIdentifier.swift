@@ -84,7 +84,7 @@ class SinglePathNodeIdentifier: NodeIdentifier {
       self._treeType = treeType
     }
   }
-
+  
   override func getTreeType() -> TreeType {
     return self.treeType
   }
@@ -128,5 +128,4 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
     let uidToCopy: UID = uid ?? self.uid
     return LocalNodeIdentifier(uidToCopy, self.getSinglePath())
   }
-
 }

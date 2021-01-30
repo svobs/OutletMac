@@ -20,9 +20,9 @@ enum UserOpType: UInt32 {
     UserOpType.MV: "To Move"
   ]
 
- func hasDst() -> Bool {
-  return self == .CP || self == .MV || self == .UP
- }
+  func hasDst() -> Bool {
+    return self == .CP || self == .MV || self == .UP
+  }
 }
 
 enum UserOpStatus: UInt32 {

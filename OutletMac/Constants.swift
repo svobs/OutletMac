@@ -152,20 +152,20 @@ enum TrashStatus: UInt32 {
   }
   
   static func display(_ code: UInt32) -> String {
-      guard let status = TrashStatus(rawValue: code) else {
-          return "UNKNOWN"
-      }
+    guard let status = TrashStatus(rawValue: code) else {
+      return "UNKNOWN"
+    }
 
-      switch status {
+    switch status {
       case .NOT_TRASHED:
-          return "No"
+        return "No"
       case .EXPLICITLY_TRASHED:
-          return "UserTrashed"
+        return "UserTrashed"
       case .IMPLICITLY_TRASHED:
-          return "Trashed"
+        return "Trashed"
       case .DELETED:
-          return "Deleted"
-      }
+        return "Deleted"
+    }
   }
 }
 
@@ -183,32 +183,32 @@ enum TreeType: UID {
   
   func getName() -> String {
     switch self {
-    case .NA:
-      return "None"
-    case .MIXED:
-      return "Mixed"
-    case .LOCAL_DISK:
-      return "Local Disk"
-    case .GDRIVE:
-      return "Google Drive"
+      case .NA:
+        return "None"
+      case .MIXED:
+        return "Mixed"
+      case .LOCAL_DISK:
+        return "Local Disk"
+      case .GDRIVE:
+        return "Google Drive"
     }
   }
   
   static func display(code: UID) -> String {
-      guard let treeType = TreeType(rawValue: code) else {
-          return "UNKNOWN"
-      }
+    guard let treeType = TreeType(rawValue: code) else {
+      return "UNKNOWN"
+    }
 
-      switch treeType {
+    switch treeType {
       case .NA:
-          return "✪"
+        return "✪"
       case .MIXED:
-          return "M"
+        return "M"
       case .LOCAL_DISK:
-          return "L"
+        return "L"
       case .GDRIVE:
-          return "G"
-      }
+        return "G"
+    }
   }
 }
 

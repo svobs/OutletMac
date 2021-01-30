@@ -45,15 +45,15 @@ class OutletGRPCClient: OutletBackend {
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
   static func makeClient(host: String, port: Int) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-//    defer {
-//      try? group.syncShutdownGracefully()
-//    }
-
+    //    defer {
+    //      try? group.syncShutdownGracefully()
+    //    }
+    
     let channel = ClientConnection.insecure(group: group)
       .withConnectionTimeout(minimum: TimeAmount.seconds(3))
       .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
       .connect(host: host, port: port)
-
+    
     return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
   }
   
@@ -68,9 +68,9 @@ class OutletGRPCClient: OutletBackend {
     if let spid = request.spid {
       grpcRequest.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
     }
-
+    
     let call = self.stub.request_display_tree_ui_state(grpcRequest)
-
+    
     do {
       let response = try call.response.wait()
       if (response.hasDisplayTreeUiState) {
@@ -84,7 +84,7 @@ class OutletGRPCClient: OutletBackend {
       throw OutletError.grpcFailure("RPC 'requestDisplayTree' failed: \(error)")
     }
   }
-
+  
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node? {
     var request = Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request()
     request.uid = uid
@@ -232,7 +232,7 @@ class OutletGRPCClient: OutletBackend {
    Notifies the backend that the tree was requested, and returns a display tree object, which the backend will also send via
    notification (unless is_startup==True, in which case no notification will be sent). Also is_startup helps determine whether
    to load it immediately.
-
+   
    The DisplayTree object is immediately created and returned even if the tree has not finished loading on the backend. The backend
    will send a notification if/when it has finished loading.
    */
@@ -475,7 +475,7 @@ class OutletGRPCClient: OutletBackend {
     do {
       let response = try call.response.wait()
       assert(response.configList.count == configKeyList.count, "getConfigList(): response config count (\(response.configList.count)) "
-             + "does not match request config count (\(configKeyList.count))")
+              + "does not match request config count (\(configKeyList.count))")
       var configDict: [String: String] = [:]
       for config in response.configList {
         configDict[config.key] = config.val

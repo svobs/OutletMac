@@ -13,7 +13,7 @@ protocol OutletBackend {
   func putConfigList(_ configDict: [String: String]) throws
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
   
-//  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
+  //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
   func getNodeForLocalPath(fullPath: String) throws -> Node?
   func nextUID() throws -> UID

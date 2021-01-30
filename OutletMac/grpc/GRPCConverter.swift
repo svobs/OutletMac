@@ -15,17 +15,17 @@ import Foundation
  Note on ordering of methods: TO comes before FROM
  */
 class GRPCConverter {
-  
+
   // Node
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  
+
   static func nodeToGRPC(_ node: Node) throws -> Outlet_Backend_Daemon_Grpc_Generated_Node {
     var grpc = Outlet_Backend_Daemon_Grpc_Generated_Node()
     let nodeIdentifier: NodeIdentifier
     if node.isDecorator {
       grpc.decoratorNid = node.uid
       grpc.decoratorParentNid = node.parentList[0]
-      
+
       if let decoNode = node as? DecoNode {
         nodeIdentifier = decoNode.nodeIdentifier
       } else {
@@ -34,19 +34,19 @@ class GRPCConverter {
     } else {
       nodeIdentifier = node.nodeIdentifier
     }
-    
+
     // NodeIdentifier fields:
     grpc.uid = nodeIdentifier.uid
     grpc.treeType = nodeIdentifier.treeType.rawValue
     grpc.pathList = nodeIdentifier.pathList
-    
+
     // Node common fields:
     grpc.trashed = node.trashed.rawValue
     grpc.isShared = node.isShared
     if let icon = node.customIcon {
       grpc.iconID = icon.rawValue
     }
-    
+
     if let containerNode = node as? ContainerNode {
       // ContainerNode or subclass
       if let catNode = containerNode as? CategoryNode {
@@ -80,14 +80,14 @@ class GRPCConverter {
         grpc.localFileMeta.parentUid = try node.getSingleParent()
       }
     } else if node.treeType == .GDRIVE {
-      
+
       if node.isDir {  // GDrive Folder
         grpc.gdriveFolderMeta = Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta()
         var meta = grpc.gdriveFolderMeta
         meta.dirMeta = try GRPCConverter.dirMetaToGRPC(node.getDirStats())
         if let gnode = node as? GDriveFolder {
           meta.allChildrenFetched = gnode.isAllChildrenFetched
-          
+
           // GDriveNode common fields
           meta.googID = gnode.googID ?? ""
           meta.name = gnode.name
@@ -101,7 +101,7 @@ class GRPCConverter {
         } else {
           throw OutletError.invalidState("Node has isDir=true but is not GDriveFolder: \(node)")
         }
-        
+
       } else {  // GDrive File
         assert(node.isFile, "Expected node to be File type: \(node)")
         if let gnode = node as? GDriveFile {
@@ -111,7 +111,7 @@ class GRPCConverter {
           meta.version = gnode.version ?? 0 // NOTE: may need to investigate if we ever use the version field
           meta.sizeBytes = gnode.sizeBytes ?? 0 // FIXME! Null !== 0
           meta.mimeTypeUid = gnode.mimeTypeUID // mimeType: 0 == null
-          
+
           // GDriveNode common fields
           meta.googID = gnode.googID ?? ""
           meta.name = gnode.name
@@ -125,99 +125,99 @@ class GRPCConverter {
         } else {
           throw OutletError.invalidState("Node has isDir=false but is not GDriveFile: \(node)")
         }
-        
+
       }
     }
-    
+
     return grpc
   }
-  
+
   static func nodeFromGRPC(_ nodeGRPC: Outlet_Backend_Daemon_Grpc_Generated_Node) throws -> Node {
     if nodeGRPC.treeType == 0 {
       throw OutletError.invalidState("GRPC node does not exist or is invalid!")
     }
     let treeType: TreeType = TreeType(rawValue: nodeGRPC.treeType)!
     let nodeIdentifier: NodeIdentifier = try NodeIdentifierFactory.forAllValues(nodeGRPC.uid, treeType, nodeGRPC.pathList, mustBeSinglePath: false)
-    
+
     var node: Node
-    
+
     if let nodeType = nodeGRPC.nodeType {
-       switch nodeType {
-       case .gdriveFileMeta(let meta):
-         let gdriveIdentifier = nodeIdentifier as! GDriveIdentifier
-         let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-         let googID = meta.googID == "" ? nil : meta.googID
-         let md5 = meta.md5 == "" ? nil : meta.md5
-         let sizeBytes = meta.sizeBytes == 0 ? nil : meta.sizeBytes
-         let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
-         let createTs = meta.createTs == 0 ? nil : meta.createTs
-         let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
-         let sharedByUserUid = meta.sharedByUserUid == 0 ? nil : meta.sharedByUserUid
-         let driveId = meta.driveID == "" ? nil : meta.driveID
-         node = GDriveFile(gdriveIdentifier, meta.parentUidList, trashed: trashed, googID: googID, createTS: createTs,
-                           modifyTS: modifyTs, name: meta.name, ownerUID: meta.ownerUid, driveID: driveId, isShared: nodeGRPC.isShared,
-                           sharedByUserUID: sharedByUserUid, syncTS: syncTs, version: meta.version, md5: md5,
-                           mimeTypeUID: meta.mimeTypeUid, sizeBytes: sizeBytes)
-       case .gdriveFolderMeta(let meta):
-         let gdriveIdentifier = nodeIdentifier as! GDriveIdentifier
-         let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-         let googID = meta.googID == "" ? nil : meta.googID
-         let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
-         let createTs = meta.createTs == 0 ? nil : meta.createTs
-         let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
-         let sharedByUserUid = meta.sharedByUserUid == 0 ? nil : meta.sharedByUserUid
-         let driveId = meta.driveID == "" ? nil : meta.driveID
-         node = GDriveFolder(gdriveIdentifier, meta.parentUidList, trashed: trashed, googID: googID, createTS: createTs,
-                             modifyTS: modifyTs, name: meta.name, ownerUID: meta.ownerUid, driveID: driveId, isShared:
-                             nodeGRPC.isShared, sharedByUserUID: sharedByUserUid, syncTS: syncTs,
-                             allChildrenFetched: meta.allChildrenFetched)
-         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-         try node.setDirStats(dirStats)
-       case .localDirMeta(let meta):
-         let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
-         let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-         node = LocalDirNode(localNodeIdentifier, meta.parentUid, trashed, isLive: meta.isLive)
-         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-         try node.setDirStats(dirStats)
-       case .localFileMeta(let meta):
-         let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
-         let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-         let md5 = meta.md5 == "" ? nil : meta.md5
-         let sha256 = meta.sha256 == "" ? nil : meta.sha256
-         let sizeBytes = meta.sizeBytes == 0 ? nil : meta.sizeBytes
-         let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
-         let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
-         let changeTs = meta.changeTs == 0 ? nil : meta.changeTs
-         node = LocaFileNode(localNodeIdentifier, meta.parentUid, trashed: trashed, isLive: meta.isLive, md5: md5, sha256: sha256,
-                             sizeBytes: sizeBytes, syncTS: syncTs, modifyTS: modifyTs, changeTS: changeTs)
-       case .containerMeta(let meta):
-         node = ContainerNode(nodeIdentifier)
-         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-         try node.setDirStats(dirStats)
-       case .categoryMeta(let meta):
-         let opType = UserOpType(rawValue: meta.opType)!
-         node = CategoryNode(nodeIdentifier, opType)
-         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-         try node.setDirStats(dirStats)
-       case .rootTypeMeta(let meta):
-         node = RootTypeNode(nodeIdentifier)
-         let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-         try node.setDirStats(dirStats)
-       }
+      switch nodeType {
+        case .gdriveFileMeta(let meta):
+          let gdriveIdentifier = nodeIdentifier as! GDriveIdentifier
+          let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
+          let googID = meta.googID == "" ? nil : meta.googID
+          let md5 = meta.md5 == "" ? nil : meta.md5
+          let sizeBytes = meta.sizeBytes == 0 ? nil : meta.sizeBytes
+          let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
+          let createTs = meta.createTs == 0 ? nil : meta.createTs
+          let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
+          let sharedByUserUid = meta.sharedByUserUid == 0 ? nil : meta.sharedByUserUid
+          let driveId = meta.driveID == "" ? nil : meta.driveID
+          node = GDriveFile(gdriveIdentifier, meta.parentUidList, trashed: trashed, googID: googID, createTS: createTs,
+                            modifyTS: modifyTs, name: meta.name, ownerUID: meta.ownerUid, driveID: driveId, isShared: nodeGRPC.isShared,
+                            sharedByUserUID: sharedByUserUid, syncTS: syncTs, version: meta.version, md5: md5,
+                            mimeTypeUID: meta.mimeTypeUid, sizeBytes: sizeBytes)
+        case .gdriveFolderMeta(let meta):
+          let gdriveIdentifier = nodeIdentifier as! GDriveIdentifier
+          let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
+          let googID = meta.googID == "" ? nil : meta.googID
+          let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
+          let createTs = meta.createTs == 0 ? nil : meta.createTs
+          let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
+          let sharedByUserUid = meta.sharedByUserUid == 0 ? nil : meta.sharedByUserUid
+          let driveId = meta.driveID == "" ? nil : meta.driveID
+          node = GDriveFolder(gdriveIdentifier, meta.parentUidList, trashed: trashed, googID: googID, createTS: createTs,
+                              modifyTS: modifyTs, name: meta.name, ownerUID: meta.ownerUid, driveID: driveId, isShared:
+                                nodeGRPC.isShared, sharedByUserUID: sharedByUserUid, syncTS: syncTs,
+                              allChildrenFetched: meta.allChildrenFetched)
+          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+          try node.setDirStats(dirStats)
+        case .localDirMeta(let meta):
+          let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
+          let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
+          node = LocalDirNode(localNodeIdentifier, meta.parentUid, trashed, isLive: meta.isLive)
+          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+          try node.setDirStats(dirStats)
+        case .localFileMeta(let meta):
+          let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
+          let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
+          let md5 = meta.md5 == "" ? nil : meta.md5
+          let sha256 = meta.sha256 == "" ? nil : meta.sha256
+          let sizeBytes = meta.sizeBytes == 0 ? nil : meta.sizeBytes
+          let syncTs = meta.syncTs == 0 ? nil : meta.syncTs
+          let modifyTs = meta.modifyTs == 0 ? nil : meta.modifyTs
+          let changeTs = meta.changeTs == 0 ? nil : meta.changeTs
+          node = LocaFileNode(localNodeIdentifier, meta.parentUid, trashed: trashed, isLive: meta.isLive, md5: md5, sha256: sha256,
+                              sizeBytes: sizeBytes, syncTS: syncTs, modifyTS: modifyTs, changeTS: changeTs)
+        case .containerMeta(let meta):
+          node = ContainerNode(nodeIdentifier)
+          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+          try node.setDirStats(dirStats)
+        case .categoryMeta(let meta):
+          let opType = UserOpType(rawValue: meta.opType)!
+          node = CategoryNode(nodeIdentifier, opType)
+          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+          try node.setDirStats(dirStats)
+        case .rootTypeMeta(let meta):
+          node = RootTypeNode(nodeIdentifier)
+          let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
+          try node.setDirStats(dirStats)
+      }
     } else {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
-    
+
     node.customIcon = IconId(rawValue: nodeGRPC.iconID)!
-    
+
     if nodeGRPC.decoratorNid > 0 {
       assert(nodeGRPC.decoratorParentNid > 0, "No parent_nid for decorator node! (decorator_nid=\(nodeGRPC.decoratorNid)")
       node = DecoratorFactory.decorate(node, nodeGRPC.decoratorNid, nodeGRPC.decoratorParentNid)
     }
-    
+
     return node
   }
-  
+
   static func dirMetaToGRPC(_ dirStats: DirectoryStats?) throws -> Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
     var grpc = Outlet_Backend_Daemon_Grpc_Generated_DirMeta()
     if dirStats == nil {
@@ -233,8 +233,8 @@ class GRPCConverter {
     }
     return grpc
   }
-  
-  
+
+
   static func dirMetaFromGRPC(_ grpc: Outlet_Backend_Daemon_Grpc_Generated_DirMeta) throws -> DirectoryStats? {
     if grpc.hasData_p {
       let dirStats = DirectoryStats()
@@ -249,10 +249,10 @@ class GRPCConverter {
       return nil
     }
   }
-  
+
   // Node list
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  
+
   static func nodeListFromGRPC(_ nodeListGRPC: [Outlet_Backend_Daemon_Grpc_Generated_Node]) throws -> [Node] {
     var convertedNodeList: [Node] = []
     for nodeGRPC in nodeListGRPC {
@@ -260,7 +260,7 @@ class GRPCConverter {
     }
     return convertedNodeList
   }
-  
+
   static func nodeListToGRPC(_ nodeList: [Node]) throws -> [Outlet_Backend_Daemon_Grpc_Generated_Node] {
     var nodeListGRPC: [Outlet_Backend_Daemon_Grpc_Generated_Node] = []
     for node in nodeList {
@@ -268,15 +268,15 @@ class GRPCConverter {
     }
     return nodeListGRPC
   }
-  
+
   // NodeIdentifier
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  
+
   static func nodeIdentifierFromGRPC(_ spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
     let treeType: TreeType = TreeType(rawValue: spidGRPC.treeType)!
     return try NodeIdentifierFactory.forAllValues(spidGRPC.uid, treeType, spidGRPC.pathList, mustBeSinglePath: spidGRPC.isSinglePath)
   }
-  
+
   static func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
     var grpc = Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier()
     grpc.uid = nodeIdentifier.uid
@@ -285,15 +285,15 @@ class GRPCConverter {
     grpc.isSinglePath = nodeIdentifier.isSpid()
     return grpc
   }
-  
+
   static func spidFromGRPC(spidGRPC: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) throws -> SinglePathNodeIdentifier {
     let nodeIdentifier = try GRPCConverter.nodeIdentifierFromGRPC(spidGRPC)
     return nodeIdentifier as! SinglePathNodeIdentifier
   }
-  
+
   // SPIDNodePair
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  
+
   static func snToGRPC(_ sn: SPIDNodePair) throws -> Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
     var grpc = Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair()
     grpc.spid = try GRPCConverter.nodeIdentifierToGRPC(sn.spid)
@@ -313,10 +313,10 @@ class GRPCConverter {
     }
     return SPIDNodePair(spid: spid, node: node)
   }
-  
+
   // FilterCriteria
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  
+
   static func filterCriteriaToGRPC(_ filterCriteria: FilterCriteria) throws -> Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
     var grpc = Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()
     grpc.searchQuery = filterCriteria.searchQuery
@@ -326,17 +326,17 @@ class GRPCConverter {
     grpc.showSubtreesOfMatches = filterCriteria.showSubtreesOfMatches
     return grpc
   }
-  
+
   static func filterCriteriaFromGRPC(_ grpc: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria) throws -> FilterCriteria {
     return FilterCriteria(searchQuery: grpc.searchQuery, isTrashed: Ternary(rawValue: grpc.isTrashed)!,
-                                        isShared: Ternary(rawValue: grpc.isShared)!, isIgnoreCase: grpc.isIgnoreCase,
-                                        showSubtreesOfMatches: grpc.showSubtreesOfMatches)
+                          isShared: Ternary(rawValue: grpc.isShared)!, isIgnoreCase: grpc.isIgnoreCase,
+                          showSubtreesOfMatches: grpc.showSubtreesOfMatches)
   }
-  
+
   // DisplayTreeUiState
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  
+
   static func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
     let rootSn: SPIDNodePair = try GRPCConverter.snFromGRPC(stateGRPC.rootSn)
     NSLog("Got rootSN: \(rootSn)")
