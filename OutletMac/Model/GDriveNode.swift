@@ -208,7 +208,7 @@ class GDriveFile: GDriveNode {
       return _md5
     }
     set (md5) {
-      self._md5 = md5z
+      self._md5 = md5
     }
   }
   

@@ -32,7 +32,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     do {
       let backend: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
       NSLog("gRPC client connecting")
-      backend.receiveServerSignals()
+
+      try backend.start()
       
       let win_id = ID_DIFF_WINDOW
       let xLocConfigPath = "ui_state.\(win_id).x"
@@ -47,8 +48,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       
       NSLog("WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
       
-      let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-      let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+      let treeLeft: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)
+      let treeRight: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)
+      // TODO: build editor trees
+
+
       
       NSLog("Sleeping 2...")
       sleep(2)

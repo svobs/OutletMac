@@ -12,15 +12,22 @@ import NIO
 
 class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
+  var signalReceiverThread: SignalReceiverThread?
   init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient) {
     self.stub = client
+  }
+
+  func start() throws {
+    self.signalReceiverThread = SignalReceiverThread(self)
+    self.signalReceiverThread!.start()
   }
   
   func shutdown() throws {
     try self.stub.channel.close().wait()
+    self.signalReceiverThread?.cancel()
   }
   
-  func receiveServerSignals() {
+  func receiveServerSignals() throws {
     NSLog("Subscribing to server signals...")
     let request = Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
@@ -37,7 +44,7 @@ class OutletGRPCClient: OutletBackend {
         NSLog("ReceiveSignals failed: \(status)")
       }
     }
-    
+
     // Wait for the call to end.
     _ = try! call.status.wait()
   }
