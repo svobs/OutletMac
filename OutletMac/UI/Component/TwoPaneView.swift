@@ -8,88 +8,85 @@
 
 import SwiftUI
 
-let SPACING_V: CGFloat = 10
-let SPACING_H: CGFloat = 10
-
 struct TodoPlaceholder: View {
-    let msg: String
-    init(_ msg: String) {
-        self.msg = msg
-    }
-    
-    var body: some View {
-        ZStack {
-            Rectangle().fill(Color.green)
-            Text(msg)
-                .foregroundColor(Color.black)
-        } .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
+  let msg: String
+  init(_ msg: String) {
+    self.msg = msg
+  }
+
+  var body: some View {
+    ZStack {
+      Rectangle().fill(Color.green)
+      Text(msg)
+        .foregroundColor(Color.black)
+    } .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
 
 }
 
-struct RootDirPanel: View {
-    var body: some View {
-        TodoPlaceholder("<TODO: RootDirPanel>")
-    }
-}
-
-struct FilterPanel: View {
-    var body: some View {
-        TodoPlaceholder("<TODO: FilterPanel>")
-    }
-}
-
+/**
+ STRUCT TreeView
+ */
 struct TreeView: View {
   
   var outlineTree: OutlineTree<ExampleClass, [ExampleClass]>
   @State var selectedItem: OutlineNode<ExampleClass>? = nil
   
   init(items: [ExampleClass]) {
-      outlineTree = OutlineTree(representedObjects: items)
+    outlineTree = OutlineTree(representedObjects: items)
   }
   
-    var body: some View {
-      OutlineSection<ExampleClass, [ExampleClass]>(selectedItem: $selectedItem).environmentObject(outlineTree)
-          .frame(minWidth: 200, minHeight: 200, maxHeight: .infinity)
-    }
+  var body: some View {
+    OutlineSection<ExampleClass, [ExampleClass]>(selectedItem: $selectedItem).environmentObject(outlineTree)
+      .frame(minWidth: 200, minHeight: 200, maxHeight: .infinity)
+  }
 }
 
+/**
+ STRUCT StatusPanel
+ */
 struct StatusPanel: View {
-    var body: some View {
-        TodoPlaceholder("<Status msg panel>")
-    }
+  var body: some View {
+    TodoPlaceholder("<Status msg panel>")
+  }
 }
 
+/**
+ STRUCT TreePanel
+ */
 struct TreePanel {
-    let root_dir_panel = RootDirPanel()
-    let filter_panel = FilterPanel()
+  let root_dir_panel = RootDirPanel(canChangeRoot: true, isEditing: true)
+  let filter_panel = FilterPanel()
   let tree_view = TreeView(items:  exampleArray())
-    let status_panel = StatusPanel()
+  let status_panel = StatusPanel()
 }
 
+/**
+ STRUCT TwoPaneView
+ */
 @available(OSX 11.0, *)
 struct TwoPaneView: View {
-    private var columns: [GridItem] = [
-        // these specify spacing between columns
-        GridItem(.flexible(minimum: 300), spacing: SPACING_H),
-        GridItem(.flexible(minimum: 300), spacing: SPACING_H),
-    ]
-    
-    private var left_tree_panel = TreePanel()
-    private var right_tree_panel = TreePanel()
-    
-    init() {
-    }
-    private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
-    private var colors: [Color] = [.yellow, .purple, .green]
+  private var columns: [GridItem] = [
+    // these specify spacing between columns
+    GridItem(.flexible(minimum: 300), spacing: H_PAD),
+    GridItem(.flexible(minimum: 300), spacing: H_PAD),
+  ]
 
-    
+  private var left_tree_panel = TreePanel()
+  private var right_tree_panel = TreePanel()
+
+  init() {
+  }
+  private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
+  private var colors: [Color] = [.yellow, .purple, .green]
+
+
     var body: some View {
 //        ScrollView(.vertical) {
             LazyVGrid(
                 columns: columns,
                 alignment: .center,
-                spacing: SPACING_V
+                spacing: V_PAD
 //                pinnedViews: [.sectionHeaders, .sectionFooters]
             ) {
 //                ForEach((0...10), id: \.self) {
@@ -129,7 +126,7 @@ struct TwoPaneView: View {
 
 @available(OSX 11.0, *)
 struct TwoPaneView_Previews: PreviewProvider {
-    static var previews: some View {
-        TwoPaneView()
-    }
+  static var previews: some View {
+    TwoPaneView()
+  }
 }

@@ -41,6 +41,8 @@
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
 		D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeViewController.swift */; };
 		D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */; };
+		D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */; };
+		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
 /* End PBXBuildFile section */
@@ -84,6 +86,8 @@
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		D1E913B925AA735C008E958B /* TreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
 		D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingalReceiverThread.swift; sourceTree = "<group>"; };
+		D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDirPanel.swift; sourceTree = "<group>"; };
+		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
@@ -122,17 +126,14 @@
 		11DDEECD23A6F9580014C2A6 /* OutletMac */ = {
 			isa = PBXGroup;
 			children = (
+				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* grpc */,
-				D1E913B825AA7342008E958B /* TreeView */,
 				D1BAC56B25A1954800D951A2 /* Main.storyboard */,
 				D1BAC55E25A193C800D951A2 /* AppDelegate.swift */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
-				D1BAC55F25A193C800D951A2 /* ContentView.swift */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
-				D1BAC55625A193C800D951A2 /* OutlineView */,
-				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
 				D1F36C3B25B54E73009498D8 /* Constants.swift */,
 				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
 				D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */,
@@ -187,7 +188,6 @@
 				D1BAC55925A193C800D951A2 /* OutlineNode.swift */,
 				D1BAC55A25A193C800D951A2 /* SplitView.swift */,
 				D1BAC55B25A193C800D951A2 /* OutlineView.swift */,
-				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
 			);
 			path = OutlineView;
 			sourceTree = "<group>";
@@ -218,6 +218,28 @@
 				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
 			);
 			path = TreeView;
+			sourceTree = "<group>";
+		};
+		D1ED5E2425C7D75D00A8E5DB /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				D1ED5E2525C7D78700A8E5DB /* Component */,
+				D1E913B825AA7342008E958B /* TreeView */,
+				D1BAC55F25A193C800D951A2 /* ContentView.swift */,
+				D1BAC55625A193C800D951A2 /* OutlineView */,
+				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		D1ED5E2525C7D78700A8E5DB /* Component */ = {
+			isa = PBXGroup;
+			children = (
+				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
+				D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */,
+				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
+			);
+			path = Component;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -337,7 +359,9 @@
 			files = (
 				D1BAC56725A193C800D951A2 /* AppDelegate.swift in Sources */,
 				D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */,
+				D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */,
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
+				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
 				D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,

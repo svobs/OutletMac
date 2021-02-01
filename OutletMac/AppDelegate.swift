@@ -29,38 +29,38 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     window.contentView = NSHostingView(rootView: contentView)
     window.makeKeyAndOrderFront(nil)
     
-    do {
-      let backend: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
-      NSLog("gRPC client connecting")
-
-      try backend.start()
-      
-      let win_id = ID_DIFF_WINDOW
-      let xLocConfigPath = "ui_state.\(win_id).x"
-      let yLocConfigPath = "ui_state.\(win_id).y"
-      let winX : Int = try backend.getIntConfig(xLocConfigPath)
-      let winY : Int = try backend.getIntConfig(yLocConfigPath)
-      
-      let widthConfigPath = "ui_state.\(win_id).width"
-      let heightConfigPath = "ui_state.\(win_id).height"
-      let winWidth : Int = try backend.getIntConfig(widthConfigPath)
-      let winHeight : Int = try backend.getIntConfig(heightConfigPath)
-      
-      NSLog("WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
-      
-      let treeLeft: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)
-      let treeRight: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)
-      // TODO: build editor trees
-
-
-      
-      NSLog("Sleeping 2...")
-      sleep(2)
-      NSLog("Quitting")
-      exit(0)
-    } catch {
-      fatalError("RPC failed: \(error)")
-    }
+//    do {
+//      let backend: OutletGRPCClient = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
+//      NSLog("gRPC client connecting")
+//
+//      try backend.start()
+//      
+//      let win_id = ID_DIFF_WINDOW
+//      let xLocConfigPath = "ui_state.\(win_id).x"
+//      let yLocConfigPath = "ui_state.\(win_id).y"
+//      let winX : Int = try backend.getIntConfig(xLocConfigPath)
+//      let winY : Int = try backend.getIntConfig(yLocConfigPath)
+//      
+//      let widthConfigPath = "ui_state.\(win_id).width"
+//      let heightConfigPath = "ui_state.\(win_id).height"
+//      let winWidth : Int = try backend.getIntConfig(widthConfigPath)
+//      let winHeight : Int = try backend.getIntConfig(heightConfigPath)
+//      
+//      NSLog("WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
+//      
+//      let treeLeft: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)
+//      let treeRight: DisplayTree? = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)
+//      // TODO: build editor trees
+//
+//
+//      
+//      NSLog("Sleeping 2...")
+//      sleep(2)
+//      NSLog("Quitting")
+//      exit(0)
+//    } catch {
+//      fatalError("RPC failed: \(error)")
+//    }
   }
   
   func applicationWillTerminate(_ aNotification: Notification) {

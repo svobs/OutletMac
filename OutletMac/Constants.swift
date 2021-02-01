@@ -16,8 +16,8 @@ typealias SHA256 = String
 let APP_NAME = "Outlet"
 
 // Padding in pixels
-let H_PAD = 5
-let V_PAD = 5
+let H_PAD: CGFloat = 5
+let V_PAD: CGFloat = 5
 
 let LARGE_NUMBER_OF_CHILDREN = 10000
 
