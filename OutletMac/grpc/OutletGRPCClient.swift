@@ -26,14 +26,52 @@ class OutletGRPCClient: OutletBackend {
     try self.stub.channel.close().wait()
     self.signalReceiverThread?.cancel()
   }
+
+  func _relaySignalLocally(_ signalGRPC: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg) throws {
+    let signal = Signal(rawValue: signalGRPC.sigInt)!
+    NSLog("Got signal: \(signal)")
+    var argDict: [String: Any] = [:]
+
+    switch signal {
+      case .DISPLAY_TREE_CHANGED, .GENERATE_MERGE_TREE_DONE:
+        let displayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
+        let tree: DisplayTree = displayTreeUiState.toDisplayTree(backend: self)
+        argDict["tree"] = tree
+      case .OP_EXECUTION_PLAY_STATE_CHANGED:
+        argDict["is_enabled"] = signalGRPC.playState.isEnabled
+      case .TOGGLE_UI_ENABLEMENT:
+        argDict["enable"] = signalGRPC.uiEnablement.enable
+      case .ERROR_OCCURRED:
+        argDict["msg"] = signalGRPC.errorOccurred.msg
+        argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
+      case .NODE_UPSERTED, .NODE_REMOVED:
+        argDict["node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.node)
+      case .NODE_MOVED:
+        argDict["src_node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.srcNode)
+        argDict["dst_node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.dstNode)
+      case .SET_STATUS:
+        argDict["status_msg"] = signalGRPC.statusMsg.msg
+      case .DOWNLOAD_FROM_GDRIVE_DONE:
+        argDict["filename"] = signalGRPC.downloadMsg.filename
+      default:
+        break
+    }
+    argDict["signal"] = signal
+    argDict["sender"] = signalGRPC.sender
+
+    // TODO: DIPATCH MSG
+  }
   
   func receiveServerSignals() throws {
     NSLog("Subscribing to server signals...")
     let request = Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
-      let signal = Signal(rawValue: signalGRPC.sigInt)!
-      NSLog("Got signal: \(signal)")
-      
+      do {
+        try self._relaySignalLocally(signalGRPC)
+      } catch {
+        let signal = Signal(rawValue: signalGRPC.sigInt)!
+        NSLog("Error processing received signal \(signal): \(error)")
+      }
     }
     
     call.status.whenSuccess { status in
@@ -83,7 +121,7 @@ class OutletGRPCClient: OutletBackend {
       if (response.hasDisplayTreeUiState) {
         let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
         NSLog("Got state: \(state)")
-        return state.toDisplayTree()
+        return state.toDisplayTree(backend: self)
       } else {
         return nil
       }
@@ -261,7 +299,7 @@ class OutletGRPCClient: OutletBackend {
       let tree: DisplayTree?
       if response.hasDisplayTreeUiState {
         let state = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-        tree = state.toDisplayTree()
+        tree = state.toDisplayTree(backend: self)
         NSLog("Returning DisplayTree: \(tree!)")
       } else {
         tree = nil

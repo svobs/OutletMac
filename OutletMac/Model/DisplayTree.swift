@@ -13,9 +13,11 @@ import Foundation
  CLASS DisplayTree
  */
 class DisplayTree {
+  let backend: OutletBackend
   let state: DisplayTreeUiState
   
-  init(state: DisplayTreeUiState) {
+  init(backend: OutletBackend, state: DisplayTreeUiState) {
+    self.backend = backend
     self.state = state
   }
 }
@@ -99,11 +101,11 @@ class DisplayTreeUiState: CustomStringConvertible {
     }
   }
   
-  func toDisplayTree() -> DisplayTree {
+  func toDisplayTree(backend: OutletBackend) -> DisplayTree {
     if self.rootExists {
-      return DisplayTree(state: self)
+      return DisplayTree(backend: backend, state: self)
     } else {
-      return NullDisplayTree(state: self)
+      return NullDisplayTree(backend: backend, state: self)
     }
   }
 }
