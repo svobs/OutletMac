@@ -7,6 +7,7 @@
 //
 
 protocol OutletBackend {
+  var dispatcher: Dispatcher { get }
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String
   func putConfig(_ configKey: String, _ configVal: String) throws
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
@@ -48,6 +49,11 @@ protocol OutletBackend {
  Should be used only for testing & previews
  */
 class NullBackend: OutletBackend {
+  let _dipatcher: Dispatcher = Dispatcher()
+  var dispatcher: Dispatcher {
+    return _dipatcher
+  }
+
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String {
     throw OutletError.invalidOperation("Cannot call NullBackend methods")
   }

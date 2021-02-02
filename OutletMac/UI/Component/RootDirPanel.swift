@@ -25,9 +25,14 @@ struct RootDirPanel: View {
     self.canChangeRoot = canChangeRoot
   }
 
+  func start() {
+
+    
+  }
+
   func submitRootPath() {
     do {
-      try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.rootPath)
+      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.rootPath)
     } catch {
       NSLog("Failed to submit root path \"\(rootPath)\": \(error)")
     }

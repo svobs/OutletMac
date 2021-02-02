@@ -13,7 +13,13 @@ import NIO
 class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   var signalReceiverThread: SignalReceiverThread?
+  let _dipatcher: Dispatcher
+  var dispatcher: Dispatcher {
+    return _dipatcher
+  }
+
   init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient) {
+    self._dipatcher = Dispatcher()
     self.stub = client
   }
 
