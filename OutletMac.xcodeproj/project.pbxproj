@@ -43,6 +43,7 @@
 		D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */; };
 		D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
+		D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
 /* End PBXBuildFile section */
@@ -88,6 +89,7 @@
 		D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingalReceiverThread.swift; sourceTree = "<group>"; };
 		D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDirPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
+		D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				D1F36C3B25B54E73009498D8 /* Constants.swift */,
 				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
 				D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */,
+				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 				D1BAC56225A193C800D951A2 /* ExampleData.swift in Sources */,
 				D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
+				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
 				D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,

@@ -20,6 +20,12 @@ class DisplayTree {
     self.backend = backend
     self.state = state
   }
+
+  var treeID: String {
+    get {
+      return self.state.treeID
+    }
+  }
 }
 
 /**
@@ -48,16 +54,16 @@ class DiffResultTreeIDs {
  Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
  */
 class DisplayTreeRequest {
-  let treeId: String
+  let treeID: String
   let returnAsync: Bool
   let userPath: String?
   let spid: SPID?
   let isStartup: Bool
   let treeDisplayMode: TreeDisplayMode
   
-  init(treeId: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
+  init(treeID: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
-    self.treeId = treeId
+    self.treeID = treeID
     self.returnAsync = returnAsync
     self.userPath = userPath
     self.spid = spid
@@ -71,7 +77,7 @@ class DisplayTreeRequest {
  */
 class DisplayTreeUiState: CustomStringConvertible {
   
-  let treeId: String
+  let treeID: String
   let rootSN: SPIDNodePair
   let rootExists: Bool
   let offendingPath: String?
@@ -79,9 +85,9 @@ class DisplayTreeUiState: CustomStringConvertible {
   let hasCheckboxes: Bool
   let needsManualLoad: Bool
   
-  init(treeId: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
+  init(treeID: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
-    self.treeId = treeId
+    self.treeID = treeID
     /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
      Each display tree can only have one root path.*/
     self.rootSN = rootSN
@@ -97,7 +103,7 @@ class DisplayTreeUiState: CustomStringConvertible {
 
   var description: String {
     get {
-      return "DisplayTreeUiState(treeID='\(self.treeId)' rootSN=\(self.rootSN) rootExists=\(self.rootExists) offendingPath='\(self.offendingPath ?? "null")' treeDisplayMode=\(self.treeDisplayMode) hasCheckboxes=\(self.hasCheckboxes))"
+      return "DisplayTreeUiState(treeID='\(self.treeID)' rootSN=\(self.rootSN) rootExists=\(self.rootExists) offendingPath='\(self.offendingPath ?? "null")' treeDisplayMode=\(self.treeDisplayMode) hasCheckboxes=\(self.hasCheckboxes))"
     }
   }
   

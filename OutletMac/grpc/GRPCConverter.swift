@@ -340,6 +340,6 @@ class GRPCConverter {
   static func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
     let rootSn: SPIDNodePair = try GRPCConverter.snFromGRPC(stateGRPC.rootSn)
     NSLog("Got rootSN: \(rootSn)")
-    return DisplayTreeUiState(treeId: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists)
+    return DisplayTreeUiState(treeID: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists)
   }
 }

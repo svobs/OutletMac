@@ -11,14 +11,26 @@ import SwiftUI
  STRUCT RootDirPanel
  */
 struct RootDirPanel: View {
-  var isEditing: Bool
+  let con: TreeControllable
+  @State var isEditing: Bool = false
   var canChangeRoot: Bool
   var isRootExists: Bool = false
   @State var rootPath: String = "/usr/path"
+  let colors: [Color] = [.gray, .red, .orange, .yellow,
+                             .green, .blue, .purple, .pink]
+  @State private var fgColor: Color = .gray
 
-  init(canChangeRoot: Bool, isEditing: Bool) {
+  init(controller: TreeControllable, canChangeRoot: Bool) {
+    self.con = controller
     self.canChangeRoot = canChangeRoot
-    self.isEditing = isEditing
+  }
+
+  func submitRootPath() {
+    do {
+      try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.rootPath)
+    } catch {
+      NSLog("Failed to submit root path \"\(rootPath)\": \(error)")
+    }
   }
 
   var body: some View {
@@ -36,9 +48,35 @@ struct RootDirPanel: View {
       }
 
       if isEditing {
-        TextField("Enter path...", text: $rootPath)
+        TextField("Enter path...", text: $rootPath, onEditingChanged: { (editingChanged) in
+          if editingChanged {
+            // we don't use this
+          } else {
+            NSLog("TextField focus removed: root path is \(rootPath)")
+            // TODO: also bind to Escape key
+            self.isEditing = false
+
+            // TODO: separate this, do for Enter key only
+            self.submitRootPath()
+          }
+        })
+          .textFieldStyle(RoundedBorderTextFieldStyle())
+          .background(fgColor)
+//          .foregroundColor(Color.blue)
+          .onTapGesture(count: 1, perform: {
+                          fgColor = colors.randomElement()!
+                      })
+        .onExitCommand {
+          NSLog("TextField got exit cmd: root path is \(rootPath)")
+          self.isEditing = false
+        }
+        
       } else {
         Text(rootPath)
+          .background(fgColor)
+          .onTapGesture(count: 1, perform: {
+            isEditing = true
+                      })
       }
     }
   }
@@ -47,6 +85,12 @@ struct RootDirPanel: View {
 @available(OSX 11.0, *)
 struct RootDirPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootDirPanel(canChangeRoot: true, isEditing: true)
+    RootDirPanel(controller: NullTreeController(ID_LEFT_TREE), canChangeRoot: true)
+  }
+}
+
+struct RootDirPanel_Previews_2: PreviewProvider {
+  static var previews: some View {
+    /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
   }
 }

@@ -55,10 +55,19 @@ struct StatusPanel: View {
  STRUCT TreePanel
  */
 struct TreePanel {
-  let root_dir_panel = RootDirPanel(canChangeRoot: true, isEditing: true)
-  let filter_panel = FilterPanel()
-  let tree_view = TreeView(items:  exampleArray())
-  let status_panel = StatusPanel()
+  let con: TreeControllable
+  let root_dir_panel: RootDirPanel
+  let filter_panel: FilterPanel
+  let tree_view: TreeView
+  let status_panel: StatusPanel
+
+  init(controller: TreeControllable) {
+    self.con = controller
+    self.root_dir_panel = RootDirPanel(controller: self.con, canChangeRoot: true)
+    self.filter_panel = FilterPanel()
+    self.tree_view = TreeView(items:  exampleArray())
+    self.status_panel = StatusPanel()
+  }
 }
 
 /**
@@ -72,11 +81,20 @@ struct TwoPaneView: View {
     GridItem(.flexible(minimum: 300), spacing: H_PAD),
   ]
 
-  private var left_tree_panel = TreePanel()
-  private var right_tree_panel = TreePanel()
+  let backend: OutletBackend
+  let conLeft: TreeControllable
+  let conRight: TreeControllable
+  let left_tree_panel: TreePanel
+  let right_tree_panel: TreePanel
 
-  init() {
+  init(backend: OutletBackend, conLeft: TreeControllable, conRight: TreeControllable) {
+    self.backend = backend
+    self.conLeft = conLeft
+    self.conRight = conRight
+    self.left_tree_panel = TreePanel(controller: conLeft)
+    self.right_tree_panel = TreePanel(controller: conRight)
   }
+
   private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
   private var colors: [Color] = [.yellow, .purple, .green]
 
@@ -127,6 +145,6 @@ struct TwoPaneView: View {
 @available(OSX 11.0, *)
 struct TwoPaneView_Previews: PreviewProvider {
   static var previews: some View {
-    TwoPaneView()
+    TwoPaneView(backend: NullBackend(), conLeft: NullTreeController(ID_LEFT_TREE), conRight: NullTreeController(ID_RIGHT_TREE))
   }
 }

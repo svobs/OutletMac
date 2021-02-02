@@ -11,10 +11,19 @@ import SwiftUI
 
 @available(OSX 11.0, *)
 struct ContentView: View {
+  let backend: OutletBackend
+  let conLeft: TreeControllable
+  let conRight: TreeControllable
   let items: [ExampleClass] = exampleArray()
 
+  init(backend: OutletBackend, conLeft: TreeControllable, conRight: TreeControllable) {
+    self.backend = backend
+    self.conLeft = conLeft
+    self.conRight = conRight
+  }
+
   var body: some View {
-    TwoPaneView()
+    TwoPaneView(backend: backend, conLeft: self.conLeft, conRight: self.conRight)
     //        SplitView(items: items)
   }
 }
@@ -23,7 +32,7 @@ struct ContentView: View {
 @available(OSX 11.0, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView()
+    ContentView(backend: NullBackend(), conLeft: NullTreeController(ID_LEFT_TREE), conRight: NullTreeController(ID_RIGHT_TREE))
   }
 }
 

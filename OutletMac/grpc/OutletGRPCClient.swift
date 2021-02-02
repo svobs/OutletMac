@@ -105,7 +105,7 @@ class OutletGRPCClient: OutletBackend {
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
     var grpcRequest = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
-    grpcRequest.treeID = request.treeId
+    grpcRequest.treeID = request.treeID
     grpcRequest.userPath = request.userPath ?? ""
     grpcRequest.returnAsync = request.returnAsync
     grpcRequest.treeDisplayMode = request.treeDisplayMode.rawValue
@@ -247,29 +247,29 @@ class OutletGRPCClient: OutletBackend {
   
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
     let spid = NodeIdentifierFactory.getRootConstantGDriveSPID()
-    let request = DisplayTreeRequest(treeId: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
   
   func createDisplayTreeFromConfig(treeID: String, isStartup: Bool = false) throws -> DisplayTree? {
-    let request = DisplayTreeRequest(treeId: treeID, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeID: treeID, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
   
   func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
     // Note: this shouldn't actually return anything, as returnAsync==true
-    let request = DisplayTreeRequest(treeId: treeID, returnAsync: true, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
   
   func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree? {
     // Note: this shouldn't actually return anything, as returnAsync==true
-    let request = DisplayTreeRequest(treeId: treeID, returnAsync: true, userPath: userPath, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, userPath: userPath, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
   
   func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
-    let request = DisplayTreeRequest(treeId: treeID, returnAsync: false, treeDisplayMode: treeDisplayMode)
+    let request = DisplayTreeRequest(treeID: treeID, returnAsync: false, treeDisplayMode: treeDisplayMode)
     return try self.requestDisplayTree(request)
   }
   
@@ -284,7 +284,7 @@ class OutletGRPCClient: OutletBackend {
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree? {
     var requestGRPC = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     requestGRPC.isStartup = request.isStartup
-    requestGRPC.treeID = request.treeId
+    requestGRPC.treeID = request.treeID
     requestGRPC.returnAsync = request.returnAsync
     requestGRPC.userPath = request.userPath ?? ""
     if request.spid != nil {
@@ -339,8 +339,8 @@ class OutletGRPCClient: OutletBackend {
     do {
       let response = try call.response.wait()
       
-      let treeIds = DiffResultTreeIDs(left: response.treeIDLeft, right: response.treeIDRight)
-      return treeIds
+      let treeIDs = DiffResultTreeIDs(left: response.treeIDLeft, right: response.treeIDRight)
+      return treeIDs
     } catch {
       throw OutletError.grpcFailure("RPC 'startDiffTrees' failed: \(error)")
     }
