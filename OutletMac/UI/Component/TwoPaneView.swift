@@ -81,14 +81,14 @@ struct TwoPaneView: View {
     GridItem(.flexible(minimum: 300), spacing: H_PAD),
   ]
 
-  let backend: OutletBackend
+  let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
   let left_tree_panel: TreePanel
   let right_tree_panel: TreePanel
 
-  init(backend: OutletBackend, conLeft: TreeControllable, conRight: TreeControllable) {
-    self.backend = backend
+  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
+    self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
     self.left_tree_panel = TreePanel(controller: conLeft)
@@ -145,6 +145,6 @@ struct TwoPaneView: View {
 @available(OSX 11.0, *)
 struct TwoPaneView_Previews: PreviewProvider {
   static var previews: some View {
-    TwoPaneView(backend: NullBackend(), conLeft: NullTreeController(ID_LEFT_TREE), conRight: NullTreeController(ID_RIGHT_TREE))
+    TwoPaneView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
   }
 }

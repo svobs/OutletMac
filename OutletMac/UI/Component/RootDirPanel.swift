@@ -90,7 +90,7 @@ struct RootDirPanel: View {
 @available(OSX 11.0, *)
 struct RootDirPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootDirPanel(controller: NullTreeController(ID_LEFT_TREE), canChangeRoot: true)
+    RootDirPanel(controller: MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
   }
 }
 

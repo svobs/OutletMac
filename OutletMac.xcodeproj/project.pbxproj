@@ -26,6 +26,7 @@
 		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
 		D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
+		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
 		D1BAC56125A193C800D951A2 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55725A193C800D951A2 /* DetailView.swift */; };
 		D1BAC56225A193C800D951A2 /* ExampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55825A193C800D951A2 /* ExampleData.swift */; };
@@ -44,7 +45,7 @@
 		D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
 		D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */; };
-		D1ED5E4925C946B600A8E5DB /* Dispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E4825C946B600A8E5DB /* Dispatcher.swift */; };
+		D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
 /* End PBXBuildFile section */
@@ -71,6 +72,7 @@
 		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
 		D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
+		D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55725A193C800D951A2 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		D1BAC55825A193C800D951A2 /* ExampleData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleData.swift; sourceTree = "<group>"; };
@@ -91,7 +93,7 @@
 		D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDirPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
-		D1ED5E4825C946B600A8E5DB /* Dispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatcher.swift; sourceTree = "<group>"; };
+		D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
@@ -142,7 +144,8 @@
 				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
 				D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */,
 				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
-				D1ED5E4825C946B600A8E5DB /* Dispatcher.swift */,
+				D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */,
+				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -368,12 +371,13 @@
 				D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */,
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
 				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
+				D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */,
 				D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
-				D1ED5E4925C946B600A8E5DB /* Dispatcher.swift in Sources */,
+				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,
 				D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,

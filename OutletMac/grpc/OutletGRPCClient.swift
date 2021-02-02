@@ -13,13 +13,10 @@ import NIO
 class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   var signalReceiverThread: SignalReceiverThread?
-  let _dipatcher: Dispatcher
-  var dispatcher: Dispatcher {
-    return _dipatcher
-  }
+  let dispatcher: SignalDispatcher
 
-  init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient) {
-    self._dipatcher = Dispatcher()
+  init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient, _ dispatcher: SignalDispatcher) {
+    self.dispatcher = dispatcher
     self.stub = client
   }
 
@@ -94,7 +91,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
-  static func makeClient(host: String, port: Int) -> OutletGRPCClient {
+  static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
     //    defer {
     //      try? group.syncShutdownGracefully()
@@ -105,7 +102,7 @@ class OutletGRPCClient: OutletBackend {
       .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
       .connect(host: host, port: port)
     
-    return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel))
+    return OutletGRPCClient(Outlet_Backend_Daemon_Grpc_Generated_OutletClient(channel: channel), dispatcher)
   }
   
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {

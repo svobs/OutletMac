@@ -6,8 +6,7 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 
-protocol OutletBackend {
-  var dispatcher: Dispatcher { get }
+protocol OutletBackend: HasLifecycle {
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String
   func putConfig(_ configKey: String, _ configVal: String) throws
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
@@ -44,129 +43,149 @@ protocol OutletBackend {
 }
 
 /**
- CLASS NullBackend
+ Workaround to add default params.
+ This may be bad practice. See note at bottom of https://medium.com/@georgetsifrikas/swift-protocols-with-default-values-b7278d3eef22
+ */
+extension OutletBackend {
+  func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
+    return try getConfig(configKey, defaultVal: defaultVal)
+  }
+
+  func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
+    return try getIntConfig(configKey, defaultVal: defaultVal)
+  }
+}
+
+/**
+ CLASS MockBackend
 
  Should be used only for testing & previews
  */
-class NullBackend: OutletBackend {
-  let _dipatcher: Dispatcher = Dispatcher()
-  var dispatcher: Dispatcher {
-    return _dipatcher
+class MockBackend: OutletBackend {
+  let dipatcher: SignalDispatcher
+  init(_ d: SignalDispatcher? = nil) {
+    self.dipatcher = d ?? SignalDispatcher()
+  }
+
+  func start() throws {
+  }
+
+  func shutdown() throws {
   }
 
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func putConfig(_ configKey: String, _ configVal: String) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getConfigList(_ configKeyList: [String]) throws -> [String : String] {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func putConfigList(_ configDict: [String : String]) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getNodeForLocalPath(fullPath: String) throws -> Node? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func nextUID() throws -> UID {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")  }
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")  }
 
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func startSubtreeLoad(treeID: String) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getOpExecutionPlayState() throws -> Bool {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getChildList(parent: Node, treeID: String?, filterCriteria: FilterCriteria?) throws -> [Node] {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node] {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getLastPendingOp(nodeUID: UID) throws -> UserOp? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func deleteSubtree(nodeUIDList: [UID]) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func getFilterCriteria(treeID: String) throws -> FilterCriteria? {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
   func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws {
-    throw OutletError.invalidOperation("Cannot call NullBackend methods")
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
 

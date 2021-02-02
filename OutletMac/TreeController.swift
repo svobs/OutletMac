@@ -6,36 +6,47 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 protocol TreeControllable {
+  var app: OutletApp { get }
   var backend: OutletBackend { get }
   var tree: DisplayTree { get }
 }
 
 /**
- CLASS NullTreeController
+ CLASS MockTreeController
 
  Non-functioning implementation of TreeControllable. Should only be used for testing & previews
  */
-class NullTreeController: TreeControllable {
-  let backend: OutletBackend
+class MockTreeController: TreeControllable {
+  let app: OutletApp
+  var backend: OutletBackend {
+    get {
+      return app.backend!
+    }
+  }
   let spid: SinglePathNodeIdentifier
   let rootSN: SPIDNodePair
   var tree: DisplayTree
 
   init(_ treeID: String) {
-    backend = NullBackend()
+    self.app = MockApp()
     // dummy data follows
     spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
     rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
-    tree = NullDisplayTree(backend: NullBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
+    tree = NullDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
   }
 }
 
 class TreeController: TreeControllable {
-  var backend: OutletBackend
+  let app: OutletApp
+  var backend: OutletBackend {
+    get {
+      return app.backend!
+    }
+  }
   var tree: DisplayTree
 
-  init(backend: OutletBackend, tree: DisplayTree) {
-    self.backend = backend
+  init(app: OutletApp, tree: DisplayTree) {
+    self.app = app
     self.tree = tree
   }
 }

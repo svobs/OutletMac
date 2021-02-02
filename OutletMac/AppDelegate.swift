@@ -9,12 +9,34 @@
 import Cocoa
 import SwiftUI
 
+/**
+ PROTOCOL OutletApp
+ */
+protocol OutletApp {
+  var dispatcher: SignalDispatcher { get }
+  var backend: OutletBackend? { get }
+}
+
+class MockApp: OutletApp {
+  var dispatcher: SignalDispatcher
+  var backend: OutletBackend?
+
+  init() {
+    self.dispatcher = SignalDispatcher()
+    self.backend = MockBackend(self.dispatcher)
+  }
+}
+
+/**
+ CLASS AppDelegate
+ */
 @available(OSX 11.0, *)
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
-  
+class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
+
   var window: NSWindow!
-  var backend: OutletGRPCClient? = nil
+  let dispatcher = SignalDispatcher()
+  var backend: OutletBackend? = nil
 
 //  static func endEditing() {
 //      sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -24,10 +46,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     do {
 
-      self.backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051)
+      let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+      self.backend = backendGRPC
       NSLog("gRPC client connecting")
 
-      try backend!.start()
+      try self.backend!.start()
 
       let win_id = ID_DIFF_WINDOW
       let xLocConfigPath = "ui_state.\(win_id).x"
@@ -44,11 +67,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
       let treeLeft: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      let conLeft = TreeController(backend: backend!, tree: treeLeft)
-      let conRight = TreeController(backend: backend!, tree: treeRight)
+      let conLeft = TreeController(app: self, tree: treeLeft)
+      let conRight = TreeController(app: self, tree: treeRight)
 
       // Create the SwiftUI view that provides the window contents.
-      let contentView = ContentView(backend: backend!, conLeft: conLeft, conRight: conRight)
+      let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
       
       // Create the window and set the content view.
       window = NSWindow(

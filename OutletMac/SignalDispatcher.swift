@@ -1,5 +1,5 @@
 //
-//  Dispatcher.swift
+//  SignalDispatcher.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-02-02.
@@ -7,16 +7,17 @@
 //
 import Foundation
 
+/** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
 typealias ParamDict = [String: AnyObject]
 typealias Listener = (ParamDict) -> Void
 
 /**
- CLASS Dispatcher
+ CLASS SignalDispatcher
 
  Mimics the functionality of PyDispatcher, with some simplifications/improvments. It's simple enough that I just wrote my own code.
  */
-class Dispatcher {
+class SignalDispatcher {
   var signalListenerDict = [UInt32: [ListenerID: Listener]]()
 
   func addListener(signal: Signal, listenerID: ListenerID, _ listener: @escaping Listener) throws {
