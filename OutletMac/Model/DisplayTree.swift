@@ -8,6 +8,7 @@
 
 import Foundation
 
+typealias TreeID = String
 
 /**
  CLASS DisplayTree
@@ -21,7 +22,7 @@ class DisplayTree {
     self.state = state
   }
 
-  var treeID: String {
+  var treeID: TreeID {
     get {
       return self.state.treeID
     }
@@ -42,7 +43,7 @@ class DiffResultTreeIDs {
   let treeIDLeft: String
   let treeIDRight: String
   
-  init(left treeIDLeft: String, right treeIDRight: String) {
+  init(left treeIDLeft: TreeID, right treeIDRight: TreeID) {
     self.treeIDLeft = treeIDLeft
     self.treeIDRight = treeIDRight
   }
@@ -54,14 +55,14 @@ class DiffResultTreeIDs {
  Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
  */
 class DisplayTreeRequest {
-  let treeID: String
+  let treeID: TreeID
   let returnAsync: Bool
   let userPath: String?
   let spid: SPID?
   let isStartup: Bool
   let treeDisplayMode: TreeDisplayMode
   
-  init(treeID: String, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
+  init(treeID: TreeID, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
     self.treeID = treeID
     self.returnAsync = returnAsync
@@ -77,7 +78,7 @@ class DisplayTreeRequest {
  */
 class DisplayTreeUiState: CustomStringConvertible {
   
-  let treeID: String
+  let treeID: TreeID
   let rootSN: SPIDNodePair
   let rootExists: Bool
   let offendingPath: String?
@@ -85,7 +86,7 @@ class DisplayTreeUiState: CustomStringConvertible {
   let hasCheckboxes: Bool
   let needsManualLoad: Bool
   
-  init(treeID: String, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
+  init(treeID: TreeID, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
     self.treeID = treeID
     /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.

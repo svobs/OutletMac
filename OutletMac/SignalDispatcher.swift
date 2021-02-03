@@ -10,7 +10,73 @@ import Foundation
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
 typealias ParamDict = [String: AnyObject]
-typealias Listener = (ParamDict) -> Void
+typealias Callback = (ParamDict) -> Void
+typealias SenderID = String
+
+/**
+ CLASS DispatchListener
+ */
+class DispatchListener {
+  let _id: ListenerID
+  let _dispatcher: SignalDispatcher
+  var _subscribedSignals = [Signal]()
+
+  init(_ id: ListenerID, _ dispatcher: SignalDispatcher) {
+    self._id = id
+    self._dispatcher = dispatcher
+  }
+
+  func subscribe(signal: Signal, _ callback: @escaping Callback, whitelistSenderID: SenderID? = nil) throws {
+    let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID)
+    let sub = Subscription(callback, filterBy: filterCriteria)
+    try self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
+  }
+
+  /**
+   TODO: put in destructor? Does Swift have those?
+  */
+  func unsubscribeAll() throws {
+    for signal in self._subscribedSignals {
+      try self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
+    }
+    self._subscribedSignals.removeAll()
+  }
+}
+
+fileprivate class SignalFilterCriteria {
+  let whitelistSenderID: SenderID?
+  // maybe more stuff in future
+
+  init(whitelistSenderID: SenderID? = nil) {
+    self.whitelistSenderID = whitelistSenderID
+  }
+
+  func matches(_ senderID: SenderID?) -> Bool {
+    if whitelistSenderID == nil || senderID == nil {
+      return true
+    } else {
+      return senderID! == whitelistSenderID!
+    }
+  }
+}
+
+fileprivate class Subscription {
+  let callback: Callback
+  let filterCriteria: SignalFilterCriteria?
+
+  init(_ callback: @escaping Callback, filterBy filterCriteria: SignalFilterCriteria? = nil) {
+    self.callback = callback
+    self.filterCriteria = filterCriteria
+  }
+
+  func matches(_ senderID: SenderID?) -> Bool {
+    if self.filterCriteria == nil {
+      return true
+    } else {
+      return self.filterCriteria!.matches(senderID)
+    }
+  }
+}
 
 /**
  CLASS SignalDispatcher
@@ -18,44 +84,46 @@ typealias Listener = (ParamDict) -> Void
  Mimics the functionality of PyDispatcher, with some simplifications/improvments. It's simple enough that I just wrote my own code.
  */
 class SignalDispatcher {
-  var signalListenerDict = [UInt32: [ListenerID: Listener]]()
+  fileprivate var signalListenerDict = [Signal: [ListenerID: Subscription]]()
 
-  func addListener(signal: Signal, listenerID: ListenerID, _ listener: @escaping Listener) throws {
-    var listenerDict: [ListenerID: Listener]? = self.signalListenerDict[signal.rawValue]
-    if listenerDict == nil {
-      listenerDict = [:]
-      self.signalListenerDict[signal.rawValue] = listenerDict
+  func createListener(_ id: ListenerID) -> DispatchListener {
+    let listener = DispatchListener(id, self)
+
+    return listener
+  }
+
+
+  fileprivate func subscribe(signal: Signal, listenerID: ListenerID, _ subscription: Subscription) throws {
+    var subscriberDict: [ListenerID: Subscription]? = self.signalListenerDict[signal]
+    if subscriberDict == nil {
+      subscriberDict = [:]
+      self.signalListenerDict[signal] = subscriberDict
     }
 
-    if listenerDict!.updateValue(listener, forKey: listenerID) != nil {
+    if subscriberDict!.updateValue(subscription, forKey: listenerID) != nil {
       NSLog("Warning: overwriting listener '\(listenerID)' for signal '\(signal)'")
     }
   }
 
-  func removeListener(signal: Signal, listenerID: ListenerID) throws {
-    if var listenerDict: [ListenerID: Listener] = self.signalListenerDict[signal.rawValue] {
-      if listenerDict.removeValue(forKey: listenerID) != nil {
-        NSLog("Removed listener '\(listenerID)' for signal '\(signal)'")
+  fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
+    if var subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
+      if subscriberDict.removeValue(forKey: listenerID) != nil {
+        NSLog("Removed listener '\(listenerID)' from signal '\(signal)'")
         return
       }
     }
-    NSLog("Warning: could not remove listener '\(listenerID)' for signal '\(signal)': not found")
+    NSLog("Warning: could not remove listener '\(listenerID)' from signal '\(signal)': not found")
   }
 
-  func sendSignal(signal: Signal, params: ParamDict?, listenerID: ListenerID?) {
-    if let listenerDict: [ListenerID: Listener] = self.signalListenerDict[signal.rawValue] {
+  func sendSignal(signal: Signal, params: ParamDict?, senderID: SenderID?) {
+    if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let paramsForSure = params ?? [:]
-      if listenerID == nil {
-        for (mappedListenerID, listener) in listenerDict {
-          NSLog("Calling listener '\(mappedListenerID)' for signal '\(signal)'")
-          listener(paramsForSure)
-        }
-      } else {
-        if let listener = listenerDict[listenerID!] {
-          NSLog("Calling unitary listener '\(listenerID!)' for signal '\(signal)'")
-          listener(paramsForSure)
+      for (subID, subscriber) in subscriberDict {
+        if subscriber.matches(senderID) {
+          NSLog("Calling listener \(subID) for signal '\(signal)'")
+          subscriber.callback(paramsForSure)
         } else {
-          NSLog("Cannot send signal: could not find unitary listener '\(listenerID!)' for signal '\(signal)'")
+          NSLog("Listener \(subID) does not match signal '\(signal)'")
         }
       }
     }

@@ -12,6 +12,7 @@ import SwiftUI
  */
 struct RootDirPanel: View {
   let con: TreeControllable
+  let dipatchListener: DispatchListener
   @State var isEditing: Bool = false
   var canChangeRoot: Bool
   var isRootExists: Bool = false
@@ -23,11 +24,16 @@ struct RootDirPanel: View {
   init(controller: TreeControllable, canChangeRoot: Bool) {
     self.con = controller
     self.canChangeRoot = canChangeRoot
+    let dispatchListenerID = "RootDirPanel-\(self.con.treeID)"
+    self.dipatchListener = self.con.dispatcher.createListener(dispatchListenerID)
   }
 
-  func start() {
+  func start() throws {
+    try self.dipatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+  }
 
-    
+  func onEnableUIToggled(_ params: ParamDict) {
+
   }
 
   func submitRootPath() {
