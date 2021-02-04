@@ -12,28 +12,33 @@ import SwiftUI
  */
 struct RootDirPanel: View {
   let con: TreeControllable
-  let dipatchListener: DispatchListener
-  @State var isEditing: Bool = false
-  var canChangeRoot: Bool
-  var isRootExists: Bool = false
-  @State var rootPath: String = "/usr/path"
-  let colors: [Color] = [.gray, .red, .orange, .yellow,
-                             .green, .blue, .purple, .pink]
+  private let dipatchListener: DispatchListener
+
+  @State private var isEditing: Bool = false
+  private var canChangeRoot: Bool
+  @State private var isUIEnabled: Bool = false
+  private var isRootExists: Bool = false
+  @State private var rootPath: String = "/usr/path"
+  private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
   init(controller: TreeControllable, canChangeRoot: Bool) {
     self.con = controller
-    self.canChangeRoot = canChangeRoot
     let dispatchListenerID = "RootDirPanel-\(self.con.treeID)"
     self.dipatchListener = self.con.dispatcher.createListener(dispatchListenerID)
+
+    self.canChangeRoot = canChangeRoot
+    self.isUIEnabled = canChangeRoot
   }
 
-  func start() throws {
+  mutating func start() throws {
     try self.dipatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+    try self.dipatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.con.treeID)
+    try self.dipatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.con.treeID)
   }
 
-  func onEnableUIToggled(_ params: ParamDict) {
-
+  func shutdown() throws {
+    try self.dipatchListener.unsubscribeAll()
   }
 
   func submitRootPath() {
@@ -75,8 +80,8 @@ struct RootDirPanel: View {
           .background(fgColor)
 //          .foregroundColor(Color.blue)
           .onTapGesture(count: 1, perform: {
-                          fgColor = colors.randomElement()!
-                      })
+            fgColor = colors.randomElement()!
+          })
         .onExitCommand {
           NSLog("TextField got exit cmd: root path is \(rootPath)")
           self.isEditing = false
@@ -87,11 +92,31 @@ struct RootDirPanel: View {
           .background(fgColor)
           .onTapGesture(count: 1, perform: {
             isEditing = true
-                      })
+          })
       }
     }
   }
+
+  // Dispatch Listeners
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+  func onEnableUIToggled(_ props: PropertyList) throws {
+    if !self.canChangeRoot {
+      assert(!self.isUIEnabled)
+      return
+    }
+    self.isUIEnabled = try props.getBool("enable")
+  }
+
+  func onLoadStarted(_ params: PropertyList) {
+    // TODO
+  }
+
+  func onDisplayTreeChanged(_ params: PropertyList) {
+    // TODO
+  }
+
 }
+
 
 @available(OSX 11.0, *)
 struct RootDirPanel_Previews: PreviewProvider {

@@ -9,17 +9,53 @@ import Foundation
 
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
-typealias ParamDict = [String: AnyObject]
-typealias Callback = (ParamDict) -> Void
+typealias ParamDict = [String: String]
+typealias Callback = (PropertyList) throws -> Void
 typealias SenderID = String
+
+class PropertyList {
+  private var _propertyDict: ParamDict
+  init(_ propertyDict: ParamDict?) {
+    self._propertyDict = propertyDict ?? [:]
+  }
+
+  func get(_ key: String) throws -> String {
+    let configVal: String? = self._propertyDict[key]
+    if configVal == nil {
+      throw OutletError.invalidState("No value for key '\(key)'")
+    } else {
+      return configVal!
+    }
+  }
+
+  func getInt(_ key: String) throws -> Int {
+    let val: String = try self.get(key)
+    let configValInt = Int(val)
+    if configValInt == nil {
+      throw OutletError.invalidState("Failed to parse value '\(val)' as Int for key '\(key)'")
+    } else {
+      return configValInt!
+    }
+  }
+
+  func getBool(_ key: String) throws -> Bool {
+    let val: String = try self.get(key)
+    let configValBool = Bool(val)
+    if configValBool == nil {
+      throw OutletError.invalidState("Failed to parse value '\(val)' as Bool for key '\(key)'")
+    } else {
+      return configValBool!
+    }
+  }
+}
 
 /**
  CLASS DispatchListener
  */
 class DispatchListener {
-  let _id: ListenerID
-  let _dispatcher: SignalDispatcher
-  var _subscribedSignals = [Signal]()
+  private let _id: ListenerID
+  private let _dispatcher: SignalDispatcher
+  private var _subscribedSignals = [Signal]()
 
   init(_ id: ListenerID, _ dispatcher: SignalDispatcher) {
     self._id = id
@@ -117,13 +153,17 @@ class SignalDispatcher {
 
   func sendSignal(signal: Signal, params: ParamDict?, senderID: SenderID?) {
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
-      let paramsForSure = params ?? [:]
+      let propertyList = PropertyList(params)
       for (subID, subscriber) in subscriberDict {
         if subscriber.matches(senderID) {
           NSLog("Calling listener \(subID) for signal '\(signal)'")
-          subscriber.callback(paramsForSure)
+          do {
+            try subscriber.callback(propertyList)
+          } catch {
+            NSLog("ERROR While calling listener \(subID) for signal '\(signal)': \(error)")
+          }
         } else {
-          NSLog("Listener \(subID) does not match signal '\(signal)'")
+          NSLog("DEBUG Listener \(subID) does not match signal '\(signal)'")
         }
       }
     }
