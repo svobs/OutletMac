@@ -27,6 +27,30 @@ class DisplayTree {
       return self.state.treeID
     }
   }
+
+  var needsManualLoad: Bool {
+    get {
+      return self.state.needsManualLoad
+    }
+  }
+
+  var rootPath: String {
+    get {
+      return self.state.rootSN.spid.getSinglePath()
+    }
+  }
+
+  var rootExists: Bool {
+    get {
+      return self.state.rootExists
+    }
+  }
+
+  var treeType: TreeType {
+    get {
+      return self.state.rootSN.spid.treeType
+    }
+  }
 }
 
 /**
@@ -49,12 +73,11 @@ class DiffResultTreeIDs {
   }
 }
 
-
 /**
  CLASS DisplayTreeRequest
  Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
  */
-class DisplayTreeRequest {
+class DisplayTreeRequest: CustomStringConvertible {
   let treeID: TreeID
   let returnAsync: Bool
   let userPath: String?
@@ -70,6 +93,12 @@ class DisplayTreeRequest {
     self.spid = spid
     self.isStartup = isStartup
     self.treeDisplayMode = treeDisplayMode
+  }
+
+  var description: String {
+    get {
+      return "DisplayTreeRequest(treeID=\(quoted(self.treeID)) spid=\(descOrNil(self.spid)) userPath=\(quotedOrNil(self.userPath)) isStartup='\(self.isStartup)' treeDisplayMode=\(self.treeDisplayMode) returnAsync=\(self.returnAsync))"
+    }
   }
 }
 

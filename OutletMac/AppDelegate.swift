@@ -52,6 +52,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
 
       try self.backend!.start()
 
+      NSLog("Backend started")
+
       let win_id = ID_DIFF_WINDOW
       let xLocConfigPath = "ui_state.\(win_id).x"
       let yLocConfigPath = "ui_state.\(win_id).y"

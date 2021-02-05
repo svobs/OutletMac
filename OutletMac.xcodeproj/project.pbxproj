@@ -39,6 +39,7 @@
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
+		D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D090EC25CD3C980070B69D /* StringUtil.swift */; };
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
 		D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeViewController.swift */; };
 		D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */; };
@@ -87,6 +88,7 @@
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		D1D090EC25CD3C980070B69D /* StringUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		D1E913B925AA735C008E958B /* TreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
 		D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingalReceiverThread.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
 				D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */,
 				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
+				D1D090EC25CD3C980070B69D /* StringUtil.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,
+				D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */,
 				D1BAC56425A193C800D951A2 /* SplitView.swift in Sources */,
 				D1BAC56325A193C800D951A2 /* OutlineNode.swift in Sources */,
 				D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */,

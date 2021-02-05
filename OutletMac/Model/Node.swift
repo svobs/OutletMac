@@ -147,7 +147,7 @@ class Node: CustomStringConvertible {
   
   var treeType: TreeType {
     get {
-      return self.nodeIdentifier.getTreeType()
+      return self.nodeIdentifier.treeType
     }
   }
   

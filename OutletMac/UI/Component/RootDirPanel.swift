@@ -15,10 +15,12 @@ struct RootDirPanel: View {
   private let dipatchListener: DispatchListener
 
   @State private var isEditing: Bool = false
-  private var canChangeRoot: Bool
+  private var canChangeRoot: Bool = false
+  // TODO: figure out if we can somehow bind directly to the var
+  @State private var needsManualLoad: Bool = false
   @State private var isUIEnabled: Bool = false
-  private var isRootExists: Bool = false
-  @State private var rootPath: String = "/usr/path"
+  @State private var isRootExists: Bool = false
+  @State private var rootPath: String = ""
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
@@ -27,8 +29,11 @@ struct RootDirPanel: View {
     let dispatchListenerID = "RootDirPanel-\(self.con.treeID)"
     self.dipatchListener = self.con.dispatcher.createListener(dispatchListenerID)
 
+    NSLog("Setting rootPath to \(controller.tree.rootPath)")
+    self.rootPath = controller.tree.rootPath
     self.canChangeRoot = canChangeRoot
     self.isUIEnabled = canChangeRoot
+    self.needsManualLoad = self.con.tree.needsManualLoad
   }
 
   mutating func start() throws {
@@ -87,7 +92,7 @@ struct RootDirPanel: View {
           self.isEditing = false
         }
         
-      } else {
+      } else { // not editing
         Text(rootPath)
           .background(fgColor)
           .onTapGesture(count: 1, perform: {
@@ -99,7 +104,7 @@ struct RootDirPanel: View {
 
   // Dispatch Listeners
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  func onEnableUIToggled(_ props: PropertyList) throws {
+  func onEnableUIToggled(_ props: PropDict) throws {
     if !self.canChangeRoot {
       assert(!self.isUIEnabled)
       return
@@ -107,12 +112,16 @@ struct RootDirPanel: View {
     self.isUIEnabled = try props.getBool("enable")
   }
 
-  func onLoadStarted(_ params: PropertyList) {
-    // TODO
+  func onLoadStarted(_ params: PropDict) throws {
+    if self.needsManualLoad {
+      self.needsManualLoad = false
+    }
   }
 
-  func onDisplayTreeChanged(_ params: PropertyList) {
-    // TODO
+  func onDisplayTreeChanged(_ params: PropDict) throws {
+    let newTree: DisplayTree = try params.get("tree") as! DisplayTree
+    self.rootPath = newTree.rootPath
+    self.isRootExists = newTree.rootExists
   }
 
 }

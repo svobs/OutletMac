@@ -194,11 +194,7 @@ enum TreeType: UID {
     }
   }
   
-  static func display(code: UID) -> String {
-    guard let treeType = TreeType(rawValue: code) else {
-      return "UNKNOWN"
-    }
-
+  static func display(_ treeType: TreeType) -> String {
     switch treeType {
       case .NA:
         return "✪"

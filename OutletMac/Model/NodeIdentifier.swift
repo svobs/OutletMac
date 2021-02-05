@@ -28,7 +28,7 @@ class NodeIdentifier: CustomStringConvertible {
   }
 
   public var description: String {
-    return "\(self.getTreeType().rawValue)-\(uid)⩨\(pathList)∣"
+    return "\(TreeType.display(self.treeType))-\(uid)⩨\(pathList)∣"
   }
   
   var treeType: TreeType {
@@ -36,11 +36,7 @@ class NodeIdentifier: CustomStringConvertible {
       return .NA
     }
   }
-  
-  func getTreeType() -> TreeType {
-    return self.treeType
-  }
-  
+
   // MARK: SPID
   
   func isSpid() -> Bool {
@@ -84,11 +80,7 @@ class SinglePathNodeIdentifier: NodeIdentifier {
       self._treeType = treeType
     }
   }
-  
-  override func getTreeType() -> TreeType {
-    return self.treeType
-  }
-  
+
   override func isSpid() -> Bool {
     false
   }
@@ -105,8 +97,10 @@ typealias SPID = SinglePathNodeIdentifier
  CLASS GDriveIdentifier
  */
 class GDriveIdentifier: NodeIdentifier {
-  override func getTreeType() -> TreeType {
-    return .GDRIVE
+  override var treeType: TreeType {
+    get {
+      return .GDRIVE
+    }
   }
   
   override func copy(with uid: UID? = nil) -> GDriveIdentifier {

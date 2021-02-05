@@ -10,6 +10,11 @@ import GRPC
 import Logging
 import NIO
 
+/**
+ CLASS OutletGRPCClient
+
+ Thin gRPC client to the backend service
+ */
 class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   var signalReceiverThread: SignalReceiverThread?
@@ -106,6 +111,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
+    NSLog("Requesting DisplayTree for params: \(request)")
     var grpcRequest = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeID
@@ -247,7 +253,7 @@ class OutletGRPCClient: OutletBackend {
       throw OutletError.grpcFailure("RPC 'getAncestorList' failed: \(error)")
     }
   }
-  
+
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
     let spid = NodeIdentifierFactory.getRootConstantGDriveSPID()
     let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
@@ -270,7 +276,7 @@ class OutletGRPCClient: OutletBackend {
     let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, userPath: userPath, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
-  
+
   func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
     let request = DisplayTreeRequest(treeID: treeID, returnAsync: false, treeDisplayMode: treeDisplayMode)
     return try self.requestDisplayTree(request)
@@ -487,6 +493,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
+    NSLog("getIntConfig entered")
     let defaultValStr: String?
     if defaultVal == nil {
       defaultValStr = nil
@@ -498,6 +505,7 @@ class OutletGRPCClient: OutletBackend {
     if configValInt == nil {
       throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
     } else {
+      NSLog("getIntConfig returning: \(configValInt!)")
       return configValInt!
     }
   }

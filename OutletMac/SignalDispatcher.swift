@@ -9,18 +9,21 @@ import Foundation
 
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
-typealias ParamDict = [String: String]
-typealias Callback = (PropertyList) throws -> Void
+typealias ParamDict = [String: Any]
+typealias Callback = (PropDict) throws -> Void
 typealias SenderID = String
 
-class PropertyList {
+/**
+ CLASS PropDict
+ */
+class PropDict {
   private var _propertyDict: ParamDict
   init(_ propertyDict: ParamDict?) {
     self._propertyDict = propertyDict ?? [:]
   }
 
-  func get(_ key: String) throws -> String {
-    let configVal: String? = self._propertyDict[key]
+  func get(_ key: String) throws -> Any {
+    let configVal: Any? = self._propertyDict[key]
     if configVal == nil {
       throw OutletError.invalidState("No value for key '\(key)'")
     } else {
@@ -28,8 +31,17 @@ class PropertyList {
     }
   }
 
+  func getString(_ key: String) throws -> String {
+    let configVal: Any? = self._propertyDict[key]
+    if configVal == nil {
+      throw OutletError.invalidState("No value for key '\(key)'")
+    } else {
+      return configVal! as! String
+    }
+  }
+
   func getInt(_ key: String) throws -> Int {
-    let val: String = try self.get(key)
+    let val: String = try self.getString(key)
     let configValInt = Int(val)
     if configValInt == nil {
       throw OutletError.invalidState("Failed to parse value '\(val)' as Int for key '\(key)'")
@@ -39,7 +51,7 @@ class PropertyList {
   }
 
   func getBool(_ key: String) throws -> Bool {
-    let val: String = try self.get(key)
+    let val: String = try self.getString(key)
     let configValBool = Bool(val)
     if configValBool == nil {
       throw OutletError.invalidState("Failed to parse value '\(val)' as Bool for key '\(key)'")
@@ -153,7 +165,7 @@ class SignalDispatcher {
 
   func sendSignal(signal: Signal, params: ParamDict?, senderID: SenderID?) {
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
-      let propertyList = PropertyList(params)
+      let propertyList = PropDict(params)
       for (subID, subscriber) in subscriberDict {
         if subscriber.matches(senderID) {
           NSLog("Calling listener \(subID) for signal '\(signal)'")
