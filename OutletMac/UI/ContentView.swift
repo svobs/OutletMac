@@ -31,7 +31,7 @@ struct ContentView: View {
           // for the ones which have a TapGesture handler already assigned
           TapGesture().onEnded { _ in
             NSLog("Tapped!")
-            app.dispatcher.sendSignal(signal: .END_EDITING, senderID: ID_MAIN_WINDOW)
+            app.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
           }
         )
     }

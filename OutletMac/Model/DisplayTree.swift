@@ -63,7 +63,7 @@ class NullDisplayTree: DisplayTree {
 /**
  CLASS DiffResultTreeIDs
  */
-class DiffResultTreeIDs {
+struct DiffResultTreeIDs {
   let treeIDLeft: String
   let treeIDRight: String
   
@@ -77,7 +77,7 @@ class DiffResultTreeIDs {
  CLASS DisplayTreeRequest
  Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
  */
-class DisplayTreeRequest: CustomStringConvertible {
+struct DisplayTreeRequest: CustomStringConvertible {
   let treeID: TreeID
   let returnAsync: Bool
   let userPath: String?
@@ -106,14 +106,13 @@ class DisplayTreeRequest: CustomStringConvertible {
  CLASS DisplayTreeUiState
  */
 class DisplayTreeUiState: CustomStringConvertible {
-  
   let treeID: TreeID
   let rootSN: SPIDNodePair
   let rootExists: Bool
   let offendingPath: String?
+  let needsManualLoad: Bool
   let treeDisplayMode: TreeDisplayMode
   let hasCheckboxes: Bool
-  let needsManualLoad: Bool
   
   init(treeID: TreeID, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {

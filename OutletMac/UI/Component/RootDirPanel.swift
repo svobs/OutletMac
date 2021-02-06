@@ -12,52 +12,21 @@ import SwiftUI
  */
 struct RootDirPanel: View {
   let con: TreeControllable
-  private let dipatchListener: DispatchListener
+  @ObservedObject var uiState: TreeSwiftState
 
-  @State private var isEditing: Bool = true
-  private var canChangeRoot: Bool = false
-  // TODO: figure out if we can somehow bind directly to the var
-  @State private var needsManualLoad: Bool = false
-  @State private var isUIEnabled: Bool = false
-  @State private var isRootExists: Bool = false
-  @State private var rootPath: String = ""
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
   init(controller: TreeControllable, canChangeRoot: Bool) {
     self.con = controller
-    let dispatchListenerID = "RootDirPanel-\(self.con.treeID)"
-    self.dipatchListener = self.con.dispatcher.createListener(dispatchListenerID)
-
-    NSLog("[\(self.con.treeID)] Setting rootPath to \(controller.tree.rootPath)")
-    self.rootPath = controller.tree.rootPath
-    self.canChangeRoot = canChangeRoot
-    self.isUIEnabled = canChangeRoot
-    self.needsManualLoad = self.con.tree.needsManualLoad
-    do {
-      try start()
-    } catch {
-      // TODO: what do we do here?
-      fatalError("Failed to start RootDirPanel!")
-    }
-  }
-
-  mutating func start() throws {
-    try self.dipatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
-    try self.dipatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.con.treeID)
-    try self.dipatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.con.treeID)
-    try self.dipatchListener.subscribe(signal: .END_EDITING, self.onEditingCancelled)
-  }
-
-  func shutdown() throws {
-    try self.dipatchListener.unsubscribeAll()
+    self.uiState = self.con.uiState
   }
 
   func submitRootPath() {
     do {
-      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.rootPath)
+      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.uiState.rootPath)
     } catch {
-      NSLog("Failed to submit root path \"\(rootPath)\": \(error)")
+      NSLog("Failed to submit root path \"\(self.uiState.rootPath)\": \(error)")
     }
   }
 
@@ -67,7 +36,7 @@ struct RootDirPanel: View {
           .renderingMode(.template)
           .frame(width: 16, height: 16)
           .padding(.leading, H_PAD)
-      if !isRootExists {
+      if !self.uiState.isRootExists {
         // TODO: alert icon
         Image("folder.13-regular-medium")
             .renderingMode(.template)
@@ -75,8 +44,8 @@ struct RootDirPanel: View {
             .padding(.leading, H_PAD)
       }
 
-      if isEditing {
-        TextField("Enter path...", text: $rootPath, onEditingChanged: { (editingChanged) in
+      if self.uiState.isEditingRoot {
+        TextField("Enter path...", text: $uiState.rootPath, onEditingChanged: { (editingChanged) in
           if editingChanged {
             // we don't use this
           } else {
@@ -95,45 +64,18 @@ struct RootDirPanel: View {
             fgColor = colors.randomElement()!
           })
         .onExitCommand {
-          NSLog("[\(self.con.treeID)] TextField got exit cmd: root path is \(rootPath)")
-          self.isEditing = false
+          NSLog("[\(self.con.treeID)] TextField got exit cmd: root path is \(self.uiState.rootPath)")
+          self.uiState.isEditingRoot = false
         }
         
       } else { // not editing
-        Text($rootPath.wrappedValue)
+        Text(self.uiState.rootPath)
           .background(fgColor)
           .onTapGesture(count: 1, perform: {
-            isEditing = true
+            self.uiState.isEditingRoot = true
           })
       }
     }
-  }
-
-  // Dispatch Listeners
-  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  func onEnableUIToggled(_ props: PropDict) throws {
-    if !self.canChangeRoot {
-      assert(!self.isUIEnabled)
-      return
-    }
-    self.isUIEnabled = try props.getBool("enable")
-  }
-
-  func onLoadStarted(_ params: PropDict) throws {
-    if self.needsManualLoad {
-      self.needsManualLoad = false
-    }
-  }
-
-  func onDisplayTreeChanged(_ params: PropDict) throws {
-    let newTree: DisplayTree = try params.get("tree") as! DisplayTree
-    self.rootPath = newTree.rootPath
-    self.isRootExists = newTree.rootExists
-  }
-
-  func onEditingCancelled(_ params: PropDict) throws {
-    NSLog("[\(self.con.treeID)] Editing cancelled")
-    self.isEditing = false
   }
 
 }

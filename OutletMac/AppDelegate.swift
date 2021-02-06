@@ -72,6 +72,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
       let conLeft = TreeController(app: self, tree: treeLeft)
       let conRight = TreeController(app: self, tree: treeRight)
 
+      try conLeft.start()
+      try conRight.start()
+
       // Create the SwiftUI view that provides the window contents.
       let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
       

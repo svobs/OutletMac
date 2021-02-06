@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 2021-02-01.
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
+import SwiftUI
 
 /**
  PROTOCOL TreeControllable
@@ -15,6 +16,12 @@ protocol TreeControllable {
   var dispatcher: SignalDispatcher { get }
   var tree: DisplayTree { get }
   var treeID: TreeID { get }
+
+  var uiState: TreeSwiftState { get }
+
+  var dispatchListener: DispatchListener { get }
+
+  func start() throws
 }
 
 /**
@@ -48,6 +55,8 @@ extension TreeControllable {
 class MockTreeController: TreeControllable {
   let app: OutletApp
   var tree: DisplayTree
+  let dispatchListener: DispatchListener
+  var uiState: TreeSwiftState
 
   init(_ treeID: String) {
     self.app = MockApp()
@@ -55,18 +64,110 @@ class MockTreeController: TreeControllable {
     let spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
     let rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
     self.tree = NullDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
+    self.uiState = TreeSwiftState.from(self.tree)
+
+    self.dispatchListener = self.app.dispatcher.createListener(self.tree.treeID)
+  }
+
+  func start() throws {
+  }
+
+}
+
+/**
+ Encapsulates *ONLY* the information required to redraw the SwiftUI views for a given DisplayTree.
+ */
+class TreeSwiftState: ObservableObject {
+  @Published var isUIEnabled: Bool
+  @Published var isRootExists: Bool
+  @Published var isEditingRoot: Bool
+  @Published var isManualLoadNeeded: Bool
+  @Published var offendingPath: String?
+  @Published var rootPath: String = ""
+
+  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String) {
+    self.isUIEnabled = isUIEnabled
+    self.isRootExists = isRootExists
+    self.isEditingRoot = isEditingRoot
+    self.isManualLoadNeeded = isManualLoadNeeded
+    self.offendingPath = offendingPath
+    self.rootPath = rootPath
+  }
+
+  func updateFrom(_ newTree: DisplayTree) {
+    self.rootPath = newTree.rootPath
+    self.offendingPath = newTree.state.offendingPath
+    self.isRootExists = newTree.rootExists
+    self.isEditingRoot = false
+    self.isManualLoadNeeded = newTree.needsManualLoad
+  }
+
+  static func from(_ tree: DisplayTree) -> TreeSwiftState {
+    return TreeSwiftState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
+                          offendingPath: tree.state.offendingPath, rootPath: tree.rootPath)
   }
 }
 
 /**
  CLASS TreeController
  */
-class TreeController: TreeControllable {
+class TreeController: TreeControllable, ObservableObject {
   let app: OutletApp
   var tree: DisplayTree
+  let dispatchListener: DispatchListener
+
+  var uiState: TreeSwiftState
+
+  var canChangeRoot: Bool = true // TODO
 
   init(app: OutletApp, tree: DisplayTree) {
     self.app = app
     self.tree = tree
+    self.uiState = TreeSwiftState.from(tree)
+    self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
   }
+
+  func start() throws {
+    try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .CANCEL_EDIT_ROOT, self.onEditingRootCancelled)
+  }
+
+  // Dispatch Listeners
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+  func onEnableUIToggled(_ props: PropDict) throws {
+    if !self.canChangeRoot {
+      assert(!self.uiState.isUIEnabled)
+      return
+    }
+    let isEnabled = try props.getBool("enable")
+    DispatchQueue.main.async {
+      self.uiState.isUIEnabled = isEnabled
+    }
+  }
+
+  func onLoadStarted(_ params: PropDict) throws {
+    if self.uiState.isManualLoadNeeded {
+      DispatchQueue.main.async {
+        self.uiState.isManualLoadNeeded = false
+      }
+    }
+  }
+
+  func onDisplayTreeChanged(_ params: PropDict) throws {
+    let newTree: DisplayTree = try params.get("tree") as! DisplayTree
+    DispatchQueue.main.async {
+      self.uiState.updateFrom(newTree)
+    }
+  }
+
+  func onEditingRootCancelled(_ params: PropDict) throws {
+    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.uiState.isEditingRoot))")
+    DispatchQueue.main.async {
+      self.uiState.isEditingRoot = false
+      NSLog("isEditing is now: \(self.uiState.isEditingRoot)") // TODO
+    }
+  }
+
 }
