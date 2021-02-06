@@ -29,6 +29,7 @@ struct OutlineRow<T: OutlineRepresentable>: View where T: Identifiable, T: Hasha
             }
             .frame(width: 16, height: 16)
             .onTapGesture {
+                // TODO app.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
                 self.node.open.toggle()
             }
             

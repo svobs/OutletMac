@@ -47,31 +47,30 @@ struct RootDirPanel: View {
       if self.uiState.isEditingRoot {
         TextField("Enter path...", text: $uiState.rootPath, onEditingChanged: { (editingChanged) in
           if editingChanged {
-            // we don't use this
+            // we don't care about this
           } else {
-//            NSLog("[\(self.con.treeID)] TextField focus removed: root path is \(rootPath)")
-            // TODO: also bind to Escape key
-//            self.isEditing = false
+            // This is ENTER key
+            NSLog("[\(self.con.treeID)] DEBUG TextField focus removed (assuming ENTER key pressed): submitting root path")
 
-            // TODO: separate this, do for Enter key only
-//            self.submitRootPath()
+            self.submitRootPath()
+            self.uiState.isEditingRoot = false
           }
         })
           .textFieldStyle(RoundedBorderTextFieldStyle())
           .background(fgColor)
-//          .foregroundColor(Color.blue)
           .onTapGesture(count: 1, perform: {
-            fgColor = colors.randomElement()!
+            // No op. Just override default
           })
         .onExitCommand {
-          NSLog("[\(self.con.treeID)] TextField got exit cmd: root path is \(self.uiState.rootPath)")
-          self.uiState.isEditingRoot = false
+          NSLog("[\(self.con.treeID)] DEBUG TextField got exit cmd")
+          self.con.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
         }
         
       } else { // not editing
         Text(self.uiState.rootPath)
           .background(fgColor)
           .onTapGesture(count: 1, perform: {
+            // switch to Editing mode
             self.uiState.isEditingRoot = true
           })
       }

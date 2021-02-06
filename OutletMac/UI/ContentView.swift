@@ -23,17 +23,16 @@ struct ContentView: View {
   }
 
   var body: some View {
+    let tapCancelEdit = TapGesture()
+      .onEnded { _ in
+        NSLog("Tapped!")
+        app.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
+      }
+
     ZStack {
       TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
         .contentShape(Rectangle()) // taps should be detected in the whole window
-        .simultaneousGesture(
-          // TODO: this *almost* gets us what we want. This will work for all Views inside our window except
-          // for the ones which have a TapGesture handler already assigned
-          TapGesture().onEnded { _ in
-            NSLog("Tapped!")
-            app.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
-          }
-        )
+        .gesture(tapCancelEdit)
     }
   }
 }

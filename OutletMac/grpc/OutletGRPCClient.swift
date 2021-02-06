@@ -65,9 +65,8 @@ class OutletGRPCClient: OutletBackend {
         break
     }
     argDict["signal"] = signal
-    argDict["sender"] = signalGRPC.sender
 
-    // TODO: DIPATCH MSG
+    dispatcher.sendSignal(signal: signal, params: argDict, senderID: signalGRPC.sender)
   }
   
   func receiveServerSignals() throws {

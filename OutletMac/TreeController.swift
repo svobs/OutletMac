@@ -156,17 +156,19 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func onDisplayTreeChanged(_ params: PropDict) throws {
-    let newTree: DisplayTree = try params.get("tree") as! DisplayTree
+    self.tree = try params.get("tree") as! DisplayTree
+    NSLog("[\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
     DispatchQueue.main.async {
-      self.uiState.updateFrom(newTree)
+      self.uiState.updateFrom(self.tree)
     }
   }
 
   func onEditingRootCancelled(_ params: PropDict) throws {
-    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.uiState.isEditingRoot))")
+    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.uiState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
+      // restore root path to value received from server
+      self.uiState.rootPath = self.tree.rootPath
       self.uiState.isEditingRoot = false
-      NSLog("isEditing is now: \(self.uiState.isEditingRoot)") // TODO
     }
   }
 
