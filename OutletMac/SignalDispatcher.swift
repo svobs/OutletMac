@@ -136,39 +136,41 @@ class SignalDispatcher {
 
   func createListener(_ id: ListenerID) -> DispatchListener {
     let listener = DispatchListener(id, self)
-
     return listener
   }
 
 
   fileprivate func subscribe(signal: Signal, listenerID: ListenerID, _ subscription: Subscription) throws {
-    var subscriberDict: [ListenerID: Subscription]? = self.signalListenerDict[signal]
-    if subscriberDict == nil {
-      subscriberDict = [:]
-      self.signalListenerDict[signal] = subscriberDict
+    if self.signalListenerDict[signal] == nil {
+      self.signalListenerDict[signal] = [:]
     }
 
-    if subscriberDict!.updateValue(subscription, forKey: listenerID) != nil {
-      NSLog("Warning: overwriting listener '\(listenerID)' for signal '\(signal)'")
+    if self.signalListenerDict[signal]!.updateValue(subscription, forKey: listenerID) != nil {
+      NSLog("WARN  Overwriting subscriber '\(listenerID)' for signal '\(signal)'")
+    } else {
+      NSLog("DEBUG Added subscriber '\(listenerID)' for signal '\(signal)'")
     }
   }
 
   fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
-    if var subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
-      if subscriberDict.removeValue(forKey: listenerID) != nil {
-        NSLog("Removed listener '\(listenerID)' from signal '\(signal)'")
-        return
-      }
+    if self.signalListenerDict[signal]?.removeValue(forKey: listenerID) != nil {
+      NSLog("DEBUG Removed subscriber '\(listenerID)' from signal '\(signal)'")
+      return
     }
-    NSLog("Warning: could not remove listener '\(listenerID)' from signal '\(signal)': not found")
+    NSLog("WARN  Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
   }
 
-  func sendSignal(signal: Signal, params: ParamDict?, senderID: SenderID?) {
+  func sendSignal(signal: Signal, params: ParamDict? = nil, senderID: SenderID?) {
+    NSLog("DEBUG Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
+      var countNotified = 0
+      var countTotal = 0
       for (subID, subscriber) in subscriberDict {
+        countTotal += 1
         if subscriber.matches(senderID) {
-          NSLog("Calling listener \(subID) for signal '\(signal)'")
+          countNotified += 1
+          NSLog("DEBUG Calling listener \(subID) for signal '\(signal)'")
           do {
             try subscriber.callback(propertyList)
           } catch {
@@ -178,6 +180,10 @@ class SignalDispatcher {
           NSLog("DEBUG Listener \(subID) does not match signal '\(signal)'")
         }
       }
+
+      NSLog("DEBUG Sent signal \(signal) to \(countNotified) of \(countTotal) subscribers")
+    } else {
+      NSLog("DEBUG No subscribers found for signal \(signal)")
     }
   }
 }

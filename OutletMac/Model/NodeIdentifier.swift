@@ -28,7 +28,7 @@ class NodeIdentifier: CustomStringConvertible {
   }
 
   public var description: String {
-    return "\(TreeType.display(self.treeType))-\(uid)⩨\(pathList)∣"
+    return "∣\(TreeType.display(treeType))-\(uid)⩨\(pathList)∣"
   }
   
   var treeType: TreeType {
@@ -54,6 +54,10 @@ class NodeIdentifier: CustomStringConvertible {
 class NullNodeIdentifier: NodeIdentifier {
   init() {
     super.init(NULL_UID, [])
+  }
+
+  override public var description: String {
+    return "∣\(TreeType.display(treeType))-\(uid)⩨∣"
   }
 }
 
@@ -87,6 +91,10 @@ class SinglePathNodeIdentifier: NodeIdentifier {
   
   override func getSinglePath() -> String {
     self.pathList[0]
+  }
+
+  override public var description: String {
+    return "∣\(TreeType.display(treeType))-\(uid)⩨\"\(getSinglePath())\"∣"
   }
 }
 

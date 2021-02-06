@@ -85,6 +85,9 @@ enum Signal: UInt32 {
 
   // --- Status bar ---
   case SET_STATUS = 105
+
+  // --- Only used by SwiftUI ---
+  case END_EDITING = 200
 }
 
 // --- Sender identifiers ---

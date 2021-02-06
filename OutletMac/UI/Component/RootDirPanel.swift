@@ -14,7 +14,7 @@ struct RootDirPanel: View {
   let con: TreeControllable
   private let dipatchListener: DispatchListener
 
-  @State private var isEditing: Bool = false
+  @State private var isEditing: Bool = true
   private var canChangeRoot: Bool = false
   // TODO: figure out if we can somehow bind directly to the var
   @State private var needsManualLoad: Bool = false
@@ -29,17 +29,24 @@ struct RootDirPanel: View {
     let dispatchListenerID = "RootDirPanel-\(self.con.treeID)"
     self.dipatchListener = self.con.dispatcher.createListener(dispatchListenerID)
 
-    NSLog("Setting rootPath to \(controller.tree.rootPath)")
+    NSLog("[\(self.con.treeID)] Setting rootPath to \(controller.tree.rootPath)")
     self.rootPath = controller.tree.rootPath
     self.canChangeRoot = canChangeRoot
     self.isUIEnabled = canChangeRoot
     self.needsManualLoad = self.con.tree.needsManualLoad
+    do {
+      try start()
+    } catch {
+      // TODO: what do we do here?
+      fatalError("Failed to start RootDirPanel!")
+    }
   }
 
   mutating func start() throws {
     try self.dipatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dipatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.con.treeID)
     try self.dipatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.con.treeID)
+    try self.dipatchListener.subscribe(signal: .END_EDITING, self.onEditingCancelled)
   }
 
   func shutdown() throws {
@@ -73,12 +80,12 @@ struct RootDirPanel: View {
           if editingChanged {
             // we don't use this
           } else {
-            NSLog("TextField focus removed: root path is \(rootPath)")
+//            NSLog("[\(self.con.treeID)] TextField focus removed: root path is \(rootPath)")
             // TODO: also bind to Escape key
-            self.isEditing = false
+//            self.isEditing = false
 
             // TODO: separate this, do for Enter key only
-            self.submitRootPath()
+//            self.submitRootPath()
           }
         })
           .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -88,12 +95,12 @@ struct RootDirPanel: View {
             fgColor = colors.randomElement()!
           })
         .onExitCommand {
-          NSLog("TextField got exit cmd: root path is \(rootPath)")
+          NSLog("[\(self.con.treeID)] TextField got exit cmd: root path is \(rootPath)")
           self.isEditing = false
         }
         
       } else { // not editing
-        Text(rootPath)
+        Text($rootPath.wrappedValue)
           .background(fgColor)
           .onTapGesture(count: 1, perform: {
             isEditing = true
@@ -122,6 +129,11 @@ struct RootDirPanel: View {
     let newTree: DisplayTree = try params.get("tree") as! DisplayTree
     self.rootPath = newTree.rootPath
     self.isRootExists = newTree.rootExists
+  }
+
+  func onEditingCancelled(_ params: PropDict) throws {
+    NSLog("[\(self.con.treeID)] Editing cancelled")
+    self.isEditing = false
   }
 
 }

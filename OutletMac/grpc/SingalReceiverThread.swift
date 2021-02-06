@@ -21,6 +21,7 @@ class SignalReceiverThread: Thread {
       } catch {
         fatalError("Receiving signals failed: \(error)")
       }
+      NSLog("SignalReceiverThread looping")
     }
   }
 
