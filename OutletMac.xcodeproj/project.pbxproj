@@ -42,7 +42,7 @@
 		D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D090EC25CD3C980070B69D /* StringUtil.swift */; };
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
 		D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeViewController.swift */; };
-		D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */; };
+		D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */; };
 		D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
 		D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */; };
@@ -91,7 +91,7 @@
 		D1D090EC25CD3C980070B69D /* StringUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		D1E913B925AA735C008E958B /* TreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
-		D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingalReceiverThread.swift; sourceTree = "<group>"; };
+		D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalReceiverThread.swift; sourceTree = "<group>"; };
 		D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDirPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 				D16839AD25AD551100D76169 /* generated */,
 				D16839E725AD8D0600D76169 /* SignalConstants.swift */,
 				D1CB04A025B1832E00556B28 /* GRPCConverter.swift */,
-				D1ED5E2125C6A25A00A8E5DB /* SingalReceiverThread.swift */,
+				D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */,
 			);
 			path = grpc;
 			sourceTree = "<group>";
@@ -375,7 +375,7 @@
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
 				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
 				D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */,
-				D1ED5E2225C6A25A00A8E5DB /* SingalReceiverThread.swift in Sources */,
+				D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
