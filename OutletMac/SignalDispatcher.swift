@@ -74,8 +74,8 @@ class DispatchListener {
     self._dispatcher = dispatcher
   }
 
-  func subscribe(signal: Signal, _ callback: @escaping Callback, whitelistSenderID: SenderID? = nil) throws {
-    let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID)
+  func subscribe(signal: Signal, _ callback: @escaping Callback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) throws {
+    let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
     try self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
   }
@@ -93,17 +93,25 @@ class DispatchListener {
 
 fileprivate class SignalFilterCriteria {
   let whitelistSenderID: SenderID?
+  let blacklistSenderID: SenderID?
   // maybe more stuff in future
 
-  init(whitelistSenderID: SenderID? = nil) {
+  init(whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) {
     self.whitelistSenderID = whitelistSenderID
+    self.blacklistSenderID = blacklistSenderID
   }
 
   func matches(_ senderID: SenderID?) -> Bool {
-    if whitelistSenderID == nil || senderID == nil {
+    if senderID == nil {
       return true
     } else {
-      return senderID! == whitelistSenderID!
+      if self.whitelistSenderID != nil {
+        return senderID! == self.whitelistSenderID!
+      } else if self.blacklistSenderID != nil {
+        return senderID! != self.blacklistSenderID!
+      } else {
+        return true
+      }
     }
   }
 }

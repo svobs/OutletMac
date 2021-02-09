@@ -63,16 +63,29 @@ struct RootDirPanel: View {
           })
         .onExitCommand {
           NSLog("[\(self.con.treeID)] DEBUG TextField got exit cmd")
-          self.con.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
+          self.con.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
         }
         
       } else { // not editing
-        Text(self.uiState.rootPath)
-          .background(fgColor)
-          .onTapGesture(count: 1, perform: {
-            // switch to Editing mode
-            self.uiState.isEditingRoot = true
-          })
+        HStack(spacing: H_PAD, content: {
+          if self.uiState.rootPath.isEmpty {
+            Text("No path entered")
+              .italic()
+              .multilineTextAlignment(.leading)
+          } else {
+            Text(self.uiState.rootPath)
+              .multilineTextAlignment(.leading)
+          }
+          Spacer() // this will align the preceding Text object to the left
+        })
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle()) // taps should be detected in the whole area
+        .onTapGesture(count: 1, perform: {
+          // cancel any previous edit
+          self.con.dispatcher.sendSignal(signal: .CANCEL_OTHER_EDIT_ROOT, senderID: con.treeID)
+          // switch to Editing mode
+          self.uiState.isEditingRoot = true
+        })
       }
     }
   }
@@ -87,8 +100,3 @@ struct RootDirPanel_Previews: PreviewProvider {
   }
 }
 
-struct RootDirPanel_Previews_2: PreviewProvider {
-  static var previews: some View {
-    /*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/
-  }
-}

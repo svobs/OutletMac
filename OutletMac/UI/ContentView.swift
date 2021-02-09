@@ -26,14 +26,12 @@ struct ContentView: View {
     let tapCancelEdit = TapGesture()
       .onEnded { _ in
         NSLog("Tapped!")
-        app.dispatcher.sendSignal(signal: .CANCEL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
+        app.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
       }
 
-    ZStack {
-      TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
-        .contentShape(Rectangle()) // taps should be detected in the whole window
-        .gesture(tapCancelEdit)
-    }
+    TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
+      .contentShape(Rectangle()) // taps should be detected in the whole window
+      .gesture(tapCancelEdit)
   }
 }
 

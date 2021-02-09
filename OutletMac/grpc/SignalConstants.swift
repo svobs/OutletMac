@@ -87,7 +87,8 @@ enum Signal: UInt32 {
   case SET_STATUS = 105
 
   // --- Only used by SwiftUI ---
-  case CANCEL_EDIT_ROOT = 200
+  case CANCEL_ALL_EDIT_ROOT = 200
+  case CANCEL_OTHER_EDIT_ROOT = 201
 }
 
 // --- Sender identifiers ---
