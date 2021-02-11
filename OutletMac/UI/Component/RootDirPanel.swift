@@ -10,9 +10,10 @@ import SwiftUI
 /**
  STRUCT RootDirPanel
  */
+@available(OSX 11.0, *)
 struct RootDirPanel: View {
-  let con: TreeControllable
   @ObservedObject var uiState: TreeSwiftState
+  let con: TreeControllable
 
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
@@ -32,19 +33,23 @@ struct RootDirPanel: View {
 
   var body: some View {
     HStack(alignment: .center, spacing: H_PAD) {
-      Image("folder.13-regular-medium")
-          .renderingMode(.template)
-          .frame(width: 16, height: 16)
-          .padding(.leading, H_PAD)
+      Image(systemName: "folder")
+        .renderingMode(.template)
+        .frame(width: 32, height: 32)
+        .padding(.leading, H_PAD)
+        .font(Font.system(.title))
+
       if !self.uiState.isRootExists {
-        // TODO: alert icon
-        Image("folder.13-regular-medium")
-            .renderingMode(.template)
-            .frame(width: 16, height: 16)
-            .padding(.leading, H_PAD)
+        Image(systemName: "exclamationmark.triangle.fill")
+          .renderingMode(.template)
+          .frame(width: 32, height: 32)
+          .padding(.leading, H_PAD)
+          .font(Font.system(.title))
       }
 
       if self.uiState.isEditingRoot {
+
+        // IS EDITING
         TextField("Enter path...", text: $uiState.rootPath, onEditingChanged: { (editingChanged) in
           if editingChanged {
             // we don't care about this
@@ -56,8 +61,9 @@ struct RootDirPanel: View {
             self.uiState.isEditingRoot = false
           }
         })
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .background(fgColor)
+          .font(Font.system(.title))
+//        .foregroundColor(.pink)
+//        .background(Color.white)
           .onTapGesture(count: 1, perform: {
             // No op. Just override default
           })
@@ -66,15 +72,19 @@ struct RootDirPanel: View {
           self.con.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
         }
         
-      } else { // not editing
+      } else {
+        // NOT EDITING
+
         HStack(spacing: H_PAD, content: {
           if self.uiState.rootPath.isEmpty {
             Text("No path entered")
               .italic()
               .multilineTextAlignment(.leading)
+              .font(Font.system(.title))
           } else {
             Text(self.uiState.rootPath)
               .multilineTextAlignment(.leading)
+              .font(Font.system(.title))
           }
           Spacer() // this will align the preceding Text object to the left
         })
@@ -86,8 +96,10 @@ struct RootDirPanel: View {
           // switch to Editing mode
           self.uiState.isEditingRoot = true
         })
-      }
-    }
+
+      } // editing / not editing
+
+    }  // HStack
   }
 
 }

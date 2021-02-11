@@ -92,6 +92,7 @@ class OutletGRPCClient: OutletBackend {
 
     // Wait for the call to end.
     _ = try! call.status.wait()
+    NSLog("receiveServerSignals() returning")
   }
   
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.

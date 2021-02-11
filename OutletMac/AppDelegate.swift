@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
 
       // Create the SwiftUI view that provides the window contents.
       let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
-      
+
       // Create the window and set the content view.
       window = NSWindow(
         contentRect: NSRect(x: 0, y: 0, width: 1200, height: 800),

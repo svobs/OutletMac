@@ -54,6 +54,7 @@ struct StatusPanel: View {
 /**
  STRUCT TreePanel
  */
+@available(OSX 11.0, *)
 struct TreePanel {
   let con: TreeControllable
   let root_dir_panel: RootDirPanel
