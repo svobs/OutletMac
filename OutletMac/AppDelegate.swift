@@ -30,7 +30,6 @@ class MockApp: OutletApp {
 /**
  CLASS AppDelegate
  */
-@available(OSX 11.0, *)
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
 

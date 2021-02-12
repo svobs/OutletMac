@@ -10,7 +10,6 @@ import SwiftUI
 /**
  STRUCT RootDirPanel
  */
-@available(OSX 11.0, *)
 struct RootDirPanel: View {
   @ObservedObject var uiState: TreeSwiftState
   let con: TreeControllable
@@ -104,8 +103,6 @@ struct RootDirPanel: View {
 
 }
 
-
-@available(OSX 11.0, *)
 struct RootDirPanel_Previews: PreviewProvider {
   static var previews: some View {
     RootDirPanel(controller: MockTreeController(ID_LEFT_TREE), canChangeRoot: true)

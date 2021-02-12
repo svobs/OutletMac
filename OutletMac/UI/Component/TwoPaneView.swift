@@ -54,7 +54,6 @@ struct StatusPanel: View {
 /**
  STRUCT TreePanel
  */
-@available(OSX 11.0, *)
 struct TreePanel {
   let con: TreeControllable
   let root_dir_panel: RootDirPanel
@@ -74,7 +73,6 @@ struct TreePanel {
 /**
  STRUCT TwoPaneView
  */
-@available(OSX 11.0, *)
 struct TwoPaneView: View {
   private var columns: [GridItem] = [
     // these specify spacing between columns
@@ -143,7 +141,6 @@ struct TwoPaneView: View {
     }
 }
 
-@available(OSX 11.0, *)
 struct TwoPaneView_Previews: PreviewProvider {
   static var previews: some View {
     TwoPaneView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))

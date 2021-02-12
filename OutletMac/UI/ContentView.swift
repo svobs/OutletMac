@@ -9,7 +9,6 @@
 import SwiftUI
 
 
-@available(OSX 11.0, *)
 struct ContentView: View {
   let app: OutletApp
   let conLeft: TreeControllable
@@ -35,7 +34,6 @@ struct ContentView: View {
   }
 }
 
-@available(OSX 11.0, *)
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
     ContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
