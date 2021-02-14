@@ -12,12 +12,13 @@ import SwiftUI
  */
 protocol TreeControllable {
   var app: OutletApp { get }
+  var tree: DisplayTree { get }
+  var uiState: TreeSwiftState { get }
+
+  // Convenience getters - see extension below
   var backend: OutletBackend { get }
   var dispatcher: SignalDispatcher { get }
-  var tree: DisplayTree { get }
   var treeID: TreeID { get }
-
-  var uiState: TreeSwiftState { get }
 
   var dispatchListener: DispatchListener { get }
 
@@ -63,10 +64,12 @@ class MockTreeController: TreeControllable {
     // dummy data follows
     let spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
     let rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
-    self.tree = NullDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
+    self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
     self.uiState = TreeSwiftState.from(self.tree)
 
     self.dispatchListener = self.app.dispatcher.createListener(self.tree.treeID)
+
+    self.uiState.statusBarMsg = "Status msg for \(self.treeID)"
   }
 
   func start() throws {
@@ -84,6 +87,7 @@ class TreeSwiftState: ObservableObject {
   @Published var isManualLoadNeeded: Bool
   @Published var offendingPath: String?
   @Published var rootPath: String = ""
+  @Published var statusBarMsg: String = ""
 
   init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String) {
     self.isUIEnabled = isUIEnabled
@@ -133,6 +137,7 @@ class TreeController: TreeControllable, ObservableObject {
     try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: self.treeID)
   }
 
   // Dispatch Listeners
@@ -173,4 +178,11 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
+  func onSetStatus(_ props: PropDict) throws {
+    let statusBarMsg = try props.getString("status_msg")
+    NSLog("Updating status bar msg with content: \"\(statusBarMsg)\"")
+    DispatchQueue.main.async {
+      self.uiState.statusBarMsg = statusBarMsg
+    }
+  }
 }

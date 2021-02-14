@@ -49,6 +49,7 @@
 		D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
+		D1FCD9AB25D8EF9E000C8FF3 /* TernaryToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1FCD9AA25D8EF9E000C8FF3 /* TernaryToggleButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -98,6 +99,7 @@
 		D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
+		D1FCD9AA25D8EF9E000C8FF3 /* TernaryToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TernaryToggleButton.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -250,6 +252,7 @@
 				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
 				D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */,
 				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
+				D1FCD9AA25D8EF9E000C8FF3 /* TernaryToggleButton.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
 				D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */,
 				D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */,
+				D1FCD9AB25D8EF9E000C8FF3 /* TernaryToggleButton.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,

@@ -88,12 +88,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
       window.makeKeyAndOrderFront(nil)
 
 
-//      NSLog("Sleeping 2...")
-//      sleep(2)
+      NSLog("Sleeping 3...")
+      sleep(3)
 //      NSLog("Quitting")
 //      exit(0)
     } catch {
-      fatalError("Fatal error: \(error)")
+      NSLog("FATAL ERROR in main(): \(error)")
+      NSLog("Sleeping 1s to let things settle...")
+      sleep(1)
+      exit(1)
     }
   }
   

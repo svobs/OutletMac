@@ -86,7 +86,7 @@ class OutletGRPCClient: OutletBackend {
         // this should never happen
         NSLog("Server closed signal subscription")
       } else {
-        NSLog("ReceiveSignals failed: \(status)")
+        NSLog("ReceiveSignals(): received error: \(status)")
       }
     }
 

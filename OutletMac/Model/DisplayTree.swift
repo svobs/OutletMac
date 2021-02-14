@@ -54,9 +54,9 @@ class DisplayTree {
 }
 
 /**
- CLASS NullDisplayTree
+ CLASS MockDisplayTree
  */
-class NullDisplayTree: DisplayTree {
+class MockDisplayTree: DisplayTree {
   
 }
 
@@ -140,7 +140,7 @@ class DisplayTreeUiState: CustomStringConvertible {
     if self.rootExists {
       return DisplayTree(backend: backend, state: self)
     } else {
-      return NullDisplayTree(backend: backend, state: self)
+      return MockDisplayTree(backend: backend, state: self)
     }
   }
 }

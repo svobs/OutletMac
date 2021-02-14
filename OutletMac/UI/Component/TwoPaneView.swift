@@ -46,8 +46,20 @@ struct TreeView: View {
  STRUCT StatusPanel
  */
 struct StatusPanel: View {
+  @ObservedObject var uiState: TreeSwiftState
+
+  init(controller: TreeControllable) {
+    self.uiState = controller.uiState
+  }
+
   var body: some View {
-    TodoPlaceholder("<Status msg panel>")
+    HStack {
+      Text(self.uiState.statusBarMsg)
+        .multilineTextAlignment(.leading)
+        .font(Font.system(.body))
+      Spacer()
+    }
+    .padding(.leading, H_PAD)
   }
 }
 
@@ -64,9 +76,26 @@ struct TreePanel {
   init(controller: TreeControllable) {
     self.con = controller
     self.root_dir_panel = RootDirPanel(controller: self.con, canChangeRoot: true)
-    self.filter_panel = FilterPanel()
+    self.filter_panel = FilterPanel(controller: self.con)
     self.tree_view = TreeView(items:  exampleArray())
-    self.status_panel = StatusPanel()
+    self.status_panel = StatusPanel(controller: self.con)
+  }
+}
+
+/**
+ STRUCT ButtonBar
+ */
+fileprivate struct ButtonBar: View {
+
+  var body: some View {
+    HStack {
+      // TODO
+      Button("Diff (content-first)", action: {})
+      Button("Download Google Drive meta", action: {})
+      Spacer()
+    }
+    .padding(.leading, H_PAD)
+    .buttonStyle(BorderedButtonStyle())
   }
 }
 
@@ -98,51 +127,54 @@ struct TwoPaneView: View {
   private var colors: [Color] = [.yellow, .purple, .green]
 
 
-    var body: some View {
-//        ScrollView(.vertical) {
-            LazyVGrid(
-                columns: columns,
-                alignment: .center,
-                spacing: V_PAD
-//                pinnedViews: [.sectionHeaders, .sectionFooters]
-            ) {
-//                ForEach((0...10), id: \.self) {
-//                    Image(systemName: symbols[$0 % symbols.count])
-//                        .font(.system(size: 30))
-//                        .frame(width: 50, height: 50)
-//                        .background(colors[$0 % colors.count])
-//                        .cornerRadius(10)
-//                }
-                self.left_tree_panel.root_dir_panel
-                self.right_tree_panel.root_dir_panel
-                
-                self.left_tree_panel.filter_panel
-                self.right_tree_panel.filter_panel
-                
-                self.left_tree_panel.tree_view//.frame(maxWidth: .infinity, maxHeight: .infinity)
-                self.right_tree_panel.tree_view//.frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-                
-                self.left_tree_panel.status_panel
-                self.right_tree_panel.status_panel
-                
-                // TODO: move these out into a separate view, and out of the grid
-                TodoPlaceholder("<BUTTON BAR>")
-                TodoPlaceholder("<PROGRESS BAR>")
-                
-//                Section(header: Text("Section 1").font(.title)) {
-//                    self.leftItemList.forEach {
-//                        Rectangle().fill(Color.green)
-//                        print($0)
-//                    }
-//                }
-            }.frame(width: 800, height: 500)
-//        }.frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
+  var body: some View {
+    //        ScrollView(.vertical) {
+    LazyVGrid(
+      columns: columns,
+      alignment: .center,
+      spacing: V_PAD
+      //                pinnedViews: [.sectionHeaders, .sectionFooters]
+    ) {
+      //                ForEach((0...10), id: \.self) {
+      //                    Image(systemName: symbols[$0 % symbols.count])
+      //                        .font(.system(size: 30))
+      //                        .frame(width: 50, height: 50)
+      //                        .background(colors[$0 % colors.count])
+      //                        .cornerRadius(10)
+      //                }
+      self.left_tree_panel.root_dir_panel
+      self.right_tree_panel.root_dir_panel
+
+      self.left_tree_panel.filter_panel
+      self.right_tree_panel.filter_panel
+
+      self.left_tree_panel.tree_view
+      self.right_tree_panel.tree_view
+
+
+      self.left_tree_panel.status_panel
+      self.right_tree_panel.status_panel
+
+      // Button Bar
+      ButtonBar()
+
+      TodoPlaceholder("<PROGRESS BAR>")
+
+      //                Section(header: Text("Section 1").font(.title)) {
+      //                    self.leftItemList.forEach {
+      //                        Rectangle().fill(Color.green)
+      //                        print($0)
+      //                    }
+      //                }
+    }.frame(width: 800, height: 500)
+  }
 }
 
 struct TwoPaneView_Previews: PreviewProvider {
+  static let conLeft = MockTreeController(ID_LEFT_TREE)
+  static let conRight = MockTreeController(ID_RIGHT_TREE)
   static var previews: some View {
-    TwoPaneView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
+    TwoPaneView(app: MockApp(), conLeft: conLeft, conRight: conRight)
+      .colorScheme(.dark)
   }
 }

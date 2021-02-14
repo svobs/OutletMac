@@ -37,6 +37,11 @@ struct RootDirPanel: View {
         .frame(width: 32, height: 32)
         .padding(.leading, H_PAD)
         .font(Font.system(.title))
+        .contextMenu {
+          // TODO!
+          Button("Local filesystem subtree...", action: {})
+          Button("Google Drive subtree...", action: {})
+        }
 
       if !self.uiState.isRootExists {
         Image(systemName: "exclamationmark.triangle.fill")
@@ -74,7 +79,7 @@ struct RootDirPanel: View {
       } else {
         // NOT EDITING
 
-        HStack(spacing: H_PAD, content: {
+        HStack(spacing: H_PAD) {
           if self.uiState.rootPath.isEmpty {
             Text("No path entered")
               .italic()
@@ -86,7 +91,7 @@ struct RootDirPanel: View {
               .font(Font.system(.title))
           }
           Spacer() // this will align the preceding Text object to the left
-        })
+        }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle()) // taps should be detected in the whole area
         .onTapGesture(count: 1, perform: {

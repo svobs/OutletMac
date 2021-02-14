@@ -10,6 +10,8 @@ import Foundation
 
 class SignalReceiverThread: Thread {
   let grpcClient: OutletGRPCClient
+  var loopCount: Int = 0
+
   init(_ grpcClient: OutletGRPCClient) {
     self.grpcClient = grpcClient
   }
@@ -19,9 +21,15 @@ class SignalReceiverThread: Thread {
       do {
         try self.receiveSignals()
       } catch {
-        fatalError("Receiving signals failed: \(error)")
+        // not clear if we ever get here
+        NSLog("Receiving signals failed: \(error)")
       }
-      NSLog("SignalReceiverThread looping")
+      // TODO: give more thought to handling various "async" code paths
+      loopCount += 1
+      if loopCount > 3 {
+        fatalError("Max failures exceeded!")
+      }
+      NSLog("SignalReceiverThread looping (count: \(loopCount))")
     }
   }
 
