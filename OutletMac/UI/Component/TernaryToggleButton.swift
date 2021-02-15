@@ -62,10 +62,10 @@ struct TernaryToggleButton: View {
 
         }
       }
-      .overlay(
-        RoundedRectangle(cornerRadius: 10.0)
-          .stroke(lineWidth: 2.0)
-      )
+//      .overlay(
+//        RoundedRectangle(cornerRadius: 10.0)
+//          .stroke(lineWidth: 2.0)
+//      )
 
     }
     .buttonStyle(PlainButtonStyle())
