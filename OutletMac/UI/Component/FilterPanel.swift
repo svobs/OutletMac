@@ -30,6 +30,7 @@ struct FilterPanel: View {
           // This is ENTER key
         }
       })
+      .font(Font.system(.title))
 
       // Show ancestors
       TernaryToggleButton(.FALSE, imageName: "folder.fill")
@@ -43,6 +44,8 @@ struct FilterPanel: View {
       // Is Shared
       TernaryToggleButton(.FALSE, imageName: "person.2.fill")
     }
+    .padding(.bottom, V_PAD)
+    .padding(.top, V_PAD)
   }
 }
 

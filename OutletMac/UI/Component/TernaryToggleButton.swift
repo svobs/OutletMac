@@ -8,11 +8,8 @@
 
 import SwiftUI
 
-let DEFAULT_TERNARY_BTN_WIDTH: CGFloat = 40
-let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 40
-
-let DEFAULT_TERNARY_ICON_WIDTH: CGFloat = 32
-let DEFAULT_TERNARY_ICON_HEIGHT: CGFloat = 32
+let DEFAULT_TERNARY_BTN_WIDTH: CGFloat = 32
+let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 32
 
 /**
  STRUCT TernaryToggleButton
@@ -31,34 +28,47 @@ struct TernaryToggleButton: View {
   }
 
   var body: some View {
-    ZStack {
 
-      if isEnabled == .TRUE {
-        Circle().fill(Color.white)
-          .frame(width: DEFAULT_TERNARY_ICON_WIDTH, height: DEFAULT_TERNARY_ICON_HEIGHT)
+    Button(action: {
+      print("Button action")
+    }) {
+      ZStack {
 
-        Image(systemName: self.imageName)
-          .renderingMode(.template)
-          .colorInvert()
-          .frame(width: width, height: height)
-          .font(Font.system(.title))
-          .clipShape(Circle())
+        if isEnabled == .TRUE {
 
-          .accentColor(isEnabled == .TRUE ? .white : .black)
-//          .shadow(radius: 2)
-      } else {
-        Image(systemName: self.imageName)
-          .renderingMode(.template)
-          .frame(width: width, height: height)
-          .font(Font.system(.title))
-          .clipShape(Circle())
+          Circle().fill(Color.white)
+            .frame(width: width, height: height)
+            .shadow(color: .white, radius: 3.0)
 
-          .accentColor(isEnabled == .TRUE ? .white : .black)
-//          .shadow(radius: 5)
-        //        .overlay(Circle().stroke(Color.red, lineWidth: 2))
+          Image(systemName: self.imageName)
+            .renderingMode(.template)
+            .colorInvert()
+            .frame(width: width, height: height)
+            .font(Font.system(.title))
+            .clipShape(Circle())
+            .shadow(color: .white, radius: 3.0)
+            .accentColor(isEnabled == .TRUE ? .white : .black)
+
+        } else {
+
+          Image(systemName: self.imageName)
+            .renderingMode(.template)
+            .frame(width: width, height: height)
+            .font(Font.system(.title))
+//            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+
+            .accentColor(isEnabled == .TRUE ? .white : .black)
+//            .overlay(Circle().stroke(Color.red, lineWidth: 2))
+
+        }
       }
+      .overlay(
+        RoundedRectangle(cornerRadius: 10.0)
+          .stroke(lineWidth: 2.0)
+      )
 
     }
+    .buttonStyle(PlainButtonStyle())
   }
 }
 
