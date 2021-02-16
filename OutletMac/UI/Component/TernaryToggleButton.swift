@@ -30,7 +30,15 @@ struct TernaryToggleButton: View {
   var body: some View {
 
     Button(action: {
-      print("Button action")
+      switch isEnabled {
+        case .TRUE:
+          isEnabled = .FALSE
+        case .FALSE:
+          isEnabled = .NOT_SPECIFIED
+        case .NOT_SPECIFIED:
+          isEnabled = .TRUE
+      }
+      NSLog("Toggled button ternary value to \(isEnabled)")
     }) {
       ZStack {
 
@@ -100,7 +108,8 @@ struct BoolToggleButton: View {
   var body: some View {
 
     Button(action: {
-      print("Button action")
+      isEnabled.toggle()
+      NSLog("Toggled button bool value to \(isEnabled)")
     }) {
       ZStack {
 

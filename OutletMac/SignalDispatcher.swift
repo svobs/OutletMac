@@ -10,7 +10,7 @@ import Foundation
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
 typealias ParamDict = [String: Any]
-typealias Callback = (PropDict) throws -> Void
+typealias SignalCallback = (PropDict) throws -> Void
 typealias SenderID = String
 
 /**
@@ -74,7 +74,7 @@ class DispatchListener {
     self._dispatcher = dispatcher
   }
 
-  func subscribe(signal: Signal, _ callback: @escaping Callback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) throws {
+  func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) throws {
     let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
     try self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
@@ -117,10 +117,10 @@ fileprivate class SignalFilterCriteria {
 }
 
 fileprivate class Subscription {
-  let callback: Callback
+  let callback: SignalCallback
   let filterCriteria: SignalFilterCriteria?
 
-  init(_ callback: @escaping Callback, filterBy filterCriteria: SignalFilterCriteria? = nil) {
+  init(_ callback: @escaping SignalCallback, filterBy filterCriteria: SignalFilterCriteria? = nil) {
     self.callback = callback
     self.filterCriteria = filterCriteria
   }

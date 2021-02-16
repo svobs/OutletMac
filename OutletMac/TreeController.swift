@@ -125,32 +125,78 @@ class SwiftTreeState: ObservableObject {
  Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
  */
 class SwiftFilterState: ObservableObject {
- @Published var searchQuery: String
- @Published var isMatchCase: Bool
- @Published var isTrashed: Ternary
- @Published var isShared: Ternary
- @Published var showAncestors: Bool
+  var onChangeCallback: FilterStateCallback? = nil
 
- init(searchQuery: String, isMatchCase: Bool, isTrashed: Ternary, isShared: Ternary, showAncestors: Bool) {
-   self.searchQuery = searchQuery
-   self.isMatchCase = isMatchCase
-   self.isTrashed = isTrashed
-   self.isShared = isShared
-   self.showAncestors = showAncestors
- }
+  @Published var searchQuery: String {
+    didSet {
+      NSLog("Search query changed: \(searchQuery)")
+      if onChangeCallback != nil {
+        onChangeCallback!(self)
+      }
+    }
+  }
+  @Published var isMatchCase: Bool {
+    didSet {
+      NSLog("isMatchCase changed: \(isMatchCase)")
+      if onChangeCallback != nil {
+        onChangeCallback!(self)
+      }
+    }
+  }
 
- func updateFrom(_ filter: FilterCriteria) {
-   self.searchQuery = filter.searchQuery
-   self.isMatchCase = !filter.isIgnoreCase
-   self.isTrashed = filter.isTrashed
-   self.isShared = filter.isShared
-   self.showAncestors = filter.showSubtreesOfMatches
- }
+  @Published var isTrashed: Ternary {
+    didSet {
+      NSLog("isTrashed changed: \(isTrashed)")
+      if onChangeCallback != nil {
+        onChangeCallback!(self)
+      }
+    }
+  }
+  @Published var isShared: Ternary {
+    didSet {
+      NSLog("isShared changed: \(isShared)")
+      if onChangeCallback != nil {
+        onChangeCallback!(self)
+      }
+    }
+  }
+  @Published var showAncestors: Bool {
+    didSet {
+      NSLog("showAncestors changed: \(showAncestors)")
+      if onChangeCallback != nil {
+        onChangeCallback!(self)
+      }
+    }
+  }
 
- static func from(_ filter: FilterCriteria) -> SwiftFilterState {
-  return SwiftFilterState(searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showSubtreesOfMatches)
- }
+  init(onChangeCallback: FilterStateCallback? = nil, searchQuery: String, isMatchCase: Bool, isTrashed: Ternary, isShared: Ternary, showAncestors: Bool) {
+    self.onChangeCallback = onChangeCallback
+    self.searchQuery = searchQuery
+    self.isMatchCase = isMatchCase
+    self.isTrashed = isTrashed
+    self.isShared = isShared
+    self.showAncestors = showAncestors
+  }
+
+  func updateFrom(_ filter: FilterCriteria, onChangeCallback: FilterStateCallback? = nil) {
+    self.onChangeCallback = onChangeCallback
+    self.searchQuery = filter.searchQuery
+    self.isMatchCase = !filter.isIgnoreCase
+    self.isTrashed = filter.isTrashed
+    self.isShared = filter.isShared
+    self.showAncestors = filter.showSubtreesOfMatches
+  }
+
+  func toFilterCriteria() -> FilterCriteria {
+    return FilterCriteria(searchQuery: searchQuery, isTrashed: isTrashed, isShared: isShared, isIgnoreCase: !isMatchCase, showSubtreesOfMatches: showAncestors)
+  }
+
+  static func from(_ filter: FilterCriteria, onChangeCallback: FilterStateCallback? = nil) -> SwiftFilterState {
+    return SwiftFilterState(onChangeCallback: onChangeCallback, searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showSubtreesOfMatches)
+  }
 }
+
+typealias FilterStateCallback = (SwiftFilterState) -> Void
 
 /**
  CLASS TreeController
@@ -169,8 +215,9 @@ class TreeController: TreeControllable, ObservableObject {
     self.app = app
     self.tree = tree
     self.swiftTreeState = SwiftTreeState.from(tree)
-    self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
+    self.swiftFilterState = SwiftFilterState.from(filterCriteria)
+    self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
 
   func start() throws {
@@ -180,6 +227,14 @@ class TreeController: TreeControllable, ObservableObject {
     try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: self.treeID)
+  }
+
+  func onFilterChanged(filterState: SwiftFilterState) {
+    do {
+      try self.app.backend?.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
+    } catch {
+      NSLog("Failed to update filter criteria on the backend: \(error)")
+    }
   }
 
   // Dispatch Listeners
