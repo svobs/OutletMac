@@ -13,17 +13,17 @@ import SwiftUI
  Reminder: use the "SF Symbols" app to browse Mac OS system icons
  */
 struct FilterPanel: View {
-  @ObservedObject var uiState: TreeSwiftState
+  @ObservedObject var swiftFilterState: SwiftFilterState
   let con: TreeControllable
 
   init(controller: TreeControllable) {
     self.con = controller
-    self.uiState = controller.uiState
+    self.swiftFilterState = controller.swiftFilterState
   }
 
   var body: some View {
     HStack(spacing: H_PAD) {
-      TextField("Filter by name", text: $uiState.rootPath, onEditingChanged: { (editingChanged) in
+      TextField("Filter by name", text: $swiftFilterState.searchQuery, onEditingChanged: { (editingChanged) in
         if editingChanged {
           // TODO
         } else {
@@ -33,16 +33,16 @@ struct FilterPanel: View {
       .font(Font.system(.title))
 
       // Show ancestors
-      TernaryToggleButton(.FALSE, imageName: "folder.fill")
+      BoolToggleButton($swiftFilterState.showAncestors, imageName: "folder.fill")
 
       // Match Case
-      TernaryToggleButton(.TRUE, imageName: "textformat")
+      BoolToggleButton($swiftFilterState.isMatchCase, imageName: "textformat")
 
       // Is Trashed
-      TernaryToggleButton(.FALSE, imageName: "trash")
+      TernaryToggleButton($swiftFilterState.isTrashed, imageName: "trash")
 
       // Is Shared
-      TernaryToggleButton(.FALSE, imageName: "person.2.fill")
+      TernaryToggleButton($swiftFilterState.isShared, imageName: "person.2.fill")
     }
     .padding(.bottom, V_PAD)
     .padding(.top, V_PAD)

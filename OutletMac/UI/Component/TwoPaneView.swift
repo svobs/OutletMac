@@ -46,15 +46,15 @@ struct TreeView: View {
  STRUCT StatusPanel
  */
 struct StatusPanel: View {
-  @ObservedObject var uiState: TreeSwiftState
+  @ObservedObject var swiftTreeState: SwiftTreeState
 
   init(controller: TreeControllable) {
-    self.uiState = controller.uiState
+    self.swiftTreeState = controller.swiftTreeState
   }
 
   var body: some View {
     HStack {
-      Text(self.uiState.statusBarMsg)
+      Text(self.swiftTreeState.statusBarMsg)
         .multilineTextAlignment(.leading)
         .font(Font.system(.body))
       Spacer()

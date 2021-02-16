@@ -68,8 +68,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
 
       let treeLeft: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      let conLeft = TreeController(app: self, tree: treeLeft)
-      let conRight = TreeController(app: self, tree: treeRight)
+      let filterCriteriaLeft: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_LEFT_TREE)
+      let filterCriteriaRight: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_RIGHT_TREE)
+      let conLeft = TreeController(app: self, tree: treeLeft, filterCriteria: filterCriteriaLeft)
+      let conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
 
       try conLeft.start()
       try conRight.start()

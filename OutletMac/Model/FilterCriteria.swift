@@ -12,6 +12,9 @@ enum Ternary : UInt32 {
   case NOT_SPECIFIED = 2
 }
 
+/**
+ CLASS FilterCriteria
+ */
 class FilterCriteria: CustomStringConvertible {
   let searchQuery: String
   let isIgnoreCase: Bool

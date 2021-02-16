@@ -447,16 +447,18 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
-  func getFilterCriteria(treeID: String) throws -> FilterCriteria? {
+  func getFilterCriteria(treeID: String) throws -> FilterCriteria {
     var request = Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request()
     request.treeID = treeID
     let call = self.stub.get_filter(request)
     do {
       let response = try call.response.wait()
       if response.hasFilterCriteria {
-        return try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
+        let filterCriteria = try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
+        NSLog("[\(treeID)] Got: \(filterCriteria)")
+        return filterCriteria
       } else {
-        return nil
+        throw OutletError.invalidState("No FilterCriteria (probably unknown tree) for tree: \(treeID)")
       }
     } catch {
       throw OutletError.grpcFailure("RPC 'getFilterCriteria' failed: \(error)")

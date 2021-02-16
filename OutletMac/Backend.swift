@@ -38,7 +38,7 @@ protocol OutletBackend: HasLifecycle {
   func getLastPendingOp(nodeUID: UID) throws -> UserOp?
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
   func deleteSubtree(nodeUIDList: [UID]) throws
-  func getFilterCriteria(treeID: String) throws -> FilterCriteria?
+  func getFilterCriteria(treeID: String) throws -> FilterCriteria
   func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws
 }
 
@@ -180,7 +180,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getFilterCriteria(treeID: String) throws -> FilterCriteria? {
+  func getFilterCriteria(treeID: String) throws -> FilterCriteria {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

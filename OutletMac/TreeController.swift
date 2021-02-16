@@ -13,7 +13,8 @@ import SwiftUI
 protocol TreeControllable {
   var app: OutletApp { get }
   var tree: DisplayTree { get }
-  var uiState: TreeSwiftState { get }
+  var swiftTreeState: SwiftTreeState { get }
+  var swiftFilterState: SwiftFilterState { get }
 
   // Convenience getters - see extension below
   var backend: OutletBackend { get }
@@ -57,7 +58,8 @@ class MockTreeController: TreeControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
-  var uiState: TreeSwiftState
+  var swiftTreeState: SwiftTreeState
+  var swiftFilterState: SwiftFilterState
 
   init(_ treeID: String) {
     self.app = MockApp()
@@ -65,11 +67,13 @@ class MockTreeController: TreeControllable {
     let spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
     let rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
     self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
-    self.uiState = TreeSwiftState.from(self.tree)
+    self.swiftTreeState = SwiftTreeState.from(self.tree)
+    let filterCriteria = FilterCriteria()
+    self.swiftFilterState = SwiftFilterState.from(filterCriteria)
 
     self.dispatchListener = self.app.dispatcher.createListener(self.tree.treeID)
 
-    self.uiState.statusBarMsg = "Status msg for \(self.treeID)"
+    self.swiftTreeState.statusBarMsg = "Status msg for \(self.treeID)"
   }
 
   func start() throws {
@@ -78,9 +82,11 @@ class MockTreeController: TreeControllable {
 }
 
 /**
+ CLASS SwiftTreeState
+
  Encapsulates *ONLY* the information required to redraw the SwiftUI views for a given DisplayTree.
  */
-class TreeSwiftState: ObservableObject {
+class SwiftTreeState: ObservableObject {
   @Published var isUIEnabled: Bool
   @Published var isRootExists: Bool
   @Published var isEditingRoot: Bool
@@ -106,10 +112,44 @@ class TreeSwiftState: ObservableObject {
     self.isManualLoadNeeded = newTree.needsManualLoad
   }
 
-  static func from(_ tree: DisplayTree) -> TreeSwiftState {
-    return TreeSwiftState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
+  static func from(_ tree: DisplayTree) -> SwiftTreeState {
+    return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
                           offendingPath: tree.state.offendingPath, rootPath: tree.rootPath)
   }
+}
+
+/**
+ CLASS SwiftFilterState
+
+ See FilterCriteria class.
+ Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
+ */
+class SwiftFilterState: ObservableObject {
+ @Published var searchQuery: String
+ @Published var isMatchCase: Bool
+ @Published var isTrashed: Ternary
+ @Published var isShared: Ternary
+ @Published var showAncestors: Bool
+
+ init(searchQuery: String, isMatchCase: Bool, isTrashed: Ternary, isShared: Ternary, showAncestors: Bool) {
+   self.searchQuery = searchQuery
+   self.isMatchCase = isMatchCase
+   self.isTrashed = isTrashed
+   self.isShared = isShared
+   self.showAncestors = showAncestors
+ }
+
+ func updateFrom(_ filter: FilterCriteria) {
+   self.searchQuery = filter.searchQuery
+   self.isMatchCase = !filter.isIgnoreCase
+   self.isTrashed = filter.isTrashed
+   self.isShared = filter.isShared
+   self.showAncestors = filter.showSubtreesOfMatches
+ }
+
+ static func from(_ filter: FilterCriteria) -> SwiftFilterState {
+  return SwiftFilterState(searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showSubtreesOfMatches)
+ }
 }
 
 /**
@@ -120,14 +160,16 @@ class TreeController: TreeControllable, ObservableObject {
   var tree: DisplayTree
   let dispatchListener: DispatchListener
 
-  var uiState: TreeSwiftState
+  var swiftTreeState: SwiftTreeState
+  var swiftFilterState: SwiftFilterState
 
   var canChangeRoot: Bool = true // TODO
 
-  init(app: OutletApp, tree: DisplayTree) {
+  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria) {
     self.app = app
     self.tree = tree
-    self.uiState = TreeSwiftState.from(tree)
+    self.swiftTreeState = SwiftTreeState.from(tree)
+    self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
   }
 
@@ -144,19 +186,19 @@ class TreeController: TreeControllable, ObservableObject {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
   func onEnableUIToggled(_ props: PropDict) throws {
     if !self.canChangeRoot {
-      assert(!self.uiState.isUIEnabled)
+      assert(!self.swiftTreeState.isUIEnabled)
       return
     }
     let isEnabled = try props.getBool("enable")
     DispatchQueue.main.async {
-      self.uiState.isUIEnabled = isEnabled
+      self.swiftTreeState.isUIEnabled = isEnabled
     }
   }
 
   func onLoadStarted(_ params: PropDict) throws {
-    if self.uiState.isManualLoadNeeded {
+    if self.swiftTreeState.isManualLoadNeeded {
       DispatchQueue.main.async {
-        self.uiState.isManualLoadNeeded = false
+        self.swiftTreeState.isManualLoadNeeded = false
       }
     }
   }
@@ -165,16 +207,16 @@ class TreeController: TreeControllable, ObservableObject {
     self.tree = try params.get("tree") as! DisplayTree
     NSLog("[\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
     DispatchQueue.main.async {
-      self.uiState.updateFrom(self.tree)
+      self.swiftTreeState.updateFrom(self.tree)
     }
   }
 
   func onEditingRootCancelled(_ params: PropDict) throws {
-    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.uiState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
+    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
       // restore root path to value received from server
-      self.uiState.rootPath = self.tree.rootPath
-      self.uiState.isEditingRoot = false
+      self.swiftTreeState.rootPath = self.tree.rootPath
+      self.swiftTreeState.isEditingRoot = false
     }
   }
 
@@ -182,7 +224,7 @@ class TreeController: TreeControllable, ObservableObject {
     let statusBarMsg = try props.getString("status_msg")
     NSLog("Updating status bar msg with content: \"\(statusBarMsg)\"")
     DispatchQueue.main.async {
-      self.uiState.statusBarMsg = statusBarMsg
+      self.swiftTreeState.statusBarMsg = statusBarMsg
     }
   }
 }

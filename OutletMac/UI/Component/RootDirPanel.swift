@@ -11,7 +11,7 @@ import SwiftUI
  STRUCT RootDirPanel
  */
 struct RootDirPanel: View {
-  @ObservedObject var uiState: TreeSwiftState
+  @ObservedObject var swiftTreeState: SwiftTreeState
   let con: TreeControllable
 
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
@@ -19,14 +19,14 @@ struct RootDirPanel: View {
 
   init(controller: TreeControllable, canChangeRoot: Bool) {
     self.con = controller
-    self.uiState = self.con.uiState
+    self.swiftTreeState = self.con.swiftTreeState
   }
 
   func submitRootPath() {
     do {
-      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.uiState.rootPath)
+      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.swiftTreeState.rootPath)
     } catch {
-      NSLog("Failed to submit root path \"\(self.uiState.rootPath)\": \(error)")
+      NSLog("Failed to submit root path \"\(self.swiftTreeState.rootPath)\": \(error)")
     }
   }
 
@@ -43,7 +43,7 @@ struct RootDirPanel: View {
           Button("Google Drive subtree...", action: {})
         }
 
-      if !self.uiState.isRootExists {
+      if !self.swiftTreeState.isRootExists {
         Image(systemName: "exclamationmark.triangle.fill")
           .renderingMode(.template)
           .frame(width: 32, height: 32)
@@ -51,10 +51,10 @@ struct RootDirPanel: View {
           .font(Font.system(.title))
       }
 
-      if self.uiState.isEditingRoot {
+      if self.swiftTreeState.isEditingRoot {
 
         // IS EDITING
-        TextField("Enter path...", text: $uiState.rootPath, onEditingChanged: { (editingChanged) in
+        TextField("Enter path...", text: $swiftTreeState.rootPath, onEditingChanged: { (editingChanged) in
           if editingChanged {
             // we don't care about this
           } else {
@@ -62,7 +62,7 @@ struct RootDirPanel: View {
             NSLog("[\(self.con.treeID)] DEBUG TextField focus removed (assuming ENTER key pressed): submitting root path")
 
             self.submitRootPath()
-            self.uiState.isEditingRoot = false
+            self.swiftTreeState.isEditingRoot = false
           }
         })
           .font(Font.system(.title))
@@ -80,13 +80,13 @@ struct RootDirPanel: View {
         // NOT EDITING
 
         HStack(spacing: H_PAD) {
-          if self.uiState.rootPath.isEmpty {
+          if self.swiftTreeState.rootPath.isEmpty {
             Text("No path entered")
               .italic()
               .multilineTextAlignment(.leading)
               .font(Font.system(.title))
           } else {
-            Text(self.uiState.rootPath)
+            Text(self.swiftTreeState.rootPath)
               .multilineTextAlignment(.leading)
               .font(Font.system(.title))
           }
@@ -98,7 +98,7 @@ struct RootDirPanel: View {
           // cancel any previous edit
           self.con.dispatcher.sendSignal(signal: .CANCEL_OTHER_EDIT_ROOT, senderID: con.treeID)
           // switch to Editing mode
-          self.uiState.isEditingRoot = true
+          self.swiftTreeState.isEditingRoot = true
         })
 
       } // editing / not editing
