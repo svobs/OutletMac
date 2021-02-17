@@ -230,6 +230,8 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func onFilterChanged(filterState: SwiftFilterState) {
+    // TODO: set up a timer to only update the filter at most every X ms
+
     do {
       try self.app.backend?.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
     } catch {
@@ -239,7 +241,7 @@ class TreeController: TreeControllable, ObservableObject {
 
   // Dispatch Listeners
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  func onEnableUIToggled(_ props: PropDict) throws {
+  private func onEnableUIToggled(_ senderID: SenderID, _ props: PropDict) throws {
     if !self.canChangeRoot {
       assert(!self.swiftTreeState.isUIEnabled)
       return
@@ -250,7 +252,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onLoadStarted(_ params: PropDict) throws {
+  func onLoadStarted(_ senderID: SenderID, _ props: PropDict) throws {
     if self.swiftTreeState.isManualLoadNeeded {
       DispatchQueue.main.async {
         self.swiftTreeState.isManualLoadNeeded = false
@@ -258,15 +260,15 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onDisplayTreeChanged(_ params: PropDict) throws {
-    self.tree = try params.get("tree") as! DisplayTree
+  func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
+    self.tree = try props.get("tree") as! DisplayTree
     NSLog("[\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
     DispatchQueue.main.async {
       self.swiftTreeState.updateFrom(self.tree)
     }
   }
 
-  func onEditingRootCancelled(_ params: PropDict) throws {
+  func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
     NSLog("[\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
       // restore root path to value received from server
@@ -275,7 +277,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onSetStatus(_ props: PropDict) throws {
+  func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
     NSLog("Updating status bar msg with content: \"\(statusBarMsg)\"")
     DispatchQueue.main.async {

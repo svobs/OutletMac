@@ -86,16 +86,43 @@ struct TreePanel {
  STRUCT ButtonBar
  */
 fileprivate struct ButtonBar: View {
+  let conLeft: TreeControllable
+  let conRight: TreeControllable
+
+  init(conLeft: TreeControllable, conRight: TreeControllable) {
+    self.conLeft = conLeft
+    self.conRight = conRight
+  }
 
   var body: some View {
     HStack {
-      // TODO
-      Button("Diff (content-first)", action: {})
+      Button("Diff (content-first)", action: self.onDiffButtonClicked)
+
       Button("Download Google Drive meta", action: {})
       Spacer()
     }
     .padding(.leading, H_PAD)
     .buttonStyle(BorderedButtonStyle())
+  }
+
+  func onDiffButtonClicked() {
+    NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
+
+    // First disable UI
+    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_DIFF_WINDOW)
+
+    // Now ask BE to start the diff
+    do {
+      _ = try self.conLeft.backend.startDiffTrees(treeIDLeft: self.conLeft.treeID, treeIDRight: self.conRight.treeID)
+      // We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
+    } catch {
+      NSLog("ERROR Failed to start tree diff: \(error)")
+    }
+  }
+
+  func onDownloadFromGDriveButtonClicked() {
+    NSLog("DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
+    self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_DIFF_WINDOW)
   }
 }
 
@@ -156,7 +183,7 @@ struct TwoPaneView: View {
       self.right_tree_panel.status_panel
 
       // Button Bar
-      ButtonBar()
+      ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
 
       TodoPlaceholder("<PROGRESS BAR>")
 

@@ -10,8 +10,8 @@ import Foundation
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
 typealias ParamDict = [String: Any]
-typealias SignalCallback = (PropDict) throws -> Void
 typealias SenderID = String
+typealias SignalCallback = (SenderID, PropDict) throws -> Void
 
 /**
  CLASS PropDict
@@ -168,7 +168,7 @@ class SignalDispatcher {
     NSLog("WARN  Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
   }
 
-  func sendSignal(signal: Signal, params: ParamDict? = nil, senderID: SenderID?) {
+  func sendSignal(signal: Signal, params: ParamDict? = nil, senderID: SenderID) {
     NSLog("DEBUG Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
@@ -180,7 +180,7 @@ class SignalDispatcher {
           countNotified += 1
           NSLog("DEBUG Calling listener \(subID) for signal '\(signal)'")
           do {
-            try subscriber.callback(propertyList)
+            try subscriber.callback(senderID, propertyList)
           } catch {
             NSLog("ERROR While calling listener \(subID) for signal '\(signal)': \(error)")
           }

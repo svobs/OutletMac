@@ -19,15 +19,23 @@ class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Daemon_Grpc_Generated_OutletClient
   var signalReceiverThread: SignalReceiverThread?
   let dispatcher: SignalDispatcher
+  let dispatchListener: DispatchListener
 
   init(_ client: Outlet_Backend_Daemon_Grpc_Generated_OutletClient, _ dispatcher: SignalDispatcher) {
     self.dispatcher = dispatcher
     self.stub = client
+    self.dispatchListener = dispatcher.createListener(ID_BACKEND_CLIENT)
   }
 
   func start() throws {
     self.signalReceiverThread = SignalReceiverThread(self)
     self.signalReceiverThread!.start()
+
+    // Forward the following Dispatcher signals across gRPC:
+    try connectAndForwardSignal(.PAUSE_OP_EXECUTION)
+    try connectAndForwardSignal(.RESUME_OP_EXECUTION)
+    try connectAndForwardSignal(.COMPLETE_MERGE)
+    try connectAndForwardSignal(.DOWNLOAD_ALL_GDRIVE_META)
   }
   
   func shutdown() throws {
@@ -35,7 +43,20 @@ class OutletGRPCClient: OutletBackend {
     self.signalReceiverThread?.cancel()
   }
 
-  func _relaySignalLocally(_ signalGRPC: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg) throws {
+  private func connectAndForwardSignal(_ signal: Signal) throws {
+    try self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
+      self.sendSignalToServer(signal, senderID)
+    }
+  }
+
+  private func sendSignalToServer(_ signal: Signal, _ senderID: SenderID, _ propDict: PropDict? = nil) {
+    var signalMsg = Outlet_Backend_Daemon_Grpc_Generated_SignalMsg()
+    signalMsg.sigInt = signal.rawValue
+    signalMsg.sender = senderID
+    _ = self.stub.send_signal(signalMsg)
+  }
+
+  private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg) throws {
     let signal = Signal(rawValue: signalGRPC.sigInt)!
     NSLog("DEBUG Got signal from backend via gRPC: \(signal)")
     var argDict: [String: Any] = [:]
@@ -74,7 +95,7 @@ class OutletGRPCClient: OutletBackend {
     let request = Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
       do {
-        try self._relaySignalLocally(signalGRPC)
+        try self.relaySignalLocally(signalGRPC)
       } catch {
         let signal = Signal(rawValue: signalGRPC.sigInt)!
         NSLog("Error processing received signal \(signal): \(error)")

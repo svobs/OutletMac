@@ -63,17 +63,17 @@ struct TernaryToggleButton: View {
             .renderingMode(.template)
             .frame(width: width, height: height)
             .font(Font.system(.title))
-//            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+            //            .clipShape(RoundedRectangle(cornerRadius: 10.0))
 
             .accentColor(isEnabled == .TRUE ? .white : .black)
-//            .overlay(Circle().stroke(Color.red, lineWidth: 2))
+          //            .overlay(Circle().stroke(Color.red, lineWidth: 2))
 
         }
       }
-//      .overlay(
-//        RoundedRectangle(cornerRadius: 10.0)
-//          .stroke(lineWidth: 2.0)
-//      )
+      //      .overlay(
+      //        RoundedRectangle(cornerRadius: 10.0)
+      //          .stroke(lineWidth: 2.0)
+      //      )
 
     }
     .buttonStyle(PlainButtonStyle())
