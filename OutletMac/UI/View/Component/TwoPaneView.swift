@@ -122,7 +122,7 @@ fileprivate struct ButtonBar: View {
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
-    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_DIFF_WINDOW)
+    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_DIFF_WINDOW, ["enable": true])
 
     // Now ask BE to start the diff
     do {

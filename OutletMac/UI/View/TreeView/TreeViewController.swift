@@ -34,7 +34,7 @@ final class TreeViewController: NSViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let outlineView = (self.view as! TreeView).treeView
+    let outlineView = (self.view as! TreeView).outlineView
 
     outlineView.delegate = self
 

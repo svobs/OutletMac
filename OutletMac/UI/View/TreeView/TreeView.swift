@@ -36,9 +36,14 @@ class BaseView: NSView {
 class TreeView: BaseView {
   var scrollViewTreeView = NSScrollView()
 
-  var treeView: NSOutlineView = {
+  var outlineView: NSOutlineView = {
     let table = NSOutlineView(frame: .zero)
+    table.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
+    table.allowsMultipleSelection = true
+    table.autosaveTableColumns = true
+    table.autosaveExpandedItems = true
     table.rowSizeStyle = .large
+    table.indentationPerLevel = 16
     table.backgroundColor = .clear
 
     table.headerView = NSTableHeaderView()
@@ -57,7 +62,14 @@ class TreeView: BaseView {
   }()
 
   override func addSubviews() {
-    scrollViewTreeView.documentView = treeView
+    scrollViewTreeView.autohidesScrollers = true
+    scrollViewTreeView.horizontalPageScroll = 10
+    scrollViewTreeView.verticalLineScroll = 19
+    scrollViewTreeView.verticalPageScroll = 10
+    scrollViewTreeView.usesPredominantAxisScrolling = false
+    scrollViewTreeView.translatesAutoresizingMaskIntoConstraints = false
+    
+    scrollViewTreeView.documentView = outlineView
     [scrollViewTreeView].forEach(addSubview)
   }
 

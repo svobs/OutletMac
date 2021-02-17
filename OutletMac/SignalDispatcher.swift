@@ -9,12 +9,17 @@ import Foundation
 
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String
-typealias ParamDict = [String: Any]
 typealias SenderID = String
 typealias SignalCallback = (SenderID, PropDict) throws -> Void
+typealias ParamDict = [String: Any]
 
 /**
  CLASS PropDict
+
+ Basically a plain dictionary with a bunch of mechnaics to get around serialization issues for various types.
+ Its keys must always be Strings, but its values can be stored at any type, with type conversion (if any) occurring when getters are called.
+ This facilitates using values received via gRPC (which will usually be serialized as Strings), and also provides a convenient way to enforce
+ type checking for whoever is doing the getting.
  */
 class PropDict {
   private var _propertyDict: ParamDict
@@ -41,23 +46,31 @@ class PropDict {
   }
 
   func getInt(_ key: String) throws -> Int {
-    let val: String = try self.getString(key)
-    let configValInt = Int(val)
-    if configValInt == nil {
-      throw OutletError.invalidState("Failed to parse value '\(val)' as Int for key '\(key)'")
-    } else {
-      return configValInt!
+    let val: Any = try self.get(key)
+    if let intVal = val as? Int {
+      return intVal
+    } else if let strVal = val as? String {
+      let intVal = Int(strVal)
+      if intVal == nil {
+        throw OutletError.invalidState("Failed to parse value '\(strVal)' as Bool for key '\(key)'")
+      }
+      return intVal!
     }
+    throw OutletError.invalidState("Invalid type for value '\(val)' (expected Int) for key '\(key)'")
   }
 
   func getBool(_ key: String) throws -> Bool {
-    let val: String = try self.getString(key)
-    let configValBool = Bool(val)
-    if configValBool == nil {
-      throw OutletError.invalidState("Failed to parse value '\(val)' as Bool for key '\(key)'")
-    } else {
-      return configValBool!
+    let val: Any = try self.get(key)
+    if let boolVal = val as? Bool {
+      return boolVal
+    } else if let strVal = val as? String {
+      let boolVal = Bool(strVal)
+      if boolVal == nil {
+        throw OutletError.invalidState("Failed to parse value '\(strVal)' as Bool for key '\(key)'")
+      }
+      return boolVal!
     }
+    throw OutletError.invalidState("Invalid type for value '\(val)' (expected Bool) for key '\(key)'")
   }
 }
 
@@ -168,7 +181,7 @@ class SignalDispatcher {
     NSLog("WARN  Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
   }
 
-  func sendSignal(signal: Signal, params: ParamDict? = nil, senderID: SenderID) {
+  func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
     NSLog("DEBUG Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
