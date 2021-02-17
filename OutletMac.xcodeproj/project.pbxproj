@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
 		D1175BFA25DCEC3000602B7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1175BF925DCEC3000602B7F /* Main.storyboard */; };
+		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
@@ -34,7 +35,7 @@
 		D1BAC56325A193C800D951A2 /* OutlineNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55925A193C800D951A2 /* OutlineNode.swift */; };
 		D1BAC56425A193C800D951A2 /* SplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55A25A193C800D951A2 /* SplitView.swift */; };
 		D1BAC56525A193C800D951A2 /* OutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55B25A193C800D951A2 /* OutlineView.swift */; };
-		D1BAC56725A193C800D951A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* AppDelegate.swift */; };
+		D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* OutletApp.swift */; };
 		D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* ContentView.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
@@ -57,6 +58,7 @@
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		D1175BF925DCEC3000602B7F /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
@@ -84,7 +86,7 @@
 		D1BAC55B25A193C800D951A2 /* OutlineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineView.swift; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
-		D1BAC55E25A193C800D951A2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D1BAC55E25A193C800D951A2 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
 		D1BAC55F25A193C800D951A2 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
@@ -140,14 +142,13 @@
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* grpc */,
-				D1BAC55E25A193C800D951A2 /* AppDelegate.swift */,
+				D1BAC55E25A193C800D951A2 /* OutletApp.swift */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
 				D1F36C3B25B54E73009498D8 /* Constants.swift */,
 				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
 				D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */,
-				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
 				D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */,
 				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
 				D1D090EC25CD3C980070B69D /* StringUtil.swift */,
@@ -170,6 +171,18 @@
 				7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D1175BFF25DCF27300602B7F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				D1ED5E2525C7D78700A8E5DB /* Component */,
+				D1E913B825AA7342008E958B /* TreeView */,
+				D1BAC55F25A193C800D951A2 /* ContentView.swift */,
+				D1BAC55625A193C800D951A2 /* OutlineView */,
+				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		D168399E25AD532800D76169 /* grpc */ = {
@@ -237,11 +250,9 @@
 		D1ED5E2425C7D75D00A8E5DB /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				D1ED5E2525C7D78700A8E5DB /* Component */,
-				D1E913B825AA7342008E958B /* TreeView */,
-				D1BAC55F25A193C800D951A2 /* ContentView.swift */,
-				D1BAC55625A193C800D951A2 /* OutlineView */,
-				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
+				D1175BFF25DCF27300602B7F /* View */,
+				D1175BFC25DCF25700602B7F /* ObservableObjects.swift */,
+				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -376,7 +387,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1BAC56725A193C800D951A2 /* AppDelegate.swift in Sources */,
+				D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */,
 				D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */,
 				D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */,
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
@@ -385,6 +396,7 @@
 				D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */,
 				D1FCD9AB25D8EF9E000C8FF3 /* TernaryToggleButton.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
+				D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
