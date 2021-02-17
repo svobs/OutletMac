@@ -4,12 +4,15 @@ import SwiftUI
 import Foundation
 
 struct TreeViewRepresentable: NSViewControllerRepresentable {
+  // TODO: @Binding var nodes: Array<Node>?
 
   func makeNSViewController(context: Context) -> TreeViewController {
     return TreeViewController()
   }
   
   func updateNSViewController(_ nsViewController: TreeViewController, context: Context) {
+    // TODO: apply updates here
+    NSLog("TreeView update requested!")
     return
   }
 }
@@ -19,12 +22,19 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
  
  */
 final class TreeViewController: NSViewController {
-  @IBOutlet weak var outlineView: NSOutlineView!
+//  @IBOutlet weak var outlineView: NSOutlineView!
   private let treeController = NSTreeController()
   @objc dynamic var content = [TreeViewNode]()
 
+  override func loadView() {
+      let rect = NSRect(x: 0, y: 0, width: 400, height: 400)
+      view = TreeView(frame: rect)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    let outlineView = (self.view as! TreeView).treeView
 
     outlineView.delegate = self
 

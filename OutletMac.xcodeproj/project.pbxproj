@@ -10,6 +10,7 @@
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
 		D1175BFA25DCEC3000602B7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1175BF925DCEC3000602B7F /* Main.storyboard */; };
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
+		D1175C0325DD007200602B7F /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175C0225DD007200602B7F /* TreeView.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
@@ -59,6 +60,7 @@
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		D1175BF925DCEC3000602B7F /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
+		D1175C0225DD007200602B7F /* TreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				D1E913B925AA735C008E958B /* TreeViewController.swift */,
 				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
 				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
+				D1175C0225DD007200602B7F /* TreeView.swift */,
 			);
 			path = TreeView;
 			sourceTree = "<group>";
@@ -399,6 +402,7 @@
 				D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
+				D1175C0325DD007200602B7F /* TreeView.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
 				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,

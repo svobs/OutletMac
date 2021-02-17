@@ -25,9 +25,9 @@ struct TodoPlaceholder: View {
 }
 
 /**
- STRUCT TreeView
+ STRUCT TreeViewPanel
  */
-struct TreeView: View {
+struct TreeViewPanel: View {
   
   var outlineTree: OutlineTree<ExampleClass, [ExampleClass]>
   @State var selectedItem: OutlineNode<ExampleClass>? = nil
@@ -39,6 +39,19 @@ struct TreeView: View {
   var body: some View {
     OutlineSection<ExampleClass, [ExampleClass]>(selectedItem: $selectedItem).environmentObject(outlineTree)
       .frame(minWidth: 200, minHeight: 200, maxHeight: .infinity)
+  }
+}
+
+struct LegacyTreeView: View {
+  var body: some View {
+    HStack {
+      TreeViewRepresentable()
+        .padding(.top)
+        .frame(height: 200.0)
+        .frame(alignment: .topLeading)
+  //      .onAppear(perform: retrievePlayers)
+      Spacer()
+    }
   }
 }
 
@@ -70,14 +83,14 @@ struct TreePanel {
   let con: TreeControllable
   let root_dir_panel: RootDirPanel
   let filter_panel: FilterPanel
-  let tree_view: TreeView
+  let tree_view: LegacyTreeView
   let status_panel: StatusPanel
 
   init(controller: TreeControllable) {
     self.con = controller
     self.root_dir_panel = RootDirPanel(controller: self.con, canChangeRoot: true)
     self.filter_panel = FilterPanel(controller: self.con)
-    self.tree_view = TreeView(items:  exampleArray())
+    self.tree_view = LegacyTreeView()
     self.status_panel = StatusPanel(controller: self.con)
   }
 }

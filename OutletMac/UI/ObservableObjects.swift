@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 21/2/16.
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
+import SwiftUI
 
 /**
  CLASS SwiftTreeState
