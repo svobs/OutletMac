@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
+		D1175BFA25DCEC3000602B7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1175BF925DCEC3000602B7F /* Main.storyboard */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
@@ -55,6 +56,7 @@
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
+		D1175BF925DCEC3000602B7F /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 		11DDEECD23A6F9580014C2A6 /* OutletMac */ = {
 			isa = PBXGroup;
 			children = (
+				D1175BF925DCEC3000602B7F /* Main.storyboard */,
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* grpc */,
@@ -320,6 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */,
+				D1175BFA25DCEC3000602B7F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -35,7 +35,6 @@ struct OutletMacApp: App, OutletApp {
   var conRight: TreeController? = nil
 
   init() {
-
     do {
 
       let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
@@ -69,9 +68,6 @@ struct OutletMacApp: App, OutletApp {
       try conLeft!.start()
       try conRight!.start()
 
-      // Create the SwiftUI view that provides the window contents.
-//      let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
-
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("Screen size is \(screenSize.width)x\(screenSize.height)")
 
@@ -90,6 +86,7 @@ struct OutletMacApp: App, OutletApp {
       sleep(3)
 //      NSLog("Quitting")
 //      exit(0)
+
     } catch {
       NSLog("FATAL ERROR in main(): \(error)")
       NSLog("Sleeping 1s to let things settle...")
@@ -98,11 +95,12 @@ struct OutletMacApp: App, OutletApp {
     }
   }
 
-    var body: some Scene {
-        let mainWindow = WindowGroup {
-          ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
-        }
-
-      mainWindow
+  var body: some Scene {
+    WindowGroup("Outlet") {
+      ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
+        .frame(width: 800, height: 800)
+        .frame(minWidth: 800, maxWidth: .infinity,
+               minHeight: 400, maxHeight: .infinity)
     }
+  }
 }
