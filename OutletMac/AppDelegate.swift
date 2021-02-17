@@ -27,21 +27,14 @@ class MockApp: OutletApp {
   }
 }
 
-/**
- CLASS AppDelegate
- */
-@NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
-
-  var window: NSWindow!
+@main
+struct OutletMacApp: App, OutletApp {
   let dispatcher = SignalDispatcher()
   var backend: OutletBackend? = nil
+  var conLeft: TreeController? = nil
+  var conRight: TreeController? = nil
 
-//  static func endEditing() {
-//      sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-//  }
-  
-  func applicationDidFinishLaunching(_ aNotification: Notification) {
+  init() {
 
     do {
 
@@ -70,25 +63,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
       let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
       let filterCriteriaLeft: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_LEFT_TREE)
       let filterCriteriaRight: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_RIGHT_TREE)
-      let conLeft = TreeController(app: self, tree: treeLeft, filterCriteria: filterCriteriaLeft)
-      let conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
+      self.conLeft = TreeController(app: self, tree: treeLeft, filterCriteria: filterCriteriaLeft)
+      self.conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
 
-      try conLeft.start()
-      try conRight.start()
+      try conLeft!.start()
+      try conRight!.start()
 
       // Create the SwiftUI view that provides the window contents.
-      let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
+//      let contentView = ContentView(app: self, conLeft: conLeft, conRight: conRight)
 
-      // Create the window and set the content view.
-      window = NSWindow(
-        contentRect: NSRect(x: 0, y: 0, width: 1200, height: 800),
-        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-        backing: .buffered, defer: false)
-      window.center()
-      window.setFrameAutosaveName("OutletMac")
-      window.contentView = NSHostingView(rootView: contentView)
-      window.makeKeyAndOrderFront(nil)
+      let screenSize = NSScreen.main?.frame.size ?? .zero
+      NSLog("Screen size is \(screenSize.width)x\(screenSize.height)")
 
+//      // Create the window and set the content view.
+//      window = NSWindow(
+//        contentRect: NSRect(x: winX, y: winY, width: winWidth, height: winHeight),
+//        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+//        backing: .buffered, defer: false)
+//      window.center()
+//      window.title = "OutletMac"
+//      window.setFrameAutosaveName("OutletMac")
+//      window.contentView = NSHostingView(rootView: contentView)
+//      window.makeKeyAndOrderFront(nil)
 
       NSLog("Sleeping 3...")
       sleep(3)
@@ -101,11 +97,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, OutletApp {
       exit(1)
     }
   }
-  
-  func applicationWillTerminate(_ aNotification: Notification) {
-    // Insert code here to tear down your application
-  }
-  
-  
-}
 
+    var body: some Scene {
+        let mainWindow = WindowGroup {
+          ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
+        }
+
+      mainWindow
+    }
+}

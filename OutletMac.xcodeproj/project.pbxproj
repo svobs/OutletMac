@@ -35,7 +35,6 @@
 		D1BAC56525A193C800D951A2 /* OutlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55B25A193C800D951A2 /* OutlineView.swift */; };
 		D1BAC56725A193C800D951A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* AppDelegate.swift */; };
 		D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* ContentView.swift */; };
-		D1BAC56C25A1954800D951A2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC56B25A1954800D951A2 /* Main.storyboard */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -85,7 +84,6 @@
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
 		D1BAC55E25A193C800D951A2 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D1BAC55F25A193C800D951A2 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		D1BAC56B25A1954800D951A2 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -139,7 +137,6 @@
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* grpc */,
-				D1BAC56B25A1954800D951A2 /* Main.storyboard */,
 				D1BAC55E25A193C800D951A2 /* AppDelegate.swift */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
@@ -322,7 +319,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1BAC56C25A1954800D951A2 /* Main.storyboard in Resources */,
 				D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
