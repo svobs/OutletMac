@@ -3,6 +3,20 @@ import AppKit
 import SwiftUI
 import Foundation
 
+/// Representation of a row in the outline view
+struct OutlineViewRow {
+  var key: String
+  var value: Any?
+  var children = [OutlineViewRow]()
+
+  static func rowsFrom( node: TreeViewNode) -> [OutlineViewRow] {
+    return [
+      OutlineViewRow(key: "node", value: node.value),
+      OutlineViewRow(key: "count", value: node.childrenCount)
+    ]
+  }
+}
+
 struct TreeViewRepresentable: NSViewControllerRepresentable {
   // TODO: @Binding var nodes: Array<Node>?
 
@@ -21,12 +35,14 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
  See: https://www.appcoda.com/macos-programming-nsoutlineview/
  
  */
-final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
+final class TreeViewController: NSViewController, NSOutlineViewDelegate {
 //  @IBOutlet weak var outlineView: NSOutlineView!
   private let treeController = NSTreeController()
   @objc dynamic var content = [TreeViewNode]()
   let scrollView = NSScrollView()
   let outlineView = NSOutlineView()
+
+  var nodes: [TreeViewNode] = []
 
   override func loadView() {
       let rect = NSRect(x: 0, y: 0, width: 400, height: 400)
@@ -49,7 +65,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     nodeColumn.title = "Nodes"
     nodeColumn.width = 200
     nodeColumn.minWidth = 100
-    nodeColumn.dataCell = NSTextFieldCell()
     outlineView.addTableColumn(nodeColumn)
 
 
@@ -57,7 +72,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     countColumn.title = "Count"
     countColumn.width = 100
     countColumn.minWidth = 100
-    countColumn.dataCell = NSTextFieldCell()
     outlineView.addTableColumn(countColumn)
 
     outlineView.gridStyleMask = .solidHorizontalGridLineMask
@@ -66,6 +80,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    nodes =  TreeViewNodeFactory().nodes()
 
     // OutlineView
     self.setUpOutlineView()
@@ -88,7 +104,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     outlineView.frame = scrollView.bounds
     outlineView.delegate = self
-    outlineView.dataSource = self
+//    outlineView.dataSource = self
 
     // TreeController
     treeController.objectClass = TreeViewNode.self
@@ -107,38 +123,52 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                      withKeyPath: "arrangedObjects",
                      options: nil)
 
-    content.append(contentsOf: TreeViewNodeFactory().nodes())
+    content.append(contentsOf: self.nodes)
   }
 
-  public func outlineView(_ outlineView: NSOutlineView,
-                          viewFor tableColumn: NSTableColumn?,
-                          item: Any) -> NSView? {
-    var cellView: NSTableCellView?
+  private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+    let textField = NSTextField()
+    textField.backgroundColor = NSColor.clear
+    textField.translatesAutoresizingMaskIntoConstraints = false
+    textField.isBordered = false
 
-    guard let identifier = tableColumn?.identifier else { return cellView }
+    let cell = NSTableCellView()
+    cell.identifier = identifier
+    cell.addSubview(textField)
+    cell.textField = textField
 
-    switch identifier {
-      case .init("node"):
-        if let view = outlineView.makeView(withIdentifier: identifier,
-                                           owner: outlineView.delegate) as? NSTableCellView {
-          view.textField?.bind(.value,
-                               to: view,
-                               withKeyPath: "objectValue.value",
-                               options: nil)
-          cellView = view
+    // Constrain the text field within the cell
+    textField.widthAnchor.constraint(equalTo: cell.widthAnchor).isActive = true
+    textField.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
+
+    return cell
+  }
+
+  /**
+   Makes contents of the cell
+   From NSOutlineViewDelegate
+   */
+  public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+    guard let identifier = tableColumn?.identifier else { return nil }
+
+    switch identifier.rawValue {
+      case "node":
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeCell(withIdentifier: identifier)
         }
-      case .init("count"):
-        if let view = outlineView.makeView(withIdentifier: identifier,
-                                           owner: outlineView.delegate) as? NSTableCellView {
-          view.textField?.bind(.value,
-                               to: view,
-                               withKeyPath: "objectValue.childrenCount",
-                               options: nil)
-          cellView = view
+        cell!.textField!.bind(.value, to: view, withKeyPath: "objectValue.value", options: nil)
+        return cell
+      case "count":
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeCell(withIdentifier: identifier)
         }
+        cell!.textField!.bind(.value, to: view, withKeyPath: "objectValue.childrenCount", options: nil)
+        return cell
       default:
-        return cellView
+        NSLog("ERROR unrecognized identifier (ignoring): \(identifier.rawValue)")
+        return nil
     }
-    return cellView
   }
 }
