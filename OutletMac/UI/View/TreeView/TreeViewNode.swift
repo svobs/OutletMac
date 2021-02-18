@@ -5,9 +5,8 @@ import Foundation
   @objc let value: String
   @objc var children: [TreeViewNode]
 
-  @objc var childrenCount: String? {
+  @objc var childrenCount: String {
     let count = children.count
-    guard count > 0 else { return nil }
     return "\(count) node\(count > 1 ? "s" : "")"
   }
 

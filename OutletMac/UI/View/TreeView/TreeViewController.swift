@@ -3,20 +3,6 @@ import AppKit
 import SwiftUI
 import Foundation
 
-/// Representation of a row in the outline view
-struct OutlineViewRow {
-  var key: String
-  var value: Any?
-  var children = [OutlineViewRow]()
-
-  static func rowsFrom( node: TreeViewNode) -> [OutlineViewRow] {
-    return [
-      OutlineViewRow(key: "node", value: node.value),
-      OutlineViewRow(key: "count", value: node.childrenCount)
-    ]
-  }
-}
-
 struct TreeViewRepresentable: NSViewControllerRepresentable {
   // TODO: @Binding var nodes: Array<Node>?
 
@@ -33,10 +19,9 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
 
 /*
  See: https://www.appcoda.com/macos-programming-nsoutlineview/
- 
+ See: https://stackoverflow.com/questions/45373039/how-to-program-a-nsoutlineview
  */
-final class TreeViewController: NSViewController, NSOutlineViewDelegate {
-//  @IBOutlet weak var outlineView: NSOutlineView!
+final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
   private let treeController = NSTreeController()
   @objc dynamic var content = [TreeViewNode]()
   let scrollView = NSScrollView()
@@ -104,27 +89,56 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate {
 
     outlineView.frame = scrollView.bounds
     outlineView.delegate = self
-//    outlineView.dataSource = self
-
-    // TreeController
-    treeController.objectClass = TreeViewNode.self
-    treeController.childrenKeyPath = "children"
-    treeController.countKeyPath = "count"
-    treeController.leafKeyPath = "isLeaf"
-
-    treeController.bind(NSBindingName(rawValue: "contentArray"),
-                        to: self,
-                        withKeyPath: "content",
-                        options: nil)
-
-
-    outlineView.bind(NSBindingName(rawValue: "content"),
-                     to: treeController,
-                     withKeyPath: "arrangedObjects",
-                     options: nil)
-
-    content.append(contentsOf: self.nodes)
+    outlineView.dataSource = self
   }
+
+  // You must give each row a unique identifier, referred to as `item` by the outline view
+  //   * For top-level rows, we use the values in the `keys` array
+  //   * For the hobbies sub-rows, we label them as ("hobbies", 0), ("hobbies", 1), ...
+  //     The integer is the index in the hobbies array
+  //
+  // item == nil means it's the "root" row of the outline view, which is not visible
+  func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+    if item == nil {
+//      return keys[index]
+      // [Matt]: just use index into nodes for now
+      return String(index)
+
+      // FIXME: this breaks for nested nodes. Just switch to using nodes with UIDs
+
+
+//    } else if let item = item as? String, item == "hobbies" {
+//      return ("hobbies", index)
+    } else {
+      return 0
+    }
+  }
+
+  // Tell how many children each row has:
+  //    * The root row has 5 children: name, age, birthPlace, birthDate, hobbies
+  //    * The hobbies row has how ever many hobbies there are
+  //    * The other rows have no children
+  func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+    if item == nil {
+      // Root
+      return self.nodes.count
+    } else if let item = item as? String {
+      return nodes[Int(item)!].count
+    } else {
+      return 0
+    }
+  }
+
+  // Tell whether the row is expandable
+  func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+    if let item = item as? String, nodes[Int(item)!].count > 0 {
+      return true
+    } else {
+      return false
+    }
+  }
+
+
 
   private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
     let textField = NSTextField()
@@ -151,20 +165,29 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate {
   public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
 
+    guard let uidStr = item as? String else {
+      NSLog("ERROR viewForTableColumn(): item is not a String: \(item)")
+      return nil
+    }
+    guard let uid = Int(uidStr) else {
+      NSLog("ERROR viewForTableColumn(): could not parse as int: \(uidStr)")
+      return nil
+    }
+
     switch identifier.rawValue {
       case "node":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.bind(.value, to: view, withKeyPath: "objectValue.value", options: nil)
+        cell!.textField!.stringValue = self.nodes[uid].value
         return cell
       case "count":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.bind(.value, to: view, withKeyPath: "objectValue.childrenCount", options: nil)
+        cell!.textField!.stringValue = self.nodes[uid].childrenCount
         return cell
       default:
         NSLog("ERROR unrecognized identifier (ignoring): \(identifier.rawValue)")
