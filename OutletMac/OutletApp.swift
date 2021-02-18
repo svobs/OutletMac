@@ -35,8 +35,8 @@ struct OutletMacApp: App, OutletApp {
   var conRight: TreeController? = nil
 
   init() {
+    NSLog("OutletMacApp init begin")
     do {
-
       let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
       self.backend = backendGRPC
       NSLog("gRPC client connecting")
@@ -82,8 +82,8 @@ struct OutletMacApp: App, OutletApp {
 //      window.contentView = NSHostingView(rootView: contentView)
 //      window.makeKeyAndOrderFront(nil)
 
-      NSLog("Sleeping 3...")
-      sleep(3)
+//      NSLog("Sleeping 3...")
+//      sleep(3)
 //      NSLog("Quitting")
 //      exit(0)
 
@@ -93,6 +93,7 @@ struct OutletMacApp: App, OutletApp {
       sleep(1)
       exit(1)
     }
+    NSLog("OutletMacApp init done")
   }
 
   var body: some Scene {
