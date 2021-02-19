@@ -99,6 +99,7 @@ struct TreePanel {
  STRUCT ButtonBar
  */
 fileprivate struct ButtonBar: View {
+  @EnvironmentObject var settings: GlobalSettings
   let conLeft: TreeControllable
   let conRight: TreeControllable
 
@@ -110,8 +111,7 @@ fileprivate struct ButtonBar: View {
   var body: some View {
     HStack {
       Button("Diff (content-first)", action: self.onDiffButtonClicked)
-
-      Button("Download Google Drive meta", action: {})
+      Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
       Spacer()
     }
     .padding(.leading, H_PAD)

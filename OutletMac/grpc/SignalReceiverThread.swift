@@ -27,7 +27,8 @@ class SignalReceiverThread: Thread {
       // TODO: give more thought to handling various "async" code paths
       loopCount += 1
       if loopCount > 3 {
-        fatalError("Max failures exceeded!")
+        // TODO: handle error better
+        fatalError("SignalReceiverThread: max failures exceeded!")
       }
       NSLog("SignalReceiverThread looping (count: \(loopCount))")
     }

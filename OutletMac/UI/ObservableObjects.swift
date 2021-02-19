@@ -8,6 +8,27 @@
 import SwiftUI
 
 /**
+ The EnivornmentObject containing shared state for all UI components in the app
+ */
+class GlobalSettings: ObservableObject {
+  @Published var showingAlert = false
+  @Published var alertTitle: String = "Alert" // placeholder msg
+  @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
+  @Published var dismissButtonText: String = "Dismiss" // placeholder msg
+
+  /**
+   This method will cause an alert to be displayed in the ContentView.
+   */
+  func showAlert(title: String, msg: String, dismissButtonText: String = "Dismiss") {
+    self.alertTitle = title
+    self.alertMsg = msg
+    self.dismissButtonText = dismissButtonText
+    self.showingAlert = true
+  }
+}
+
+
+/**
  CLASS SwiftTreeState
 
  Encapsulates *ONLY* the information required to redraw the SwiftUI views for a given DisplayTree.

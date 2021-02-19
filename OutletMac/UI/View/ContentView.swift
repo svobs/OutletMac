@@ -10,6 +10,7 @@ import SwiftUI
 
 
 struct ContentView: View {
+  @EnvironmentObject var settings: GlobalSettings
   let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
@@ -31,6 +32,9 @@ struct ContentView: View {
     TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
       .contentShape(Rectangle()) // taps should be detected in the whole window
       .gesture(tapCancelEdit)
+      .alert(isPresented: $settings.showingAlert) {
+        Alert(title: Text(settings.alertTitle), message: Text(settings.alertMsg), dismissButton: .default(Text(settings.dismissButtonText)))
+      }
   }
 }
 

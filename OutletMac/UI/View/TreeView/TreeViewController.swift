@@ -194,4 +194,22 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return nil
     }
   }
+
+  func outlineViewSelectionDidChange(_ notification: Notification) {
+    //1
+    guard let outlineView = notification.object as? NSOutlineView else {
+      return
+    }
+    //2
+    let selectedIndex = outlineView.selectedRow
+    if let item = outlineView.item(atRow: selectedIndex) as? String {
+//      //3
+//      let url = URL(string: feedItem.url)
+//      //4
+//      if let url = url {
+//        //5
+//        self.webView.mainFrame.load(URLRequest(url: url))
+//      }
+    }
+  }
 }

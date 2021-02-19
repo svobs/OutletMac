@@ -29,7 +29,10 @@ class MockApp: OutletApp {
 
 @main
 struct OutletMacApp: App, OutletApp {
+  let winID = ID_DIFF_WINDOW
+  let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
+  var dispatchListener: DispatchListener? = nil
   var backend: OutletBackend? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
@@ -40,23 +43,23 @@ struct OutletMacApp: App, OutletApp {
       let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
       self.backend = backendGRPC
       NSLog("gRPC client connecting")
-
       try self.backend!.start()
-
       NSLog("Backend started")
 
-      let win_id = ID_DIFF_WINDOW
-      let xLocConfigPath = "ui_state.\(win_id).x"
-      let yLocConfigPath = "ui_state.\(win_id).y"
+      let xLocConfigPath = "ui_state.\(winID).x"
+      let yLocConfigPath = "ui_state.\(winID).y"
       let winX : Int = try self.backend!.getIntConfig(xLocConfigPath)
       let winY : Int = try self.backend!.getIntConfig(yLocConfigPath)
 
-      let widthConfigPath = "ui_state.\(win_id).width"
-      let heightConfigPath = "ui_state.\(win_id).height"
+      let widthConfigPath = "ui_state.\(winID).width"
+      let heightConfigPath = "ui_state.\(winID).height"
       let winWidth : Int = try backend!.getIntConfig(widthConfigPath)
       let winHeight : Int = try backend!.getIntConfig(heightConfigPath)
 
       NSLog("WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
+
+      dispatchListener = dispatcher.createListener(winID)
+      try dispatchListener!.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
       let treeLeft: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
@@ -96,9 +99,14 @@ struct OutletMacApp: App, OutletApp {
     NSLog("OutletMacApp init done")
   }
 
+  func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
+    try settings.showAlert(title: propDict.getString("msg"), msg: propDict.getString("secondary_msg"))
+  }
+
   var body: some Scene {
     WindowGroup("Outlet") {
       ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
+        .environmentObject(self.settings)
         .frame(width: 800, height: 800)
         .frame(minWidth: 800, maxWidth: .infinity,
                minHeight: 400, maxHeight: .infinity)
