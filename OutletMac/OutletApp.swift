@@ -29,7 +29,7 @@ class MockApp: OutletApp {
 
 @main
 struct OutletMacApp: App, OutletApp {
-  let winID = ID_DIFF_WINDOW
+  let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
   // TODO: surely Swift has a better way to init these
@@ -106,11 +106,18 @@ struct OutletMacApp: App, OutletApp {
 
   // Displays any errors that are reported from the backend via gRPC
   func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
-    try settings.showAlert(title: propDict.getString("msg"), msg: propDict.getString("secondary_msg"))
+    let msg = try propDict.getString("msg")
+    let secondaryMsg = try propDict.getString("secondary_msg")
+    DispatchQueue.main.async {
+      settings.showAlert(title: msg, msg: secondaryMsg)
+    }
   }
 
   func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
-    settings.isPlaying = try propDict.getBool("is_enabled")
+    let isEnabled = try propDict.getBool("is_enabled")
+    DispatchQueue.main.async {
+      settings.isPlaying = isEnabled
+    }
   }
 
   var body: some Scene {

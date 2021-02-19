@@ -164,7 +164,7 @@ fileprivate struct ButtonBar: View {
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
-    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_DIFF_WINDOW, ["enable": true])
+    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
 
     // Now ask BE to start the diff
     do {
@@ -177,7 +177,7 @@ fileprivate struct ButtonBar: View {
 
   func onDownloadFromGDriveButtonClicked() {
     NSLog("DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
-    self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_DIFF_WINDOW)
+    self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_MAIN_WINDOW)
   }
 }
 
