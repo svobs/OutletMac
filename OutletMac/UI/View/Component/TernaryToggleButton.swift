@@ -13,6 +13,49 @@ let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 32
 
 typealias NoArgVoidFunc = () -> Void
 
+
+struct InvertedWhiteCircleImage: View {
+  let imageName: String
+  let width: CGFloat
+  let height: CGFloat
+
+  var body: some View {
+    ZStack {
+
+      Circle().fill(Color.white)
+        .frame(width: width, height: height)
+        .shadow(color: .white, radius: 3.0)
+
+      Image(systemName: self.imageName)
+        .renderingMode(.template)
+        .colorInvert()
+        .frame(width: width, height: height)
+        .font(Font.system(.title))
+        .clipShape(Circle())
+        .shadow(color: .white, radius: 3.0)
+        .accentColor(.white)
+
+    }
+  }
+}
+
+struct RegularImage: View {
+  let imageName: String
+  let width: CGFloat
+  let height: CGFloat
+
+  var body: some View {
+
+    Image(systemName: self.imageName)
+      .renderingMode(.template)
+      .frame(width: width, height: height)
+      .font(Font.system(.title))
+      //            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+
+      .accentColor(.black)
+  }
+}
+
 /**
  STRUCT TernaryToggleButton
  */
@@ -47,40 +90,16 @@ struct TernaryToggleButton: View {
 
   var body: some View {
     Button(action: onClickAction!) {
-      ZStack {
 
-        if isEnabled == .TRUE {
-
-          Circle().fill(Color.white)
-            .frame(width: width, height: height)
-            .shadow(color: .white, radius: 3.0)
-
-          Image(systemName: self.imageName)
-            .renderingMode(.template)
-            .colorInvert()
-            .frame(width: width, height: height)
-            .font(Font.system(.title))
-            .clipShape(Circle())
-            .shadow(color: .white, radius: 3.0)
-            .accentColor(isEnabled == .TRUE ? .white : .black)
-
-        } else {
-
-          Image(systemName: self.imageName)
-            .renderingMode(.template)
-            .frame(width: width, height: height)
-            .font(Font.system(.title))
-            //            .clipShape(RoundedRectangle(cornerRadius: 10.0))
-
-            .accentColor(isEnabled == .TRUE ? .white : .black)
-          //            .overlay(Circle().stroke(Color.red, lineWidth: 2))
-
-        }
+      switch isEnabled {
+        case .TRUE:
+          InvertedWhiteCircleImage(imageName: imageName, width: width, height: height)
+        case .FALSE:
+          // TODO: disable icon
+          RegularImage(imageName: imageName, width: width, height: height)
+        case .NOT_SPECIFIED:
+          RegularImage(imageName: imageName, width: width, height: height)
       }
-      //      .overlay(
-      //        RoundedRectangle(cornerRadius: 10.0)
-      //          .stroke(lineWidth: 2.0)
-      //      )
 
     }
     .buttonStyle(PlainButtonStyle())
@@ -120,41 +139,12 @@ struct BoolToggleButton: View {
 
   var body: some View {
     Button(action: onClickAction!) {
-      ZStack {
-
-        if isEnabled {
-
-          Circle().fill(Color.white)
-            .frame(width: width, height: height)
-            .shadow(color: .white, radius: 3.0)
-
-          Image(systemName: self.imageName)
-            .renderingMode(.template)
-            .colorInvert()
-            .frame(width: width, height: height)
-            .font(Font.system(.title))
-            .clipShape(Circle())
-            .shadow(color: .white, radius: 3.0)
-            .accentColor(isEnabled ? .white : .black)
-
-        } else {
-
-          Image(systemName: self.imageName)
-            .renderingMode(.template)
-            .frame(width: width, height: height)
-            .font(Font.system(.title))
-//            .clipShape(RoundedRectangle(cornerRadius: 10.0))
-
-            .accentColor(isEnabled ? .white : .black)
-//            .overlay(Circle().stroke(Color.red, lineWidth: 2))
-
-        }
+      if isEnabled {
+        InvertedWhiteCircleImage(imageName: imageName, width: width, height: height)
+      } else {
+        // TODO: disable icon
+        RegularImage(imageName: imageName, width: width, height: height)
       }
-//      .overlay(
-//        RoundedRectangle(cornerRadius: 10.0)
-//          .stroke(lineWidth: 2.0)
-//      )
-
     }
     .buttonStyle(PlainButtonStyle())
   }

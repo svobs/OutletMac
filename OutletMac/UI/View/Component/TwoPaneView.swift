@@ -121,46 +121,16 @@ struct PlayPauseToggleButton: View {
     }
   }
 
- var body: some View {
-   Button(action: onClickAction!) {
-     ZStack {
-
-       if isPlaying {
-
-         Image(systemName: "pause.fill")
-           .renderingMode(.template)
-           .frame(width: width, height: height)
-           .font(Font.system(.title))
-          .accentColor(.black)
-
-       } else {
-
-        Circle().fill(Color.white)
-          .frame(width: width, height: height)
-          .shadow(color: .white, radius: 3.0)
-
-         Image(systemName: "play.fill")
-           .renderingMode(.template)
-          .clipShape(Circle())
-          .colorInvert()
-          .shadow(color: .white, radius: 3.0)
-           .frame(width: width, height: height)
-           .font(Font.system(.title))
-//            .clipShape(RoundedRectangle(cornerRadius: 10.0))
-
-           .accentColor(isPlaying ? .white : .black)
-//            .overlay(Circle().stroke(Color.red, lineWidth: 2))
-
-       }
-     }
-//      .overlay(
-//        RoundedRectangle(cornerRadius: 10.0)
-//          .stroke(lineWidth: 2.0)
-//      )
-
-   }
-   .buttonStyle(PlainButtonStyle())
- }
+  var body: some View {
+    Button(action: onClickAction!) {
+      if isPlaying {
+        RegularImage(imageName: "pause.fill", width: width, height: height)
+      } else {
+        InvertedWhiteCircleImage(imageName: "play.fill", width: width, height: height)
+      }
+    }
+    .buttonStyle(PlainButtonStyle())
+  }
 }
 
 /**
