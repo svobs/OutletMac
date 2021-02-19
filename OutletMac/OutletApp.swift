@@ -32,19 +32,25 @@ struct OutletMacApp: App, OutletApp {
   let winID = ID_DIFF_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
+  // TODO: surely Swift has a better way to init these
   var dispatchListener: DispatchListener? = nil
   var backend: OutletBackend? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
 
   init() {
-    NSLog("OutletMacApp init begin")
+    NSLog("DEBUG OutletMacApp init begin")
     do {
       let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
       self.backend = backendGRPC
-      NSLog("gRPC client connecting")
+      NSLog("INFO  gRPC client connecting")
       try self.backend!.start()
-      NSLog("Backend started")
+      NSLog("INFO  Backend started")
+
+      // Subscribe to app-wide signals here
+      dispatchListener = dispatcher.createListener(winID)
+      try dispatchListener!.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+      try dispatchListener!.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
 
       let xLocConfigPath = "ui_state.\(winID).x"
       let yLocConfigPath = "ui_state.\(winID).y"
@@ -56,10 +62,9 @@ struct OutletMacApp: App, OutletApp {
       let winWidth : Int = try backend!.getIntConfig(widthConfigPath)
       let winHeight : Int = try backend!.getIntConfig(heightConfigPath)
 
-      NSLog("WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
+      NSLog("DEBUG WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
 
-      dispatchListener = dispatcher.createListener(winID)
-      try dispatchListener!.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+      settings.isPlaying = try self.backend!.getOpExecutionPlayState()
 
       let treeLeft: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
@@ -72,7 +77,7 @@ struct OutletMacApp: App, OutletApp {
       try conRight!.start()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
-      NSLog("Screen size is \(screenSize.width)x\(screenSize.height)")
+      NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
 
 //      // Create the window and set the content view.
 //      window = NSWindow(
@@ -92,15 +97,20 @@ struct OutletMacApp: App, OutletApp {
 
     } catch {
       NSLog("FATAL ERROR in main(): \(error)")
-      NSLog("Sleeping 1s to let things settle...")
+      NSLog("DEBUG Sleeping 1s to let things settle...")
       sleep(1)
       exit(1)
     }
-    NSLog("OutletMacApp init done")
+    NSLog("DEBUG OutletMacApp init done")
   }
 
+  // Displays any errors that are reported from the backend via gRPC
   func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     try settings.showAlert(title: propDict.getString("msg"), msg: propDict.getString("secondary_msg"))
+  }
+
+  func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
+    settings.isPlaying = try propDict.getBool("is_enabled")
   }
 
   var body: some Scene {

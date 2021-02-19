@@ -11,35 +11,42 @@ import SwiftUI
 let DEFAULT_TERNARY_BTN_WIDTH: CGFloat = 32
 let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 32
 
+typealias NoArgVoidFunc = () -> Void
+
 /**
  STRUCT TernaryToggleButton
  */
 struct TernaryToggleButton: View {
   @Binding var isEnabled: Ternary
+  /** Reminder: can use the "SF Symbols" app to browse for an appropriate image */
   let imageName: String
   let width: CGFloat
   let height: CGFloat
+  private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ isEnabled: Binding<Ternary>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil) {
+  init(_ isEnabled: Binding<Ternary>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
     self._isEnabled = isEnabled
     self.imageName = imageName
     self.width = width == nil ? DEFAULT_TERNARY_BTN_WIDTH : width!
     self.height = height == nil ? DEFAULT_TERNARY_BTN_HEIGHT : height!
+    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
+  }
+
+  // default behavior: toggle through all possible values
+  private func toggleValue() {
+    switch isEnabled {
+      case .TRUE:
+        isEnabled = .FALSE
+      case .FALSE:
+        isEnabled = .NOT_SPECIFIED
+      case .NOT_SPECIFIED:
+        isEnabled = .TRUE
+    }
+    NSLog("Toggled button ternary value to \(isEnabled)")
   }
 
   var body: some View {
-
-    Button(action: {
-      switch isEnabled {
-        case .TRUE:
-          isEnabled = .FALSE
-        case .FALSE:
-          isEnabled = .NOT_SPECIFIED
-        case .NOT_SPECIFIED:
-          isEnabled = .TRUE
-      }
-      NSLog("Toggled button ternary value to \(isEnabled)")
-    }) {
+    Button(action: onClickAction!) {
       ZStack {
 
         if isEnabled == .TRUE {
@@ -86,7 +93,6 @@ extension TernaryToggleButton {
   }
 }
 
-
 /**
  STRUCT BoolToggleButton
 
@@ -97,20 +103,23 @@ struct BoolToggleButton: View {
   let imageName: String
   let width: CGFloat
   let height: CGFloat
+  private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ isEnabled: Binding<Bool>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil) {
+  init(_ isEnabled: Binding<Bool>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
     self._isEnabled = isEnabled
     self.imageName = imageName
     self.width = width == nil ? DEFAULT_TERNARY_BTN_WIDTH : width!
     self.height = height == nil ? DEFAULT_TERNARY_BTN_HEIGHT : height!
+    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
+  }
+
+  private func toggleValue() {
+    isEnabled.toggle()
+    NSLog("Toggled button bool value to \(isEnabled)")
   }
 
   var body: some View {
-
-    Button(action: {
-      isEnabled.toggle()
-      NSLog("Toggled button bool value to \(isEnabled)")
-    }) {
+    Button(action: onClickAction!) {
       ZStack {
 
         if isEnabled {

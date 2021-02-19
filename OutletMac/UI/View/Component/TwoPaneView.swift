@@ -96,6 +96,74 @@ struct TreePanel {
 }
 
 /**
+ TODO: refactor to share code with BoolToggleButton, TernaryToggleButton
+ */
+struct PlayPauseToggleButton: View {
+  @Binding var isPlaying: Bool
+ let dispatcher: SignalDispatcher
+ let width: CGFloat = DEFAULT_TERNARY_BTN_WIDTH
+ let height: CGFloat = DEFAULT_TERNARY_BTN_HEIGHT
+ private var onClickAction: NoArgVoidFunc? = nil
+
+  init(_ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
+   self._isPlaying = isPlaying
+   self.dispatcher = dispatcher
+   self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
+ }
+
+  private func toggleValue() {
+    if self.isPlaying {
+      NSLog("Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
+      dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
+    } else {
+      NSLog("Play/Pause btn clicked! Sending signal \(Signal.RESUME_OP_EXECUTION)")
+      dispatcher.sendSignal(signal: .RESUME_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
+    }
+  }
+
+ var body: some View {
+   Button(action: onClickAction!) {
+     ZStack {
+
+       if isPlaying {
+
+         Image(systemName: "pause.fill")
+           .renderingMode(.template)
+           .frame(width: width, height: height)
+           .font(Font.system(.title))
+          .accentColor(.black)
+
+       } else {
+
+        Circle().fill(Color.white)
+          .frame(width: width, height: height)
+          .shadow(color: .white, radius: 3.0)
+
+         Image(systemName: "play.fill")
+           .renderingMode(.template)
+          .clipShape(Circle())
+          .colorInvert()
+          .shadow(color: .white, radius: 3.0)
+           .frame(width: width, height: height)
+           .font(Font.system(.title))
+//            .clipShape(RoundedRectangle(cornerRadius: 10.0))
+
+           .accentColor(isPlaying ? .white : .black)
+//            .overlay(Circle().stroke(Color.red, lineWidth: 2))
+
+       }
+     }
+//      .overlay(
+//        RoundedRectangle(cornerRadius: 10.0)
+//          .stroke(lineWidth: 2.0)
+//      )
+
+   }
+   .buttonStyle(PlainButtonStyle())
+ }
+}
+
+/**
  STRUCT ButtonBar
  */
 fileprivate struct ButtonBar: View {
@@ -112,11 +180,15 @@ fileprivate struct ButtonBar: View {
     HStack {
       Button("Diff (content-first)", action: self.onDiffButtonClicked)
       Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
+      PlayPauseToggleButton($settings.isPlaying, conLeft.dispatcher)
       Spacer()
     }
     .padding(.leading, H_PAD)
     .buttonStyle(BorderedButtonStyle())
   }
+
+  // UI callbacks
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func onDiffButtonClicked() {
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
@@ -216,5 +288,6 @@ struct TwoPaneView_Previews: PreviewProvider {
   static var previews: some View {
     TwoPaneView(app: MockApp(), conLeft: conLeft, conRight: conRight)
       .colorScheme(.dark)
+      .environmentObject(GlobalSettings())
   }
 }

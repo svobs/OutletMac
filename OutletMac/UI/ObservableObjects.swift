@@ -11,6 +11,9 @@ import SwiftUI
  The EnivornmentObject containing shared state for all UI components in the app
  */
 class GlobalSettings: ObservableObject {
+  @Published var isPlaying = false
+
+  // Alert stuff:
   @Published var showingAlert = false
   @Published var alertTitle: String = "Alert" // placeholder msg
   @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
