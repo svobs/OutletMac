@@ -186,6 +186,10 @@ class GDriveFolder: GDriveNode {
   override func setDirStats(_ dirStats: DirectoryStats?) throws {
     self._dirStats = dirStats
   }
+
+  override func getDirStats() throws -> DirectoryStats? {
+    return self._dirStats
+  }
   
   override public var description: String {
     return "GDriveFolder(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) trashed=\(trashed) " +

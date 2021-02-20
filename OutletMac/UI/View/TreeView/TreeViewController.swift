@@ -12,7 +12,7 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
   
   func updateNSViewController(_ nsViewController: TreeViewController, context: Context) {
     // TODO: apply updates here
-    NSLog("TreeView update requested!")
+    NSLog("DEBUG TreeView update requested!")
     return
   }
 }

@@ -22,7 +22,7 @@ class SignalReceiverThread: Thread {
         try self.receiveSignals()
       } catch {
         // not clear if we ever get here
-        NSLog("Receiving signals failed: \(error)")
+        NSLog("ERROR Receiving signals failed: \(error)")
       }
       // TODO: give more thought to handling various "async" code paths
       loopCount += 1
@@ -30,7 +30,7 @@ class SignalReceiverThread: Thread {
         // TODO: handle error better
         fatalError("SignalReceiverThread: max failures exceeded!")
       }
-      NSLog("SignalReceiverThread looping (count: \(loopCount))")
+      NSLog("DEBUG SignalReceiverThread looping (count: \(loopCount))")
     }
   }
 

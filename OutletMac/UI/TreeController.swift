@@ -108,6 +108,7 @@ class TreeController: TreeControllable, ObservableObject {
   func start() throws {
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
@@ -116,6 +117,16 @@ class TreeController: TreeControllable, ObservableObject {
 
   func shutdown() throws {
     try self.dispatchListener.unsubscribeAll()
+  }
+
+  func populateRoot() throws {
+    let nodeList: [Node] = try self.tree.getChildListForRoot()
+    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(nodeList.count) top-level nodes for root")
+  }
+
+  func loadTree() throws {
+    // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
+    try self.backend.startSubtreeLoad(treeID: self.treeID)
   }
 
   // DispatchListener callbacks
@@ -140,16 +151,30 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
-    self.tree = try props.get("tree") as! DisplayTree
-    NSLog("[\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
-    DispatchQueue.main.async {
-      self.swiftTreeState.updateFrom(self.tree)
+  func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
+    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+      do {
+        try self.populateRoot()
+      } catch {
+        NSLog("ERROR Failed to populate tree: \(error)")
+        let errorMsg: String = "\(error)" // ew, heh
+        self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": "Failed to populate tree", "secondary_msg": errorMsg])
+      }
     }
   }
 
+  func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
+    self.tree = try props.get("tree") as! DisplayTree
+    NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
+    DispatchQueue.main.async {
+      self.swiftTreeState.updateFrom(self.tree)
+    }
+
+    try self.loadTree()
+  }
+
   func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
-    NSLog("[\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
+    NSLog("DEBUG [\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
       // restore root path to value received from server
       self.swiftTreeState.rootPath = self.tree.rootPath
@@ -159,7 +184,7 @@ class TreeController: TreeControllable, ObservableObject {
 
   func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
-    NSLog("Updating status bar msg with content: \"\(statusBarMsg)\"")
+    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
     DispatchQueue.main.async {
       self.swiftTreeState.statusBarMsg = statusBarMsg
     }
@@ -174,7 +199,7 @@ class TreeController: TreeControllable, ObservableObject {
     do {
       try self.app.backend?.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
     } catch {
-      NSLog("Failed to update filter criteria on the backend: \(error)")
+      NSLog("ERROR Failed to update filter criteria on the backend: \(error)")
     }
   }
 }

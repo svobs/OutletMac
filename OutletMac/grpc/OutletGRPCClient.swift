@@ -242,15 +242,12 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
-  func getChildList(parent: Node, treeID: String?, filterCriteria: FilterCriteria?) throws -> [Node] {
+  func getChildList(parent: Node, treeID: String?) throws -> [Node] {
     var request = Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request()
     if treeID != nil {
       request.treeID = treeID!
     }
     request.parentNode = try GRPCConverter.nodeToGRPC(parent)
-    if filterCriteria != nil {
-      request.filterCriteria = try GRPCConverter.filterCriteriaToGRPC(filterCriteria!)
-    }
     
     let call = self.stub.get_child_list_for_node(request)
     do {

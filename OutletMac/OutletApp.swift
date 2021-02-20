@@ -74,7 +74,9 @@ struct OutletMacApp: App, OutletApp {
       self.conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
 
       try conLeft!.start()
+      try conLeft!.loadTree()
       try conRight!.start()
+      try conRight!.loadTree()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")

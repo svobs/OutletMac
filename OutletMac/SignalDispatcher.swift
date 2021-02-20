@@ -182,7 +182,7 @@ class SignalDispatcher {
   }
 
   func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
-    NSLog("DEBUG Sending signal \(signal)")
+    NSLog("DEBUG Dispatcher: Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
       var countNotified = 0

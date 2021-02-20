@@ -51,6 +51,27 @@ class DisplayTree {
       return self.state.rootSN.spid.treeType
     }
   }
+
+  var rootNode: Node? {
+    get {
+      return self.state.rootSN.node
+    }
+  }
+
+  func getChildListForRoot() throws -> [Node] {
+    let rootNode = self.rootNode
+    if rootNode == nil {
+      NSLog("DEBUG Root does not exist; returning empty child list")
+      return []
+    } else {
+      NSLog("DEBUG Getting child list for root: \(rootNode!.uid)")
+      return try self.getChildList(rootNode!)
+    }
+  }
+
+  func getChildList(_ parentNode: Node) throws -> [Node] {
+    return try self.backend.getChildList(parent: parentNode, treeID: self.treeID)
+  }
 }
 
 /**

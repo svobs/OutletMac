@@ -158,11 +158,11 @@ class Node: CustomStringConvertible {
   }
   
   func setDirStats(_ dirStats: DirectoryStats?) throws {
-    throw OutletError.invalidOperation("Cannot call setDirStats() for Node base class!")
+    throw OutletError.invalidOperation("setDirStats(): class does not implement getDirStats(): \(type(of: self))!")
   }
   
   func getDirStats() throws -> DirectoryStats? {
-    throw OutletError.invalidOperation("Cannot call getDirStats() for Node base class!")
+    throw OutletError.invalidOperation("getDirStats(): class does not implement getDirStats(): \(type(of: self))!")
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
@@ -186,6 +186,7 @@ class Node: CustomStringConvertible {
   }
 }
 
+// the only time node is nil is if the tree's root does not exist
 typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node?)
 
 

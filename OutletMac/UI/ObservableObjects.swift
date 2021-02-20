@@ -23,6 +23,7 @@ class GlobalSettings: ObservableObject {
    This method will cause an alert to be displayed in the ContentView.
    */
   func showAlert(title: String, msg: String, dismissButtonText: String = "Dismiss") {
+    NSLog("DEBUG Showing alert with title='\(title)', msg='\(msg)'")
     self.alertTitle = title
     self.alertMsg = msg
     self.dismissButtonText = dismissButtonText
