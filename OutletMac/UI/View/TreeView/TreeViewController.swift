@@ -3,16 +3,27 @@ import AppKit
 import SwiftUI
 import Foundation
 
+/**
+ TreeViewRepresentable: SwiftUI wrapper for TreeView
+ */
 struct TreeViewRepresentable: NSViewControllerRepresentable {
-  // TODO: @Binding var nodes: Array<Node>?
+  let con: TreeControllable
+
+  init(controller: TreeControllable) {
+    self.con = controller
+  }
 
   func makeNSViewController(context: Context) -> TreeViewController {
-    return TreeViewController()
+    // TOOD: find better names for TreeController/TreeControllable
+
+    let treeViewController = TreeViewController()
+    treeViewController.con = self.con
+    return treeViewController
   }
   
   func updateNSViewController(_ nsViewController: TreeViewController, context: Context) {
     // TODO: apply updates here
-    NSLog("DEBUG TreeView update requested!")
+    NSLog("DEBUG [\(self.con.treeID)] TreeView update requested!")
     return
   }
 }
@@ -22,17 +33,44 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
  See: https://stackoverflow.com/questions/45373039/how-to-program-a-nsoutlineview
  */
 final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
+  // Cannot override init(), but this must be set manually before loadView() is called
+  var con: TreeControllable? = nil
+
   private let treeController = NSTreeController()
-  @objc dynamic var content = [TreeViewNode]()
   let scrollView = NSScrollView()
   let outlineView = NSOutlineView()
 
-  var nodes: [TreeViewNode] = []
+  var topLevelNodeList: [Node] = []
+  var treeNodeDict: [UID: Node] = [:]
+
+  func repopulate(_ nodeList: [Node]) {
+    var nodeDict: [UID: Node] = [:]
+    for node in nodeList {
+      nodeDict[node.uid] = node
+    }
+
+    DispatchQueue.main.async {
+      // TODO: is this thread-safe?
+      self.topLevelNodeList = nodeList
+      self.treeNodeDict = nodeDict
+      self.outlineView.reloadData()
+    }
+  }
+
+  // NSViewController methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   override func loadView() {
-      let rect = NSRect(x: 0, y: 0, width: 400, height: 400)
-      view = NSView(frame: rect)
-    
+    guard self.con != nil else {
+      fatalError("loadView(): TreeViewController has no TreeControllable set!")
+    }
+    NSLog("DEBUG [\(self.con!.treeID)] loadView(): setting TreeViewController in TreeController")
+    self.con!.connectTreeView(self)
+    self.con!.treeView = self
+
+    // TODO: does this do anything??
+    let rect = NSRect(x: 0, y: 0, width: 600, height: 600)
+    view = NSView(frame: rect)
   }
 
   private func setUpOutlineView() {
@@ -66,8 +104,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    nodes =  TreeViewNodeFactory().nodes()
-
     // OutlineView
     self.setUpOutlineView()
 
@@ -92,38 +128,41 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.dataSource = self
   }
 
-  // You must give each row a unique identifier, referred to as `item` by the outline view
-  //   * For top-level rows, we use the values in the `keys` array
-  //   * For the hobbies sub-rows, we label them as ("hobbies", 0), ("hobbies", 1), ...
-  //     The integer is the index in the hobbies array
-  //
-  // item == nil means it's the "root" row of the outline view, which is not visible
+  // DataSource methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  /**
+   Returns a UID corresponding to the item with the given parameters
+
+   1. You must give each row a unique identifier, referred to as `item` by the outline view.
+   2. For top-level rows, we use the values in the `keys` array
+   3. item == nil means it's the "root" row of the outline view, which is not visible
+   */
   func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
     if item == nil {
-//      return keys[index]
-      // [Matt]: just use index into nodes for now
-      return String(index)
+      return self.topLevelNodeList[index].uid
 
-      // FIXME: this breaks for nested nodes. Just switch to using nodes with UIDs
+      // FIXME: this breaks for nested topLevelNodeList. Just switch to using topLevelNodeList with UIDs
 
 
 //    } else if let item = item as? String, item == "hobbies" {
 //      return ("hobbies", index)
     } else {
-      return 0
+      return "0"
     }
   }
 
-  // Tell how many children each row has:
-  //    * The root row has 5 children: name, age, birthPlace, birthDate, hobbies
-  //    * The hobbies row has how ever many hobbies there are
-  //    * The other rows have no children
+  /**
+  // Tell Apple how many children each row has.
+  */
   func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
     if item == nil {
       // Root
-      return self.nodes.count
-    } else if let item = item as? String {
-      return nodes[Int(item)!].count
+      return self.topLevelNodeList.count
+    } else if let item = item as? UID {
+      // TODO
+      return 0
+//      return topLevelNodeList[Int(item)!].count
     } else {
       return 0
     }
@@ -131,11 +170,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   // Tell whether the row is expandable
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    if let item = item as? String, nodes[Int(item)!].count > 0 {
-      return true
-    } else {
-      return false
-    }
+    return false
+//    if let item = item as? String, topLevelNodeList[Int(item)!].count > 0 {
+//      return true
+//    } else {
+//      return false
+//    }
   }
 
 
@@ -158,6 +198,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return cell
   }
 
+  // NSOutlineViewDelegate methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
   /**
    Makes contents of the cell
    From NSOutlineViewDelegate
@@ -165,14 +208,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
 
-    guard let uidStr = item as? String else {
-      NSLog("ERROR viewForTableColumn(): item is not a String: \(item)")
+    guard let uid = item as? UID else {
+      NSLog("ERROR [\(self.con!.treeID)] viewForTableColumn(): not a UID: \(item)")
       return nil
     }
-    guard let uid = Int(uidStr) else {
-      NSLog("ERROR viewForTableColumn(): could not parse as int: \(uidStr)")
+
+    let nodeOpt: Node? = self.treeNodeDict[uid]
+    guard nodeOpt != nil else {
+      NSLog("ERROR [\(self.con!.treeID)] viewForTableColumn(): node not found with UID: \(uid)")
       return nil
     }
+    let node = nodeOpt!
 
     switch identifier.rawValue {
       case "node":
@@ -180,17 +226,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.stringValue = self.nodes[uid].value
+        cell!.textField!.stringValue = node.name
         return cell
       case "count":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.stringValue = self.nodes[uid].childrenCount
+        cell!.textField!.stringValue = String(node.sizeBytes ?? 0)
         return cell
       default:
-        NSLog("ERROR unrecognized identifier (ignoring): \(identifier.rawValue)")
+        NSLog("ERROR [\(self.con!.treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
         return nil
     }
   }

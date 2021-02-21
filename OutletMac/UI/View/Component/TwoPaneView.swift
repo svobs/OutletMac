@@ -42,10 +42,16 @@ struct TreeViewPanel: View {
   }
 }
 
-struct LegacyTreeView: View {
+struct LegacyOutlineViewWrapper: View {
+  let con: TreeControllable
+
+  init(controller: TreeControllable) {
+    self.con = controller
+  }
+
   var body: some View {
     HStack {
-      TreeViewRepresentable()
+      TreeViewRepresentable(controller: self.con)
         .padding(.top)
         .frame(height: 200.0)
         .frame(alignment: .topLeading)
@@ -83,14 +89,14 @@ struct TreePanel {
   let con: TreeControllable
   let root_dir_panel: RootDirPanel
   let filter_panel: FilterPanel
-  let tree_view: LegacyTreeView
+  let tree_view: LegacyOutlineViewWrapper
   let status_panel: StatusPanel
 
   init(controller: TreeControllable) {
     self.con = controller
     self.root_dir_panel = RootDirPanel(controller: self.con, canChangeRoot: true)
     self.filter_panel = FilterPanel(controller: self.con)
-    self.tree_view = LegacyTreeView()
+    self.tree_view = LegacyOutlineViewWrapper(controller: self.con)
     self.status_panel = StatusPanel(controller: self.con)
   }
 }

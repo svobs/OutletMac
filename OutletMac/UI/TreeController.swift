@@ -16,6 +16,8 @@ protocol TreeControllable: HasLifecycle {
   var swiftTreeState: SwiftTreeState { get }
   var swiftFilterState: SwiftFilterState { get }
 
+  var treeView: TreeViewController? { get set }
+
   // Convenience getters - see extension below
   var backend: OutletBackend { get }
   var dispatcher: SignalDispatcher { get }
@@ -24,6 +26,8 @@ protocol TreeControllable: HasLifecycle {
   var dispatchListener: DispatchListener { get }
 
   func start() throws
+
+  func connectTreeView(_ treeView: TreeViewController)
 }
 
 /**
@@ -61,6 +65,8 @@ class MockTreeController: TreeControllable {
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
 
+  var treeView: TreeViewController? = nil
+
   init(_ treeID: String) {
     self.app = MockApp()
     // dummy data follows
@@ -81,6 +87,9 @@ class MockTreeController: TreeControllable {
 
   func shutdown() throws {
   }
+
+  func connectTreeView(_ treeView: TreeViewController) {
+  }
 }
 
 /**
@@ -93,6 +102,10 @@ class TreeController: TreeControllable, ObservableObject {
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
+
+  var treeView: TreeViewController? = nil
+  // workaround for race condition, in case we are ready to populate before the UI is ready
+  private var readyToPopulate: Bool = false
 
   var canChangeRoot: Bool = true // TODO
 
@@ -119,15 +132,46 @@ class TreeController: TreeControllable, ObservableObject {
     try self.dispatchListener.unsubscribeAll()
   }
 
-  func populateRoot() throws {
-    let nodeList: [Node] = try self.tree.getChildListForRoot()
-    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(nodeList.count) top-level nodes for root")
-  }
-
   func loadTree() throws {
     // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
     try self.backend.startSubtreeLoad(treeID: self.treeID)
   }
+
+  func connectTreeView(_ treeView: TreeViewController) {
+    self.treeView = treeView
+
+    if self.readyToPopulate {
+      do {
+        try self.populateRoot()
+      } catch {
+        NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
+        let errorMsg: String = "\(error)" // ew, heh
+        self.reportError("Failed to populate tree", errorMsg)
+      }
+    }
+  }
+
+  func populateRoot() throws {
+    guard self.treeView != nil else {
+      NSLog("DEBUG populateRoot(): TreeView is nil. Setting readyToPopulate = true")
+      readyToPopulate = true
+      return
+    }
+    readyToPopulate = false
+
+    let nodeList: [Node] = try self.tree.getChildListForRoot()
+    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(nodeList.count) top-level nodes for root")
+
+    self.treeView!.repopulate(nodeList)
+  }
+
+  /**
+  Util func: report error to the user in UI
+  */
+  func reportError(_ title: String, _ errorMsg: String) {
+    self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
+  }
+
 
   // DispatchListener callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -156,9 +200,9 @@ class TreeController: TreeControllable, ObservableObject {
       do {
         try self.populateRoot()
       } catch {
-        NSLog("ERROR Failed to populate tree: \(error)")
+        NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
         let errorMsg: String = "\(error)" // ew, heh
-        self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": "Failed to populate tree", "secondary_msg": errorMsg])
+        self.reportError("Failed to populate tree", errorMsg)
       }
     }
   }
@@ -188,6 +232,15 @@ class TreeController: TreeControllable, ObservableObject {
     DispatchQueue.main.async {
       self.swiftTreeState.statusBarMsg = statusBarMsg
     }
+  }
+
+  func onNodeExpansionToggled(_ senderID: SenderID, _ props: PropDict) throws {
+    guard self.treeView != nil else {
+      NSLog("ERROR onExpandRequested(): TreeView is nil!")
+      return
+    }
+
+    // TODO
   }
 
   // Other callbacks
