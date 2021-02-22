@@ -40,6 +40,7 @@
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
+		D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CDE54325E3628E003816CF /* DisplayStore.swift */; };
 		D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D090EC25CD3C980070B69D /* StringUtil.swift */; };
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
 		D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeViewController.swift */; };
@@ -91,6 +92,7 @@
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
+		D1CDE54325E3628E003816CF /* DisplayStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayStore.swift; sourceTree = "<group>"; };
 		D1D090EC25CD3C980070B69D /* StringUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		D1E913B925AA735C008E958B /* TreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				D1E913B925AA735C008E958B /* TreeViewController.swift */,
 				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
 				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
+				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
 			);
 			path = TreeView;
 			sourceTree = "<group>";
@@ -399,6 +402,7 @@
 				D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
+				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
 				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,

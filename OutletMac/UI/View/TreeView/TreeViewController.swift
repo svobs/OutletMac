@@ -40,21 +40,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   let scrollView = NSScrollView()
   let outlineView = NSOutlineView()
 
-  var topLevelNodeList: [Node] = []
-  var treeNodeDict: [UID: Node] = [:]
-
-  func repopulate(_ nodeList: [Node]) {
-    var nodeDict: [UID: Node] = [:]
-    for node in nodeList {
-      nodeDict[node.uid] = node
-    }
-
-    DispatchQueue.main.async {
-      // TODO: is this thread-safe?
-      self.topLevelNodeList = nodeList
-      self.treeNodeDict = nodeDict
-      self.outlineView.reloadData()
-    }
+  var displayStore: DisplayStore {
+    return self.con!.displayStore
   }
 
   // NSViewController methods
@@ -62,11 +49,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   override func loadView() {
     guard self.con != nil else {
-      fatalError("loadView(): TreeViewController has no TreeControllable set!")
+      fatalError("[\(self.con!.treeID)] loadView(): TreeViewController has no TreeControllable set!")
     }
     NSLog("DEBUG [\(self.con!.treeID)] loadView(): setting TreeViewController in TreeController")
     self.con!.connectTreeView(self)
-    self.con!.treeView = self
 
     // TODO: does this do anything??
     let rect = NSRect(x: 0, y: 0, width: 600, height: 600)
@@ -131,6 +117,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   // DataSource methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  private func itemToUID(_ item: Any?) -> UID {
+    if item == nil {
+      return NULL_UID
+    } else {
+      return item as! UID
+    }
+  }
+
   /**
    Returns a UID corresponding to the item with the given parameters
 
@@ -139,43 +133,21 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    3. item == nil means it's the "root" row of the outline view, which is not visible
    */
   func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-    if item == nil {
-      return self.topLevelNodeList[index].uid
-
-      // FIXME: this breaks for nested topLevelNodeList. Just switch to using topLevelNodeList with UIDs
-
-
-//    } else if let item = item as? String, item == "hobbies" {
-//      return ("hobbies", index)
-    } else {
-      return "0"
-    }
+    return displayStore.getChild(itemToUID(item), index)?.uid ?? NULL_UID
   }
 
   /**
   // Tell Apple how many children each row has.
   */
   func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-    if item == nil {
-      // Root
-      return self.topLevelNodeList.count
-    } else if let item = item as? UID {
-      // TODO
-      return 0
-//      return topLevelNodeList[Int(item)!].count
-    } else {
-      return 0
-    }
+    return displayStore.getChildList(itemToUID(item)).count
   }
 
-  // Tell whether the row is expandable
+  /**
+   Tell whether the row is expandable
+   */
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    return false
-//    if let item = item as? String, topLevelNodeList[Int(item)!].count > 0 {
-//      return true
-//    } else {
-//      return false
-//    }
+    return displayStore.getNode(itemToUID(item))?.isDir ?? false
   }
 
 
@@ -213,7 +185,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return nil
     }
 
-    let nodeOpt: Node? = self.treeNodeDict[uid]
+    let nodeOpt: Node? = displayStore.treeNodeDict[uid]
     guard nodeOpt != nil else {
       NSLog("ERROR [\(self.con!.treeID)] viewForTableColumn(): node not found with UID: \(uid)")
       return nil

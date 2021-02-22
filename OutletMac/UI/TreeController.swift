@@ -17,6 +17,7 @@ protocol TreeControllable: HasLifecycle {
   var swiftFilterState: SwiftFilterState { get }
 
   var treeView: TreeViewController? { get set }
+  var displayStore: DisplayStore { get }
 
   // Convenience getters - see extension below
   var backend: OutletBackend { get }
@@ -62,6 +63,8 @@ class MockTreeController: TreeControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
+  var displayStore: DisplayStore = DisplayStore()
+
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
 
@@ -83,6 +86,7 @@ class MockTreeController: TreeControllable {
   }
 
   func start() throws {
+    self.displayStore.con = self
   }
 
   func shutdown() throws {
@@ -99,6 +103,7 @@ class TreeController: TreeControllable, ObservableObject {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
+  var displayStore: DisplayStore = DisplayStore()
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
@@ -119,6 +124,7 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func start() throws {
+    self.displayStore.con = self
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.treeID)
@@ -137,6 +143,7 @@ class TreeController: TreeControllable, ObservableObject {
     try self.backend.startSubtreeLoad(treeID: self.treeID)
   }
 
+  // Should be called by TreeViewController
   func connectTreeView(_ treeView: TreeViewController) {
     self.treeView = treeView
 
@@ -159,10 +166,23 @@ class TreeController: TreeControllable, ObservableObject {
     }
     readyToPopulate = false
 
-    let nodeList: [Node] = try self.tree.getChildListForRoot()
-    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(nodeList.count) top-level nodes for root")
+    let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
+    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-    self.treeView!.repopulate(nodeList)
+    var nodeDict: [UID: Node] = [:]
+    for node in topLevelNodeList {
+      nodeDict[node.uid] = node
+    }
+
+    DispatchQueue.main.async {
+      // TODO: is this thread-safe?
+      self.displayStore.treeNodeDict = nodeDict
+      self.displayStore.parentChildListDict.removeAll()
+      self.displayStore.parentChildListDict[NULL_UID] = topLevelNodeList
+
+      self.treeView!.outlineView.reloadData()
+    }
+
   }
 
   /**

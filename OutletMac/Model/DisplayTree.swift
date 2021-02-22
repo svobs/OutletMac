@@ -61,10 +61,10 @@ class DisplayTree {
   func getChildListForRoot() throws -> [Node] {
     let rootNode = self.rootNode
     if rootNode == nil {
-      NSLog("DEBUG Root does not exist; returning empty child list")
+      NSLog("DEBUG [\(treeID)] Root does not exist; returning empty child list")
       return []
     } else {
-      NSLog("DEBUG Getting child list for root: \(rootNode!.uid)")
+      NSLog("DEBUG [\(treeID)] Getting child list for root: \(rootNode!.uid)")
       return try self.getChildList(rootNode!)
     }
   }
