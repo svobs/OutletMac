@@ -43,14 +43,66 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return self.con!.displayStore
   }
 
+  var treeID: String {
+    if con == nil {
+      return "???"
+    } else {
+      return con!.treeID
+    }
+  }
+
+  override func keyDown(with theEvent: NSEvent) {
+    // Enable key events
+    interpretKeyEvents([theEvent])
+  }
+
+  // Delete row if Delete key pressed:
+  override func deleteBackward(_ sender: Any?) {
+
+    let selectedRowIndexes: IndexSet = outlineView.selectedRowIndexes
+    if selectedRowIndexes.isEmpty {
+      return
+    }
+
+    outlineView.beginUpdates()
+
+    for selectedRow in selectedRowIndexes {
+      if let item = outlineView.item(atRow: selectedRow) {
+        if let uid = item as? UID {
+          // TODO: hook this up to backend
+        }
+      }
+    }
+    outlineView.removeItems(at: selectedRowIndexes, inParent: nil, withAnimation: .slideLeft)
+
+    // TODO: see also: insertItemsAtIndexes(_:, inParent:, withAnimation:)
+    // TODO: see also: moveItemAtIndex(_:, inParent:, toIndex:, inParent:)
+
+
+    outlineView.endUpdates()
+  }
+
+  // TODO: how to hook this up?
+  func doubleClickedItem(_ sender: NSOutlineView) {
+    let item = sender.item(atRow: sender.clickedRow)
+
+    if item is UID {
+      if sender.isItemExpanded(item) {
+        sender.collapseItem(item)
+      } else {
+        sender.expandItem(item)
+      }
+    }
+  }
+
   // NSViewController methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   override func loadView() {
     guard self.con != nil else {
-      fatalError("[\(self.con!.treeID)] loadView(): TreeViewController has no TreeControllable set!")
+      fatalError("[\(treeID)] loadView(): TreeViewController has no TreeControllable set!")
     }
-    NSLog("DEBUG [\(self.con!.treeID)] loadView(): setting TreeViewController in TreeController")
+    NSLog("DEBUG [\(treeID)] loadView(): setting TreeViewController in TreeController")
     self.con!.connectTreeView(self)
 
     // TODO: does this do anything??
@@ -209,13 +261,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     guard let identifier = tableColumn?.identifier else { return nil }
 
     guard let uid = item as? UID else {
-      NSLog("ERROR [\(self.con!.treeID)] viewForTableColumn(): not a UID: \(item)")
+      NSLog("ERROR [\(treeID)] viewForTableColumn(): not a UID: \(item)")
       return nil
     }
 
     let nodeOpt: Node? = displayStore.treeNodeDict[uid]
     guard nodeOpt != nil else {
-      NSLog("ERROR [\(self.con!.treeID)] viewForTableColumn(): node not found with UID: \(uid)")
+      NSLog("ERROR [\(treeID)] viewForTableColumn(): node not found with UID: \(uid)")
       return nil
     }
     let node = nodeOpt!
@@ -257,19 +309,19 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         cell!.textField!.stringValue = String(node.changeTS ?? 0)
         return cell
       default:
-        NSLog("ERROR [\(self.con!.treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
+        NSLog("ERROR [\(treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
         return nil
     }
   }
 
   func outlineViewSelectionDidChange(_ notification: Notification) {
-    //1
     guard let outlineView = notification.object as? NSOutlineView else {
       return
     }
-    //2
+
     let selectedIndex = outlineView.selectedRow
-    if let item = outlineView.item(atRow: selectedIndex) as? String {
+    if let uid = outlineView.item(atRow: selectedIndex) as? UID {
+      NSLog("DEBUG [\(treeID)] User selected node with UID \(uid)")
 //      //3
 //      let url = URL(string: feedItem.url)
 //      //4
@@ -279,4 +331,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 //      }
     }
   }
+
+  /*
+ TODO: see:
+
+ - (void)outlineViewItemWillExpand:(NSNotification *)notification;
+ - (void)outlineViewItemDidExpand:(NSNotification *)notification;
+ - (void)outlineViewItemWillCollapse:(NSNotification *)notification;
+ - (void)outlineViewItemDidCollapse:(NSNotification *)notification;
+ */
 }
