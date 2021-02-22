@@ -58,7 +58,7 @@ class OutletGRPCClient: OutletBackend {
 
   private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg) throws {
     let signal = Signal(rawValue: signalGRPC.sigInt)!
-    NSLog("DEBUG Got signal from backend via gRPC: \(signal)")
+    NSLog("DEBUG GRPCClient: got signal from backend via gRPC: \(signal)")
     var argDict: [String: Any] = [:]
 
     switch signal {

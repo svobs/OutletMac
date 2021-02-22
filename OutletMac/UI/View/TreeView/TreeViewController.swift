@@ -37,7 +37,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   var con: TreeControllable? = nil
 
   private let treeController = NSTreeController()
-  let scrollView = NSScrollView()
   let outlineView = NSOutlineView()
 
   var displayStore: DisplayStore {
@@ -59,7 +58,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     view = NSView(frame: rect)
   }
 
-  private func setUpOutlineView() {
+  private func configureOutlineView(_ scrollView: NSScrollView) {
     outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
     outlineView.allowsMultipleSelection = true
     outlineView.autosaveTableColumns = true
@@ -70,48 +69,77 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.appearance = NSAppearance(named: NSAppearance.Name.vibrantDark)
 
     outlineView.headerView = NSTableHeaderView()
-    let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "node"))
-    nodeColumn.title = "Nodes"
+
+    // Columns:
+
+    let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
+    nodeColumn.title = "Name"
     nodeColumn.width = 200
     nodeColumn.minWidth = 100
     outlineView.addTableColumn(nodeColumn)
 
+    let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
+    sizeBytesCol.title = "Size"
+    sizeBytesCol.width = 100
+    sizeBytesCol.minWidth = 100
+    outlineView.addTableColumn(sizeBytesCol)
 
-    let countColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "count"))
-    countColumn.title = "Count"
-    countColumn.width = 100
-    countColumn.minWidth = 100
-    outlineView.addTableColumn(countColumn)
+    let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
+    etcCol.title = "Etc"
+    etcCol.width = 100
+    etcCol.minWidth = 100
+    outlineView.addTableColumn(etcCol)
+
+    let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "mtime"))
+    mtimeCol.title = "Modification Time"
+    mtimeCol.width = 100
+    mtimeCol.minWidth = 100
+    outlineView.addTableColumn(mtimeCol)
+
+    let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "ctime"))
+    ctimeCol.title = "Meta Change Time"
+    ctimeCol.width = 100
+    ctimeCol.minWidth = 100
+    outlineView.addTableColumn(ctimeCol)
 
     outlineView.gridStyleMask = .solidHorizontalGridLineMask
     outlineView.autosaveExpandedItems = true
+
+    scrollView.documentView = outlineView
+    outlineView.frame = scrollView.bounds
+    outlineView.delegate = self
+    outlineView.dataSource = self
   }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  private func addScrollView() -> NSScrollView {
+    let scrollView = NSScrollView()
 
-    // OutlineView
-    self.setUpOutlineView()
-
-    // ScrollView
-    self.view.addSubview(scrollView)
-    self.scrollView.translatesAutoresizingMaskIntoConstraints = false
-    self.view.addConstraint(NSLayoutConstraint(item: self.scrollView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: self.scrollView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 23))
-    self.view.addConstraint(NSLayoutConstraint(item: self.scrollView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: self.scrollView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0))
     scrollView.backgroundColor = NSColor.clear
     scrollView.drawsBackground = false
-    scrollView.documentView = outlineView
     scrollView.hasHorizontalScroller = false
     scrollView.hasVerticalScroller = true
     scrollView.horizontalPageScroll = 10
     scrollView.verticalLineScroll = 19
     scrollView.verticalPageScroll = 10
 
-    outlineView.frame = scrollView.bounds
-    outlineView.delegate = self
-    outlineView.dataSource = self
+    self.view.addSubview(scrollView)
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0))
+    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 23))
+    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0))
+    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0))
+
+    return scrollView
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    // ScrollView
+    let scrollView = self.addScrollView()
+
+    // OutlineView
+    self.configureOutlineView(scrollView)
   }
 
   // DataSource methods
@@ -193,19 +221,40 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let node = nodeOpt!
 
     switch identifier.rawValue {
-      case "node":
+      case "name":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = node.name
         return cell
-      case "count":
+      case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = String(node.sizeBytes ?? 0)
+        return cell
+      case "etc":
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeCell(withIdentifier: identifier)
+        }
+        cell!.textField!.stringValue = String(node.etc)
+        return cell
+      case "mtime":
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeCell(withIdentifier: identifier)
+        }
+        cell!.textField!.stringValue = String(node.modifyTS ?? 0)
+        return cell
+      case "ctime":
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeCell(withIdentifier: identifier)
+        }
+        cell!.textField!.stringValue = String(node.changeTS ?? 0)
         return cell
       default:
         NSLog("ERROR [\(self.con!.treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")

@@ -191,7 +191,7 @@ class SignalDispatcher {
         countTotal += 1
         if subscriber.matches(senderID) {
           countNotified += 1
-          NSLog("DEBUG Calling listener \(subID) for signal '\(signal)'")
+          NSLog("DEBUG Dispatcher: Calling listener \(subID) for signal '\(signal)'")
           do {
             try subscriber.callback(senderID, propertyList)
           } catch {
@@ -202,7 +202,7 @@ class SignalDispatcher {
         }
       }
 
-      NSLog("DEBUG Sent signal \(signal) to \(countNotified) of \(countTotal) subscribers")
+      NSLog("DEBUG Dispatcher: Sent signal \(signal) to \(countNotified) of \(countTotal) subscribers")
     } else {
       NSLog("DEBUG No subscribers found for signal \(signal)")
     }
