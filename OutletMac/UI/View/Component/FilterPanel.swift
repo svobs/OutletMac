@@ -33,16 +33,16 @@ struct FilterPanel: View {
       .font(Font.system(.title))
 
       // Show ancestors
-      BoolToggleButton($swiftFilterState.showAncestors, imageName: "folder.fill")
+      BoolToggleButton($swiftFilterState.showAncestors, imageName: "FolderTree")
 
       // Match Case
-      BoolToggleButton($swiftFilterState.isMatchCase, imageName: "textformat")
+      BoolToggleButton($swiftFilterState.isMatchCase, systemImageName: "textformat")
 
       // Is Trashed
-      TernaryToggleButton($swiftFilterState.isTrashed, imageName: "trash")
+      TernaryToggleButton($swiftFilterState.isTrashed, systemImageName: "trash")
 
       // Is Shared
-      TernaryToggleButton($swiftFilterState.isShared, imageName: "person.2.fill")
+      TernaryToggleButton($swiftFilterState.isShared, imageName: "Shared")
     }
     .padding(.bottom, V_PAD)
     .padding(.top, V_PAD)

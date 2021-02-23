@@ -15,9 +15,17 @@ typealias NoArgVoidFunc = () -> Void
 
 
 struct InvertedWhiteCircleImage: View {
-  let imageName: String
+  let imageName: String?
+  let systemImageName: String?
   let width: CGFloat
   let height: CGFloat
+
+  init(imageName: String? = nil, systemImageName: String? = nil, width: CGFloat, height: CGFloat) {
+    self.imageName = imageName
+    self.systemImageName = systemImageName
+    self.width = width
+    self.height = height
+  }
 
   var body: some View {
     ZStack {
@@ -26,33 +34,58 @@ struct InvertedWhiteCircleImage: View {
         .frame(width: width, height: height)
         .shadow(color: .white, radius: 3.0)
 
-      Image(systemName: self.imageName)
-        .renderingMode(.template)
-        .colorInvert()
-        .frame(width: width, height: height)
-        .font(Font.system(.title))
-        .clipShape(Circle())
-        .shadow(color: .white, radius: 3.0)
-        .accentColor(.white)
+      if systemImageName != nil {
+        Image(systemName: self.systemImageName!)
+          .renderingMode(.template)
+          .colorInvert()
+          .frame(width: width, height: height)
+          .font(Font.system(.title))
+          .clipShape(Circle())
+          .shadow(color: .white, radius: 3.0)
+          .accentColor(.white)
+      } else {
+        Image(self.imageName!)
+          .renderingMode(.template)
+          .colorInvert()
+          .frame(width: width, height: height)
+          .font(Font.system(.title))
+          .clipShape(Circle())
+          .shadow(color: .white, radius: 3.0)
+          .accentColor(.white)
+      }
 
     }
   }
 }
 
 struct RegularImage: View {
-  let imageName: String
+  let imageName: String?
+  let systemImageName: String?
   let width: CGFloat
   let height: CGFloat
 
+  init(imageName: String? = nil, systemImageName: String? = nil, width: CGFloat, height: CGFloat) {
+    self.imageName = imageName
+    self.systemImageName = systemImageName
+    self.width = width
+    self.height = height
+  }
+
   var body: some View {
 
-    Image(systemName: self.imageName)
-      .renderingMode(.template)
-      .frame(width: width, height: height)
-      .font(Font.system(.title))
-      //            .clipShape(RoundedRectangle(cornerRadius: 10.0))
-
-      .accentColor(.black)
+    if self.systemImageName != nil {
+      Image(systemName: self.systemImageName!)
+        .renderingMode(.template)
+        .frame(width: width, height: height)
+        .font(Font.system(.title))
+        .accentColor(.black)
+    } else {
+      Image(self.imageName!)
+        .renderingMode(.template)
+        .frame(width: width, height: height)
+        .font(Font.system(.title))
+        .accentColor(.black)
+    }
   }
 }
 
@@ -62,14 +95,18 @@ struct RegularImage: View {
 struct TernaryToggleButton: View {
   @Binding var isEnabled: Ternary
   /** Reminder: can use the "SF Symbols" app to browse for an appropriate image */
-  let imageName: String
+  let imageName: String?
+  let systemImageName: String?
   let width: CGFloat
   let height: CGFloat
   private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ isEnabled: Binding<Ternary>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
+  init(_ isEnabled: Binding<Ternary>, imageName: String? = nil, systemImageName: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
     self._isEnabled = isEnabled
+    assert(!(imageName == nil && systemImageName == nil), "imageName and systemImageName cannot both be nil")
+    assert(!(imageName != nil && systemImageName != nil), "imageName and systemImageName cannot both be specified")
     self.imageName = imageName
+    self.systemImageName = systemImageName
     self.width = width == nil ? DEFAULT_TERNARY_BTN_WIDTH : width!
     self.height = height == nil ? DEFAULT_TERNARY_BTN_HEIGHT : height!
     self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
@@ -93,12 +130,12 @@ struct TernaryToggleButton: View {
 
       switch isEnabled {
         case .TRUE:
-          InvertedWhiteCircleImage(imageName: imageName, width: width, height: height)
+          InvertedWhiteCircleImage(imageName: imageName, systemImageName: systemImageName, width: width, height: height)
         case .FALSE:
           // TODO: disable icon
-          RegularImage(imageName: imageName, width: width, height: height)
+          RegularImage(imageName: imageName, systemImageName: systemImageName, width: width, height: height)
         case .NOT_SPECIFIED:
-          RegularImage(imageName: imageName, width: width, height: height)
+          RegularImage(imageName: imageName, systemImageName: systemImageName, width: width, height: height)
       }
 
     }
@@ -119,14 +156,18 @@ extension TernaryToggleButton {
  */
 struct BoolToggleButton: View {
   @Binding var isEnabled: Bool
-  let imageName: String
+  let imageName: String?
+  let systemImageName: String?
   let width: CGFloat
   let height: CGFloat
   private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ isEnabled: Binding<Bool>, imageName: String, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
+  init(_ isEnabled: Binding<Bool>, imageName: String? = nil, systemImageName: String? = nil, width: CGFloat? = nil, height: CGFloat? = nil, onClickAction: NoArgVoidFunc? = nil) {
     self._isEnabled = isEnabled
+    assert(!(imageName == nil && systemImageName == nil), "imageName and systemImageName cannot both be nil")
+    assert(!(imageName != nil && systemImageName != nil), "imageName and systemImageName cannot both be specified")
     self.imageName = imageName
+    self.systemImageName = systemImageName
     self.width = width == nil ? DEFAULT_TERNARY_BTN_WIDTH : width!
     self.height = height == nil ? DEFAULT_TERNARY_BTN_HEIGHT : height!
     self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
@@ -140,10 +181,10 @@ struct BoolToggleButton: View {
   var body: some View {
     Button(action: onClickAction!) {
       if isEnabled {
-        InvertedWhiteCircleImage(imageName: imageName, width: width, height: height)
+        InvertedWhiteCircleImage(imageName: imageName, systemImageName: systemImageName, width: width, height: height)
       } else {
         // TODO: disable icon
-        RegularImage(imageName: imageName, width: width, height: height)
+        RegularImage(imageName: imageName, systemImageName: systemImageName, width: width, height: height)
       }
     }
     .buttonStyle(PlainButtonStyle())
@@ -154,9 +195,9 @@ struct BoolToggleButton: View {
 struct TernaryToggleButton_Previews: PreviewProvider {
   static var previews: some View {
     HStack {
-      TernaryToggleButton(.constant(Ternary.TRUE), imageName: "person.2.fill")
-      TernaryToggleButton(.constant(Ternary.FALSE), imageName: "trash")
-      TernaryToggleButton(.constant(Ternary.NOT_SPECIFIED), imageName: "trash")
+      TernaryToggleButton(.constant(Ternary.TRUE), systemImageName: "person.2.fill")
+      TernaryToggleButton(.constant(Ternary.FALSE), systemImageName: "trash")
+      TernaryToggleButton(.constant(Ternary.NOT_SPECIFIED), systemImageName: "trash")
     }
   }
 }

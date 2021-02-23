@@ -112,9 +112,9 @@ struct PlayPauseToggleButton: View {
   var body: some View {
     Button(action: onClickAction!) {
       if isPlaying {
-        RegularImage(imageName: "pause.fill", width: width, height: height)
+        RegularImage(systemImageName: "pause.fill", width: width, height: height)
       } else {
-        InvertedWhiteCircleImage(imageName: "play.fill", width: width, height: height)
+        InvertedWhiteCircleImage(systemImageName: "play.fill", width: width, height: height)
       }
     }
     .buttonStyle(PlainButtonStyle())
