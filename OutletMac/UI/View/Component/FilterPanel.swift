@@ -7,6 +7,45 @@
 //
 import SwiftUI
 
+/*
+extension NSTextField {
+  // Workaround to get rid of focus ring in all text fields
+  open override var focusRingType: NSFocusRingType {
+    get { .none }
+    set { }
+  }
+}
+ */
+
+struct FancyTextField: View {
+  let titleKey: LocalizedStringKey
+  let text: Binding<String>
+  let onEditingChanged: (Bool) -> Void
+  let onCommit: () -> Void
+
+  init(_ titleKey: LocalizedStringKey, text: Binding<String>, onEditingChanged: @escaping (Bool) -> Void = { _ in }, onCommit: @escaping () -> Void = {}) {
+    self.titleKey = titleKey
+    self.text = text
+    self.onEditingChanged = onEditingChanged
+    self.onCommit = onCommit
+  }
+
+  var body: some View {
+    HStack {
+      HStack {
+        TextField("Filter by name", text: text, onEditingChanged: onEditingChanged, onCommit: onCommit)
+        .textFieldStyle(PlainTextFieldStyle())
+        .font(Font.system(.title))
+        .frame(minWidth: 180, maxWidth: .infinity)
+      }
+      .padding(2)
+      .background(RoundedRectangle(cornerRadius: 3).stroke(Color.secondary))
+      //      .shadow(color: .primary, radius: 2)
+    }
+    .padding(H_PAD)
+  }
+}
+
 /**
  STRUCT FilterPanel
 
@@ -23,17 +62,13 @@ struct FilterPanel: View {
 
   var body: some View {
     HStack(spacing: H_PAD) {
-      TextField("Filter by name", text: $swiftFilterState.searchQuery, onEditingChanged: { (editingChanged) in
+      FancyTextField("Filter by name", text: $swiftFilterState.searchQuery, onEditingChanged: { (editingChanged) in
         if editingChanged {
           // TODO
         } else {
           // This is ENTER key
         }
       })
-      .cornerRadius(6.0)
-      .font(Font.system(.title))
-      .frame(minWidth: 180, maxWidth: .infinity)
-      .padding(.leading, H_PAD)
 
       // Show ancestors
       BoolToggleButton($swiftFilterState.showAncestors, imageName: "FolderTree")
