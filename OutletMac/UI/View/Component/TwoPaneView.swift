@@ -73,14 +73,14 @@ struct StatusPanel: View {
  */
 struct TreePanel {
   let con: TreeControllable
-  let root_dir_panel: RootDirPanel
+  let rootPathPanel: RootPathPanel
   let filter_panel: FilterPanel
   let tree_view: LegacyOutlineViewWrapper
   let status_panel: StatusPanel
 
   init(controller: TreeControllable) {
     self.con = controller
-    self.root_dir_panel = RootDirPanel(controller: self.con, canChangeRoot: true)
+    self.rootPathPanel = RootPathPanel(controller: self.con, canChangeRoot: true)
     self.filter_panel = FilterPanel(controller: self.con)
     self.tree_view = LegacyOutlineViewWrapper(controller: self.con)
     self.status_panel = StatusPanel(controller: self.con)
@@ -186,15 +186,15 @@ struct TwoPaneView: View {
   let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
-  let left_tree_panel: TreePanel
-  let right_tree_panel: TreePanel
+  let leftPanel: TreePanel
+  let rightPanel: TreePanel
 
   init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    self.left_tree_panel = TreePanel(controller: conLeft)
-    self.right_tree_panel = TreePanel(controller: conRight)
+    self.leftPanel = TreePanel(controller: conLeft)
+    self.rightPanel = TreePanel(controller: conRight)
   }
 
   private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
@@ -216,18 +216,18 @@ struct TwoPaneView: View {
       //                        .background(colors[$0 % colors.count])
       //                        .cornerRadius(10)
       //                }
-      self.left_tree_panel.root_dir_panel
-      self.right_tree_panel.root_dir_panel
+      self.leftPanel.rootPathPanel
+      self.rightPanel.rootPathPanel
 
-      self.left_tree_panel.filter_panel
-      self.right_tree_panel.filter_panel
+      self.leftPanel.filter_panel
+      self.rightPanel.filter_panel
 
-      self.left_tree_panel.tree_view
-      self.right_tree_panel.tree_view
+      self.leftPanel.tree_view
+      self.rightPanel.tree_view
 
 
-      self.left_tree_panel.status_panel
-      self.right_tree_panel.status_panel
+      self.leftPanel.status_panel
+      self.rightPanel.status_panel
 
       // Button Bar
       ButtonBar(conLeft: self.conLeft, conRight: self.conRight)

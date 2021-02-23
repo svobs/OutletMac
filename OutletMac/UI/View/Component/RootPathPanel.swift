@@ -1,5 +1,5 @@
 //
-//  RootDirPanel.swift
+//  RootPathPanel.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-01-31.
@@ -8,9 +8,9 @@
 import SwiftUI
 
 /**
- STRUCT RootDirPanel
+ STRUCT RootPathPanel
  */
-struct RootDirPanel: View {
+struct RootPathPanel: View {
   @ObservedObject var swiftTreeState: SwiftTreeState
   let con: TreeControllable
 
@@ -109,9 +109,9 @@ struct RootDirPanel: View {
 
 }
 
-struct RootDirPanel_Previews: PreviewProvider {
+struct RootPathPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootDirPanel(controller: MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
+    RootPathPanel(controller: MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
   }
 }
 
