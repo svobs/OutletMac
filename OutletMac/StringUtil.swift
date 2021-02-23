@@ -23,3 +23,24 @@ func descOrNil(_ obj: CustomStringConvertible?) -> String {
 func fromBoolOrNil(_ b: Bool?) -> String {
   return b == nil ? "nil" : String(b!)
 }
+
+class StringUtil {
+  private static let byteCountFormatter: ByteCountFormatter = makeByteCountFormatter()
+
+  private static func makeByteCountFormatter() -> ByteCountFormatter {
+    let formatter = ByteCountFormatter()
+    formatter.allowedUnits = .useAll
+    formatter.countStyle = .file
+    formatter.includesUnit = true
+    formatter.isAdaptive = true
+    return formatter
+  }
+
+  static func formatByteCount(_ byteCount: UInt64?) -> String {
+    guard let sizeBytes = byteCount else {
+      return ""
+    }
+    return byteCountFormatter.string(fromByteCount: Int64(sizeBytes))
+  }
+
+}

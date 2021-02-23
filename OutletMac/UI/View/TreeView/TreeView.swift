@@ -28,6 +28,9 @@ struct TreeView: NSViewControllerRepresentable {
   }
 }
 
+// TreeViewController
+// ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
 /*
  See: https://www.appcoda.com/macos-programming-nsoutlineview/
  See: https://stackoverflow.com/questions/45373039/how-to-program-a-nsoutlineview
@@ -99,6 +102,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   override func loadView() {
+    // connect to controller
     guard self.con != nil else {
       fatalError("[\(treeID)] loadView(): TreeViewController has no TreeControllable set!")
     }
@@ -142,13 +146,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "mtime"))
     mtimeCol.title = "Modification Time"
-    mtimeCol.width = 100
+    mtimeCol.width = 200
     mtimeCol.minWidth = 100
     outlineView.addTableColumn(mtimeCol)
 
     let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "ctime"))
     ctimeCol.title = "Meta Change Time"
-    ctimeCol.width = 100
+    ctimeCol.width = 200
     ctimeCol.minWidth = 100
     outlineView.addTableColumn(ctimeCol)
 
@@ -235,6 +239,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.backgroundColor = NSColor.clear
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.isBordered = false
+    // FIXME: this doesn't work
+    textField.font = NSFont.systemFont(ofSize: 7)
 
     let cell = NSTableCellView()
     cell.identifier = identifier
@@ -283,7 +289,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.stringValue = String(node.sizeBytes ?? 0)
+        cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
       case "etc":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
@@ -297,14 +303,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.stringValue = String(node.modifyTS ?? 0)
+        cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
       case "ctime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        cell!.textField!.stringValue = String(node.changeTS ?? 0)
+        cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         return cell
       default:
         NSLog("ERROR [\(treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")

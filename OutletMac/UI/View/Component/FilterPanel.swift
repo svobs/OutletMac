@@ -30,6 +30,7 @@ struct FilterPanel: View {
           // This is ENTER key
         }
       })
+      .cornerRadius(6.0)
       .font(Font.system(.title))
       .frame(minWidth: 180, maxWidth: .infinity)
       .padding(.leading, H_PAD)
