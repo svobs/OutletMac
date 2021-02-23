@@ -74,15 +74,15 @@ struct StatusPanel: View {
 struct TreePanel {
   let con: TreeControllable
   let rootPathPanel: RootPathPanel
-  let filter_panel: FilterPanel
-  let tree_view: LegacyOutlineViewWrapper
+  let filterPanel: FilterPanel
+  let treeView: LegacyOutlineViewWrapper
   let status_panel: StatusPanel
 
   init(controller: TreeControllable) {
     self.con = controller
     self.rootPathPanel = RootPathPanel(controller: self.con, canChangeRoot: true)
-    self.filter_panel = FilterPanel(controller: self.con)
-    self.tree_view = LegacyOutlineViewWrapper(controller: self.con)
+    self.filterPanel = FilterPanel(controller: self.con)
+    self.treeView = LegacyOutlineViewWrapper(controller: self.con)
     self.status_panel = StatusPanel(controller: self.con)
   }
 }
@@ -197,33 +197,20 @@ struct TwoPaneView: View {
     self.rightPanel = TreePanel(controller: conRight)
   }
 
-  private var symbols = ["keyboard", "hifispeaker.fill", "printer.fill", "tv.fill", "desktopcomputer", "headphones", "tv.music.note", "mic", "plus.bubble", "video"]
-  private var colors: [Color] = [.yellow, .purple, .green]
-
-
   var body: some View {
-    //        ScrollView(.vertical) {
     LazyVGrid(
       columns: columns,
       alignment: .leading,
       spacing: V_PAD
-      //                pinnedViews: [.sectionHeaders, .sectionFooters]
     ) {
-      //                ForEach((0...10), id: \.self) {
-      //                    Image(systemName: symbols[$0 % symbols.count])
-      //                        .font(.system(size: 30))
-      //                        .frame(width: 50, height: 50)
-      //                        .background(colors[$0 % colors.count])
-      //                        .cornerRadius(10)
-      //                }
       self.leftPanel.rootPathPanel
       self.rightPanel.rootPathPanel
 
-      self.leftPanel.filter_panel
-      self.rightPanel.filter_panel
+      self.leftPanel.filterPanel
+      self.rightPanel.filterPanel
 
-      self.leftPanel.tree_view
-      self.rightPanel.tree_view
+      self.leftPanel.treeView
+      self.rightPanel.treeView
 
 
       self.leftPanel.status_panel
@@ -238,13 +225,6 @@ struct TwoPaneView: View {
         TodoPlaceholder("<PROGRESS BAR>")
           .frame(alignment: .bottomTrailing)
       }
-
-      //                Section(header: Text("Section 1").font(.title)) {
-      //                    self.leftItemList.forEach {
-      //                        Rectangle().fill(Color.green)
-      //                        print($0)
-      //                    }
-      //                }
     }
     .frame(minWidth: 600,
            maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,

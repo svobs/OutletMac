@@ -49,6 +49,7 @@ struct RootPathPanel: View {
           .frame(width: 32, height: 32)
           .padding(.leading, H_PAD)
           .font(Font.system(.title))
+          .foregroundColor(.yellow)
       }
 
       if self.swiftTreeState.isEditingRoot {
@@ -87,6 +88,7 @@ struct RootPathPanel: View {
             Text(self.swiftTreeState.rootPath)
               .multilineTextAlignment(.leading)
               .font(Font.system(.title))
+              .foregroundColor(self.swiftTreeState.isRootExists ? .primary : .red)
           }
           Spacer() // this will align the preceding Text object to the left
         }
