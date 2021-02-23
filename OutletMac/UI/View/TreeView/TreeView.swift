@@ -4,9 +4,9 @@ import SwiftUI
 import Foundation
 
 /**
- TreeViewRepresentable: SwiftUI wrapper for TreeView
+ TreeView: SwiftUI wrapper for TreeView
  */
-struct TreeViewRepresentable: NSViewControllerRepresentable {
+struct TreeView: NSViewControllerRepresentable {
   let con: TreeControllable
 
   init(controller: TreeControllable) {
@@ -105,9 +105,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     NSLog("DEBUG [\(treeID)] loadView(): setting TreeViewController in TreeController")
     self.con!.connectTreeView(self)
 
-    // TODO: does this do anything??
-    let rect = NSRect(x: 0, y: 0, width: 600, height: 600)
-    view = NSView(frame: rect)
+    view = NSView()
   }
 
   private func configureOutlineView(_ scrollView: NSScrollView) {

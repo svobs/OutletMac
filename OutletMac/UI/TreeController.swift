@@ -181,6 +181,9 @@ class TreeController: TreeControllable, ObservableObject {
       self.displayStore.parentChildListDict[NULL_UID] = topLevelNodeList
 
       self.treeView!.outlineView.reloadData()
+      let fittingSize = self.treeView!.outlineView.fittingSize
+      NSLog("FITTING SIZE IS NOW: \(fittingSize.width)x\(fittingSize.height)")
+      let preferredContentSize = CGSize(width: fittingSize.width, height: fittingSize.height)
     }
 
   }

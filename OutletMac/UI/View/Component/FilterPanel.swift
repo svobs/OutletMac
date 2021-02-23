@@ -31,6 +31,8 @@ struct FilterPanel: View {
         }
       })
       .font(Font.system(.title))
+      .frame(minWidth: 180, maxWidth: .infinity)
+      .padding(.leading, H_PAD)
 
       // Show ancestors
       BoolToggleButton($swiftFilterState.showAncestors, imageName: "FolderTree")
@@ -46,6 +48,9 @@ struct FilterPanel: View {
     }
     .padding(.bottom, V_PAD)
     .padding(.top, V_PAD)
+    .frame(minWidth: 200,
+           maxWidth: .infinity,
+           alignment: .topLeading)
   }
 }
 

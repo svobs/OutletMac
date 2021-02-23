@@ -19,7 +19,8 @@ struct TodoPlaceholder: View {
       Rectangle().fill(Color.green)
       Text(msg)
         .foregroundColor(Color.black)
-    } .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
 }
@@ -33,10 +34,13 @@ struct LegacyOutlineViewWrapper: View {
 
   var body: some View {
     HStack {
-      TreeViewRepresentable(controller: self.con)
+      TreeView(controller: self.con)
         .padding(.top)
-        .frame(height: 200.0)
-        .frame(alignment: .topLeading)
+        .frame(minWidth: 200,
+               maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+               minHeight: 400, // FIXME: height should not be fixed at this value
+               maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+               alignment: .topLeading)
   //      .onAppear(perform: retrievePlayers)
       Spacer()
     }
@@ -175,8 +179,8 @@ fileprivate struct ButtonBar: View {
 struct TwoPaneView: View {
   private var columns: [GridItem] = [
     // these specify spacing between columns
-    GridItem(.flexible(minimum: 300), spacing: H_PAD),
-    GridItem(.flexible(minimum: 300), spacing: H_PAD),
+    GridItem(.flexible(minimum: 300, maximum: .infinity), spacing: H_PAD),
+    GridItem(.flexible(minimum: 300, maximum: .infinity), spacing: H_PAD),
   ]
 
   let app: OutletApp
@@ -201,7 +205,7 @@ struct TwoPaneView: View {
     //        ScrollView(.vertical) {
     LazyVGrid(
       columns: columns,
-      alignment: .center,
+      alignment: .leading,
       spacing: V_PAD
       //                pinnedViews: [.sectionHeaders, .sectionFooters]
     ) {
@@ -227,8 +231,13 @@ struct TwoPaneView: View {
 
       // Button Bar
       ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
+        .frame(alignment: .bottomLeading)
 
-      TodoPlaceholder("<PROGRESS BAR>")
+      HStack {
+        Spacer()
+        TodoPlaceholder("<PROGRESS BAR>")
+          .frame(alignment: .bottomTrailing)
+      }
 
       //                Section(header: Text("Section 1").font(.title)) {
       //                    self.leftItemList.forEach {
@@ -236,7 +245,12 @@ struct TwoPaneView: View {
       //                        print($0)
       //                    }
       //                }
-    }.frame(width: 800, height: 500)
+    }
+    .frame(minWidth: 600,
+           maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+           minHeight: 400,
+           maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+           alignment: .topLeading)
   }
 }
 

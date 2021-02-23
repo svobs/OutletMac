@@ -66,8 +66,6 @@ struct RootDirPanel: View {
           }
         })
           .font(Font.system(.title))
-//        .foregroundColor(.pink)
-//        .background(Color.white)
           .onTapGesture(count: 1, perform: {
             // No op. Just override default
           })
@@ -104,6 +102,9 @@ struct RootDirPanel: View {
       } // editing / not editing
 
     }  // HStack
+    .frame(minWidth: 300,
+           maxWidth: .infinity,
+           alignment: .topLeading)
   }
 
 }

@@ -126,9 +126,11 @@ struct OutletMacApp: App, OutletApp {
     WindowGroup("Outlet") {
       ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
         .environmentObject(self.settings)
-        .frame(width: 800, height: 800)
-        .frame(minWidth: 800, maxWidth: .infinity,
-               minHeight: 400, maxHeight: .infinity)
+        .frame(minWidth: 800,
+               maxWidth: .infinity,
+               minHeight: 400,
+               maxHeight: .infinity,
+               alignment: .topLeading)
     }
   }
 }

@@ -38,7 +38,7 @@
 		D1CDE56525E4A9DC003816CF /* outlet-icon-256.icns in Resources */ = {isa = PBXBuildFile; fileRef = D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */; };
 		D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D090EC25CD3C980070B69D /* StringUtil.swift */; };
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
-		D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeViewController.swift */; };
+		D1E913BA25AA735C008E958B /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeView.swift */; };
 		D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */; };
 		D1ED5E2725C7D7A400A8E5DB /* RootDirPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
@@ -85,7 +85,7 @@
 		D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "outlet-icon-256.icns"; sourceTree = "<group>"; };
 		D1D090EC25CD3C980070B69D /* StringUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
-		D1E913B925AA735C008E958B /* TreeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
+		D1E913B925AA735C008E958B /* TreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalReceiverThread.swift; sourceTree = "<group>"; };
 		D1ED5E2625C7D7A400A8E5DB /* RootDirPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDirPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
@@ -219,7 +219,7 @@
 		D1E913B825AA7342008E958B /* TreeView */ = {
 			isa = PBXGroup;
 			children = (
-				D1E913B925AA735C008E958B /* TreeViewController.swift */,
+				D1E913B925AA735C008E958B /* TreeView.swift */,
 				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
 				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
 				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
@@ -382,7 +382,7 @@
 				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
 				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
-				D1E913BA25AA735C008E958B /* TreeViewController.swift in Sources */,
+				D1E913BA25AA735C008E958B /* TreeView.swift in Sources */,
 				D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,

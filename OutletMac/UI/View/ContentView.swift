@@ -29,6 +29,7 @@ struct ContentView: View {
       }
 
     TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
       .contentShape(Rectangle()) // taps should be detected in the whole window
       .gesture(tapCancelEdit)
       .alert(isPresented: $settings.showingAlert) {
