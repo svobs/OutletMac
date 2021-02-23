@@ -24,24 +24,6 @@ struct TodoPlaceholder: View {
 
 }
 
-/**
- STRUCT TreeViewPanel
- */
-struct TreeViewPanel: View {
-  
-  var outlineTree: OutlineTree<ExampleClass, [ExampleClass]>
-  @State var selectedItem: OutlineNode<ExampleClass>? = nil
-  
-  init(items: [ExampleClass]) {
-    outlineTree = OutlineTree(representedObjects: items)
-  }
-  
-  var body: some View {
-    OutlineSection<ExampleClass, [ExampleClass]>(selectedItem: $selectedItem).environmentObject(outlineTree)
-      .frame(minWidth: 200, minHeight: 200, maxHeight: .infinity)
-  }
-}
-
 struct LegacyOutlineViewWrapper: View {
   let con: TreeControllable
 

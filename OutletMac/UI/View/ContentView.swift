@@ -14,7 +14,6 @@ struct ContentView: View {
   let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
-  let items: [ExampleClass] = exampleArray()
 
   init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
