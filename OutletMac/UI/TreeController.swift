@@ -174,6 +174,16 @@ class TreeController: TreeControllable, ObservableObject {
     }
     readyToPopulate = false
 
+    let expandedRows: Set<UID>
+    do {
+      expandedRows = try self.app.backend!.getExpandedRowSet(treeID: self.treeID)
+      NSLog("DEBUG [\(treeID)] Got expanded rows: \(expandedRows)")
+    } catch {
+      let errorMsg: String = "\(error)" // ew, heh
+      reportError("Failed to fetch expanded node list", errorMsg)
+      expandedRows = Set() // non-fatal error
+    }
+
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateRoot(): Got \(topLevelNodeList.count) top-level nodes for root")
 

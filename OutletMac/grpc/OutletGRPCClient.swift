@@ -272,6 +272,36 @@ class OutletGRPCClient: OutletBackend {
     }
   }
 
+  func getExpandedRowSet(treeID: String) throws -> Set<UID> {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request()
+    request.treeID = treeID
+
+    let call = self.stub.get_expanded_row_set(request)
+    do {
+      let response = try call.response.wait()
+      var uidSet: Set<UID> = Set()
+      for uid in response.nodeUidSet {
+        uidSet.insert(uid)
+      }
+      return uidSet
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getExpandedRowSet' failed: \(error)")
+    }
+  }
+
+  func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request()
+    request.nodeUid = rowUID
+    request.treeID = treeID
+
+    let call = self.stub.remove_expanded_row(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'removeExpandedRow' failed: \(error)")
+    }
+  }
+
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
     let spid = NodeIdentifierFactory.getRootConstantGDriveSPID()
     let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)

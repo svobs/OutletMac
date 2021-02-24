@@ -159,6 +159,55 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response {
   public init() {}
 }
 
+public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var nodeUid: UInt32 = 0
+
+  public var treeID: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+/// nothing
+public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var treeID: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var nodeUidSet: [UInt32] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -1172,6 +1221,127 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response: SwiftProto
   }
 
   public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".RemoveExpandedRow_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "node_uid"),
+    2: .standard(proto: "tree_id"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.nodeUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
+    }
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request) -> Bool {
+    if lhs.nodeUid != rhs.nodeUid {return false}
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".RemoveExpandedRow_Response"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let _ = try decoder.nextFieldNumber() {
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetExpandedRowSet_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "tree_id"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request) -> Bool {
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetExpandedRowSet_Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "node_uid_set"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.nodeUidSet) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.nodeUidSet.isEmpty {
+      try visitor.visitPackedUInt32Field(value: self.nodeUidSet, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response) -> Bool {
+    if lhs.nodeUidSet != rhs.nodeUidSet {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

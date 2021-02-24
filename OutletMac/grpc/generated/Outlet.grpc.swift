@@ -81,6 +81,16 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol: GRPCC
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>
 
+  func remove_expanded_row(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>
+
+  func get_expanded_row_set(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>
+
   func request_display_tree_ui_state(
     _ request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request,
     callOptions: CallOptions?
@@ -332,6 +342,42 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to remove_expanded_row
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to remove_expanded_row.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func remove_expanded_row(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/remove_expanded_row",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeremove_expanded_rowInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to get_expanded_row_set
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_expanded_row_set.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_expanded_row_set(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/get_expanded_row_set",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_expanded_row_setInterceptors() ?? []
     )
   }
 
@@ -602,6 +648,12 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientInterceptorFact
   /// - Returns: Interceptors to use when invoking 'update_filter'.
   func makeupdate_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>]
 
+  /// - Returns: Interceptors to use when invoking 'remove_expanded_row'.
+  func makeremove_expanded_rowInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>]
+
+  /// - Returns: Interceptors to use when invoking 'get_expanded_row_set'.
+  func makeget_expanded_row_setInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>]
+
   /// - Returns: Interceptors to use when invoking 'request_display_tree_ui_state'.
   func makerequest_display_tree_ui_stateInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>]
 
@@ -687,6 +739,10 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletProvider: CallHandler
   func get_filter(request: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response>
 
   func update_filter(request: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>
+
+  func remove_expanded_row(request: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>
+
+  func get_expanded_row_set(request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>
 
   func request_display_tree_ui_state(request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -822,6 +878,26 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.update_filter(request: request, context: context)
+        }
+      }
+
+    case "remove_expanded_row":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeremove_expanded_rowInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.remove_expanded_row(request: request, context: context)
+        }
+      }
+
+    case "get_expanded_row_set":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeget_expanded_row_setInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.get_expanded_row_set(request: request, context: context)
         }
       }
 
@@ -1002,6 +1078,14 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletServerInterceptorFact
   /// - Returns: Interceptors to use when handling 'update_filter'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeupdate_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response>]
+
+  /// - Returns: Interceptors to use when handling 'remove_expanded_row'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeremove_expanded_rowInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_expanded_row_set'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_expanded_row_setInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree_ui_state'.
   ///   Defaults to calling `self.makeInterceptors()`.

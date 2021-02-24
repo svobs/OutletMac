@@ -17,6 +17,10 @@ extension NSTextField {
 }
  */
 
+/**
+ MacOS's default text field is just a wrapper for NSTextField, which is archaic and minimally ocnfigurable. This is an attempt to clean it up
+ and give it a slightly better look.
+ */
 struct FancyTextField: View {
   let titleKey: LocalizedStringKey
   let text: Binding<String>

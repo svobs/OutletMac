@@ -336,12 +336,34 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  /*
- TODO: see:
+  private func getKey(_ notification: Notification) -> UID? {
+    let item = notification.userInfo?["NSObject"]
 
- - (void)outlineViewItemWillExpand:(NSNotification *)notification;
- - (void)outlineViewItemDidExpand:(NSNotification *)notification;
- - (void)outlineViewItemWillCollapse:(NSNotification *)notification;
- - (void)outlineViewItemDidCollapse:(NSNotification *)notification;
- */
+    guard item != nil else {
+      NSLog("ERROR [\(treeID)] getKey(): no item")
+      return nil
+    }
+
+    guard let uid = item as? UID else {
+      NSLog("ERROR [\(treeID)] getKey(): not a UID: \(item!)")
+      return nil
+    }
+    return uid
+  }
+
+  func outlineViewItemWillExpand(_ notification: Notification) {
+    guard let uid: UID = getKey(notification) else {
+      return
+    }
+    NSLog("DEBUG [\(treeID)] User expanded node with UID \(uid)")
+
+  }
+
+  func outlineViewItemWillCollapse(_ notification: Notification) {
+    guard let uid: UID = getKey(notification) else {
+      return
+    }
+    NSLog("DEBUG [\(treeID)] User collapsed node with UID \(uid)")
+  }
+
 }
