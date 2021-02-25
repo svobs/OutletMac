@@ -29,6 +29,9 @@ protocol TreeControllable: HasLifecycle {
   func start() throws
 
   func connectTreeView(_ treeView: TreeViewController)
+
+  func reportError(_ title: String, _ errorMsg: String)
+  func reportException(_ title: String, _ error: Error)
 }
 
 /**
@@ -63,7 +66,7 @@ class MockTreeController: TreeControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
-  var displayStore: DisplayStore = DisplayStore()
+  lazy var displayStore: DisplayStore = DisplayStore(self)
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
@@ -86,7 +89,6 @@ class MockTreeController: TreeControllable {
   }
 
   func start() throws {
-    self.displayStore.con = self
   }
 
   func shutdown() throws {
@@ -94,6 +96,12 @@ class MockTreeController: TreeControllable {
 
   func connectTreeView(_ treeView: TreeViewController) {
   }
+  func reportError(_ title: String, _ errorMsg: String) {
+  }
+
+  func reportException(_ title: String, _ error: Error) {
+  }
+
 }
 
 /**
@@ -103,7 +111,7 @@ class TreeController: TreeControllable, ObservableObject {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
-  var displayStore: DisplayStore = DisplayStore()
+  lazy var displayStore: DisplayStore = DisplayStore(self)
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
@@ -124,7 +132,6 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func start() throws {
-    self.displayStore.con = self
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.treeID)
@@ -159,9 +166,7 @@ class TreeController: TreeControllable, ObservableObject {
       do {
         try self.populateRoot()
       } catch {
-        NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
-        let errorMsg: String = "\(error)" // ew, heh
-        self.reportError("Failed to populate tree", errorMsg)
+        self.reportException("Failed to populate tree", error)
       }
     }
   }
@@ -179,25 +184,15 @@ class TreeController: TreeControllable, ObservableObject {
       expandedRows = try self.app.backend!.getExpandedRowSet(treeID: self.treeID)
       NSLog("DEBUG [\(treeID)] Got expanded rows: \(expandedRows)")
     } catch {
-      let errorMsg: String = "\(error)" // ew, heh
-      reportError("Failed to fetch expanded node list", errorMsg)
+      reportException("Failed to fetch expanded node list", error)
       expandedRows = Set() // non-fatal error
     }
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateRoot(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-    var nodeDict: [UID: Node] = [:]
-    for node in topLevelNodeList {
-      nodeDict[node.uid] = node
-    }
-
     DispatchQueue.main.async {
-      // TODO: is this thread-safe?
-      self.displayStore.treeNodeDict = nodeDict
-      self.displayStore.parentChildListDict.removeAll()
-      self.displayStore.parentChildListDict[NULL_UID] = topLevelNodeList
-
+      self.displayStore.repopulateRoot(topLevelNodeList)
       self.treeView!.outlineView.reloadData()
 
       // TODO: see if this junk is useful
@@ -208,11 +203,17 @@ class TreeController: TreeControllable, ObservableObject {
 
   }
 
-  /**
-  Util func: report error to the user in UI
-  */
+  // Util: error reporting
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
   func reportError(_ title: String, _ errorMsg: String) {
     self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
+  }
+
+  func reportException(_ title: String, _ error: Error) {
+    let errorMsg: String = "\(error)" // ew, heh
+    NSLog("ERROR [\(self.treeID)] title='\(title)' error'\(errorMsg)'")
+    reportError("Failed to fetch expanded node list", errorMsg)
   }
 
 

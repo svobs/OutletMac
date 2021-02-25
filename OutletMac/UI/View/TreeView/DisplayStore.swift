@@ -12,10 +12,33 @@ import Foundation
  I suppose this class a repository for "ModelView" objects in the MVVC design pattern.
  */
 class DisplayStore {
-  var con: TreeControllable? = nil
+  private var con: TreeControllable? = nil
 
-  var parentChildListDict: [UID: [Node]] = [:]
-  var treeNodeDict: [UID: Node] = [:]
+  private var parentChildListDict: [UID: [Node]] = [:]
+  private var treeNodeDict: [UID: Node] = [:]
+
+  init(_ controllable: TreeControllable) {
+    self.con = controllable
+  }
+
+  // TODO: make thread-safe
+  func repopulateRoot(_ topLevelNodeList: [Node]) {
+    var nodeDict: [UID: Node] = [:]
+    for node in topLevelNodeList {
+      nodeDict[node.uid] = node
+    }
+
+    self.treeNodeDict = nodeDict
+    self.parentChildListDict.removeAll()
+    self.parentChildListDict[NULL_UID] = topLevelNodeList
+  }
+
+  func populateChildList(_ parentUID: UID, _ childList: [Node]) {
+    for child in childList {
+      treeNodeDict[child.uid] = child
+    }
+    self.parentChildListDict[parentUID] = childList
+  }
 
   func getNode(_ uid: UID) -> Node? {
     return treeNodeDict[uid] ?? nil

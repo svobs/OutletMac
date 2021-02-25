@@ -78,7 +78,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
     outlineView.removeItems(at: selectedRowIndexes, inParent: nil, withAnimation: .slideLeft)
 
-    // TODO: see also: insertItemsAtIndexes(_:, inParent:, withAnimation:)
     // TODO: see also: moveItemAtIndex(_:, inParent:, toIndex:, inParent:)
 
 
@@ -269,12 +268,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return nil
     }
 
-    let nodeOpt: Node? = displayStore.treeNodeDict[uid]
-    guard nodeOpt != nil else {
+    guard let node = displayStore.getNode(uid) else {
       NSLog("ERROR [\(treeID)] viewForTableColumn(): node not found with UID: \(uid)")
       return nil
     }
-    let node = nodeOpt!
 
     switch identifier.rawValue {
       case "name":
@@ -325,45 +322,60 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let selectedIndex = outlineView.selectedRow
     if let uid = outlineView.item(atRow: selectedIndex) as? UID {
-      NSLog("DEBUG [\(treeID)] User selected node with UID \(uid)")
-//      //3
-//      let url = URL(string: feedItem.url)
-//      //4
-//      if let url = url {
-//        //5
-//        self.webView.mainFrame.load(URLRequest(url: url))
-//      }
+      NSLog("DEBUG [\(treeID)] User selected node \(uid)")
     }
   }
 
   private func getKey(_ notification: Notification) -> UID? {
-    let item = notification.userInfo?["NSObject"]
-
-    guard item != nil else {
+    guard let item = notification.userInfo?["NSObject"] else {
       NSLog("ERROR [\(treeID)] getKey(): no item")
       return nil
     }
 
     guard let uid = item as? UID else {
-      NSLog("ERROR [\(treeID)] getKey(): not a UID: \(item!)")
+      NSLog("ERROR [\(treeID)] getKey(): not a UID: \(item)")
       return nil
     }
     return uid
   }
 
   func outlineViewItemWillExpand(_ notification: Notification) {
-    guard let uid: UID = getKey(notification) else {
+    guard let parentUID: UID = getKey(notification) else {
       return
     }
-    NSLog("DEBUG [\(treeID)] User expanded node with UID \(uid)")
+    NSLog("DEBUG [\(treeID)] User expanded node \(parentUID)")
 
+    guard let parentNode = self.displayStore.getNode(parentUID) else {
+      self.con?.reportError("Could not expand row", "Node not found with UID \(parentUID)")
+      return
+    }
+    do {
+      let childList = try self.con!.backend.getChildList(parent: parentNode, treeID: self.treeID)
+      self.displayStore.populateChildList(parentUID, childList)
+      self.outlineView.reloadItem(parentUID, reloadChildren: true)
+//      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
+    } catch {
+      self.con!.reportException("Failed to expand node", error)
+    }
   }
 
   func outlineViewItemWillCollapse(_ notification: Notification) {
-    guard let uid: UID = getKey(notification) else {
+    guard let parentUID: UID = getKey(notification) else {
       return
     }
-    NSLog("DEBUG [\(treeID)] User collapsed node with UID \(uid)")
+    NSLog("DEBUG [\(treeID)] User collapsed node \(parentUID)")
+
+    do {
+      try self.con!.backend.removeExpandedRow(parentUID, self.treeID)
+    } catch {
+      NSLog("ERROR Failed to report collapsed node to BE: \(error)")
+    }
+
+    let childNodeList = self.displayStore.getChildList(parentUID)
+    self.outlineView.reloadItem(parentUID, reloadChildren: true)
+//    let rowIndexes = IndexSet.init(integersIn: 0..<childNodeList.count)
+//    outlineView.removeItems(at: rowIndexes, inParent: parentUID, withAnimation: .slideLeft)
+
   }
 
 }
