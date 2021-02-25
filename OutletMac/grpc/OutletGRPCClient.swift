@@ -288,7 +288,22 @@ class OutletGRPCClient: OutletBackend {
       }
       return rows
     } catch {
-      throw OutletError.grpcFailure("RPC 'getExpandedRowSet' failed: \(error)")
+      throw OutletError.grpcFailure("RPC 'getRowsOfInterest' failed: \(error)")
+    }
+  }
+
+  func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request()
+    for uid in selected {
+      request.selectedRowUidSet.append(uid)
+    }
+    request.treeID = treeID
+
+    let call = self.stub.set_selected_row_set(request)
+    do {
+      let _ = try call.response.wait()
+    } catch {
+      throw OutletError.grpcFailure("RPC 'setSelectedRowSet' failed: \(error)")
     }
   }
 
