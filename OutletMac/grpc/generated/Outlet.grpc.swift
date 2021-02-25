@@ -86,10 +86,10 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol: GRPCC
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>
 
-  func get_expanded_row_set(
-    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request,
+  func get_rows_of_interest(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request,
     callOptions: CallOptions?
-  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response>
 
   func request_display_tree_ui_state(
     _ request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request,
@@ -363,21 +363,21 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol {
     )
   }
 
-  /// Unary call to get_expanded_row_set
+  /// Unary call to get_rows_of_interest
   ///
   /// - Parameters:
-  ///   - request: Request to send to get_expanded_row_set.
+  ///   - request: Request to send to get_rows_of_interest.
   ///   - callOptions: Call options.
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func get_expanded_row_set(
-    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request,
+  public func get_rows_of_interest(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request,
     callOptions: CallOptions? = nil
-  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response> {
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response> {
     return self.makeUnaryCall(
-      path: "/outlet.backend.daemon.grpc.generated.Outlet/get_expanded_row_set",
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/get_rows_of_interest",
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makeget_expanded_row_setInterceptors() ?? []
+      interceptors: self.interceptors?.makeget_rows_of_interestInterceptors() ?? []
     )
   }
 
@@ -651,8 +651,8 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientInterceptorFact
   /// - Returns: Interceptors to use when invoking 'remove_expanded_row'.
   func makeremove_expanded_rowInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>]
 
-  /// - Returns: Interceptors to use when invoking 'get_expanded_row_set'.
-  func makeget_expanded_row_setInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>]
+  /// - Returns: Interceptors to use when invoking 'get_rows_of_interest'.
+  func makeget_rows_of_interestInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response>]
 
   /// - Returns: Interceptors to use when invoking 'request_display_tree_ui_state'.
   func makerequest_display_tree_ui_stateInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>]
@@ -742,7 +742,7 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletProvider: CallHandler
 
   func remove_expanded_row(request: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>
 
-  func get_expanded_row_set(request: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>
+  func get_rows_of_interest(request: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response>
 
   func request_display_tree_ui_state(request: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -891,13 +891,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletProvider {
         }
       }
 
-    case "get_expanded_row_set":
+    case "get_rows_of_interest":
       return CallHandlerFactory.makeUnary(
         callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_expanded_row_setInterceptors() ?? []
+        interceptors: self.interceptors?.makeget_rows_of_interestInterceptors() ?? []
       ) { context in
         return { request in
-          self.get_expanded_row_set(request: request, context: context)
+          self.get_rows_of_interest(request: request, context: context)
         }
       }
 
@@ -1083,9 +1083,9 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletServerInterceptorFact
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeremove_expanded_rowInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response>]
 
-  /// - Returns: Interceptors to use when handling 'get_expanded_row_set'.
+  /// - Returns: Interceptors to use when handling 'get_rows_of_interest'.
   ///   Defaults to calling `self.makeInterceptors()`.
-  func makeget_expanded_row_setInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response>]
+  func makeget_rows_of_interestInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree_ui_state'.
   ///   Defaults to calling `self.makeInterceptors()`.

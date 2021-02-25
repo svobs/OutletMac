@@ -22,7 +22,7 @@ protocol OutletBackend: HasLifecycle {
   func getOpExecutionPlayState() throws -> Bool
   func getChildList(parent: Node, treeID: String?) throws -> [Node]
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node]
-  func getExpandedRowSet(treeID: String) throws -> Set<UID>
+  func getRowsOfInterest(treeID: String) throws -> RowsOfInterest
   func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws
   
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree?
@@ -126,7 +126,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getExpandedRowSet(treeID: String) throws -> Set<UID> {
+  func getRowsOfInterest(treeID: String) throws -> RowsOfInterest {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

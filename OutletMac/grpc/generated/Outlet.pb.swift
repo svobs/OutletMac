@@ -184,7 +184,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request {
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -196,12 +196,14 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response {
+public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeUidSet: [UInt32] = []
+  public var expandedRowUidSet: [UInt32] = []
+
+  public var selectedRowUidSet: [UInt32] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1283,8 +1285,8 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response: Swift
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetExpandedRowSet_Request"
+extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetRowsOfInterest_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
   ]
@@ -1308,17 +1310,18 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetExpandedRowSet_Response"
+extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetRowsOfInterest_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_uid_set"),
+    1: .standard(proto: "expanded_row_uid_set"),
+    2: .standard(proto: "selected_row_uid_set"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1327,21 +1330,26 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response: Swift
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.nodeUidSet) }()
+      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.expandedRowUidSet) }()
+      case 2: try { try decoder.decodeRepeatedUInt32Field(value: &self.selectedRowUidSet) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.nodeUidSet.isEmpty {
-      try visitor.visitPackedUInt32Field(value: self.nodeUidSet, fieldNumber: 1)
+    if !self.expandedRowUidSet.isEmpty {
+      try visitor.visitPackedUInt32Field(value: self.expandedRowUidSet, fieldNumber: 1)
+    }
+    if !self.selectedRowUidSet.isEmpty {
+      try visitor.visitPackedUInt32Field(value: self.selectedRowUidSet, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetExpandedRowSet_Response) -> Bool {
-    if lhs.nodeUidSet != rhs.nodeUidSet {return false}
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response) -> Bool {
+    if lhs.expandedRowUidSet != rhs.expandedRowUidSet {return false}
+    if lhs.selectedRowUidSet != rhs.selectedRowUidSet {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

@@ -181,14 +181,16 @@ class TreeController: TreeControllable, ObservableObject {
     }
     readyToPopulate = false
 
-    let expandedRows: Set<UID>
+    let rows: RowsOfInterest
     do {
-      expandedRows = try self.app.backend.getExpandedRowSet(treeID: self.treeID)
-      NSLog("DEBUG [\(treeID)] Got expanded rows: \(expandedRows)")
+      rows = try self.app.backend.getRowsOfInterest(treeID: self.treeID)
+      NSLog("DEBUG [\(treeID)] Got expanded rows: \(rows.expanded) and selected rows: \(rows.selected)")
     } catch {
       reportException("Failed to fetch expanded node list", error)
-      expandedRows = Set() // non-fatal error
+      rows = RowsOfInterest() // non-fatal error
     }
+
+    // TODO: recursive populate
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")

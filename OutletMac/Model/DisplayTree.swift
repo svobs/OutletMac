@@ -82,7 +82,20 @@ class MockDisplayTree: DisplayTree {
 }
 
 /**
- CLASS DiffResultTreeIDs
+ CLASS RowsOfInterest
+ */
+class RowsOfInterest {
+  var expanded: Set<UID>
+  var selected: Set<UID>
+
+  init(expanded: Set<UID> = Set(), selected: Set<UID> = Set()) {
+    self.expanded = expanded
+    self.selected = selected
+  }
+}
+
+/**
+ STRUCT DiffResultTreeIDs
  */
 struct DiffResultTreeIDs {
   let treeIDLeft: String
@@ -95,7 +108,7 @@ struct DiffResultTreeIDs {
 }
 
 /**
- CLASS DisplayTreeRequest
+ STRUCT DisplayTreeRequest
  Fat Microsoft-style struct encapsulating a bunch of params for request_display_tree()
  */
 struct DisplayTreeRequest: CustomStringConvertible {
