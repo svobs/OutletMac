@@ -40,7 +40,7 @@ protocol TreeControllable: HasLifecycle {
 extension TreeControllable {
   var backend: OutletBackend {
     get {
-      return app.backend!
+      return app.backend
     }
   }
 
@@ -163,17 +163,19 @@ class TreeController: TreeControllable, ObservableObject {
     self.treeView = treeView
 
     if self.readyToPopulate {
-      do {
-        try self.populateRoot()
-      } catch {
-        self.reportException("Failed to populate tree", error)
+      DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+        do {
+          try self.populateTreeView()
+        } catch {
+          self.reportException("Failed to populate tree", error)
+        }
       }
     }
   }
 
-  func populateRoot() throws {
+  private func populateTreeView() throws {
     guard self.treeView != nil else {
-      NSLog("DEBUG populateRoot(): TreeView is nil. Setting readyToPopulate = true")
+      NSLog("DEBUG populateTreeView(): TreeView is nil. Setting readyToPopulate = true")
       readyToPopulate = true
       return
     }
@@ -181,7 +183,7 @@ class TreeController: TreeControllable, ObservableObject {
 
     let expandedRows: Set<UID>
     do {
-      expandedRows = try self.app.backend!.getExpandedRowSet(treeID: self.treeID)
+      expandedRows = try self.app.backend.getExpandedRowSet(treeID: self.treeID)
       NSLog("DEBUG [\(treeID)] Got expanded rows: \(expandedRows)")
     } catch {
       reportException("Failed to fetch expanded node list", error)
@@ -189,7 +191,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
-    NSLog("DEBUG [\(treeID)] populateRoot(): Got \(topLevelNodeList.count) top-level nodes for root")
+    NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
     DispatchQueue.main.async {
       self.displayStore.repopulateRoot(topLevelNodeList)
@@ -242,7 +244,7 @@ class TreeController: TreeControllable, ObservableObject {
   func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
-        try self.populateRoot()
+        try self.populateTreeView()
       } catch {
         NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
         let errorMsg: String = "\(error)" // ew, heh
@@ -294,7 +296,7 @@ class TreeController: TreeControllable, ObservableObject {
     // TODO: set up a timer to only update the filter at most every X ms
 
     do {
-      try self.app.backend?.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
+      try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
     } catch {
       NSLog("ERROR Failed to update filter criteria on the backend: \(error)")
     }

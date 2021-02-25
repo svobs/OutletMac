@@ -14,12 +14,12 @@ import SwiftUI
  */
 protocol OutletApp {
   var dispatcher: SignalDispatcher { get }
-  var backend: OutletBackend? { get }
+  var backend: OutletBackend { get }
 }
 
 class MockApp: OutletApp {
   var dispatcher: SignalDispatcher
-  var backend: OutletBackend?
+  var backend: OutletBackend
 
   init() {
     self.dispatcher = SignalDispatcher()
@@ -34,17 +34,16 @@ struct OutletMacApp: App, OutletApp {
   let dispatcher = SignalDispatcher()
   // TODO: surely Swift has a better way to init these
   var dispatchListener: DispatchListener? = nil
-  var backend: OutletBackend? = nil
+  var backend: OutletBackend
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
 
   init() {
     NSLog("DEBUG OutletMacApp init begin")
     do {
-      let backendGRPC = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
-      self.backend = backendGRPC
+      self.backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
       NSLog("INFO  gRPC client connecting")
-      try self.backend!.start()
+      try self.backend.start()
       NSLog("INFO  Backend started")
 
       // Subscribe to app-wide signals here
@@ -54,22 +53,23 @@ struct OutletMacApp: App, OutletApp {
 
       let xLocConfigPath = "ui_state.\(winID).x"
       let yLocConfigPath = "ui_state.\(winID).y"
-      let winX : Int = try self.backend!.getIntConfig(xLocConfigPath)
-      let winY : Int = try self.backend!.getIntConfig(yLocConfigPath)
+      let winX : Int = try self.backend.getIntConfig(xLocConfigPath)
+      let winY : Int = try self.backend.getIntConfig(yLocConfigPath)
 
       let widthConfigPath = "ui_state.\(winID).width"
       let heightConfigPath = "ui_state.\(winID).height"
-      let winWidth : Int = try backend!.getIntConfig(widthConfigPath)
-      let winHeight : Int = try backend!.getIntConfig(heightConfigPath)
+      let winWidth : Int = try backend.getIntConfig(widthConfigPath)
+      let winHeight : Int = try backend.getIntConfig(heightConfigPath)
 
       NSLog("DEBUG WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
 
-      settings.isPlaying = try self.backend!.getOpExecutionPlayState()
+      settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
-      let treeLeft: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-      let treeRight: DisplayTree = try backend!.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      let filterCriteriaLeft: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_LEFT_TREE)
-      let filterCriteriaRight: FilterCriteria = try backend!.getFilterCriteria(treeID: ID_RIGHT_TREE)
+      // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
+      let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
+      let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+      let filterCriteriaLeft: FilterCriteria = try backend.getFilterCriteria(treeID: ID_LEFT_TREE)
+      let filterCriteriaRight: FilterCriteria = try backend.getFilterCriteria(treeID: ID_RIGHT_TREE)
       self.conLeft = TreeController(app: self, tree: treeLeft, filterCriteria: filterCriteriaLeft)
       self.conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
 

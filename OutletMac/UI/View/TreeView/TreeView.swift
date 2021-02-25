@@ -37,21 +37,25 @@ struct TreeView: NSViewControllerRepresentable {
  */
 final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
   // Cannot override init(), but this must be set manually before loadView() is called
-  var con: TreeControllable? = nil
+  private var _lazyCon: TreeControllable? = nil
+  var con: TreeControllable {
+    get {
+      return _lazyCon!
+    }
+    set (con) {
+      self._lazyCon = con
+    }
+  }
 
   private let treeController = NSTreeController()
   let outlineView = NSOutlineView()
 
   var displayStore: DisplayStore {
-    return self.con!.displayStore
+    return self.con.displayStore
   }
 
   var treeID: String {
-    if con == nil {
-      return "???"
-    } else {
-      return con!.treeID
-    }
+    return con.treeID
   }
 
   override func keyDown(with theEvent: NSEvent) {
@@ -102,11 +106,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   override func loadView() {
     // connect to controller
-    guard self.con != nil else {
-      fatalError("[\(treeID)] loadView(): TreeViewController has no TreeControllable set!")
-    }
     NSLog("DEBUG [\(treeID)] loadView(): setting TreeViewController in TreeController")
-    self.con!.connectTreeView(self)
+    self.con.connectTreeView(self)
 
     view = NSView()
   }
@@ -346,16 +347,16 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     NSLog("DEBUG [\(treeID)] User expanded node \(parentUID)")
 
     guard let parentNode = self.displayStore.getNode(parentUID) else {
-      self.con?.reportError("Could not expand row", "Node not found with UID \(parentUID)")
+      self.con.reportError("Could not expand row", "Node not found with UID \(parentUID)")
       return
     }
     do {
-      let childList = try self.con!.backend.getChildList(parent: parentNode, treeID: self.treeID)
+      let childList = try self.con.backend.getChildList(parent: parentNode, treeID: self.treeID)
       self.displayStore.populateChildList(parentUID, childList)
       self.outlineView.reloadItem(parentUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
     } catch {
-      self.con!.reportException("Failed to expand node", error)
+      self.con.reportException("Failed to expand node", error)
     }
   }
 
@@ -366,7 +367,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     NSLog("DEBUG [\(treeID)] User collapsed node \(parentUID)")
 
     do {
-      try self.con!.backend.removeExpandedRow(parentUID, self.treeID)
+      try self.con.backend.removeExpandedRow(parentUID, self.treeID)
     } catch {
       NSLog("ERROR Failed to report collapsed node to BE: \(error)")
     }
