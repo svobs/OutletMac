@@ -49,6 +49,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   private let treeController = NSTreeController()
   let outlineView = NSOutlineView()
+  var expandContractListenersEnabled: Bool = true
 
   var displayStore: DisplayStore {
     return self.con.displayStore
@@ -72,6 +73,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     outlineView.beginUpdates()
+    defer {
+      outlineView.endUpdates()
+    }
 
     for selectedRow in selectedRowIndexes {
       if let item = outlineView.item(atRow: selectedRow) {
@@ -85,7 +89,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // TODO: see also: moveItemAtIndex(_:, inParent:, toIndex:, inParent:)
 
 
-    outlineView.endUpdates()
   }
 
   // TODO: how to hook this up?
@@ -361,6 +364,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    EXPAND ROW
   */
   func outlineViewItemWillExpand(_ notification: Notification) {
+    guard self.expandContractListenersEnabled else {
+      return
+    }
+
     guard let parentUID: UID = getKey(notification) else {
       return
     }
@@ -372,6 +379,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
     do {
       let childList = try self.con.backend.getChildList(parent: parentNode, treeID: self.treeID)
+
+      outlineView.beginUpdates()
+      defer {
+        outlineView.endUpdates()
+      }
       self.displayStore.populateChildList(parentUID, childList)
       self.outlineView.reloadItem(parentUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)

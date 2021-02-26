@@ -191,22 +191,70 @@ class TreeController: TreeControllable, ObservableObject {
       rows = RowsOfInterest() // non-fatal error
     }
 
-    let queue = LinkedList<Node>()
-
+    var queue = LinkedList<Node>()
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-    DispatchQueue.main.async {
-      self.displayStore.repopulateRoot(topLevelNodeList)
-      self.treeView!.outlineView.reloadData()
+    self.displayStore.repopulateRoot(topLevelNodeList)
+    queue.append(contentsOf: topLevelNodeList)
 
-      // TODO: see if this junk is useful
-      let fittingSize = self.treeView!.outlineView.fittingSize
-      NSLog("FITTING SIZE IS NOW: \(fittingSize.width)x\(fittingSize.height)")
-      let preferredContentSize = CGSize(width: fittingSize.width, height: fittingSize.height)
+    var toExpandInOrder: [UID] = []
+    // populate each expanded dir:
+    while !queue.isEmpty {
+      let node = queue.popFirst()!
+      if node.isDir && rows.expanded.contains(node.uid) {
+        toExpandInOrder.append(node.uid)
+        let childList: [Node] = try self.tree.getChildList(node)
+        NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childList.count) child nodes for parent \(node.uid)")
+        self.displayStore.populateChildList(node.uid, childList)
+        queue.append(contentsOf: childList)
+      }
     }
 
+    DispatchQueue.main.async {
+      self.restoreExpandedRows(toExpandInOrder)
+
+      if rows.selected.count > 0 {
+        var indexSet = IndexSet()
+        for uid in rows.selected {
+          let index = self.treeView!.outlineView.row(forItem: uid)
+          if index >= 0 {
+            indexSet.insert(index)
+          } else {
+            NSLog("DEBUG [\(self.treeID)] populateTreeView(): could not select row because it was not found: \(uid)")
+          }
+        }
+
+        NSLog("DEBUG [\(self.treeID)] populateTreeView(): selecting \(indexSet.count) rows")
+        self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+      }
+
+
+      // TODO: see if this junk is useful
+//      let fittingSize = self.treeView!.outlineView.fittingSize
+//      NSLog("FITTING SIZE IS NOW: \(fittingSize.width)x\(fittingSize.height)")
+//      let preferredContentSize = CGSize(width: fittingSize.width, height: fittingSize.height)
+    }
+
+  }
+
+  private func restoreExpandedRows(_ toExpandInOrder: [UID]) {
+    self.treeView!.outlineView.beginUpdates()
+    defer {
+      self.treeView!.outlineView.endUpdates()
+    }
+
+    self.treeView!.outlineView.reloadData()
+
+    // disable listeners while we restore expansion state
+    self.treeView!.expandContractListenersEnabled = false
+    defer {
+      self.treeView!.expandContractListenersEnabled = true
+    }
+    for uid in toExpandInOrder {
+      self.treeView!.outlineView.expandItem(uid)
+    }
   }
 
   // Util: error reporting
