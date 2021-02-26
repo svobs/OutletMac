@@ -191,6 +191,10 @@ class TreeController: TreeControllable, ObservableObject {
       rows = RowsOfInterest() // non-fatal error
     }
 
+    // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
+    self.displayStore.repopulateRoot([])
+    self.appendEphemeralNode(nil, "Loading...")
+
     var queue = LinkedList<Node>()
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
@@ -370,6 +374,10 @@ class TreeController: TreeControllable, ObservableObject {
 
   func onFilterChanged(filterState: SwiftFilterState) {
     // TODO: set up a timer to only update the filter at most every X ms
+
+    // ^^^ FIXME ^^^
+
+
     NSLog("DEBUG onFilterChanged(): \(filterState)")
 
     do {
