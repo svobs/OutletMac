@@ -316,14 +316,31 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
+  /**
+   SELECTION CHANGED
+  */
   func outlineViewSelectionDidChange(_ notification: Notification) {
     guard let outlineView = notification.object as? NSOutlineView else {
       return
     }
 
-    let selectedIndex = outlineView.selectedRow
-    if let uid = outlineView.item(atRow: selectedIndex) as? UID {
-      NSLog("DEBUG [\(treeID)] User selected node \(uid)")
+    var uidSet = Set<UID>()
+    for selectedRow in outlineView.selectedRowIndexes {
+      if let item = outlineView.item(atRow: selectedRow) {
+        if let uid = item as? UID {
+          uidSet.insert(uid)
+        }
+      }
+    }
+    NSLog("DEBUG [\(treeID)] User selected nodes: \(uidSet)")
+
+    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+      do {
+        try self.con.backend.setSelectedRowSet(uidSet, self.treeID)
+      } catch {
+        // Not a serious error: don't show to user
+        NSLog("Failed to report node selection: \(error)")
+      }
     }
   }
 
@@ -340,6 +357,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return uid
   }
 
+  /**
+   EXPAND ROW
+  */
   func outlineViewItemWillExpand(_ notification: Notification) {
     guard let parentUID: UID = getKey(notification) else {
       return
@@ -360,6 +380,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
+  /**
+   COLLAPSE ROW
+  */
   func outlineViewItemWillCollapse(_ notification: Notification) {
     guard let parentUID: UID = getKey(notification) else {
       return

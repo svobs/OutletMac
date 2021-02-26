@@ -6,6 +6,7 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 import SwiftUI
+import LinkedList
 
 /**
  PROTOCOL TreeControllable
@@ -190,7 +191,8 @@ class TreeController: TreeControllable, ObservableObject {
       rows = RowsOfInterest() // non-fatal error
     }
 
-    // TODO: recursive populate
+    let queue = LinkedList<Node>()
+
 
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")

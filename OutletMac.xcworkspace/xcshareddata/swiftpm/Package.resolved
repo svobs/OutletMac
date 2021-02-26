@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "LinkedList",
+        "repositoryURL": "https://github.com/Wildchild9/LinkedList.git",
+        "state": {
+          "branch": null,
+          "revision": "a78b946352b88fc87145782d046cca9c8b97472d",
+          "version": "1.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
