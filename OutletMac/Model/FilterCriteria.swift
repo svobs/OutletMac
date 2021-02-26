@@ -20,15 +20,15 @@ class FilterCriteria: CustomStringConvertible {
   let isIgnoreCase: Bool
   let isTrashed: Ternary
   let isShared: Ternary
-  let showSubtreesOfMatches: Bool
+  let showAncestors: Bool
   
   init(searchQuery: String = "", isTrashed: Ternary = .NOT_SPECIFIED, isShared: Ternary = .NOT_SPECIFIED, isIgnoreCase: Bool = false,
-       showSubtreesOfMatches: Bool = false) {
+       showAncestors: Bool = false) {
     self.searchQuery = searchQuery
     self.isTrashed = isTrashed
     self.isShared = isShared
     self.isIgnoreCase = isIgnoreCase
-    self.showSubtreesOfMatches = showSubtreesOfMatches
+    self.showAncestors = showAncestors
   }
   
   func hasCriteria() -> Bool {
@@ -36,6 +36,6 @@ class FilterCriteria: CustomStringConvertible {
   }
   
   var description: String {
-    return "FilterCriteria(q=\"\(searchQuery)\" trashed=\(isTrashed) shared=\(isShared) ignoreCase=\(isIgnoreCase) showSubtrees=\(showSubtreesOfMatches))"
+    return "FilterCriteria(q=\"\(searchQuery)\" trashed=\(isTrashed) shared=\(isShared) ignoreCase=\(isIgnoreCase) showAncestors=\(showAncestors))"
   }
 }

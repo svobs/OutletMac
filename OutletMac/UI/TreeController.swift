@@ -196,6 +196,13 @@ class TreeController: TreeControllable, ObservableObject {
     let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
     NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
+    if topLevelNodeList.count > MAX_NUMBER_DISPLAYABLE_CHILD_NODES {
+      NSLog("ERROR [\(treeID)] populateTreeView(): Too many top-level nodes to display! (count=\(topLevelNodeList.count))")
+      self.displayStore.repopulateRoot([])
+      self.appendEphemeralNode(nil, "ERROR: too many items to display (\(topLevelNodeList.count))")
+      return
+    }
+
     self.displayStore.repopulateRoot(topLevelNodeList)
     queue.append(contentsOf: topLevelNodeList)
 
@@ -207,8 +214,15 @@ class TreeController: TreeControllable, ObservableObject {
         toExpandInOrder.append(node.uid)
         let childList: [Node] = try self.tree.getChildList(node)
         NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childList.count) child nodes for parent \(node.uid)")
-        self.displayStore.populateChildList(node.uid, childList)
-        queue.append(contentsOf: childList)
+
+        if childList.count > MAX_NUMBER_DISPLAYABLE_CHILD_NODES {
+          NSLog("ERROR [\(treeID)] populateTreeView(): Too many nodes under \(node.uid) to display! (count=\(childList.count))")
+          self.appendEphemeralNode(node.uid, "ERROR: too many items to display (\(childList.count))")
+        } else {
+          // Acceptable number: populate all
+          self.displayStore.populateChildList(node.uid, childList)
+          queue.append(contentsOf: childList)
+        }
       }
     }
 
@@ -237,6 +251,16 @@ class TreeController: TreeControllable, ObservableObject {
 //      let preferredContentSize = CGSize(width: fittingSize.width, height: fittingSize.height)
     }
 
+  }
+
+  private func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
+    // note: top-level's parent is 'nil' in OutlineView, but is NULL_UID in DisplayStore
+    let parentUID: UID = parent == nil ? NULL_UID : parent!
+    let node = EmptyNode(nodeName)
+    self.displayStore.populateChildList(parentUID, [node])
+    DispatchQueue.main.async {
+      self.treeView!.outlineView.reloadItem(parent, reloadChildren: true)
+    }
   }
 
   private func restoreExpandedRows(_ toExpandInOrder: [UID]) {
@@ -346,11 +370,18 @@ class TreeController: TreeControllable, ObservableObject {
 
   func onFilterChanged(filterState: SwiftFilterState) {
     // TODO: set up a timer to only update the filter at most every X ms
+    NSLog("DEBUG onFilterChanged(): \(filterState)")
 
     do {
       try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
     } catch {
       NSLog("ERROR Failed to update filter criteria on the backend: \(error)")
+      return
+    }
+    do {
+      try self.populateTreeView()
+    } catch {
+      reportException("Failed repopulate TreeView after filter change", error)
     }
   }
 }

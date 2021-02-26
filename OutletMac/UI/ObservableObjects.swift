@@ -75,7 +75,8 @@ class SwiftTreeState: ObservableObject {
  See FilterCriteria class.
  Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
  */
-class SwiftFilterState: ObservableObject {
+class SwiftFilterState: ObservableObject, CustomStringConvertible {
+  // See: TreeController.onFilterChanged()
   var onChangeCallback: FilterStateCallback? = nil
 
   @Published var searchQuery: String {
@@ -135,15 +136,19 @@ class SwiftFilterState: ObservableObject {
     self.isMatchCase = !filter.isIgnoreCase
     self.isTrashed = filter.isTrashed
     self.isShared = filter.isShared
-    self.showAncestors = filter.showSubtreesOfMatches
+    self.showAncestors = filter.showAncestors
   }
 
   func toFilterCriteria() -> FilterCriteria {
-    return FilterCriteria(searchQuery: searchQuery, isTrashed: isTrashed, isShared: isShared, isIgnoreCase: !isMatchCase, showSubtreesOfMatches: showAncestors)
+    return FilterCriteria(searchQuery: searchQuery, isTrashed: isTrashed, isShared: isShared, isIgnoreCase: !isMatchCase, showAncestors: showAncestors)
   }
 
   static func from(_ filter: FilterCriteria, onChangeCallback: FilterStateCallback? = nil) -> SwiftFilterState {
-    return SwiftFilterState(onChangeCallback: onChangeCallback, searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showSubtreesOfMatches)
+    return SwiftFilterState(onChangeCallback: onChangeCallback, searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showAncestors)
+  }
+
+  var description: String {
+    return "SwiftFilterState(q=\"\(searchQuery)\" trashed=\(isTrashed) shared=\(isShared) isMatchCase=\(isMatchCase) showAncestors=\(showAncestors))"
   }
 }
 

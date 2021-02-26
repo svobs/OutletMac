@@ -19,7 +19,7 @@ let APP_NAME = "Outlet"
 let H_PAD: CGFloat = 5
 let V_PAD: CGFloat = 5
 
-let LARGE_NUMBER_OF_CHILDREN = 10000
+let MAX_NUMBER_DISPLAYABLE_CHILD_NODES = 10000
 
 /**
  ENUM IconNames

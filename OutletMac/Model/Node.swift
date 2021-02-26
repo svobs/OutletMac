@@ -239,3 +239,27 @@ class DirectoryStats {
   }
   
 }
+
+/**
+ CLASS EmptyNode
+ Is an ephemeral node (not much content)
+ */
+class EmptyNode: Node {
+  let _name: String
+  init(_ name: String) {
+    self._name = name
+    super.init(NullNodeIdentifier(), [], .NOT_TRASHED)
+  }
+
+  override var name: String {
+    get {
+      return self._name
+    }
+  }
+
+  override var isEphemeral: Bool {
+    get {
+      return true
+    }
+  }
+}

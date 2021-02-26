@@ -323,14 +323,14 @@ class GRPCConverter {
     grpc.isTrashed = filterCriteria.isTrashed.rawValue
     grpc.isShared = filterCriteria.isShared.rawValue
     grpc.isIgnoreCase = filterCriteria.isIgnoreCase
-    grpc.showSubtreesOfMatches = filterCriteria.showSubtreesOfMatches
+    grpc.showSubtreesOfMatches = filterCriteria.showAncestors
     return grpc
   }
 
   static func filterCriteriaFromGRPC(_ grpc: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria) throws -> FilterCriteria {
     return FilterCriteria(searchQuery: grpc.searchQuery, isTrashed: Ternary(rawValue: grpc.isTrashed)!,
                           isShared: Ternary(rawValue: grpc.isShared)!, isIgnoreCase: grpc.isIgnoreCase,
-                          showSubtreesOfMatches: grpc.showSubtreesOfMatches)
+                          showAncestors: grpc.showSubtreesOfMatches)
   }
 
   // DisplayTreeUiState
