@@ -223,10 +223,10 @@ class DirectoryStats {
       var dirsString: String = ""
       if dirs > 0 {
         let multi = dirs == 1 ? "" : "s"
-        dirsString = "\(dirs) file\(multi)"
+        dirsString = ", \(dirs) dir\(multi)"
       }
       
-      return "\(filesString), \(dirsString)"
+      return "\(filesString)\(dirsString)"
     }
   }
   

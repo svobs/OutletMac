@@ -131,32 +131,38 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
     nodeColumn.title = "Name"
-    nodeColumn.width = 200
+    nodeColumn.width = 300
     nodeColumn.minWidth = 100
+    nodeColumn.isEditable = false
     outlineView.addTableColumn(nodeColumn)
 
     let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
     sizeBytesCol.title = "Size"
     sizeBytesCol.width = 100
     sizeBytesCol.minWidth = 100
+    sizeBytesCol.isEditable = false
     outlineView.addTableColumn(sizeBytesCol)
 
     let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
     etcCol.title = "Etc"
     etcCol.width = 100
     etcCol.minWidth = 100
+    etcCol.isEditable = false
     outlineView.addTableColumn(etcCol)
 
     let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "mtime"))
     mtimeCol.title = "Modification Time"
     mtimeCol.width = 200
     mtimeCol.minWidth = 100
+    mtimeCol.isEditable = false
     outlineView.addTableColumn(mtimeCol)
 
     let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "ctime"))
     ctimeCol.title = "Meta Change Time"
     ctimeCol.width = 200
     ctimeCol.minWidth = 100
+    ctimeCol.isEditable = false
+//    ctimeCol.isHidden = true
     outlineView.addTableColumn(ctimeCol)
 
     outlineView.gridStyleMask = .solidHorizontalGridLineMask
@@ -242,6 +248,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.backgroundColor = NSColor.clear
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.isBordered = false
+    textField.isEditable = false
     // FIXME: this doesn't work
     textField.font = NSFont.systemFont(ofSize: 7)
 

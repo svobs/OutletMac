@@ -477,6 +477,43 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response {
   public init() {}
 }
 
+public struct Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var uid: UInt32 = 0
+
+  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+    set {_dirMeta = newValue}
+  }
+  /// Returns true if `dirMeta` has been explicitly set.
+  public var hasDirMeta: Bool {return self._dirMeta != nil}
+  /// Clears the value of `dirMeta`. Subsequent reads from it will return its default value.
+  public mutating func clearDirMeta() {self._dirMeta = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+}
+
+public struct Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var dirMetaList: [Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate] = []
+
+  public var statusMsg: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -560,6 +597,14 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
     set {signalData = .downloadMsg(newValue)}
   }
 
+  public var statsUpdate: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
+    get {
+      if case .statsUpdate(let v)? = signalData {return v}
+      return Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate()
+    }
+    set {signalData = .statsUpdate(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -572,6 +617,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
     case srcDstNodeList(Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList)
     case statusMsg(Outlet_Backend_Daemon_Grpc_Generated_StatusMsg)
     case downloadMsg(Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg)
+    case statsUpdate(Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -613,6 +659,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
       }()
       case (.downloadMsg, .downloadMsg): return {
         guard case .downloadMsg(let l) = lhs, case .downloadMsg(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.statsUpdate, .statsUpdate): return {
+        guard case .statsUpdate(let l) = lhs, case .statsUpdate(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -1988,6 +2038,82 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response: SwiftProtobuf.
   }
 }
 
+extension Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".DirMetaUpdate"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "uid"),
+    2: .standard(proto: "dir_meta"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.uid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
+    }
+    if let v = self._dirMeta {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate, rhs: Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate) -> Bool {
+    if lhs.uid != rhs.uid {return false}
+    if lhs._dirMeta != rhs._dirMeta {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".StatsUpdate"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "dir_meta_list"),
+    2: .standard(proto: "status_msg"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.dirMetaList) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.statusMsg) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.dirMetaList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.dirMetaList, fieldNumber: 1)
+    }
+    if !self.statusMsg.isEmpty {
+      try visitor.visitSingularStringField(value: self.statusMsg, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate, rhs: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate) -> Bool {
+    if lhs.dirMetaList != rhs.dirMetaList {return false}
+    if lhs.statusMsg != rhs.statusMsg {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -2002,6 +2128,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
     16: .standard(proto: "src_dst_node_list"),
     17: .standard(proto: "status_msg"),
     18: .standard(proto: "download_msg"),
+    19: .standard(proto: "stats_update"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2093,6 +2220,15 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .downloadMsg(v)}
       }()
+      case 19: try {
+        var v: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .statsUpdate(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .statsUpdate(v)}
+      }()
       default: break
       }
     }
@@ -2144,6 +2280,10 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
     case .downloadMsg?: try {
       guard case .downloadMsg(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 18)
+    }()
+    case .statsUpdate?: try {
+      guard case .statsUpdate(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
     }()
     case nil: break
     }

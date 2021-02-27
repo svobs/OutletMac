@@ -287,6 +287,13 @@ class TreeController: TreeControllable, ObservableObject {
       self.treeView!.outlineView.expandItem(uid)
     }
   }
+  
+  private func updateStatusBarMsg(_ statusMsg: String) {
+    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusMsg)\"")
+    DispatchQueue.main.async {
+      self.swiftTreeState.statusBarMsg = statusMsg
+    }
+  }
 
   // Util: error reporting
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -357,18 +364,12 @@ class TreeController: TreeControllable, ObservableObject {
 
   private func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
-    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
-    DispatchQueue.main.async {
-      self.swiftTreeState.statusBarMsg = statusBarMsg
-    }
+    self.updateStatusBarMsg(statusBarMsg)
   }
 
   private func onRefreshStatsDone(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
-    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
-    DispatchQueue.main.async {
-      self.swiftTreeState.statusBarMsg = statusBarMsg
-    }
+    self.updateStatusBarMsg(statusBarMsg)
   }
 
   // Other callbacks

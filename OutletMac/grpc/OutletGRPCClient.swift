@@ -82,6 +82,8 @@ class OutletGRPCClient: OutletBackend {
         argDict["status_msg"] = signalGRPC.statusMsg.msg
       case .DOWNLOAD_FROM_GDRIVE_DONE:
         argDict["filename"] = signalGRPC.downloadMsg.filename
+      case .REFRESH_SUBTREE_STATS_DONE:
+        argDict["status_msg"] = signalGRPC.statsUpdate.statusMsg
       default:
         break
     }
