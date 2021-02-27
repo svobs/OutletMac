@@ -250,14 +250,7 @@ class TreeController: TreeControllable, ObservableObject {
         NSLog("DEBUG [\(self.treeID)] populateTreeView(): selecting \(indexSet.count) rows")
         self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
       }
-
-
-      // TODO: see if this junk is useful
-//      let fittingSize = self.treeView!.outlineView.fittingSize
-//      NSLog("FITTING SIZE IS NOW: \(fittingSize.width)x\(fittingSize.height)")
-//      let preferredContentSize = CGSize(width: fittingSize.width, height: fittingSize.height)
     }
-
   }
 
   private func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
@@ -267,6 +260,7 @@ class TreeController: TreeControllable, ObservableObject {
     self.displayStore.populateChildList(parentUID, [node])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parent, reloadChildren: true)
+      NSLog("DEBUG [\(self.treeID)] appended ephemeral node: '\(nodeName)'")
     }
   }
 
@@ -316,7 +310,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onLoadStarted(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onLoadStarted(_ senderID: SenderID, _ props: PropDict) throws {
     if self.swiftTreeState.isManualLoadNeeded {
       DispatchQueue.main.async {
         self.swiftTreeState.isManualLoadNeeded = false
@@ -324,7 +318,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
         try self.populateTreeView()
@@ -336,7 +330,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
     self.tree = try props.get("tree") as! DisplayTree
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
     DispatchQueue.main.async {
@@ -346,7 +340,7 @@ class TreeController: TreeControllable, ObservableObject {
     try self.loadTree()
   }
 
-  func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
     NSLog("DEBUG [\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
       // restore root path to value received from server
@@ -355,21 +349,12 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
     NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
     DispatchQueue.main.async {
       self.swiftTreeState.statusBarMsg = statusBarMsg
     }
-  }
-
-  func onNodeExpansionToggled(_ senderID: SenderID, _ props: PropDict) throws {
-    guard self.treeView != nil else {
-      NSLog("ERROR onExpandRequested(): TreeView is nil!")
-      return
-    }
-
-    // TODO
   }
 
   // Other callbacks

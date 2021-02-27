@@ -17,6 +17,7 @@ protocol OutletApp {
   var backend: OutletBackend { get }
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
+  func execSync(_ workItem: @escaping NoArgVoidFunc)
 }
 
 class MockApp: OutletApp {
@@ -29,6 +30,8 @@ class MockApp: OutletApp {
   }
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
+  }
+  func execSync(_ workItem: @escaping NoArgVoidFunc) {
   }
 }
 
@@ -142,5 +145,9 @@ struct OutletMacApp: App, OutletApp {
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
     self.taskRunner.execAsync(workItem)
+  }
+
+  func execSync(_ workItem: @escaping NoArgVoidFunc) {
+    self.taskRunner.execSync(workItem)
   }
 }
