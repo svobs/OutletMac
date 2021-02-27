@@ -26,6 +26,7 @@
 		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
+		D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BF0025E9CFC700B4827F /* TaskRunner.swift */; };
 		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
 		D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
@@ -72,6 +73,7 @@
 		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
 		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
+		D194BF0025E9CFC700B4827F /* TaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRunner.swift; sourceTree = "<group>"; };
 		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
 		D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
 				D1D090EC25CD3C980070B69D /* StringUtil.swift */,
 				D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */,
+				D194BF0025E9CFC700B4827F /* TaskRunner.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -400,6 +403,7 @@
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
 				D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */,
+				D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,

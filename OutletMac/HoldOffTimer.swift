@@ -12,8 +12,8 @@ class HoldOffTimer {
   private let holdoffTimeSec: Double
   private let callback: NoArgVoidFunc
 
-  init(_ holdoffTimeMS: Double, _ callback: @escaping NoArgVoidFunc) {
-    self.holdoffTimeSec = holdoffTimeMS / 1000.0
+  init(_ holdoffTimeMS: Int, _ callback: @escaping NoArgVoidFunc) {
+    self.holdoffTimeSec = Double(holdoffTimeMS) / 1000.0
     self.callback = callback
   }
 
@@ -24,14 +24,17 @@ class HoldOffTimer {
   }
 
   func reschedule() {
+    NSLog("reschedule()")
     self.cancel()
-    
+
+    NSLog("Scheduling timer")
     let timer = Timer.scheduledTimer(timeInterval: self.holdoffTimeSec, target: self, selector: #selector(self.callbackWrapper), userInfo: nil, repeats: false)
-    timer.tolerance = 0.05
+    timer.tolerance = TIMER_TOLERANCE_SEC
     self.timer = timer
   }
 
   @objc private func callbackWrapper() {
+    NSLog("callbackWrapper()")
     self.callback()
   }
 }

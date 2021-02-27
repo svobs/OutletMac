@@ -15,6 +15,8 @@ import SwiftUI
 protocol OutletApp {
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
+
+  func execAsync(_ workItem: @escaping NoArgVoidFunc)
 }
 
 class MockApp: OutletApp {
@@ -24,6 +26,9 @@ class MockApp: OutletApp {
   init() {
     self.dispatcher = SignalDispatcher()
     self.backend = MockBackend(self.dispatcher)
+  }
+
+  func execAsync(_ workItem: @escaping NoArgVoidFunc) {
   }
 }
 
@@ -37,6 +42,7 @@ struct OutletMacApp: App, OutletApp {
   var backend: OutletBackend
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
+  var taskRunner: TaskRunner = TaskRunner()
 
   init() {
     NSLog("DEBUG OutletMacApp init begin")
@@ -106,6 +112,18 @@ struct OutletMacApp: App, OutletApp {
     NSLog("DEBUG OutletMacApp init done")
   }
 
+  var body: some Scene {
+    WindowGroup("Outlet") {
+      ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
+        .environmentObject(self.settings)
+        .frame(minWidth: 800,
+               maxWidth: .infinity,
+               minHeight: 400,
+               maxHeight: .infinity,
+               alignment: .topLeading)
+    }
+  }
+
   // Displays any errors that are reported from the backend via gRPC
   func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
@@ -122,15 +140,7 @@ struct OutletMacApp: App, OutletApp {
     }
   }
 
-  var body: some Scene {
-    WindowGroup("Outlet") {
-      ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
-        .environmentObject(self.settings)
-        .frame(minWidth: 800,
-               maxWidth: .infinity,
-               minHeight: 400,
-               maxHeight: .infinity,
-               alignment: .topLeading)
-    }
+  func execAsync(_ workItem: @escaping NoArgVoidFunc) {
+    self.taskRunner.execAsync(workItem)
   }
 }

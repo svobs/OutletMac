@@ -124,7 +124,7 @@ class TreeController: TreeControllable, ObservableObject {
 
   var canChangeRoot: Bool = true // TODO
 
-  private lazy var filterTimer = HoldOffTimer(500.0, self.fireFilterTimer)
+  private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
 
   init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria) {
     self.app = app
