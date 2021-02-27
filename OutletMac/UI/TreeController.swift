@@ -97,6 +97,7 @@ class MockTreeController: TreeControllable {
 
   func connectTreeView(_ treeView: TreeViewController) {
   }
+
   func reportError(_ title: String, _ errorMsg: String) {
   }
 
@@ -123,16 +124,18 @@ class TreeController: TreeControllable, ObservableObject {
 
   var canChangeRoot: Bool = true // TODO
 
+  private lazy var filterTimer = HoldOffTimer(500.0, self.fireFilterTimer)
+
   init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria) {
     self.app = app
     self.tree = tree
     self.swiftTreeState = SwiftTreeState.from(tree)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
-    self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
 
   func start() throws {
+    self.swiftFilterState.onChangeCallback = self.onFilterChanged
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.treeID)
@@ -372,16 +375,18 @@ class TreeController: TreeControllable, ObservableObject {
   // Other callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  /**
+   The is called when the user makes a filter change in the UI.
+  */
   func onFilterChanged(filterState: SwiftFilterState) {
-    // TODO: set up a timer to only update the filter at most every X ms
+    self.filterTimer.reschedule()
+  }
 
-    // ^^^ FIXME ^^^
-
-
-    NSLog("DEBUG onFilterChanged(): \(filterState)")
+  private func fireFilterTimer() {
+    NSLog("DEBUG Firing timer to update filter via BE")
 
     do {
-      try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: filterState.toFilterCriteria())
+      try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: self.swiftFilterState.toFilterCriteria())
     } catch {
       NSLog("ERROR Failed to update filter criteria on the backend: \(error)")
       return
@@ -392,4 +397,5 @@ class TreeController: TreeControllable, ObservableObject {
       reportException("Failed repopulate TreeView after filter change", error)
     }
   }
+
 }
