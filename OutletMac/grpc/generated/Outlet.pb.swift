@@ -500,6 +500,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate {
   fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
 }
 
+/// StatsUpdate is sent:
+/// 1. Some period of time after node added / modified / removed from tree (not after *every* update)
+/// 2. If the FE requests it (DEPRECATED behavior)
 public struct Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
