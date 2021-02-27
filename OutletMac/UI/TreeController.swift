@@ -125,6 +125,7 @@ class TreeController: TreeControllable, ObservableObject {
   var canChangeRoot: Bool = true // TODO
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
+  private lazy var statsRefreshTimer = HoldOffTimer(STATS_REFRESH_HOLDOFF_TIME_MS, self.fireRequestStatsRefresh)
 
   init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria) {
     self.app = app
@@ -143,6 +144,7 @@ class TreeController: TreeControllable, ObservableObject {
     try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: self.treeID)
   }
 
   func shutdown() throws {
@@ -250,6 +252,10 @@ class TreeController: TreeControllable, ObservableObject {
         NSLog("DEBUG [\(self.treeID)] populateTreeView(): selecting \(indexSet.count) rows")
         self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
       }
+
+      // remember to kick this off inside the main dispatch queue
+      NSLog("DEBUG [\(self.treeID)] Rescheduling stats refresh timer")
+      self.statsRefreshTimer.reschedule()
     }
   }
 
@@ -357,6 +363,14 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
+  private func onRefreshStatsDone(_ senderID: SenderID, _ props: PropDict) throws {
+    let statusBarMsg = try props.getString("status_msg")
+    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
+    DispatchQueue.main.async {
+      self.swiftTreeState.statusBarMsg = statusBarMsg
+    }
+  }
+
   // Other callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -368,18 +382,30 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   private func fireFilterTimer() {
-    NSLog("DEBUG Firing timer to update filter via BE")
+    NSLog("DEBUG [\(self.treeID)] Firing timer to update filter via BE")
 
     do {
       try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: self.swiftFilterState.toFilterCriteria())
     } catch {
-      NSLog("ERROR Failed to update filter criteria on the backend: \(error)")
+      NSLog("ERROR [\(self.treeID)] Failed to update filter criteria on the backend: \(error)")
       return
     }
     do {
       try self.populateTreeView()
     } catch {
-      reportException("Failed repopulate TreeView after filter change", error)
+      reportException("Failed to repopulate TreeView after filter change", error)
+    }
+  }
+
+  private func fireRequestStatsRefresh() {
+    NSLog("DEBUG [\(self.treeID)] Requesting subtree stats refresh")
+
+    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+      do {
+        try self.backend.enqueueRefreshSubtreeStatsTask(rootUID: self.tree.rootSPID.uid, treeID: self.treeID)
+      } catch {
+        reportException("Request to refresh stats failed", error)
+      }
     }
   }
 

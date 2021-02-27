@@ -34,6 +34,12 @@ class DisplayTree {
     }
   }
 
+  var rootSPID: SPID {
+    get {
+      return self.state.rootSN.spid
+    }
+  }
+
   var rootPath: String {
     get {
       return self.state.rootSN.spid.getSinglePath()
