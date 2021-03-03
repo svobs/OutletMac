@@ -138,14 +138,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
     sizeBytesCol.title = "Size"
-    sizeBytesCol.width = 100
-    sizeBytesCol.minWidth = 100
+    sizeBytesCol.width = 70
+    sizeBytesCol.minWidth = 70
     sizeBytesCol.isEditable = false
     outlineView.addTableColumn(sizeBytesCol)
 
     let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
     etcCol.title = "Etc"
-    etcCol.width = 100
+    etcCol.width = 200
     etcCol.minWidth = 100
     etcCol.isEditable = false
     outlineView.addTableColumn(etcCol)
@@ -380,12 +380,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
     NSLog("DEBUG [\(treeID)] User expanded node \(parentUID)")
 
-    guard let parentNode = self.displayStore.getNode(parentUID) else {
-      self.con.reportError("Could not expand row", "Node not found with UID \(parentUID)")
-      return
-    }
     do {
-      let childList = try self.con.backend.getChildList(parent: parentNode, treeID: self.treeID)
+      let childList = try self.con.backend.getChildList(parentUID: parentUID, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
 
       outlineView.beginUpdates()
       defer {
@@ -394,6 +390,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       self.displayStore.populateChildList(parentUID, childList)
       self.outlineView.reloadItem(parentUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
+    } catch OutletError.maxResultsExceeded(let actualCount) {
+      self.con.appendEphemeralNode(parentUID, "ERROR: too many items to display (\(actualCount))")
     } catch {
       self.con.reportException("Failed to expand node", error)
     }
@@ -414,7 +412,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       NSLog("ERROR Failed to report collapsed node to BE: \(error)")
     }
 
-    let childNodeList = self.displayStore.getChildList(parentUID)
     self.outlineView.reloadItem(parentUID, reloadChildren: true)
 //    let rowIndexes = IndexSet.init(integersIn: 0..<childNodeList.count)
 //    outlineView.removeItems(at: rowIndexes, inParent: parentUID, withAnimation: .slideLeft)

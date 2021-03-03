@@ -717,32 +717,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var parentNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _parentNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
-    set {_parentNode = newValue}
-  }
-  /// Returns true if `parentNode` has been explicitly set.
-  public var hasParentNode: Bool {return self._parentNode != nil}
-  /// Clears the value of `parentNode`. Subsequent reads from it will return its default value.
-  public mutating func clearParentNode() {self._parentNode = nil}
-
-  public var filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
-    get {return _filterCriteria ?? Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()}
-    set {_filterCriteria = newValue}
-  }
-  /// Returns true if `filterCriteria` has been explicitly set.
-  public var hasFilterCriteria: Bool {return self._filterCriteria != nil}
-  /// Clears the value of `filterCriteria`. Subsequent reads from it will return its default value.
-  public mutating func clearFilterCriteria() {self._filterCriteria = nil}
+  public var parentUid: UInt32 = 0
 
   public var treeID: String = String()
+
+  /// 0=unlimited
+  public var maxResults: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
-
-  fileprivate var _parentNode: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
-  fileprivate var _filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria? = nil
 }
 
 public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response {
@@ -751,6 +735,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response {
   // methods supported on all messages.
 
   public var nodeList: [Outlet_Backend_Daemon_Grpc_Generated_Node] = []
+
+  /// if max_results exceeded, node_list is empty and this indicates result count
+  public var resultExceededCount: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -2388,9 +2375,9 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse: SwiftProtobuf
 extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "parent_node"),
-    2: .standard(proto: "filter_criteria"),
-    3: .standard(proto: "tree_id"),
+    1: .standard(proto: "parent_uid"),
+    2: .standard(proto: "tree_id"),
+    3: .standard(proto: "max_results"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2399,31 +2386,31 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request: SwiftProtob
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._parentNode) }()
-      case 2: try { try decoder.decodeSingularMessageField(value: &self._filterCriteria) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.maxResults) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._parentNode {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._filterCriteria {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    if self.parentUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 1)
     }
     if !self.treeID.isEmpty {
-      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 3)
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
+    }
+    if self.maxResults != 0 {
+      try visitor.visitSingularUInt32Field(value: self.maxResults, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request) -> Bool {
-    if lhs._parentNode != rhs._parentNode {return false}
-    if lhs._filterCriteria != rhs._filterCriteria {return false}
+    if lhs.parentUid != rhs.parentUid {return false}
     if lhs.treeID != rhs.treeID {return false}
+    if lhs.maxResults != rhs.maxResults {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -2433,6 +2420,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProto
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_list"),
+    2: .standard(proto: "result_exceeded_count"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2442,6 +2430,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProto
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeRepeatedMessageField(value: &self.nodeList) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.resultExceededCount) }()
       default: break
       }
     }
@@ -2451,11 +2440,15 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProto
     if !self.nodeList.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.nodeList, fieldNumber: 1)
     }
+    if self.resultExceededCount != 0 {
+      try visitor.visitSingularUInt32Field(value: self.resultExceededCount, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response) -> Bool {
     if lhs.nodeList != rhs.nodeList {return false}
+    if lhs.resultExceededCount != rhs.resultExceededCount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

@@ -30,6 +30,7 @@ protocol TreeControllable: HasLifecycle {
   func start() throws
 
   func connectTreeView(_ treeView: TreeViewController)
+  func appendEphemeralNode(_ parent: UID?, _ nodeName: String)
 
   func reportError(_ title: String, _ errorMsg: String)
   func reportException(_ title: String, _ error: Error)
@@ -104,6 +105,8 @@ class MockTreeController: TreeControllable {
   func reportException(_ title: String, _ error: Error) {
   }
 
+  func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
+  }
 }
 
 /**
@@ -202,18 +205,17 @@ class TreeController: TreeControllable, ObservableObject {
 
     var queue = LinkedList<Node>()
 
-    let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
-    NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
+    do {
+      let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
+      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-    if topLevelNodeList.count > MAX_NUMBER_DISPLAYABLE_CHILD_NODES {
-      NSLog("ERROR [\(treeID)] populateTreeView(): Too many top-level nodes to display! (count=\(topLevelNodeList.count))")
+      self.displayStore.repopulateRoot(topLevelNodeList)
+      queue.append(contentsOf: topLevelNodeList)
+    } catch OutletError.maxResultsExceeded(let actualCount) {
       self.displayStore.repopulateRoot([])
-      self.appendEphemeralNode(nil, "ERROR: too many items to display (\(topLevelNodeList.count))")
+      self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
       return
     }
-
-    self.displayStore.repopulateRoot(topLevelNodeList)
-    queue.append(contentsOf: topLevelNodeList)
 
     var toExpandInOrder: [UID] = []
     // populate each expanded dir:
@@ -221,16 +223,16 @@ class TreeController: TreeControllable, ObservableObject {
       let node = queue.popFirst()!
       if node.isDir && rows.expanded.contains(node.uid) {
         toExpandInOrder.append(node.uid)
-        let childList: [Node] = try self.tree.getChildList(node)
-        NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childList.count) child nodes for parent \(node.uid)")
+        do {
+          let childList: [Node] = try self.tree.getChildList(node)
+          NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childList.count) child nodes for parent \(node.uid)")
 
-        if childList.count > MAX_NUMBER_DISPLAYABLE_CHILD_NODES {
-          NSLog("ERROR [\(treeID)] populateTreeView(): Too many nodes under \(node.uid) to display! (count=\(childList.count))")
-          self.appendEphemeralNode(node.uid, "ERROR: too many items to display (\(childList.count))")
-        } else {
-          // Acceptable number: populate all
           self.displayStore.populateChildList(node.uid, childList)
           queue.append(contentsOf: childList)
+
+        } catch OutletError.maxResultsExceeded(let actualCount) {
+          // append err node and continue
+          self.appendEphemeralNode(node.uid, "ERROR: too many items to display (\(actualCount))")
         }
       }
     }
@@ -259,7 +261,7 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  private func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
+  func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
     // note: top-level's parent is 'nil' in OutlineView, but is NULL_UID in DisplayStore
     let parentUID: UID = parent == nil ? NULL_UID : parent!
     let node = EmptyNode(nodeName)

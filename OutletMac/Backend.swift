@@ -20,7 +20,7 @@ protocol OutletBackend: HasLifecycle {
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID?
   func startSubtreeLoad(treeID: String) throws
   func getOpExecutionPlayState() throws -> Bool
-  func getChildList(parent: Node, treeID: String?) throws -> [Node]
+  func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node]
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node]
   func getRowsOfInterest(treeID: String) throws -> RowsOfInterest
   func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws
@@ -119,7 +119,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getChildList(parent: Node, treeID: String?) throws -> [Node] {
+  func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

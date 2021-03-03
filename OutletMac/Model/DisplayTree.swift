@@ -76,7 +76,7 @@ class DisplayTree {
   }
 
   func getChildList(_ parentNode: Node) throws -> [Node] {
-    return try self.backend.getChildList(parent: parentNode, treeID: self.treeID)
+    return try self.backend.getChildList(parentUID: parentNode.uid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
   }
 }
 

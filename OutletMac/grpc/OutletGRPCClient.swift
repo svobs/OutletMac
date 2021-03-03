@@ -244,20 +244,28 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
-  func getChildList(parent: Node, treeID: String?) throws -> [Node] {
+  func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node] {
     var request = Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request()
     if treeID != nil {
       request.treeID = treeID!
     }
-    request.parentNode = try GRPCConverter.nodeToGRPC(parent)
+    request.parentUid = parentUID
+    request.maxResults = maxResults ?? 0
     
     let call = self.stub.get_child_list_for_node(request)
+    let response: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response
     do {
-      let response = try call.response.wait()
-      return try GRPCConverter.nodeListFromGRPC(response.nodeList)
+      response = try call.response.wait()
     } catch {
       throw OutletError.grpcFailure("RPC 'getChildList' failed: \(error)")
     }
+
+    if response.resultExceededCount > 0 {
+      assert (maxResults != nil && maxResults! > 0)
+      throw OutletError.maxResultsExceeded(actualCount: response.resultExceededCount)
+    }
+
+    return try GRPCConverter.nodeListFromGRPC(response.nodeList)
   }
   
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node] {
