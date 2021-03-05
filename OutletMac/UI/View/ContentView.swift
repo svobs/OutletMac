@@ -11,6 +11,7 @@ import SwiftUI
 
 struct ContentView: View {
   @EnvironmentObject var settings: GlobalSettings
+  @State private var window: NSWindow?  // enclosing window(?)
   let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable

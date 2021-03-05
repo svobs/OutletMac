@@ -190,7 +190,9 @@ fileprivate struct ButtonBar: View {
 //    } else {
 //      prefsView = PrefsView()
 //    }
-    _ = PrefsView()
+//    _ = PrefsView()
+
+    NSApp.sendAction(#selector(AppDelegate.openPreferencesWindow), to: nil, from:nil)
 
     /*
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")

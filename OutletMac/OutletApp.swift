@@ -35,6 +35,46 @@ class MockApp: OutletApp {
   }
 }
 
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+  var preferencesWindow: NSWindow!
+  func applicationDidFinishLaunching(_ notification: Notification) {
+    NSLog("START app")
+  }
+
+  func applicationWillTerminate(_ notification: Notification) {
+    NSLog("applicationWillTerminate")
+  }
+
+  @objc func openPreferencesWindow() {
+    if nil == preferencesWindow {      // create once !!
+      let preferencesView = PrefsView()
+      // Create the preferences window and set content
+      preferencesWindow = NSWindow(
+        contentRect: NSRect(x: 20, y: 20, width: 480, height: 300),
+        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+        backing: .buffered,
+        defer: false)
+      preferencesWindow.center()
+      preferencesWindow.setFrameAutosaveName("Preferences")
+      preferencesWindow.isReleasedWhenClosed = false
+      preferencesWindow.contentView = NSHostingView(rootView: preferencesView)
+    }
+    preferencesWindow.makeKeyAndOrderFront(nil)
+  }
+
+}
+
+class WindowDelegate: NSObject, NSWindowDelegate {
+    func windowDidResize(_ notification: Notification) {
+        NSLog("windowDidResize")
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        NSLog("windowWillClose")
+    }
+}
+
 @main
 struct OutletMacApp: App, OutletApp {
   let winID = ID_MAIN_WINDOW
@@ -46,6 +86,8 @@ struct OutletMacApp: App, OutletApp {
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
   var taskRunner: TaskRunner = TaskRunner()
+
+  @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
   init() {
     NSLog("DEBUG OutletMacApp init begin")
