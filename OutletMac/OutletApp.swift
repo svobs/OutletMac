@@ -35,6 +35,37 @@ class MockApp: OutletApp {
   }
 }
 
+// This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
+class AppMenu: NSMenu {
+  private lazy var applicationName = ProcessInfo.processInfo.processName
+
+  override init(title: String) {
+    super.init(title: title)
+
+    let appMenu = NSMenuItem()
+    appMenu.submenu = NSMenu()
+    let appName = ProcessInfo.processInfo.processName
+    appMenu.submenu?.addItem(NSMenuItem(title: "About \(appName)", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: ""))
+    appMenu.submenu?.addItem(NSMenuItem.separator())
+    let services = NSMenuItem(title: "Services", action: nil, keyEquivalent: "")
+    services.submenu =  NSMenu()
+    appMenu.submenu?.addItem(services)
+    appMenu.submenu?.addItem(NSMenuItem.separator())
+    appMenu.submenu?.addItem(NSMenuItem(title: "Hide \(appName)", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
+    let hideOthers = NSMenuItem(title: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
+    hideOthers.keyEquivalentModifierMask = [.command, .option]
+    appMenu.submenu?.addItem(hideOthers)
+    appMenu.submenu?.addItem(NSMenuItem(title: "Show All", action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: ""))
+    appMenu.submenu?.addItem(NSMenuItem.separator())
+    appMenu.submenu?.addItem(NSMenuItem(title: "Quit \(appName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+
+    items = [appMenu]
+  }
+  required init(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+}
+
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   var preferencesWindow: NSWindow!
   var window: NSWindow!
@@ -177,13 +208,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   @objc func windowDidMove(_ notification: Notification) {
-//    NSLog("DEBUG Main win moved! \(self.window?.frame.size as Any)")
+//    NSLog("DEBUG Main win moved! \(self.window?.frame.origin as Any)")
     if let winFrame: CGRect = self.window?.frame {
       self.settings.mainWindowHeight = winFrame.size.height
       self.contentRect = winFrame
       self.winCoordsTimer.reschedule()
     }
   }
+
+//  @objc func windowDidChangeScreen(_ notification: Notification) {
+//    NSLog("WINDOW CHANGED SCREEN!!!!!")
+//  }
 
   @objc func windowWillClose(_ notification: Notification) {
     NSLog("DEBUG User closed main window: closing app")

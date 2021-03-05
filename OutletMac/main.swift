@@ -9,7 +9,8 @@
 import AppKit
 
 // Need this code to luanch the app, since I'm not using a storyboard
-let app = NSApplication.shared
 let appDelegate = OutletMacApp()
-app.delegate = appDelegate
+let menu = AppMenu()
+NSApplication.shared.mainMenu = menu
+NSApplication.shared.delegate = appDelegate
 _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
