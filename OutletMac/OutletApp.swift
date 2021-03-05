@@ -35,22 +35,9 @@ class MockApp: OutletApp {
   }
 }
 
-
-class WindowDelegate: NSObject, NSWindowDelegate {
-
-    func windowDidResize(_ notification: Notification) {
-        NSLog("windowDidResize")
-    }
-
-    func windowWillClose(_ notification: Notification) {
-        NSLog("windowWillClose")
-    }
-}
-
-class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
+class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   var preferencesWindow: NSWindow!
   var window: NSWindow!
-  let windowDelegate = WindowDelegate()
 
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
@@ -151,7 +138,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 //    window.setContentSize(contentSize)
 //    window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
 //    window.level = .floating
-    window.delegate = windowDelegate
+    window.delegate = self
     window.title = "TestView"
 
     let contentView = ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
@@ -163,6 +150,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     func windowWillClose(_ notification: Notification) {
       NSApplication.shared.terminate(0)
     }
+  }
+
+  @objc func windowDidResize(_ notification: Notification) {
+    NSLog("WINDOW DID RESIZE !!!!!!!!!!!!!!!!!")
+  }
+
+  @objc func windowWillClose(_ notification: Notification) {
+    NSLog("windowWillClose ..................................................")
   }
 
   @objc func openPreferencesWindow() {
