@@ -5,7 +5,7 @@
 //  Created by Toph Allen on 4/13/20.
 //  Copyright © 2020 Toph Allen. All rights reserved.
 //
-
+import AppKit
 import Cocoa
 import SwiftUI
 
@@ -36,36 +36,8 @@ class MockApp: OutletApp {
 }
 
 
-class AppDelegate: NSObject, NSApplicationDelegate {
-  var preferencesWindow: NSWindow!
-  func applicationDidFinishLaunching(_ notification: Notification) {
-    NSLog("START app")
-  }
-
-  func applicationWillTerminate(_ notification: Notification) {
-    NSLog("applicationWillTerminate")
-  }
-
-  @objc func openPreferencesWindow() {
-    if nil == preferencesWindow {      // create once !!
-      let preferencesView = PrefsView()
-      // Create the preferences window and set content
-      preferencesWindow = NSWindow(
-        contentRect: NSRect(x: 20, y: 20, width: 480, height: 300),
-        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-        backing: .buffered,
-        defer: false)
-      preferencesWindow.center()
-      preferencesWindow.setFrameAutosaveName("Preferences")
-      preferencesWindow.isReleasedWhenClosed = false
-      preferencesWindow.contentView = NSHostingView(rootView: preferencesView)
-    }
-    preferencesWindow.makeKeyAndOrderFront(nil)
-  }
-
-}
-
 class WindowDelegate: NSObject, NSWindowDelegate {
+
     func windowDidResize(_ notification: Notification) {
         NSLog("windowDidResize")
     }
@@ -75,24 +47,33 @@ class WindowDelegate: NSObject, NSWindowDelegate {
     }
 }
 
-@main
-struct OutletMacApp: App, OutletApp {
+class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
+  var preferencesWindow: NSWindow!
+  var window: NSWindow!
+  let windowDelegate = WindowDelegate()
+
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
   // TODO: surely Swift has a better way to init these
   var dispatchListener: DispatchListener? = nil
-  var backend: OutletBackend
+  var _backend: OutletBackend? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
   var taskRunner: TaskRunner = TaskRunner()
 
-  @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+  var backend: OutletBackend {
+    get {
+      return self._backend!
+    }
+  }
 
-  init() {
+  func do_init() {
     NSLog("DEBUG OutletMacApp init begin")
+
     do {
-      self.backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+      self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+
       NSLog("INFO  gRPC client connecting")
       try self.backend.start()
       NSLog("INFO  Backend started")
@@ -155,18 +136,50 @@ struct OutletMacApp: App, OutletApp {
       exit(1)
     }
     NSLog("DEBUG OutletMacApp init done")
+
   }
 
-  var body: some Scene {
-    WindowGroup("Outlet") {
-      ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
-        .environmentObject(self.settings)
-        .frame(minWidth: 800,
-               maxWidth: .infinity,
-               minHeight: 400,
-               maxHeight: .infinity,
-               alignment: .topLeading)
+  func applicationDidFinishLaunching(_ notification: Notification) {
+    NSLog("START app")
+    self.do_init()
+
+    window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 1200, height: 800),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+            backing: .buffered, defer: false)
+//    let contentSize = NSSize(width:800, height:600)
+//    window.setContentSize(contentSize)
+//    window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+//    window.level = .floating
+    window.delegate = windowDelegate
+    window.title = "TestView"
+
+    let contentView = ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
+    window.contentView = NSHostingView(rootView: contentView)
+    window.center()
+    window.makeKeyAndOrderFront(nil)
+  }
+  class WindowDelegate: NSObject, NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+      NSApplication.shared.terminate(0)
     }
+  }
+
+  @objc func openPreferencesWindow() {
+    if nil == preferencesWindow {      // create once !!
+      let preferencesView = PrefsView()
+      // Create the preferences window and set content
+      preferencesWindow = NSWindow(
+        contentRect: NSRect(x: 20, y: 20, width: 480, height: 300),
+        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+        backing: .buffered,
+        defer: false)
+      preferencesWindow.center()
+      preferencesWindow.setFrameAutosaveName("Preferences")
+      preferencesWindow.isReleasedWhenClosed = false
+      preferencesWindow.contentView = NSHostingView(rootView: preferencesView)
+    }
+    preferencesWindow.makeKeyAndOrderFront(nil)
   }
 
   // Displays any errors that are reported from the backend via gRPC
@@ -174,14 +187,14 @@ struct OutletMacApp: App, OutletApp {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
     DispatchQueue.main.async {
-      settings.showAlert(title: msg, msg: secondaryMsg)
+      self.settings.showAlert(title: msg, msg: secondaryMsg)
     }
   }
 
   func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
     let isEnabled = try propDict.getBool("is_enabled")
     DispatchQueue.main.async {
-      settings.isPlaying = isEnabled
+      self.settings.isPlaying = isEnabled
     }
   }
 

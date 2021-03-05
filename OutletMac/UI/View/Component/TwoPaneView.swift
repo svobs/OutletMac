@@ -192,7 +192,7 @@ fileprivate struct ButtonBar: View {
 //    }
 //    _ = PrefsView()
 
-    NSApp.sendAction(#selector(AppDelegate.openPreferencesWindow), to: nil, from:nil)
+    NSApp.sendAction(#selector(OutletMacApp.openPreferencesWindow), to: nil, from:nil)
 
     /*
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")

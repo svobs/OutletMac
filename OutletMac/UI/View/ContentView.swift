@@ -11,10 +11,10 @@ import SwiftUI
 
 struct ContentView: View {
   @EnvironmentObject var settings: GlobalSettings
-  @State private var window: NSWindow?  // enclosing window(?)
   let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
+  @State private var window: NSWindow?  // enclosing window(?)
 
   init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
