@@ -47,7 +47,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   var _backend: OutletBackend? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
-  var taskRunner: TaskRunner = TaskRunner()
+  let taskRunner: TaskRunner = TaskRunner()
+  private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
+  private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
   var backend: OutletBackend {
     get {
@@ -55,8 +57,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  func do_init() {
-    NSLog("DEBUG OutletMacApp init begin")
+  func start() {
+    NSLog("DEBUG OutletMacApp start begin")
 
     do {
       self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
@@ -69,18 +71,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       dispatchListener = dispatcher.createListener(winID)
       try dispatchListener!.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
       try dispatchListener!.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
-
-      let xLocConfigPath = "ui_state.\(winID).x"
-      let yLocConfigPath = "ui_state.\(winID).y"
-      let winX : Int = try self.backend.getIntConfig(xLocConfigPath)
-      let winY : Int = try self.backend.getIntConfig(yLocConfigPath)
-
-      let widthConfigPath = "ui_state.\(winID).width"
-      let heightConfigPath = "ui_state.\(winID).height"
-      let winWidth : Int = try backend.getIntConfig(widthConfigPath)
-      let winHeight : Int = try backend.getIntConfig(heightConfigPath)
-
-      NSLog("DEBUG WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -100,65 +90,139 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
 
-//      // Create the window and set the content view.
-//      window = NSWindow(
-//        contentRect: NSRect(x: winX, y: winY, width: winWidth, height: winHeight),
-//        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-//        backing: .buffered, defer: false)
-//      window.center()
-//      window.title = "OutletMac"
-//      window.setFrameAutosaveName("OutletMac")
-//      window.contentView = NSHostingView(rootView: contentView)
-//      window.makeKeyAndOrderFront(nil)
-
-//      NSLog("Sleeping 3...")
-//      sleep(3)
-//      NSLog("Quitting")
-//      exit(0)
-
+      NSLog("DEBUG OutletMacApp start done")
     } catch {
-      NSLog("FATAL ERROR in main(): \(error)")
+      NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
       NSLog("DEBUG Sleeping 1s to let things settle...")
       sleep(1)
       exit(1)
     }
-    NSLog("DEBUG OutletMacApp init done")
-
   }
 
-  func applicationDidFinishLaunching(_ notification: Notification) {
-    NSLog("START app")
-    self.do_init()
+  private func loadWindowContentRectFromConfig() throws -> NSRect {
+    let xLocConfigPath = "ui_state.\(winID).x"
+    let yLocConfigPath = "ui_state.\(winID).y"
+    let widthConfigPath = "ui_state.\(winID).width"
+    let heightConfigPath = "ui_state.\(winID).height"
+    let winX : Int = try self.backend.getIntConfig(xLocConfigPath)
+    let winY : Int = try self.backend.getIntConfig(yLocConfigPath)
 
+    let winWidth : Int = try backend.getIntConfig(widthConfigPath)
+    let winHeight : Int = try backend.getIntConfig(heightConfigPath)
+
+    NSLog("DEBUG WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
+
+    return NSRect(x: winX, y: winY, width: winWidth, height: winHeight)
+  }
+
+  private func createWindow() {
+    // FIXME
+    do {
+      self.contentRect = try self.loadWindowContentRectFromConfig()
+    } catch {
+      // recoverable error: just use defaults
+      NSLog("ERROR Failed to load contentRect from config: \(error)")
+    }
     window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 1200, height: 800),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-//    let contentSize = NSSize(width:800, height:600)
-//    window.setContentSize(contentSize)
-//    window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
+      contentRect: self.contentRect,
+      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+      backing: .buffered, defer: false)
 //    window.level = .floating
+    settings.mainWindowHeight = self.contentRect.height
     window.delegate = self
-    window.title = "TestView"
-
-    let contentView = ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
-    window.contentView = NSHostingView(rootView: contentView)
+    window.title = "OutletMac"
+    window.setFrameAutosaveName("OutletMac")
     window.center()
     window.makeKeyAndOrderFront(nil)
+    let contentView = ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
+    window.contentView = NSHostingView(rootView: contentView)
   }
-  class WindowDelegate: NSObject, NSWindowDelegate {
-    func windowWillClose(_ notification: Notification) {
-      NSApplication.shared.terminate(0)
+
+  private func reportWinCoords() {
+    let rect = self.contentRect
+    NSLog("DEBUG [\(self.winID)] Firing timer to report window size: \(rect)")
+
+    var configDict = [String: String]()
+    configDict["ui_state.\(winID).x"] = String(Int(rect.minX))
+    configDict["ui_state.\(winID).y"] = String(Int(rect.minY))
+    configDict["ui_state.\(winID).width"] = String(Int(rect.width))
+    configDict["ui_state.\(winID).height"] = String(Int(rect.height))
+
+    do {
+      try self.backend.putConfigList(configDict)
+    } catch {
+      NSLog("ERROR [\(self.winID)] Failed to report window size: \(error)")
+      return
     }
   }
 
+  // NSApplicationDelegate methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  func applicationDidFinishLaunching(_ notification: Notification) {
+    self.start()
+    self.createWindow()
+  }
+
+  // NSWindowDelegate methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
   @objc func windowDidResize(_ notification: Notification) {
-    NSLog("WINDOW DID RESIZE !!!!!!!!!!!!!!!!!")
+//    NSLog("DEBUG Main win resized! \(self.window?.frame.size as Any)")
+    if let winFrame: CGRect = self.window?.frame {
+      self.settings.mainWindowHeight = winFrame.size.height
+      self.contentRect = winFrame
+      self.winCoordsTimer.reschedule()
+    }
+  }
+
+  @objc func windowDidMove(_ notification: Notification) {
+//    NSLog("DEBUG Main win moved! \(self.window?.frame.size as Any)")
+    if let winFrame: CGRect = self.window?.frame {
+      self.settings.mainWindowHeight = winFrame.size.height
+      self.contentRect = winFrame
+      self.winCoordsTimer.reschedule()
+    }
   }
 
   @objc func windowWillClose(_ notification: Notification) {
-    NSLog("windowWillClose ..................................................")
+    NSLog("DEBUG User closed main window: closing app")
+    // Close the app when window is closed, Windoze-style
+    NSApplication.shared.terminate(0)
   }
+
+  // Convenience methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  public func execAsync(_ workItem: @escaping NoArgVoidFunc) {
+    self.taskRunner.execAsync(workItem)
+  }
+
+  public func execSync(_ workItem: @escaping NoArgVoidFunc) {
+    self.taskRunner.execSync(workItem)
+  }
+
+  // SignalDispatcher callbacks
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  // Displays any errors that are reported from the backend via gRPC
+  private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
+    let msg = try propDict.getString("msg")
+    let secondaryMsg = try propDict.getString("secondary_msg")
+    DispatchQueue.main.async {
+      self.settings.showAlert(title: msg, msg: secondaryMsg)
+    }
+  }
+
+  private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
+    let isEnabled = try propDict.getBool("is_enabled")
+    DispatchQueue.main.async {
+      self.settings.isPlaying = isEnabled
+    }
+  }
+
+  // Etc
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   @objc func openPreferencesWindow() {
     if nil == preferencesWindow {      // create once !!
@@ -177,27 +241,4 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     preferencesWindow.makeKeyAndOrderFront(nil)
   }
 
-  // Displays any errors that are reported from the backend via gRPC
-  func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
-    let msg = try propDict.getString("msg")
-    let secondaryMsg = try propDict.getString("secondary_msg")
-    DispatchQueue.main.async {
-      self.settings.showAlert(title: msg, msg: secondaryMsg)
-    }
-  }
-
-  func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
-    let isEnabled = try propDict.getBool("is_enabled")
-    DispatchQueue.main.async {
-      self.settings.isPlaying = isEnabled
-    }
-  }
-
-  func execAsync(_ workItem: @escaping NoArgVoidFunc) {
-    self.taskRunner.execAsync(workItem)
-  }
-
-  func execSync(_ workItem: @escaping NoArgVoidFunc) {
-    self.taskRunner.execSync(workItem)
-  }
 }

@@ -12,7 +12,6 @@ import SwiftUI
  */
 class GlobalSettings: ObservableObject {
   @Published var isPlaying = false
-  var window: NSWindow? // Will be nil in SwiftUI previewers
 
   // Alert stuff:
   @Published var showingAlert = false
@@ -20,11 +19,7 @@ class GlobalSettings: ObservableObject {
   @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
   @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
-  func setWindow(_ window: NSWindow?) -> GlobalSettings {
-    self.window = window
-    NSLog("Window is: \(window!.frame)")
-    return self
-  }
+  @Published var mainWindowHeight: CGFloat = 0
 
   /**
    This method will cause an alert to be displayed in the ContentView.
