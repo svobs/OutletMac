@@ -125,6 +125,36 @@ struct PlayPauseToggleButton: View {
   }
 }
 
+// TODO: from https://troz.net/post/2019/swiftui-for-mac-2/
+struct PrefsView: View {
+  @State var prefsWindowDelegate = PrefsWindowDelegate()
+
+  var body: some View {
+    Text("Hello, Prefs!")
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+
+  var window: NSWindow!
+  init() {
+    window = NSWindow()
+    window.title = "Preferences"
+    // note: x & y are from lower-left corner
+    window.setFrame(NSRect(x: 200, y: 200, width: 400, height: 200), display: true)
+    window.contentView = NSHostingView(rootView: self)
+    window.delegate = prefsWindowDelegate
+    prefsWindowDelegate.windowIsOpen = true
+    window.makeKeyAndOrderFront(nil)
+  }
+
+  class PrefsWindowDelegate: NSObject, NSWindowDelegate {
+    var windowIsOpen = false
+
+    func windowWillClose(_ notification: Notification) {
+      windowIsOpen = false
+    }
+  }
+}
+
 /**
  STRUCT ButtonBar
  */
@@ -132,6 +162,8 @@ fileprivate struct ButtonBar: View {
   @EnvironmentObject var settings: GlobalSettings
   let conLeft: TreeControllable
   let conRight: TreeControllable
+
+  var prefsView: PrefsView?
 
   init(conLeft: TreeControllable, conRight: TreeControllable) {
     self.conLeft = conLeft
@@ -153,6 +185,14 @@ fileprivate struct ButtonBar: View {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func onDiffButtonClicked() {
+//    if let prefsView = prefsView, prefsView.prefsWindowDelegate.windowIsOpen {
+//      prefsView.window.makeKeyAndOrderFront(self)
+//    } else {
+//      prefsView = PrefsView()
+//    }
+    _ = PrefsView()
+
+    /*
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
@@ -164,7 +204,7 @@ fileprivate struct ButtonBar: View {
       // We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
     } catch {
       NSLog("ERROR Failed to start tree diff: \(error)")
-    }
+    }*/
   }
 
   func onDownloadFromGDriveButtonClicked() {
