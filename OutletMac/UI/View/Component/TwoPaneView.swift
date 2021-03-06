@@ -27,6 +27,7 @@ struct TodoPlaceholder: View {
 
 struct LegacyOutlineViewWrapper: View {
   let con: TreeControllable
+  @EnvironmentObject var settings: GlobalSettings
 
   init(controller: TreeControllable) {
     self.con = controller
@@ -38,12 +39,14 @@ struct LegacyOutlineViewWrapper: View {
         .padding(.top)
         .frame(minWidth: 200,
                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-               minHeight: 400, // FIXME: height should not be fixed at this value
+               minHeight: 600, // FIXME: height should not be fixed at this value
+//               minHeight: settings.mainWindowHeight  // this doesn't work either: inital value gets screwed up
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
-  //      .onAppear(perform: retrievePlayers)
-      Spacer()
+//      Spacer()
     }
+    .frame(alignment: .topLeading)
+//    .background(Color.black) // TODO
   }
 }
 
@@ -92,10 +95,10 @@ struct TreePanel {
  */
 struct PlayPauseToggleButton: View {
   @Binding var isPlaying: Bool
- let dispatcher: SignalDispatcher
- let width: CGFloat = DEFAULT_TERNARY_BTN_WIDTH
- let height: CGFloat = DEFAULT_TERNARY_BTN_HEIGHT
- private var onClickAction: NoArgVoidFunc? = nil
+  let dispatcher: SignalDispatcher
+  let width: CGFloat = DEFAULT_TERNARY_BTN_WIDTH
+  let height: CGFloat = DEFAULT_TERNARY_BTN_HEIGHT
+  private var onClickAction: NoArgVoidFunc? = nil
 
   init(_ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
    self._isPlaying = isPlaying
@@ -219,10 +222,13 @@ fileprivate struct ButtonBar: View {
  STRUCT TwoPaneView
  */
 struct TwoPaneView: View {
+  @EnvironmentObject var settings: GlobalSettings
+
   private var columns: [GridItem] = [
     // these specify spacing between columns
-    GridItem(.flexible(minimum: 300, maximum: .infinity), spacing: H_PAD),
-    GridItem(.flexible(minimum: 300, maximum: .infinity), spacing: H_PAD),
+    // note: min width must be set here, so that toolbars don't get squished
+    GridItem(.flexible(minimum: 400, maximum: .infinity), spacing: H_PAD),
+    GridItem(.flexible(minimum: 400, maximum: .infinity), spacing: H_PAD),
   ]
 
   let app: OutletApp
@@ -245,9 +251,11 @@ struct TwoPaneView: View {
       alignment: .leading,
       spacing: V_PAD
     ) {
+      // Row0: Root Path
       self.leftPanel.rootPathPanel
       self.rightPanel.rootPathPanel
 
+      // Row1:
       self.leftPanel.filterPanel
       self.rightPanel.filterPanel
 
@@ -262,17 +270,15 @@ struct TwoPaneView: View {
       ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
         .frame(alignment: .bottomLeading)
 
-      HStack {
-        Spacer()
-        TodoPlaceholder("<PROGRESS BAR>")
-          .frame(alignment: .bottomTrailing)
+      GeometryReader { gridGeometry in
+        HStack {
+          Spacer()
+          TodoPlaceholder("TotalHeight = \(gridGeometry.size.height)")
+            .frame(alignment: .bottomTrailing)
+        }
       }
-    }
-    .frame(minWidth: 600,
-           maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-           minHeight: 400,
-           maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-           alignment: .topLeading)
+    } // end of LazyVGrid
+//    .background(Color.red)
   }
 }
 

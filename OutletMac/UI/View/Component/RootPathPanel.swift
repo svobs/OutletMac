@@ -107,6 +107,7 @@ struct RootPathPanel: View {
     .frame(minWidth: 300,
            maxWidth: .infinity,
            alignment: .topLeading)
+//    .background(Color.blue)  // TODO
   }
 
 }

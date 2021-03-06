@@ -86,11 +86,12 @@ struct FilterPanel: View {
       // Is Shared
       TernaryToggleButton($swiftFilterState.isShared, imageName: "Shared")
     }
-    .padding(.bottom, V_PAD)
-    .padding(.top, V_PAD)
+    .padding(.bottom, 0)
+    .padding(.top, 0)
     .frame(minWidth: 200,
            maxWidth: .infinity,
            alignment: .topLeading)
+//    .background(Color.purple)  // TODO
   }
 }
 

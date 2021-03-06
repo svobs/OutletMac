@@ -179,16 +179,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     scrollView.backgroundColor = NSColor.clear
     scrollView.drawsBackground = false
-    scrollView.hasHorizontalScroller = false
+    scrollView.hasHorizontalScroller = true
     scrollView.hasVerticalScroller = true
     scrollView.horizontalPageScroll = 10
     scrollView.verticalLineScroll = 19
     scrollView.verticalPageScroll = 10
+    scrollView.automaticallyAdjustsContentInsets = true
 
     self.view.addSubview(scrollView)
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 23))
+    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0))
     self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0))
     self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0))
 
