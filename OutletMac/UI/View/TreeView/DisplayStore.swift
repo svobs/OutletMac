@@ -72,4 +72,8 @@ class DisplayStore {
     }
     return node
   }
+
+  func isDir(_ uid: UID) -> Bool {
+    return self.getNode(uid)?.isDir ?? false
+  }
 }

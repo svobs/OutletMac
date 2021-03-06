@@ -160,7 +160,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       backing: .buffered, defer: false)
 //    window.level = .floating
     settings.mainWindowHeight = self.contentRect.height
-    NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
+//    NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
     window.delegate = self
     window.title = "OutletMac"
     window.setFrameAutosaveName("OutletMac")
@@ -200,20 +200,20 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   @objc func windowDidResize(_ notification: Notification) {
-    NSLog("DEBUG Main win resized! \(self.window?.frame.size as Any)")
+//    NSLog("DEBUG Main win resized! \(self.window?.frame.size as Any)")
     if let winFrame: CGRect = self.window?.frame {
       self.settings.mainWindowHeight = winFrame.size.height
-      NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
+//      NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
       self.contentRect = winFrame
       self.winCoordsTimer.reschedule()
     }
   }
 
   @objc func windowDidMove(_ notification: Notification) {
-    NSLog("DEBUG Main win moved! \(self.window?.frame.origin as Any)")
+//    NSLog("DEBUG Main win moved! \(self.window?.frame.origin as Any)")
     if let winFrame: CGRect = self.window?.frame {
       self.settings.mainWindowHeight = winFrame.size.height
-      NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
+//      NSLog("DEBUG Window height = \(settings.mainWindowHeight)")
       self.contentRect = winFrame
       self.winCoordsTimer.reschedule()
     }

@@ -87,19 +87,28 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.removeItems(at: selectedRowIndexes, inParent: nil, withAnimation: .slideLeft)
 
     // TODO: see also: moveItemAtIndex(_:, inParent:, toIndex:, inParent:)
-
-
   }
 
-  // TODO: how to hook this up?
-  func doubleClickedItem(_ sender: NSOutlineView) {
+
+  @objc func doubleClickedItem(_ sender: NSOutlineView) {
     let item = sender.item(atRow: sender.clickedRow)
 
     if item is UID {
-      if sender.isItemExpanded(item) {
-        sender.collapseItem(item)
+
+      if displayStore.isDir(itemToUID(item)) {
+        // Is dir -> toggle expand/collapse
+
+        if outlineView.isItemExpanded(item) {
+          NSLog("DEBUG [\(treeID)] User double-clicked: collapsing item: \(item!)")
+          outlineView.animator().collapseItem(item, collapseChildren: true)
+        } else {
+          NSLog("DEBUG [\(treeID)] User double-clicked: expanding item: \(item!)")
+          outlineView.animator().expandItem(item)
+        }
+
       } else {
-        sender.expandItem(item)
+        // TODO: open file
+        NSLog("DEBUG [\(treeID)] TODO: write code to open file")
       }
     }
   }
@@ -172,6 +181,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.frame = scrollView.bounds
     outlineView.delegate = self
     outlineView.dataSource = self
+
+    // Hook up double-click handler
+    outlineView.doubleAction = #selector(doubleClickedItem)
   }
 
   private func addScrollView() -> NSScrollView {
@@ -239,7 +251,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    Tell whether the row is expandable
    */
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    return displayStore.getNode(itemToUID(item))?.isDir ?? false
+    return displayStore.isDir(itemToUID(item))
   }
 
 
@@ -412,10 +424,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     } catch {
       NSLog("ERROR Failed to report collapsed node to BE: \(error)")
     }
-
-    self.outlineView.reloadItem(parentUID, reloadChildren: true)
-//    let rowIndexes = IndexSet.init(integersIn: 0..<childNodeList.count)
-//    outlineView.removeItems(at: rowIndexes, inParent: parentUID, withAnimation: .slideLeft)
 
   }
 
