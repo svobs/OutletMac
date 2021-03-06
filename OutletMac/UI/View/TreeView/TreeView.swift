@@ -35,7 +35,7 @@ struct TreeView: NSViewControllerRepresentable {
  See: https://www.appcoda.com/macos-programming-nsoutlineview/
  See: https://stackoverflow.com/questions/45373039/how-to-program-a-nsoutlineview
  */
-final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource {
+final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, NSMenuDelegate {
   // Cannot override init(), but this must be set manually before loadView() is called
   private var _lazyCon: TreeControllable? = nil
   var con: TreeControllable {
@@ -184,6 +184,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     // Hook up double-click handler
     outlineView.doubleAction = #selector(doubleClickedItem)
+
+    outlineView.menu = self.initContextMenu()
   }
 
   private func addScrollView() -> NSScrollView {
@@ -253,8 +255,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
     return displayStore.isDir(itemToUID(item))
   }
-
-
 
   private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
     let textField = NSTextField()
@@ -343,18 +343,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    SELECTION CHANGED
   */
   func outlineViewSelectionDidChange(_ notification: Notification) {
-    guard let outlineView = notification.object as? NSOutlineView else {
-      return
-    }
-
-    var uidSet = Set<UID>()
-    for selectedRow in outlineView.selectedRowIndexes {
-      if let item = outlineView.item(atRow: selectedRow) {
-        if let uid = item as? UID {
-          uidSet.insert(uid)
-        }
-      }
-    }
+    let uidSet: Set<UID> = self.getSelectedUIDs()
     NSLog("DEBUG [\(treeID)] User selected nodes: \(uidSet)")
 
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
@@ -365,6 +354,18 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("Failed to report node selection: \(error)")
       }
     }
+  }
+
+  func getSelectedUIDs() -> Set<UID> {
+    var uidSet = Set<UID>()
+    for selectedRow in outlineView.selectedRowIndexes {
+      if let item = outlineView.item(atRow: selectedRow) {
+        if let uid = item as? UID {
+          uidSet.insert(uid)
+        }
+      }
+    }
+    return uidSet
   }
 
   private func getKey(_ notification: Notification) -> UID? {
@@ -424,7 +425,77 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     } catch {
       NSLog("ERROR Failed to report collapsed node to BE: \(error)")
     }
+  }
 
+  // Context Menu
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  private func initContextMenu() -> NSMenu {
+    // The key idea here is that we will use the same menu for all right clicks, but we will rebuild it
+    // via the menuNeedsUpdate() method each time it is displayed.
+    let rightClickMenu = NSMenu()
+    rightClickMenu.delegate = self
+    return rightClickMenu
+  }
+
+  func menuNeedsUpdate(_ menu: NSMenu) {
+    guard outlineView.clickedRow >= 0 else {
+      return
+    }
+    guard let item = outlineView.item(atRow: outlineView.clickedRow) else {
+      return
+    }
+    guard let clickedUID = item as? UID else {
+      return
+    }
+
+    let selectedUIDs: Set<UID> = self.getSelectedUIDs()
+    let clickedOnSelection = selectedUIDs.contains(clickedUID)
+    NSLog("DEBUG User opened context menu on: \(clickedUID); isOnSelection: \(clickedOnSelection)")
+
+    if clickedOnSelection {
+      // User right-clicked on selection -> apply context menu to all selected items:
+      self.buildContextMenuMultiple(menu, selectedUIDs)
+    } else {
+      // Singular item, or singular selection (equivalent logic)
+      self.buildContextMenuSingle(menu, clickedUID)
+    }
+  }
+
+  func buildContextMenuMultiple(_ menu: NSMenu, _ targetUIDSet: Set<UID>) {
+    // TODO
+  }
+
+  func buildContextMenuSingle(_ menu: NSMenu, _ targetUID: UID) {
+    // TODO
+
+
+    menu.removeAllItems()
+
+    menu.addItem(NSMenuItem(title: "Edit", action: #selector(tableViewEditItemClicked(_:)), keyEquivalent: ""))
+    menu.addItem(NSMenuItem(title: "Delete", action: #selector(tableViewDeleteItemClicked(_:)), keyEquivalent: ""))
+  }
+
+  @objc private func tableViewEditItemClicked(_ sender: AnyObject) {
+    guard outlineView.clickedRow >= 0 else { return }
+
+      if let item = outlineView.item(atRow: outlineView.clickedRow) {
+        if let uid = item as? UID {
+          // TODO: hook this up to backend
+          NSLog("XXXXXX \(uid)")
+        }
+      }
+  }
+
+  @objc private func tableViewDeleteItemClicked(_ sender: AnyObject) {
+    guard outlineView.clickedRow >= 0 else { return }
+
+      if let item = outlineView.item(atRow: outlineView.clickedRow) {
+        if let uid = item as? UID {
+          // TODO: hook this up to backend
+          NSLog("XXXXXX \(uid)")
+        }
+      }
   }
 
 }
