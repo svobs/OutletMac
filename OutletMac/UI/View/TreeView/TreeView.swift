@@ -141,7 +141,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
     nodeColumn.title = "Name"
     nodeColumn.width = 300
-    nodeColumn.minWidth = 100
+    nodeColumn.minWidth = 150
     nodeColumn.isEditable = false
     outlineView.addTableColumn(nodeColumn)
 

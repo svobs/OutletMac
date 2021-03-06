@@ -162,14 +162,16 @@ class GDriveFolder: GDriveNode {
       return .ICON_DIR_TRASHED
     }
   }
-  
+
+  override var sizeBytes: UInt64? {
+    get {
+      return self._dirStats?.sizeBytes
+    }
+  }
+
   override var etc: String {
     get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.etc
-      }
+      return self._dirStats?.etc ?? ""
     }
   }
   
