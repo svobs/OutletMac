@@ -423,7 +423,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     do {
       try self.con.backend.removeExpandedRow(parentUID, self.treeID)
     } catch {
-      NSLog("ERROR Failed to report collapsed node to BE: \(error)")
+      NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
     }
   }
 
@@ -451,7 +451,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let selectedUIDs: Set<UID> = self.getSelectedUIDs()
     let clickedOnSelection = selectedUIDs.contains(clickedUID)
-    NSLog("DEBUG User opened context menu on: \(clickedUID); isOnSelection: \(clickedOnSelection)")
+    NSLog("DEBUG [\(treeID)] User opened context menu on: \(clickedUID); isOnSelection: \(clickedOnSelection)")
 
     if clickedOnSelection {
       // User right-clicked on selection -> apply context menu to all selected items:

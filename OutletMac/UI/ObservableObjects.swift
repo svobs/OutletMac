@@ -155,3 +155,63 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
 }
 
 typealias FilterStateCallback = (SwiftFilterState) -> Void
+
+
+struct MyHeightPreferenceData: Equatable {
+  var col0: [String: CGFloat] = [:]
+  var col1: [String: CGFloat] = [:]
+
+  init(name: String, col: UInt, height: CGFloat) {
+    if col == 0 {
+      col0[name] = height
+    } else if col == 1 {
+      col1[name] = height
+    }
+  }
+
+  init() {
+  }
+}
+
+
+struct MyHeightPreferenceKey: PreferenceKey {
+  /**
+   Value: is a typealias that indicates what type of information we want to expose through the preference.
+   In this example you see that we are using an array of MyHeightPreferenceData. I will get to that in a minute.
+   */
+  typealias Value = MyHeightPreferenceData
+
+  /**
+   When a preference key value has not been set explicitly, SwiftUI will use this defaultValue.
+   */
+  static var defaultValue: MyHeightPreferenceData = MyHeightPreferenceData()
+
+  /**
+   reduce: This is a static function that SwiftUI will use to merge all the key values found in the view tree. Normally, you use it to accumulate all the values it receives, but you can do whatever you want. In our case, when SwiftUI goes through the tree, it will collect the preference key values and store them together in a single array, which we will be able to access later. You should know that Values are supplied to the reduce function in view-tree order. We’ll come back to that in another example, as the order is not relevant here.
+   */
+  static func reduce(value: inout MyHeightPreferenceData, nextValue: () -> MyHeightPreferenceData) {
+    let next = nextValue()
+    for (name, size) in next.col0 {
+      value.col0[name] = size
+    }
+    for (name, size) in next.col1 {
+      value.col1[name] = size
+    }
+//    print("REDUCE: \(value.col0), \(value.col1)")
+  }
+}
+
+// TODO: this doesn't work
+struct SizeModifier: ViewModifier {
+  let name: String
+  let col: UInt
+  private var sizeView: some View {
+    GeometryReader { geometry in
+      Color.clear.preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: name, col: col, height: geometry.size.height))
+    }
+  }
+
+  func body(content: Content) -> some View {
+    content.background(sizeView)
+  }
+}

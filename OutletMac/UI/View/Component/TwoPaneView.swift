@@ -249,35 +249,43 @@ struct TwoPaneView: View {
     LazyVGrid(
       columns: columns,
       alignment: .leading,
-      spacing: V_PAD
+      spacing: 0  // no vertical spacing between cells
     ) {
       // Row0: Root Path
       self.leftPanel.rootPathPanel
       self.rightPanel.rootPathPanel
 
-      // Row1:
+      // Row1: filter panel
       self.leftPanel.filterPanel
       self.rightPanel.filterPanel
 
+      // Row2: Tree view
       self.leftPanel.treeView
       self.rightPanel.treeView
 
-
+      // Row3: Status msg
       self.leftPanel.status_panel
       self.rightPanel.status_panel
 
-      // Button Bar
+      // Row4: Button bar & progress bar
       ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
         .frame(alignment: .bottomLeading)
+//        .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bottom", col: 0, height: geometry.size.height))
 
-      GeometryReader { gridGeometry in
+      GeometryReader { geometry in
         HStack {
           Spacer()
-          TodoPlaceholder("TotalHeight = \(gridGeometry.size.height)")
+          TodoPlaceholder("TotalHeight = \(geometry.size.height)")
             .frame(alignment: .bottomTrailing)
         }
+        .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bottom", col: 1, height: geometry.size.height))
+//        .modifier(SizeModifier(name: "Bottom", col: 1))
       }
     } // end of LazyVGrid
+    .onPreferenceChange(MyHeightPreferenceKey.self) { key in
+                // you have to set title value in the navigation bar here
+//      NSLog("SIZES: \(key.col0), \(key.col1)")
+            }
 //    .background(Color.red)
   }
 }
