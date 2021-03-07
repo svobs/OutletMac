@@ -134,6 +134,7 @@ enum IconId: UInt32 {
 // --- FE + BE SHARED ---
 
 let ROOT_PATH = "/"
+let GDRIVE_PATH_PREFIX = "gdrive:/"
 
 let LOOPBACK_ADDRESS = "127.0.0.1"
 

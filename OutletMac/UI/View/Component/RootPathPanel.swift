@@ -85,7 +85,7 @@ struct RootPathPanel: View {
               .multilineTextAlignment(.leading)
               .font(Font.system(.title))
           } else {
-            Text(self.swiftTreeState.rootPath)
+            Text(self.swiftTreeState.rootPathNonEdit)
               .multilineTextAlignment(.leading)
               .font(Font.system(.title))
               .foregroundColor(self.swiftTreeState.isRootExists ? .primary : .red)

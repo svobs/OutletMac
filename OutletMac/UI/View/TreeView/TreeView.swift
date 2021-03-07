@@ -4,9 +4,36 @@ import SwiftUI
 import Foundation
 
 /**
- TreeView: SwiftUI wrapper for TreeView
+ TreeView: extra layer of TreeView to specify layout
  */
-struct TreeView: NSViewControllerRepresentable {
+struct TreeView: View {
+  let con: TreeControllable
+  @EnvironmentObject var settings: GlobalSettings
+
+  init(controller: TreeControllable) {
+    self.con = controller
+  }
+
+  var body: some View {
+    HStack {
+      TreeViewRepresentable(controller: self.con)
+        .padding(.top)
+        .frame(minWidth: 200,
+               maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+               // A redraw of this view should be triggered when either of these values are changed:
+               minHeight: settings.mainWindowHeight - settings.nonTreeViewHeight,
+               maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
+               alignment: .topLeading)
+    }
+    .frame(alignment: .topLeading)
+//    .background(Color.black) // TODO
+  }
+}
+
+/**
+ TreeViewRepresentable: SwiftUI wrapper for NSOutlineView
+ */
+struct TreeViewRepresentable: NSViewControllerRepresentable {
   let con: TreeControllable
 
   init(controller: TreeControllable) {

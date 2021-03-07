@@ -19,6 +19,7 @@ class GlobalSettings: ObservableObject {
   @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
   @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
+  // These two values are calculated and stored so that the proper height of the OutlineView can be derived
   @Published var mainWindowHeight: CGFloat = 0
   @Published var nonTreeViewHeight: CGFloat = 0
 
@@ -46,20 +47,30 @@ class SwiftTreeState: ObservableObject {
   @Published var isEditingRoot: Bool
   @Published var isManualLoadNeeded: Bool
   @Published var offendingPath: String?
+  @Published var rootPathNonEdit: String = ""
   @Published var rootPath: String = ""
   @Published var statusBarMsg: String = ""
 
-  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String) {
+  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String) {
     self.isUIEnabled = isUIEnabled
     self.isRootExists = isRootExists
     self.isEditingRoot = isEditingRoot
     self.isManualLoadNeeded = isManualLoadNeeded
     self.offendingPath = offendingPath
     self.rootPath = rootPath
+    self.rootPathNonEdit = rootPathNonEdit
+  }
+
+  static func toHumanEditableRootPath(_ spid: SPID) -> String {
+    if spid.treeType == .GDRIVE {
+      return GDRIVE_PATH_PREFIX + spid.getSinglePath()
+    }
+    return spid.getSinglePath()
   }
 
   func updateFrom(_ newTree: DisplayTree) {
-    self.rootPath = newTree.rootPath
+    self.rootPathNonEdit = newTree.rootPath
+    self.rootPath = SwiftTreeState.toHumanEditableRootPath(newTree.rootSPID)
     self.offendingPath = newTree.state.offendingPath
     self.isRootExists = newTree.rootExists
     self.isEditingRoot = false
@@ -68,7 +79,7 @@ class SwiftTreeState: ObservableObject {
 
   static func from(_ tree: DisplayTree) -> SwiftTreeState {
     return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
-                          offendingPath: tree.state.offendingPath, rootPath: tree.rootPath)
+                          offendingPath: tree.state.offendingPath, rootPath: SwiftTreeState.toHumanEditableRootPath(tree.rootSPID), rootPathNonEdit: tree.rootPath)
   }
 }
 

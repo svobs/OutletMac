@@ -33,14 +33,14 @@ class NodeIdentifierFactory {
   static func getRootConstantLocalDiskSPID() -> SinglePathNodeIdentifier {
     return SinglePathNodeIdentifier(LOCAL_ROOT_UID, ROOT_PATH, .LOCAL_DISK)
   }
-  
+
   static func forAllValues(_ uid: UID, _ treeType: TreeType, _ pathList: [String], mustBeSinglePath: Bool) throws -> NodeIdentifier {
     if treeType == .LOCAL_DISK {
       // LocalNodeIdentifier is always a SPID
       return LocalNodeIdentifier(uid, pathList[0])
     } else if mustBeSinglePath {
       if pathList.count <= 1 {
-        return SinglePathNodeIdentifier(uid, pathList[0], .MIXED)
+        return SinglePathNodeIdentifier(uid, pathList[0], treeType)
       } else {
         throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): mustBeSinglePath=true but paths count is: \(pathList.count)")
       }

@@ -29,6 +29,7 @@ struct ContentView: View {
         app.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
       }
 
+    // Here, I use GeometryReader to get the full canvas size (sans window decoration)
     GeometryReader { geo in
       VStack {
       TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
@@ -41,7 +42,7 @@ struct ContentView: View {
         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       }
       .onPreferenceChange(ContentAreaPrefKey.self) { key in
-//        NSLog("HEIGHT OF CONTENT AREA: \(key.height)")
+//        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
         self.settings.mainWindowHeight = key.height
       }
     }

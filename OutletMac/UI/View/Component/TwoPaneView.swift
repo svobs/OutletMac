@@ -25,26 +25,24 @@ struct TodoPlaceholder: View {
 
 }
 
-struct LegacyOutlineViewWrapper: View {
+/**
+ STRUCT TreePanel
+
+ Just a container for all the components for a given tree
+ */
+struct TreePanel {
   let con: TreeControllable
-  @EnvironmentObject var settings: GlobalSettings
+  let rootPathPanel: RootPathPanel
+  let filterPanel: FilterPanel
+  let treeView: TreeView
+  let status_panel: StatusPanel
 
   init(controller: TreeControllable) {
     self.con = controller
-  }
-
-  var body: some View {
-    HStack {
-      TreeView(controller: self.con)
-        .padding(.top)
-        .frame(minWidth: 200,
-               maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-               minHeight: settings.mainWindowHeight - settings.nonTreeViewHeight,
-               maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-               alignment: .topLeading)
-    }
-    .frame(alignment: .topLeading)
-//    .background(Color.black) // TODO
+    self.rootPathPanel = RootPathPanel(controller: self.con, canChangeRoot: true)
+    self.filterPanel = FilterPanel(controller: self.con)
+    self.treeView = TreeView(controller: self.con)
+    self.status_panel = StatusPanel(controller: self.con)
   }
 }
 
@@ -66,25 +64,6 @@ struct StatusPanel: View {
       Spacer()
     }
     .padding(.leading, H_PAD)
-  }
-}
-
-/**
- STRUCT TreePanel
- */
-struct TreePanel {
-  let con: TreeControllable
-  let rootPathPanel: RootPathPanel
-  let filterPanel: FilterPanel
-  let treeView: LegacyOutlineViewWrapper
-  let status_panel: StatusPanel
-
-  init(controller: TreeControllable) {
-    self.con = controller
-    self.rootPathPanel = RootPathPanel(controller: self.con, canChangeRoot: true)
-    self.filterPanel = FilterPanel(controller: self.con)
-    self.treeView = LegacyOutlineViewWrapper(controller: self.con)
-    self.status_panel = StatusPanel(controller: self.con)
   }
 }
 
