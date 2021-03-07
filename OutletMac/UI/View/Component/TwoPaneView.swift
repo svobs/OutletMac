@@ -39,11 +39,9 @@ struct LegacyOutlineViewWrapper: View {
         .padding(.top)
         .frame(minWidth: 200,
                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-               minHeight: 600, // FIXME: height should not be fixed at this value
-//               minHeight: settings.mainWindowHeight  // this doesn't work either: inital value gets screwed up
+               minHeight: settings.mainWindowHeight - settings.nonTreeViewHeight,
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
-//      Spacer()
     }
     .frame(alignment: .topLeading)
 //    .background(Color.black) // TODO
@@ -253,11 +251,27 @@ struct TwoPaneView: View {
     ) {
       // Row0: Root Path
       self.leftPanel.rootPathPanel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 0, height: geo.size.height))
+        })
       self.rightPanel.rootPathPanel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 1, height: geo.size.height))
+        })
 
       // Row1: filter panel
       self.leftPanel.filterPanel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
+        })
       self.rightPanel.filterPanel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 1, height: geo.size.height))
+        })
 
       // Row2: Tree view
       self.leftPanel.treeView
@@ -265,28 +279,44 @@ struct TwoPaneView: View {
 
       // Row3: Status msg
       self.leftPanel.status_panel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Status", col: 0, height: geo.size.height))
+        })
       self.rightPanel.status_panel
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Status", col: 1, height: geo.size.height))
+        })
 
       // Row4: Button bar & progress bar
       ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
         .frame(alignment: .bottomLeading)
-//        .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bottom", col: 0, height: geometry.size.height))
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bot", col: 0, height: geo.size.height))
+        })
 
-      GeometryReader { geometry in
         HStack {
           Spacer()
-          TodoPlaceholder("TotalHeight = \(geometry.size.height)")
+          TodoPlaceholder("TODO: progress bar")
             .frame(alignment: .bottomTrailing)
         }
-        .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bottom", col: 1, height: geometry.size.height))
-//        .modifier(SizeModifier(name: "Bottom", col: 1))
-      }
+        .background(GeometryReader { geo in
+          Color.clear
+            .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Bot", col: 1, height: geo.size.height))
+        })
     } // end of LazyVGrid
     .onPreferenceChange(MyHeightPreferenceKey.self) { key in
-                // you have to set title value in the navigation bar here
+      var totalHeight: CGFloat = 0
+      for (name, height0) in key.col0 {
+        let height1 = key.col1[name]!
+        totalHeight += max(height0, height1)
+      }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
-            }
-//    .background(Color.red)
+//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.mainWindowHeight))")
+      self.settings.nonTreeViewHeight = totalHeight
+    }
   }
 }
 

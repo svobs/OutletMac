@@ -29,13 +29,22 @@ struct ContentView: View {
         app.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
       }
 
-    TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-      .contentShape(Rectangle()) // taps should be detected in the whole window
-      .gesture(tapCancelEdit)
-      .alert(isPresented: $settings.showingAlert) {
-        Alert(title: Text(settings.alertTitle), message: Text(settings.alertMsg), dismissButton: .default(Text(settings.dismissButtonText)))
+    GeometryReader { geo in
+      VStack {
+      TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .contentShape(Rectangle()) // taps should be detected in the whole window
+        .gesture(tapCancelEdit)
+        .alert(isPresented: $settings.showingAlert) {
+          Alert(title: Text(settings.alertTitle), message: Text(settings.alertMsg), dismissButton: .default(Text(settings.dismissButtonText)))
+        }
+        .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       }
+      .onPreferenceChange(ContentAreaPrefKey.self) { key in
+//        NSLog("HEIGHT OF CONTENT AREA: \(key.height)")
+        self.settings.mainWindowHeight = key.height
+      }
+    }
   }
 }
 

@@ -20,6 +20,7 @@ class GlobalSettings: ObservableObject {
   @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
   @Published var mainWindowHeight: CGFloat = 0
+  @Published var nonTreeViewHeight: CGFloat = 0
 
   /**
    This method will cause an alert to be displayed in the ContentView.
@@ -197,21 +198,29 @@ struct MyHeightPreferenceKey: PreferenceKey {
     for (name, size) in next.col1 {
       value.col1[name] = size
     }
-//    print("REDUCE: \(value.col0), \(value.col1)")
+//    NSLog("REDUCE: \(value.col0), \(value.col1)")
   }
 }
 
-// TODO: this doesn't work
-struct SizeModifier: ViewModifier {
-  let name: String
-  let col: UInt
-  private var sizeView: some View {
-    GeometryReader { geometry in
-      Color.clear.preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: name, col: col, height: geometry.size.height))
-    }
-  }
 
-  func body(content: Content) -> some View {
-    content.background(sizeView)
+struct ContentAreaPrefData: Equatable {
+  var height: CGFloat
+}
+
+
+struct ContentAreaPrefKey: PreferenceKey {
+  typealias Value = ContentAreaPrefData
+
+  /**
+   When a preference key value has not been set explicitly, SwiftUI will use this defaultValue.
+   */
+  static var defaultValue: ContentAreaPrefData = ContentAreaPrefData(height: 0)
+
+  /**
+   reduce: This is a static function that SwiftUI will use to merge all the key values found in the view tree. Normally, you use it to accumulate all the values it receives, but you can do whatever you want. In our case, when SwiftUI goes through the tree, it will collect the preference key values and store them together in a single array, which we will be able to access later. You should know that Values are supplied to the reduce function in view-tree order. We’ll come back to that in another example, as the order is not relevant here.
+   */
+  static func reduce(value: inout ContentAreaPrefData, nextValue: () -> ContentAreaPrefData) {
+    value = nextValue()
+    NSLog("HEIGHT OF CONTENT AREA: \(value.height)")
   }
 }
