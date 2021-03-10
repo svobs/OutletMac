@@ -8,72 +8,130 @@
 
 import Foundation
 
+//class GUINode {
+//  let guid: GUID
+//  let node: Node
+//
+//  init(_ guid: GUID, _ node: Node) {
+//    self.guid = guid
+//    self.node = node
+//  }
+//}
+
 /**
  I suppose this class a repository for "ModelView" objects in the MVVC design pattern.
  */
 class DisplayStore {
   private var con: TreeControllable
 
-  private var parentChildListDict: [UID: [Node]] = [:]
-  private var treeNodeDict: [UID: Node] = [:]
+  private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
+  private var primaryDict: [GUID: SPIDNodePair] = [:]
+  // TODO: create parallel data structures for DUIDs ("display UIDs") which will always be negative
 
   init(_ controllable: TreeControllable) {
     self.con = controllable
   }
 
-  func repopulateRoot(_ topLevelNodeList: [Node]) {
+  func guidFor(_ sn: SPIDNodePair?) -> GUID {
+    if sn == nil {
+      return NULL_GUID
+    }
+    let guid = self.guidFor(sn!.spid)
+    NSLog("DEBUG [\(self.con.treeID)] GUID \(guid) => \(sn!.spid.uid) \(sn!.spid.getSinglePath())")
+    return guid
+  }
+
+  private func guidFor(_ spid: SPID) -> GUID {
+    return self.guidFor(spid.treeType, singlePath: spid.getSinglePath(), uid: spid.uid)
+  }
+
+  private func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
+    return self.con.app.guidFor(treeType, singlePath: singlePath, uid: uid)
+  }
+
+  /**
+   Derives list of SPIDNodePairs from a list of Nodes and their parent SPID
+  */
+  func convertChildList(_ parentSN: SPIDNodePair, _ childNodeList: [Node]) -> [SPIDNodePair] {
+    var childSNList = [SPIDNodePair]()
+
+    let parentPath: String = parentSN.spid.getSinglePath()
+    for childNode in childNodeList {
+      let singlePath: String = URL(fileURLWithPath: parentPath).appendingPathComponent(childNode.name).path
+      let childSPID = SinglePathNodeIdentifier.from(childNode.nodeIdentifier, singlePath)
+      let childSN: SPIDNodePair = (childSPID, childNode)
+      childSNList.append(childSN)
+    }
+
+    return childSNList
+  }
+
+  func convertSingleNode(_ parentSN: SPIDNodePair?, node: Node) -> SPIDNodePair {
+    let parentPath: String = parentSN == nil ? self.con.tree.rootPath : parentSN!.spid.getSinglePath()
+    let singlePath: String = URL(fileURLWithPath: parentPath).appendingPathComponent(node.name).path
+    let childSPID = SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath)
+    return (childSPID, node)
+  }
+
+  /**
+   Clears all data structures. Populates the data structures with the given SNs, then returns them.
+  */
+  func repopulateRoot(_ topLevelSNList: [SPIDNodePair]) -> Void {
     con.app.execSync {
-      var nodeDict: [UID: Node] = [:]
-      for node in topLevelNodeList {
-        nodeDict[node.uid] = node
+      var nodeDict: [GUID: SPIDNodePair] = [:]
+      for sn in topLevelSNList {
+        nodeDict[self.guidFor(sn)] = sn
       }
 
-      self.treeNodeDict = nodeDict
+      self.primaryDict = nodeDict
       self.parentChildListDict.removeAll()
-      self.parentChildListDict[NULL_UID] = topLevelNodeList
+      self.parentChildListDict[NULL_GUID] = topLevelSNList
     }
   }
 
-  func populateChildList(_ parentUID: UID, _ childList: [Node]) {
+  func populateChildList(_ parentSN: SPIDNodePair?, _ childSNList: [SPIDNodePair]) {
     con.app.execSync {
-      for child in childList {
-        self.treeNodeDict[child.uid] = child
+
+      for childSN in childSNList {
+        self.primaryDict[self.guidFor(childSN)] = childSN
       }
-      self.parentChildListDict[parentUID] = childList
+      // note: top-level's parent is 'nil' in OutlineView, but is NULL_GUID in DisplayStore
+      let parentGUID = parentSN == nil ? NULL_GUID : self.guidFor(parentSN!)
+      self.parentChildListDict[parentGUID] = childSNList
     }
   }
 
-  func getNode(_ uid: UID) -> Node? {
-    var node: Node?
+  func getSN(_ guid: GUID) -> SPIDNodePair? {
+    var sn: SPIDNodePair?
     con.app.execSync {
-      node = self.treeNodeDict[uid] ?? nil
+      sn = self.primaryDict[guid] ?? nil
     }
-    return node
+    return sn
   }
 
-  func getChildList(_ parentUID: UID?) -> [Node] {
-    var nodeList: [Node] = []
+  func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
+    var snList: [SPIDNodePair] = []
     con.app.execSync {
-      nodeList = self.parentChildListDict[parentUID ?? NULL_UID] ?? []
+      snList = self.parentChildListDict[parentGUID ?? NULL_GUID] ?? []
     }
-    return nodeList
+    return snList
   }
 
-  func getChild(_ parentUID: UID?, _ childIndex: Int) -> Node? {
-    var node: Node?
+  func getChild(_ parentGUID: GUID?, _ childIndex: Int) -> SPIDNodePair? {
+    var sn: SPIDNodePair?
     con.app.execSync {
-      let childList = self.parentChildListDict[parentUID ?? NULL_UID] ?? []
+      let childList = self.parentChildListDict[parentGUID ?? NULL_GUID] ?? []
       if childIndex >= childList.count {
-        NSLog("ERROR Could not find child of parent UID \(parentUID ?? NULL_UID) & index \(childIndex)")
-        node = nil
+        NSLog("ERROR Could not find child of parent GUID \(parentGUID ?? NULL_GUID) & index \(childIndex)")
+        sn = nil
       } else {
-        node = childList[childIndex]
+        sn = childList[childIndex]
       }
     }
-    return node
+    return sn
   }
 
-  func isDir(_ uid: UID) -> Bool {
-    return self.getNode(uid)?.isDir ?? false
+  func isDir(_ guid: GUID) -> Bool {
+    return self.getSN(guid)?.node!.isDir ?? false
   }
 }

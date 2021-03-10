@@ -106,7 +106,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     for selectedRow in selectedRowIndexes {
       if let item = outlineView.item(atRow: selectedRow) {
-        if let uid = item as? UID {
+        if let guid = item as? GUID {
           // TODO: hook this up to backend
         }
       }
@@ -120,9 +120,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   @objc func doubleClickedItem(_ sender: NSOutlineView) {
     let item = sender.item(atRow: sender.clickedRow)
 
-    if item is UID {
+    if item is GUID {
 
-      if displayStore.isDir(itemToUID(item)) {
+      if displayStore.isDir(itemToGUID(item)) {
         // Is dir -> toggle expand/collapse
 
         if outlineView.isItemExpanded(item) {
@@ -250,37 +250,41 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   // DataSource methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func itemToUID(_ item: Any?) -> UID {
+  private func itemToGUID(_ item: Any?) -> GUID {
     if item == nil {
-      return NULL_UID
+      return NULL_GUID
     } else {
-      return item as! UID
+      return item as! GUID
     }
   }
 
   /**
-   Returns a UID corresponding to the item with the given parameters
+   Returns a GUID corresponding to the item with the given parameters
 
    1. You must give each row a unique identifier, referred to as `item` by the outline view.
    2. For top-level rows, we use the values in the `keys` array
    3. item == nil means it's the "root" row of the outline view, which is not visible
    */
   func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-    return displayStore.getChild(itemToUID(item), index)?.uid ?? NULL_UID
+    if let child  = displayStore.getChild(itemToGUID(item), index) {
+      return displayStore.guidFor(child)
+    } else {
+      return NULL_GUID
+    }
   }
 
   /**
   // Tell Apple how many children each row has.
   */
   func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-    return displayStore.getChildList(itemToUID(item)).count
+    return displayStore.getChildList(itemToGUID(item)).count
   }
 
   /**
    Tell whether the row is expandable
    */
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    return displayStore.isDir(itemToUID(item))
+    return displayStore.isDir(itemToGUID(item))
   }
 
   private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
@@ -314,16 +318,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
 
-    guard let uid = item as? UID else {
-      NSLog("ERROR [\(treeID)] viewForTableColumn(): not a UID: \(item)")
+    guard let guid = item as? GUID else {
+      NSLog("ERROR [\(treeID)] viewForTableColumn(): not a GUID: \(item)")
       return nil
     }
 
-    guard let node = displayStore.getNode(uid) else {
-      NSLog("ERROR [\(treeID)] viewForTableColumn(): node not found with UID: \(uid)")
+    guard let sn = self.displayStore.getSN(guid) else {
+      NSLog("ERROR [\(treeID)] viewForTableColumn(): node not found with GUID: \(guid)")
       return nil
     }
 
+    let node = sn.node!
     switch identifier.rawValue {
       case "name":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
@@ -371,7 +376,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   */
   func outlineViewSelectionDidChange(_ notification: Notification) {
     let uidSet: Set<UID> = self.getSelectedUIDs()
-    NSLog("DEBUG [\(treeID)] User selected nodes: \(uidSet)")
+    NSLog("DEBUG [\(treeID)] User selected UIDs: \(uidSet)")
 
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
@@ -387,25 +392,39 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     var uidSet = Set<UID>()
     for selectedRow in outlineView.selectedRowIndexes {
       if let item = outlineView.item(atRow: selectedRow) {
-        if let uid = item as? UID {
-          uidSet.insert(uid)
+        if let guid = item as? GUID {
+          if let sn = displayStore.getSN(guid) {
+            uidSet.insert(sn.spid.uid)
+          }
         }
       }
     }
     return uidSet
   }
 
-  private func getKey(_ notification: Notification) -> UID? {
+  func getSelectedGUIDs() -> Set<GUID> {
+    var guidSet = Set<GUID>()
+    for selectedRow in outlineView.selectedRowIndexes {
+      if let item = outlineView.item(atRow: selectedRow) {
+        if let guid = item as? GUID {
+          guidSet.insert(guid)
+        }
+      }
+    }
+    return guidSet
+  }
+
+  private func getKey(_ notification: Notification) -> GUID? {
     guard let item = notification.userInfo?["NSObject"] else {
       NSLog("ERROR [\(treeID)] getKey(): no item")
       return nil
     }
 
-    guard let uid = item as? UID else {
-      NSLog("ERROR [\(treeID)] getKey(): not a UID: \(item)")
+    guard let guid = item as? GUID else {
+      NSLog("ERROR [\(treeID)] getKey(): not a GUID: \(item)")
       return nil
     }
-    return uid
+    return guid
   }
 
   /**
@@ -416,23 +435,31 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return
     }
 
-    guard let parentUID: UID = getKey(notification) else {
+    guard let parentGUID: GUID = getKey(notification) else {
       return
     }
-    NSLog("DEBUG [\(treeID)] User expanded node \(parentUID)")
+
+    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
+      return
+    }
+
+    let parentUID: UID = parentSN.spid.uid
+
+    NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
 
     do {
-      let childList = try self.con.backend.getChildList(parentUID: parentUID, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+      let childNodeList = try self.con.backend.getChildList(parentUID: parentUID, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
 
       outlineView.beginUpdates()
       defer {
         outlineView.endUpdates()
       }
-      self.displayStore.populateChildList(parentUID, childList)
-      self.outlineView.reloadItem(parentUID, reloadChildren: true)
+      let childSNList: [SPIDNodePair] = self.displayStore.convertChildList(parentSN, childNodeList)
+      self.displayStore.populateChildList(parentSN, childSNList)
+      self.outlineView.reloadItem(parentGUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
     } catch OutletError.maxResultsExceeded(let actualCount) {
-      self.con.appendEphemeralNode(parentUID, "ERROR: too many items to display (\(actualCount))")
+      self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
     } catch {
       self.con.reportException("Failed to expand node", error)
     }
@@ -442,13 +469,24 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    COLLAPSE ROW
   */
   func outlineViewItemWillCollapse(_ notification: Notification) {
-    guard let parentUID: UID = getKey(notification) else {
+    guard let parentGUID: GUID = getKey(notification) else {
       return
     }
-    NSLog("DEBUG [\(treeID)] User collapsed node \(parentUID)")
+    NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
+    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
+      return
+    }
+
+    /*
+     FIXME: we have a broken model here. The BE stores expanded/collapsed UIDs, but we need it to store GUIDs.
+     Continuing to use UIDs will result in GDrive nodes being incorrectly expanded if they are linked more than
+     once in the same UI tree.
+     However, the BE currently has no idea what a GUID is.
+     This is expected to be a minor issue but let's fix it in the future by adding BE support.
+    */
 
     do {
-      try self.con.backend.removeExpandedRow(parentUID, self.treeID)
+      try self.con.backend.removeExpandedRow(parentSN.spid.uid, self.treeID)
     } catch {
       NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
     }
@@ -472,20 +510,26 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     guard let item = outlineView.item(atRow: outlineView.clickedRow) else {
       return
     }
-    guard let clickedUID = item as? UID else {
+    guard let clickedGUID = item as? GUID else {
       return
     }
 
+    guard let sn = self.displayStore.getSN(clickedGUID) else {
+      return
+    }
+
+    let uid = sn.spid.uid
+
     let selectedUIDs: Set<UID> = self.getSelectedUIDs()
-    let clickedOnSelection = selectedUIDs.contains(clickedUID)
-    NSLog("DEBUG [\(treeID)] User opened context menu on: \(clickedUID); isOnSelection: \(clickedOnSelection)")
+    let clickedOnSelection = selectedUIDs.contains(uid)
+    NSLog("DEBUG [\(treeID)] User opened context menu on: \(clickedGUID); isOnSelection: \(clickedOnSelection)")
 
     if clickedOnSelection {
       // User right-clicked on selection -> apply context menu to all selected items:
       self.buildContextMenuMultiple(menu, selectedUIDs)
     } else {
       // Singular item, or singular selection (equivalent logic)
-      self.buildContextMenuSingle(menu, clickedUID)
+      self.buildContextMenuSingle(menu, uid)
     }
   }
 
@@ -495,6 +539,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   func buildContextMenuSingle(_ menu: NSMenu, _ targetUID: UID) {
     // TODO
+
 
 
     menu.removeAllItems()

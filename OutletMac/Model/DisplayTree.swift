@@ -58,6 +58,12 @@ class DisplayTree {
     }
   }
 
+  var rootSN: SPIDNodePair {
+    get {
+      return self.state.rootSN
+    }
+  }
+
   var rootNode: Node? {
     get {
       return self.state.rootSN.node
@@ -76,7 +82,9 @@ class DisplayTree {
   }
 
   func getChildList(_ parentNode: Node) throws -> [Node] {
-    return try self.backend.getChildList(parentUID: parentNode.uid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+    let result = try self.backend.getChildList(parentUID: parentNode.uid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+    NSLog("DEBUG [\(treeID)] Got \(result.count) children for parent \(parentNode.uid)")
+    return result
   }
 }
 

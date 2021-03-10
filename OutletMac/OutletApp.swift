@@ -18,6 +18,8 @@ protocol OutletApp {
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
+
+  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID
 }
 
 class MockApp: OutletApp {
@@ -32,6 +34,9 @@ class MockApp: OutletApp {
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
   }
   func execSync(_ workItem: @escaping NoArgVoidFunc) {
+  }
+  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
+    return 0
   }
 }
 
@@ -73,14 +78,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
-  // TODO: surely Swift has a better way to init these
-  var dispatchListener: DispatchListener? = nil
+  lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
   var _backend: OutletBackend? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
   let taskRunner: TaskRunner = TaskRunner()
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
+  private let guidMapper = GUIDMapper()
 
   var backend: OutletBackend {
     get {
@@ -99,9 +104,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("INFO  Backend started")
 
       // Subscribe to app-wide signals here
-      dispatchListener = dispatcher.createListener(winID)
-      try dispatchListener!.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
-      try dispatchListener!.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
+      try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+      try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -231,6 +235,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   public func execSync(_ workItem: @escaping NoArgVoidFunc) {
     self.taskRunner.execSync(workItem)
+  }
+
+  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
+    return self.guidMapper.guidFor(treeType, singlePath: singlePath, uid: uid)
   }
 
   // SignalDispatcher callbacks

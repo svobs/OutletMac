@@ -228,6 +228,8 @@ let GDRIVE_ROOT_UID = TreeType.GDRIVE.rawValue
 
 let MIN_FREE_UID: UID = 100
 
+let NULL_GUID: Int32 = 0
+
 
 let GDRIVE_FOLDER_MIME_TYPE_UID: UID = 1
 

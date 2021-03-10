@@ -30,7 +30,7 @@ protocol TreeControllable: HasLifecycle {
   func start() throws
 
   func connectTreeView(_ treeView: TreeViewController)
-  func appendEphemeralNode(_ parent: UID?, _ nodeName: String)
+  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
 
   func reportError(_ title: String, _ errorMsg: String)
   func reportException(_ title: String, _ error: Error)
@@ -105,7 +105,7 @@ class MockTreeController: TreeControllable {
   func reportException(_ title: String, _ error: Error) {
   }
 
-  func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
+  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
   }
 }
 
@@ -203,36 +203,40 @@ class TreeController: TreeControllable, ObservableObject {
     self.displayStore.repopulateRoot([])
     self.appendEphemeralNode(nil, "Loading...")
 
-    var queue = LinkedList<Node>()
+    var queue = LinkedList<SPIDNodePair>()
 
     do {
       let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
       NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-      self.displayStore.repopulateRoot(topLevelNodeList)
-      queue.append(contentsOf: topLevelNodeList)
+      let topLevelSNList: [SPIDNodePair] = self.displayStore.convertChildList(self.tree.rootSN, topLevelNodeList)
+      self.displayStore.repopulateRoot(topLevelSNList)
+      queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       self.displayStore.repopulateRoot([])
       self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
       return
     }
 
-    var toExpandInOrder: [UID] = []
+    var toExpandInOrder: [GUID] = []
     // populate each expanded dir:
     while !queue.isEmpty {
-      let node = queue.popFirst()!
-      if node.isDir && rows.expanded.contains(node.uid) {
-        toExpandInOrder.append(node.uid)
-        do {
-          let childList: [Node] = try self.tree.getChildList(node)
-          NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childList.count) child nodes for parent \(node.uid)")
 
-          self.displayStore.populateChildList(node.uid, childList)
-          queue.append(contentsOf: childList)
+      let sn = queue.popFirst()!
+      let node = sn.node!
+      if node.isDir && rows.expanded.contains(node.uid) {
+        toExpandInOrder.append(self.displayStore.guidFor(sn))
+        do {
+          let childNodeList: [Node] = try self.tree.getChildList(node)
+          NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childNodeList.count) child nodes for parent \(node.uid)")
+
+          let childSNList: [SPIDNodePair] = self.displayStore.convertChildList(sn, childNodeList)
+          self.displayStore.populateChildList(sn, childSNList)
+          queue.append(contentsOf: childSNList)
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue
-          self.appendEphemeralNode(node.uid, "ERROR: too many items to display (\(actualCount))")
+          self.appendEphemeralNode(sn, "ERROR: too many items to display (\(actualCount))")
         }
       }
     }
@@ -261,18 +265,17 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
-  func appendEphemeralNode(_ parent: UID?, _ nodeName: String) {
-    // note: top-level's parent is 'nil' in OutlineView, but is NULL_UID in DisplayStore
-    let parentUID: UID = parent == nil ? NULL_UID : parent!
-    let node = EmptyNode(nodeName)
-    self.displayStore.populateChildList(parentUID, [node])
+  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
+    let parentGUID = self.displayStore.guidFor(parentSN)
+    let childSN = self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
+    self.displayStore.populateChildList(parentSN, [childSN])
     DispatchQueue.main.async {
-      self.treeView!.outlineView.reloadItem(parent, reloadChildren: true)
+      self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
       NSLog("DEBUG [\(self.treeID)] appended ephemeral node: '\(nodeName)'")
     }
   }
 
-  private func restoreExpandedRows(_ toExpandInOrder: [UID]) {
+  private func restoreExpandedRows(_ toExpandInOrder: [GUID]) {
     self.treeView!.outlineView.beginUpdates()
     defer {
       self.treeView!.outlineView.endUpdates()
@@ -285,8 +288,8 @@ class TreeController: TreeControllable, ObservableObject {
     defer {
       self.treeView!.expandContractListenersEnabled = true
     }
-    for uid in toExpandInOrder {
-      self.treeView!.outlineView.expandItem(uid)
+    for guid in toExpandInOrder {
+      self.treeView!.outlineView.expandItem(guid)
     }
   }
   

@@ -96,6 +96,10 @@ class SinglePathNodeIdentifier: NodeIdentifier {
   override public var description: String {
     return "∣\(TreeType.display(treeType))-\(uid)⩨\"\(getSinglePath())\"∣"
   }
+
+  static func from(_ nodeIdentifier: NodeIdentifier, _ singlePath: String) -> SinglePathNodeIdentifier {
+    return SinglePathNodeIdentifier(nodeIdentifier.uid, singlePath, nodeIdentifier.treeType)
+  }
 }
 
 typealias SPID = SinglePathNodeIdentifier
