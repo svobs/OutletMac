@@ -726,8 +726,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     if node.isLive && node.isDir && self.con.canChangeRoot {
-      let item = MenuItemWithNodeList(title: "Go Into \"\(node.name)\"", action: #selector(goIntoDir(_:)), keyEquivalent: "")
-      item.nodeList = [node]
+      let item = MenuItemWithSNList(title: "Go Into \"\(node.name)\"", action: #selector(goIntoDir(_:)), keyEquivalent: "")
+      let sn: SPIDNodePair = (SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath), node)
+      item.snList = [sn]
       menu.addItem(item)
     }
 
@@ -839,14 +840,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  @objc private func goIntoDir(_ sender: MenuItemWithNodeList) {
-    guard sender.nodeList.count > 0 else {
+  @objc private func goIntoDir(_ sender: MenuItemWithSNList) {
+    guard sender.snList.count > 0 else {
       return
     }
 
-    let node = sender.nodeList[0]
+    let sn = sender.snList[0]
 
-    // TODO
+    self.con.app.execAsync {
+      do {
+        let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: sn.spid)
+      } catch {
+        self.con.reportException("Failed to change tree root directory", error)
+      }
+    }
   }
 
   @objc private func checkAll(_ sender: MenuItemWithSNList) {

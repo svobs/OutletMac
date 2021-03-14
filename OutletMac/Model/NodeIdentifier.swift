@@ -86,7 +86,7 @@ class SinglePathNodeIdentifier: NodeIdentifier {
   }
 
   override func isSpid() -> Bool {
-    false
+    return true
   }
   
   override func getSinglePath() -> String {
