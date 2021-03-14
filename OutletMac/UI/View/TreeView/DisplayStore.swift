@@ -109,6 +109,10 @@ class DisplayStore {
     return sn
   }
 
+  func getChildListForRoot() -> [SPIDNodePair] {
+    return self.getChildList(nil)
+  }
+
   func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     con.app.execSync {

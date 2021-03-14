@@ -2,6 +2,7 @@ import Cocoa
 import AppKit
 import SwiftUI
 import Foundation
+import LinkedList
 
 /**
  TreeView: extra layer of TreeView to specify layout
@@ -485,6 +486,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      This is expected to be a minor issue but let's fix it in the future by adding BE support.
     */
 
+    /*
+     FIXME: need to remove all children from the list of epxanded rows. Otherwise we'll end up restoring the expanded
+     state of any nested directories when we expand again. Some may consider this a feature
+    */
+
     do {
       try self.con.backend.removeExpandedRow(parentSN.spid.uid, self.treeID)
     } catch {
@@ -756,8 +762,31 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return
     }
 
+    // contains items which were just expanded and need their children examined
+    var queue = LinkedList<SPIDNodePair>()
 
-    // TODO: Expand all
+    func process(_ sn: SPIDNodePair) {
+      if sn.node!.isDir {
+        let guid = self.displayStore.guidFor(sn)
+        if !outlineView.isItemExpanded(guid) {
+          outlineView.animator().expandItem(guid)
+        }
+        queue.append(sn)
+      }
+    }
+
+    for sn in sender.snList {
+      process(sn)
+    }
+
+    while !queue.isEmpty {
+      let parentSN = queue.popFirst()!
+      let parentGUID = self.displayStore.guidFor(parentSN)
+      for sn in self.displayStore.getChildList(parentGUID) {
+        process(sn)
+      }
+    }
+
   }
 
   @objc private func refreshSubtree(_ sender: MenuItemWithSNList) {
@@ -779,7 +808,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     self.con.app.execAsync {
       do {
-        // TODO: research how to show in Finder
+        let node = sender.nodeList[0]
+        let url = try URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
+        NSWorkspace.shared.activateFileViewerSelecting([url])
+      } catch {
+        self.con.reportException("Could not show in Finder", error)
       }
     }
   }
