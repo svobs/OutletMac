@@ -92,9 +92,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     interpretKeyEvents([theEvent])
   }
 
-  // Delete row if Delete key pressed:
+  /**
+   Delete key pressed: confirm delete, then delete all selected items
+   */
   override func deleteBackward(_ sender: Any?) {
-
     let selectedRowIndexes: IndexSet = outlineView.selectedRowIndexes
     if selectedRowIndexes.isEmpty {
       return
@@ -105,16 +106,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       outlineView.endUpdates()
     }
 
-    for selectedRow in selectedRowIndexes {
-      if let item = outlineView.item(atRow: selectedRow) {
-        if let guid = item as? GUID {
-          // TODO: hook this up to backend
-        }
-      }
-    }
-    outlineView.removeItems(at: selectedRowIndexes, inParent: nil, withAnimation: .slideLeft)
-
-    // TODO: see also: moveItemAtIndex(_:, inParent:, toIndex:, inParent:)
+    let selectedUIDList = Array(self.getSelectedUIDs())
+    self.confirmAndDeleteSubtrees(selectedUIDList)
   }
 
 
@@ -873,12 +866,28 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     for node in sender.nodeList {
       nodeUIDList.append(node.uid)
     }
+    self.confirmAndDeleteSubtrees(nodeUIDList)
+  }
+
+  private func confirmAndDeleteSubtrees(_ uidList: [UID]) {
+    var msg = "Are you sure you want to delete"
+    var okText = "Delete"
+    if uidList.count == 1 {
+      // TODO: ideally I would like to print the name of the item, but it's really hard to get from here
+      msg += " this item?"
+    } else {
+      msg += " these \(uidList.count) items?"
+      okText = "Delete \(uidList.count) items"
+    }
+
+    guard self.con.app.confirmWithUserDialog("Confirm Delete", msg, okButtonText: okText, cancelButtonText: "Cancel") else {
+      return
+    }
 
     do {
-      try self.con.backend.deleteSubtree(nodeUIDList: nodeUIDList)
+      try self.con.backend.deleteSubtree(nodeUIDList: uidList)
     } catch {
       self.con.reportException("Failed to delete subtree", error)
     }
   }
-
 }

@@ -20,7 +20,10 @@ protocol OutletApp {
   func execSync(_ workItem: @escaping NoArgVoidFunc)
 
   func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID
+
+  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 }
+
 
 class MockApp: OutletApp {
   var dispatcher: SignalDispatcher
@@ -37,6 +40,10 @@ class MockApp: OutletApp {
   }
   func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
     return 0
+  }
+
+  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
+    return false
   }
 }
 
@@ -280,4 +287,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     preferencesWindow.makeKeyAndOrderFront(nil)
   }
 
+  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
+    let alert = NSAlert()
+    alert.messageText = messageText
+    alert.informativeText = informativeText
+    alert.addButton(withTitle: okButtonText)
+    alert.addButton(withTitle: cancelButtonText)
+    alert.alertStyle = .warning
+    return alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+  }
 }
