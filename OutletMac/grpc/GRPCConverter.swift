@@ -282,7 +282,7 @@ class GRPCConverter {
     grpc.uid = nodeIdentifier.uid
     grpc.treeType = nodeIdentifier.treeType.rawValue
     grpc.pathList = nodeIdentifier.pathList
-    grpc.isSinglePath = nodeIdentifier.isSpid()
+    grpc.isSinglePath = nodeIdentifier.isSPID()
     return grpc
   }
 

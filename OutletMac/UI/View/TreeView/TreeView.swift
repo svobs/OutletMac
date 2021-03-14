@@ -27,7 +27,6 @@ struct TreeView: View {
                alignment: .topLeading)
     }
     .frame(alignment: .topLeading)
-//    .background(Color.black) // TODO
   }
 }
 
@@ -114,22 +113,31 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   @objc func doubleClickedItem(_ sender: NSOutlineView) {
     let item = sender.item(atRow: sender.clickedRow)
 
-    if item is GUID {
+    let guid = itemToGUID(item)
+    guard let sn = self.displayStore.getSN(guid) else {
+      return
+    }
 
-      if displayStore.isDir(itemToGUID(item)) {
-        // Is dir -> toggle expand/collapse
+    if sn.node!.isDir {
+      // Is dir -> toggle expand/collapse
 
-        if outlineView.isItemExpanded(item) {
-          NSLog("DEBUG [\(treeID)] User double-clicked: collapsing item: \(item!)")
-          outlineView.animator().collapseItem(item, collapseChildren: true)
-        } else {
-          NSLog("DEBUG [\(treeID)] User double-clicked: expanding item: \(item!)")
-          outlineView.animator().expandItem(item)
-        }
-
+      if outlineView.isItemExpanded(guid) {
+        NSLog("DEBUG [\(treeID)] User double-clicked: collapsing item: \(guid)")
+        outlineView.animator().collapseItem(guid, collapseChildren: true)
       } else {
-        // TODO: open file
-        NSLog("DEBUG [\(treeID)] TODO: write code to open file")
+        NSLog("DEBUG [\(treeID)] User double-clicked: expanding item: \(guid)")
+        outlineView.animator().expandItem(guid)
+      }
+
+    } else {
+      if sn.spid.treeType == .LOCAL_DISK {
+        NSLog("DEBUG [\(treeID)] User double-clicked: opening local file with default app: \(sn.spid.getSinglePath())")
+        self.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
+      } else if sn.spid.treeType == .GDRIVE {
+        // TODO: download from GDrive and open downloaded file
+        NSLog("DEBUG [\(treeID)] User double-clicked on Google Drive node: \(sn.spid)")
+      } else {
+        NSLog("DEBUG [\(treeID)] User double-clicked on node: \(sn.spid)")
       }
     }
   }
@@ -701,6 +709,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   }
 
   func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) {
+    let sn: SPIDNodePair = (SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath), node)
+
     if node.isLive && node.treeType == .LOCAL_DISK {
       let item = MenuItemWithNodeList(title: "Show in Finder", action: #selector(showInFinder(_:)), keyEquivalent: "")
       item.nodeList = [node]
@@ -713,8 +723,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         item.nodeList = [node]
         menu.addItem(item)
       } else if node.treeType == .LOCAL_DISK {
-        let item = MenuItemWithNodeList(title: "Open with Default App", action: #selector(openFile(_:)), keyEquivalent: "")
-        item.nodeList = [node]
+        let item = MenuItemWithSNList(title: "Open with Default App", action: #selector(openFile(_:)), keyEquivalent: "")
+        item.snList = [sn]
         menu.addItem(item)
       }
     }
@@ -727,7 +737,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     if node.isLive && node.isDir && self.con.canChangeRoot {
       let item = MenuItemWithSNList(title: "Go Into \"\(node.name)\"", action: #selector(goIntoDir(_:)), keyEquivalent: "")
-      let sn: SPIDNodePair = (SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath), node)
       item.snList = [sn]
       menu.addItem(item)
     }
@@ -827,17 +836,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  @objc private func openFile(_ sender: MenuItemWithNodeList) {
-    guard sender.nodeList.count > 0 else {
+  @objc private func openFile(_ sender: MenuItemWithSNList) {
+    guard sender.snList.count > 0 else {
       return
     }
 
-    self.con.app.execAsync {
-      do {
-        // TODO: research how to open file
+    let sn = sender.snList[0]
 
-      }
-    }
+    self.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
   }
 
   @objc private func goIntoDir(_ sender: MenuItemWithSNList) {
@@ -876,6 +882,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     self.confirmAndDeleteSubtrees(nodeUIDList)
   }
 
+  private func openLocalFileWithDefaultApp(_ fullPath: String) {
+    self.con.app.execAsync {
+      let url = URL(fileURLWithPath: fullPath)
+      NSWorkspace.shared.open(url)
+    }
+  }
+
   private func confirmAndDeleteSubtrees(_ uidList: [UID]) {
     var msg = "Are you sure you want to delete"
     var okText = "Delete"
@@ -888,8 +901,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     guard self.con.app.confirmWithUserDialog("Confirm Delete", msg, okButtonText: okText, cancelButtonText: "Cancel") else {
+      NSLog("DEBUG [\(treeID)] User cancelled delete")
       return
     }
+
+    NSLog("DEBUG [\(treeID)] User confirmed delete of \(uidList.count) items")
 
     do {
       try self.con.backend.deleteSubtree(nodeUIDList: uidList)

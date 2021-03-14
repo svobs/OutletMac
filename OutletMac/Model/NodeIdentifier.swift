@@ -39,7 +39,7 @@ class NodeIdentifier: CustomStringConvertible {
 
   // MARK: SPID
   
-  func isSpid() -> Bool {
+  func isSPID() -> Bool {
     false
   }
   
@@ -85,7 +85,7 @@ class SinglePathNodeIdentifier: NodeIdentifier {
     }
   }
 
-  override func isSpid() -> Bool {
+  override func isSPID() -> Bool {
     return true
   }
   
