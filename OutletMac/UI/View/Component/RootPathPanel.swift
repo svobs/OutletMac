@@ -34,9 +34,9 @@ struct RootPathPanel: View {
     HStack(alignment: .center, spacing: H_PAD) {
       Image(systemName: "folder")
         .renderingMode(.template)
-        .frame(width: 32, height: 32)
+//        .frame(width: 32, height: 32)
         .padding(.leading, H_PAD)
-        .font(Font.system(.title))
+        .font(ROOT_PATH_ENTRY_FONT)
         .contextMenu {
           // TODO!
           Button("Local filesystem subtree...", action: {})
@@ -46,9 +46,9 @@ struct RootPathPanel: View {
       if !self.swiftTreeState.isRootExists {
         Image(systemName: "exclamationmark.triangle.fill")
           .renderingMode(.template)
-          .frame(width: 32, height: 32)
-          .padding(.leading, H_PAD)
-          .font(Font.system(.title))
+//          .frame(width: 32, height: 32)
+          .padding(0)
+          .font(ROOT_PATH_ENTRY_FONT)
           .foregroundColor(.yellow)
       }
 
@@ -66,10 +66,10 @@ struct RootPathPanel: View {
             self.swiftTreeState.isEditingRoot = false
           }
         })
-          .font(Font.system(.title))
-          .onTapGesture(count: 1, perform: {
-            // No op. Just override default
-          })
+        .font(ROOT_PATH_ENTRY_FONT)
+        .onTapGesture(count: 1, perform: {
+          // No op. Just override default
+        })
         .onExitCommand {
           NSLog("[\(self.con.treeID)] DEBUG TextField got exit cmd")
           self.con.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
@@ -83,11 +83,11 @@ struct RootPathPanel: View {
             Text("No path entered")
               .italic()
               .multilineTextAlignment(.leading)
-              .font(Font.system(.title))
+              .font(ROOT_PATH_ENTRY_FONT)
           } else {
             Text(self.swiftTreeState.rootPathNonEdit)
               .multilineTextAlignment(.leading)
-              .font(Font.system(.title))
+              .font(ROOT_PATH_ENTRY_FONT)
               .foregroundColor(self.swiftTreeState.isRootExists ? .primary : .red)
           }
           Spacer() // this will align the preceding Text object to the left
@@ -107,6 +107,7 @@ struct RootPathPanel: View {
     .frame(minWidth: 300,
            maxWidth: .infinity,
            alignment: .topLeading)
+    .padding(.top, V_PAD)
 
 //    .background(Color.blue)  // TODO
   }

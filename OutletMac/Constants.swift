@@ -6,7 +6,7 @@
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 
 typealias MD5 = String
 typealias SHA256 = String
@@ -31,6 +31,17 @@ let STATS_REFRESH_HOLDOFF_TIME_MS = 1000
 let WIN_SIZE_STORE_DELAY_MS = 1000
 
 let TIMER_TOLERANCE_SEC = 0.05
+
+let DEFAULT_TERNARY_BTN_WIDTH: CGFloat = 32
+let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 32
+
+let BUTTON_SHADOW_RADIUS: CGFloat = 3.0
+
+let TEXT_BOX_FONT = Font.system(size: 24.0)
+let DEFAULT_FONT = TEXT_BOX_FONT
+let ROOT_PATH_ENTRY_FONT = TEXT_BOX_FONT
+let FILTER_ENTRY_FONT = TEXT_BOX_FONT
+let BUTTON_PANEL_FONT = TEXT_BOX_FONT
 
 /**
  ENUM IconNames

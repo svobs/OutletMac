@@ -168,6 +168,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // Columns:
 
     let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
+//    nodeColumn.headerCell.font = NSFont.systemFont(ofSize: 7.0)
     nodeColumn.title = "Name"
     nodeColumn.width = 300
     nodeColumn.minWidth = 150
@@ -175,6 +176,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.addTableColumn(nodeColumn)
 
     let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
+//    sizeBytesCol.headerCell.font = NSFont.systemFont(ofSize: 12.0)
     sizeBytesCol.title = "Size"
     sizeBytesCol.width = 70
     sizeBytesCol.minWidth = 70
@@ -182,6 +184,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.addTableColumn(sizeBytesCol)
 
     let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
+//    etcCol.headerCell.font = NSFont.systemFont(ofSize: 16.0)
     etcCol.title = "Etc"
     etcCol.width = 200
     etcCol.minWidth = 100
@@ -296,7 +299,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.isBordered = false
     textField.isEditable = false
     // FIXME: this doesn't work
-    textField.font = NSFont.systemFont(ofSize: 7)
+//    textField.font = NSFont.systemFont(ofSize: 7)
+//    textField.font = NSFont.userFixedPitchFont(ofSize: 10);
+
+//    tableView.rowHeight = textField.frame.height + 2
 
     let cell = NSTableCellView()
     cell.identifier = identifier
@@ -337,7 +343,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
+        let font = NSFont(name: "Courier New", size: 22.0)
         cell!.textField!.stringValue = node.name
+        let textField = cell!.textField!
+//        textField.font = NSFont.systemFont(ofSize: 7)
+//        let fontDescriptor = textField.font!.fontDescriptor
+        textField.font = font
+//        textField.sizeToFit()
+//        textField.setFrameOrigin(NSZeroPoint)
         return cell
       case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView

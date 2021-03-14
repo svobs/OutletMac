@@ -39,7 +39,7 @@ struct FancyTextField: View {
       HStack {
         TextField("Filter by name", text: text, onEditingChanged: onEditingChanged, onCommit: onCommit)
         .textFieldStyle(PlainTextFieldStyle())
-        .font(Font.system(.title))
+        .font(FILTER_ENTRY_FONT)
         .frame(minWidth: 180, maxWidth: .infinity)
       }
       .padding(2)
@@ -75,16 +75,16 @@ struct FilterPanel: View {
       })
 
       // Show ancestors
-      BoolToggleButton($swiftFilterState.showAncestors, imageName: "FolderTree")
+      BoolToggleButton($swiftFilterState.showAncestors, imageName: "FolderTree", font: FILTER_ENTRY_FONT)
 
       // Match Case
-      BoolToggleButton($swiftFilterState.isMatchCase, systemImageName: "textformat")
+      BoolToggleButton($swiftFilterState.isMatchCase, systemImageName: "textformat", font: FILTER_ENTRY_FONT)
 
       // Is Trashed
-      TernaryToggleButton($swiftFilterState.isTrashed, systemImageName: "trash")
+      TernaryToggleButton($swiftFilterState.isTrashed, systemImageName: "trash", font: FILTER_ENTRY_FONT)
 
       // Is Shared
-      TernaryToggleButton($swiftFilterState.isShared, imageName: "Shared")
+      TernaryToggleButton($swiftFilterState.isShared, imageName: "Shared", font: FILTER_ENTRY_FONT)
     }
     .padding(.bottom, 0)
     .padding(.top, 0)
