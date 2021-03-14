@@ -159,6 +159,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.autosaveTableColumns = true
     outlineView.autosaveExpandedItems = true
     outlineView.rowSizeStyle = .large
+    outlineView.lineBreakMode = .byTruncatingTail
+    outlineView.cell?.truncatesLastVisibleLine = true
+    outlineView.autoresizesOutlineColumn = true
     outlineView.indentationPerLevel = 16
     outlineView.backgroundColor = .clear
     outlineView.appearance = NSAppearance(named: NSAppearance.Name.vibrantDark)
@@ -168,7 +171,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // Columns:
 
     let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
-//    nodeColumn.headerCell.font = NSFont.systemFont(ofSize: 7.0)
     nodeColumn.title = "Name"
     nodeColumn.width = 300
     nodeColumn.minWidth = 150
@@ -176,7 +178,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.addTableColumn(nodeColumn)
 
     let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
-//    sizeBytesCol.headerCell.font = NSFont.systemFont(ofSize: 12.0)
     sizeBytesCol.title = "Size"
     sizeBytesCol.width = 70
     sizeBytesCol.minWidth = 70
@@ -184,7 +185,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.addTableColumn(sizeBytesCol)
 
     let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
-//    etcCol.headerCell.font = NSFont.systemFont(ofSize: 16.0)
     etcCol.title = "Etc"
     etcCol.width = 200
     etcCol.minWidth = 100
@@ -208,6 +208,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     outlineView.gridStyleMask = .solidHorizontalGridLineMask
     outlineView.autosaveExpandedItems = true
+    outlineView.usesAutomaticRowHeights = true  // set row height to match font (why is this not enabled by default?)
 
     scrollView.documentView = outlineView
     outlineView.frame = scrollView.bounds
@@ -292,17 +293,36 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return displayStore.isDir(itemToGUID(item))
   }
 
+  /**
+   Thanks to "jnpdx" from here for this:
+   https://stackoverflow.com/questions/66165528/how-to-change-nstextfield-font-size-when-used-in-swiftui
+   */
+  private class CustomFontNSTextField : NSTextField {
+    func customSetFont(_ font: NSFont?) {
+      super.font = font
+    }
+
+    /**
+     There seems to be a bug in Apple's code in Big Sur which causes font to be continuously set to system font, size 18.
+     Override this to prevent this from happening.
+     */
+    override var font: NSFont? {
+      get {
+        return super.font
+      }
+      set {}
+    }
+  }
+
   private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-    let textField = NSTextField()
+    let textField = CustomFontNSTextField()
     textField.backgroundColor = NSColor.clear
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.isBordered = false
+    textField.isBezeled = false
     textField.isEditable = false
-    // FIXME: this doesn't work
-//    textField.font = NSFont.systemFont(ofSize: 7)
-//    textField.font = NSFont.userFixedPitchFont(ofSize: 10);
-
-//    tableView.rowHeight = textField.frame.height + 2
+    textField.customSetFont(TREE_VIEW_NSFONT)
+    textField.lineBreakMode = .byTruncatingTail
 
     let cell = NSTableCellView()
     cell.identifier = identifier
@@ -312,6 +332,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // Constrain the text field within the cell
     textField.widthAnchor.constraint(equalTo: cell.widthAnchor).isActive = true
     textField.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
+    textField.sizeToFit()
+    textField.setFrameOrigin(NSZeroPoint)
+
+    outlineView.rowHeight = 30
 
     return cell
   }
@@ -343,14 +367,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCell(withIdentifier: identifier)
         }
-        let font = NSFont(name: "Courier New", size: 22.0)
         cell!.textField!.stringValue = node.name
-        let textField = cell!.textField!
-//        textField.font = NSFont.systemFont(ofSize: 7)
-//        let fontDescriptor = textField.font!.fontDescriptor
-        textField.font = font
-//        textField.sizeToFit()
-//        textField.setFrameOrigin(NSZeroPoint)
         return cell
       case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView

@@ -37,11 +37,13 @@ let DEFAULT_TERNARY_BTN_HEIGHT: CGFloat = 32
 
 let BUTTON_SHADOW_RADIUS: CGFloat = 3.0
 
-let TEXT_BOX_FONT = Font.system(size: 24.0)
+let TEXT_BOX_FONT = Font.system(size: 20.0)
 let DEFAULT_FONT = TEXT_BOX_FONT
 let ROOT_PATH_ENTRY_FONT = TEXT_BOX_FONT
 let FILTER_ENTRY_FONT = TEXT_BOX_FONT
 let BUTTON_PANEL_FONT = TEXT_BOX_FONT
+//let TREE_VIEW_NSFONT: NSFont = NSFont.systemFont(ofSize: 14.0)
+let TREE_VIEW_NSFONT: NSFont = NSFont.init(name: "Monaco", size: 14.0)!
 
 /**
  ENUM IconNames
