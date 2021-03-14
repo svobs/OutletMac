@@ -310,7 +310,7 @@ class TreeController: TreeControllable, ObservableObject {
   func reportException(_ title: String, _ error: Error) {
     let errorMsg: String = "\(error)" // ew, heh
     NSLog("ERROR [\(self.treeID)] title='\(title)' error'\(errorMsg)'")
-    reportError("Failed to fetch expanded node list", errorMsg)
+    reportError(title, errorMsg)
   }
 
 

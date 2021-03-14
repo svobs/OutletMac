@@ -503,71 +503,187 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return rightClickMenu
   }
 
-  func menuNeedsUpdate(_ menu: NSMenu) {
+  // This should only be called while the context menu is active
+  private func getClickedRowGUID() -> GUID? {
     guard outlineView.clickedRow >= 0 else {
-      return
+      return nil
     }
     guard let item = outlineView.item(atRow: outlineView.clickedRow) else {
-      return
+      return nil
     }
     guard let clickedGUID = item as? GUID else {
+      return nil
+    }
+
+    return clickedGUID
+  }
+
+  func menuNeedsUpdate(_ menu: NSMenu) {
+    guard let clickedGUID = self.getClickedRowGUID() else {
+      return
+    }
+
+    let selectedGUIDs: Set<GUID> = self.getSelectedGUIDs()
+    let clickedOnSelection = selectedGUIDs.contains(clickedGUID)
+    NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) isOnSelection=\(clickedOnSelection)")
+
+    if clickedOnSelection {
+      // User right-clicked on selection -> apply context menu to all selected items:
+      do {
+        try self.buildContextMenuMultiple(menu, selectedGUIDs)
+      } catch {
+        self.con.reportError("Failed to build context menu", "While loading GUIDs: \(selectedGUIDs): \(error)")
+      }
+    } else {
+      // Singular item, or singular selection (equivalent logic)
+      do {
+        try self.buildContextMenuSingle(menu, clickedGUID)
+      } catch {
+        self.con.reportError("Failed to build context menu", "While loading GUID: \(clickedGUID): \(error)")
+      }
+    }
+  }
+
+  func buildContextMenuMultiple(_ menu: NSMenu, _ targetUIDSet: Set<GUID>) throws {
+    // TODO
+  }
+
+  func buildContextMenuSingle(_ menu: NSMenu, _ targetGUID: GUID) throws {
+    guard let sn = self.displayStore.getSN(targetGUID) else {
+      NSLog("ERROR [\(treeID)] Clicked GUID not found: \(targetGUID)")
+      return
+    }
+
+    let op: UserOp? = try self.con.backend.getLastPendingOp(nodeUID: sn.spid.uid)
+
+    let singlePath = sn.spid.getSinglePath()
+
+    menu.removeAllItems()
+
+    if op != nil && op!.hasDst() {
+      NSLog("DEBUG [\(treeID)] Building context menu for: \(op)")
+
+      // Split into separate entries for src and dst.
+
+      // (1/2) Source node:
+      let srcPath: String
+      if op!.srcNode.uid == sn.node!.uid {
+        srcPath = singlePath
+      } else {
+        srcPath = op!.srcNode.firstPath
+      }
+      let srcItem = self.buildFullPathDisplayItem(preamble: "Src: ", op!.srcNode, singlePath: srcPath)
+      menu.addItem(srcItem)
+
+      if op!.srcNode.isLive {
+        let srcSubmenu = NSMenu()
+        menu.setSubmenu(srcSubmenu, for: srcItem)
+        self.buildMenuItemsForSingleNode(srcSubmenu, srcPath)
+      } else {
+        srcItem.isEnabled = false
+      }
+
+      menu.addItem(NSMenuItem.separator())
+
+      // (1/2) Destination node:
+      let dstPath: String
+      if op!.dstNode!.uid == sn.node!.uid {
+        dstPath = singlePath
+      } else {
+        dstPath = op!.dstNode!.firstPath
+      }
+      let dstItem = self.buildFullPathDisplayItem(preamble: "Dst: ", op!.dstNode!, singlePath: dstPath)
+      menu.addItem(dstItem)
+
+      if op!.srcNode.isLive {
+        let srcSubmenu = NSMenu()
+        menu.setSubmenu(srcSubmenu, for: dstItem)
+        self.buildMenuItemsForSingleNode(srcSubmenu, srcPath)
+      } else {
+        dstItem.isEnabled = false
+      }
+
+      menu.addItem(NSMenuItem.separator())
+
+    } else {
+      let item = self.buildFullPathDisplayItem(sn.node!, singlePath: sn.spid.getSinglePath())
+      item.isEnabled = false
+      menu.addItem(item)
+
+      menu.addItem(NSMenuItem.separator())
+
+      self.buildMenuItemsForSingleNode(menu, singlePath)
+    }
+
+    if sn.node!.isDir {
+      menu.addItem(NSMenuItem(title: "Expand all", action: #selector(expandAll(_:)), keyEquivalent: ""))
+    }
+
+    if sn.node!.isLive {
+      menu.addItem(NSMenuItem.separator())
+      menu.addItem(NSMenuItem(title: "Refresh", action: #selector(refreshSubtree(_:)), keyEquivalent: ""))
+    }
+  }
+
+  func buildFullPathDisplayItem(preamble: String = "", _ node: Node, singlePath: String) -> NSMenuItem {
+    let displayPath: String
+    if node.treeType == .GDRIVE {
+      displayPath = "\(preamble)\(GDRIVE_PATH_PREFIX)\(singlePath)"
+    } else {
+      displayPath = "\(preamble)\(singlePath)"
+    }
+    let item = NSMenuItem(title: displayPath, action: nil, keyEquivalent: "")
+    item.toolTip = "The path of the selected item"
+    return item
+  }
+
+  func buildMenuItemsForSingleNode(_ menu: NSMenu, _ singlePath: String) {
+    // TODO
+
+
+
+
+//    menu.addItem(NSMenuItem(title: "Edit", action: #selector(menuEditItemClicked(_:)), keyEquivalent: ""))
+//    menu.addItem(NSMenuItem(title: "Delete", action: #selector(menuDeleteItemClicked(_:)), keyEquivalent: ""))
+  }
+
+  // Context Menu Actions
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  @objc private func expandAll(_ sender: AnyObject) {
+    guard let clickedGUID = self.getClickedRowGUID() else {
+      return
+    }
+
+    // TODO: Expand all
+  }
+
+  @objc private func refreshSubtree(_ sender: AnyObject) {
+    guard let clickedGUID = self.getClickedRowGUID() else {
       return
     }
 
     guard let sn = self.displayStore.getSN(clickedGUID) else {
+      NSLog("ERROR [\(treeID)] Clicked GUID not found: \(clickedGUID)")
       return
     }
-
-    let uid = sn.spid.uid
-
-    let selectedUIDs: Set<UID> = self.getSelectedUIDs()
-    let clickedOnSelection = selectedUIDs.contains(uid)
-    NSLog("DEBUG [\(treeID)] User opened context menu on: \(clickedGUID); isOnSelection: \(clickedOnSelection)")
-
-    if clickedOnSelection {
-      // User right-clicked on selection -> apply context menu to all selected items:
-      self.buildContextMenuMultiple(menu, selectedUIDs)
-    } else {
-      // Singular item, or singular selection (equivalent logic)
-      self.buildContextMenuSingle(menu, uid)
+    do {
+      try self.con.backend.enqueueRefreshSubtreeTask(nodeIdentifier: sn.spid, treeID: self.treeID)
+    } catch {
+      self.con.reportException("Failed to refresh subtree", error)
     }
   }
 
-  func buildContextMenuMultiple(_ menu: NSMenu, _ targetUIDSet: Set<UID>) {
-    // TODO
+  @objc private func menuEditItemClicked(_ sender: AnyObject) {
+    guard let clickedGUID = self.getClickedRowGUID() else {
+      return
+    }
   }
 
-  func buildContextMenuSingle(_ menu: NSMenu, _ targetUID: UID) {
-    // TODO
-
-
-
-    menu.removeAllItems()
-
-    menu.addItem(NSMenuItem(title: "Edit", action: #selector(tableViewEditItemClicked(_:)), keyEquivalent: ""))
-    menu.addItem(NSMenuItem(title: "Delete", action: #selector(tableViewDeleteItemClicked(_:)), keyEquivalent: ""))
-  }
-
-  @objc private func tableViewEditItemClicked(_ sender: AnyObject) {
-    guard outlineView.clickedRow >= 0 else { return }
-
-      if let item = outlineView.item(atRow: outlineView.clickedRow) {
-        if let uid = item as? UID {
-          // TODO: hook this up to backend
-          NSLog("XXXXXX \(uid)")
-        }
-      }
-  }
-
-  @objc private func tableViewDeleteItemClicked(_ sender: AnyObject) {
-    guard outlineView.clickedRow >= 0 else { return }
-
-      if let item = outlineView.item(atRow: outlineView.clickedRow) {
-        if let uid = item as? UID {
-          // TODO: hook this up to backend
-          NSLog("XXXXXX \(uid)")
-        }
-      }
+  @objc private func menuDeleteItemClicked(_ sender: AnyObject) {
+    guard let clickedGUID = self.getClickedRowGUID() else {
+      return
+    }
   }
 
 }

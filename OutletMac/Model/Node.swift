@@ -156,6 +156,21 @@ class Node: CustomStringConvertible {
       return "\(nodeIdentifier)"
     }
   }
+
+  /** Convenience getter for all paths */
+  var pathList: [String] {
+    get {
+      return self.nodeIdentifier.pathList
+    }
+  }
+
+  /** Convenience getter for the first path in the path list */
+  var firstPath: String {
+    get {
+      assert(self.nodeIdentifier.pathList.count > 0, "Expected node to have at least 1 path: \(self.description)")
+      return self.nodeIdentifier.pathList[0]
+    }
+  }
   
   func setDirStats(_ dirStats: DirectoryStats?) throws {
     throw OutletError.invalidOperation("setDirStats(): class does not implement getDirStats(): \(type(of: self))!")
