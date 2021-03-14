@@ -64,6 +64,12 @@ class DisplayTree {
     }
   }
 
+  var hasCheckboxes: Bool {
+    get {
+      return self.state.hasCheckboxes
+    }
+  }
+
   var rootNode: Node? {
     get {
       return self.state.rootSN.node

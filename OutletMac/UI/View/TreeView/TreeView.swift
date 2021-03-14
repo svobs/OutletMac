@@ -495,6 +495,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   // Context Menu
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  class MenuItemWithSNList: NSMenuItem {
+    var snList: [SPIDNodePair] = []
+  }
+
+  class MenuItemWithNodeList: NSMenuItem {
+    var nodeList: [Node] = []
+  }
+
   private func initContextMenu() -> NSMenu {
     // The key idea here is that we will use the same menu for all right clicks, but we will rebuild it
     // via the menuNeedsUpdate() method each time it is displayed.
@@ -527,7 +535,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let clickedOnSelection = selectedGUIDs.contains(clickedGUID)
     NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) isOnSelection=\(clickedOnSelection)")
 
-    if clickedOnSelection {
+    menu.removeAllItems()
+
+    if clickedOnSelection && selectedGUIDs.count > 1 {
       // User right-clicked on selection -> apply context menu to all selected items:
       do {
         try self.buildContextMenuMultiple(menu, selectedGUIDs)
@@ -544,10 +554,62 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  func buildContextMenuMultiple(_ menu: NSMenu, _ targetUIDSet: Set<GUID>) throws {
-    // TODO
+  /**
+   Builds a context menu for multiple selected items.
+  */
+  func buildContextMenuMultiple(_ menu: NSMenu, _ targetGUIDSet: Set<GUID>) throws {
+    let item = NSMenuItem(title: "\(targetGUIDSet.count) items selected", action: nil, keyEquivalent: "")
+    item.isEnabled = false
+    menu.addItem(item)
+
+    var snList: [SPIDNodePair] = []
+    for guid in targetGUIDSet {
+      if let sn = displayStore.getSN(guid) {
+        snList.append(sn)
+      }
+    }
+    assert(snList.count == targetGUIDSet.count, "SNList size (\(snList.count)) does not match GUID count (\(targetGUIDSet.count))")
+
+
+    if self.con.tree.hasCheckboxes {
+      var item = MenuItemWithSNList(title: "Check All", action: #selector(checkAll(_:)), keyEquivalent: "")
+      item.snList = snList
+      menu.addItem(item)
+
+      item = MenuItemWithSNList(title: "Uncheck All", action: #selector(uncheckAll(_:)), keyEquivalent: "")
+      item.snList = snList
+      menu.addItem(item)
+    }
+
+    var nodeLocalList: [Node] = []
+    var nodeGDriveList: [Node] = []
+
+    for sn in snList {
+      if sn.node!.isLive {
+        if sn.spid.treeType == .LOCAL_DISK {
+          nodeLocalList.append(sn.node!)
+        } else if sn.spid.treeType == .GDRIVE {
+          nodeGDriveList.append(sn.node!)
+        }
+      }
+    }
+
+    if nodeLocalList.count > 0 {
+      let item = MenuItemWithNodeList(title: "Delete \(nodeLocalList.count) Items from Local Disk", action: #selector(deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = nodeLocalList
+      menu.addItem(item)
+    }
+
+    if nodeGDriveList.count > 0 {
+      let item = MenuItemWithNodeList(title: "Delete \(nodeGDriveList.count) Items from Google Drive", action: #selector(deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = nodeGDriveList
+      menu.addItem(item)
+    }
   }
 
+  /**
+   Builds a context menu for a single item.
+  */
   func buildContextMenuSingle(_ menu: NSMenu, _ targetGUID: GUID) throws {
     guard let sn = self.displayStore.getSN(targetGUID) else {
       NSLog("ERROR [\(treeID)] Clicked GUID not found: \(targetGUID)")
@@ -558,10 +620,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     let singlePath = sn.spid.getSinglePath()
 
-    menu.removeAllItems()
-
     if op != nil && op!.hasDst() {
-      NSLog("DEBUG [\(treeID)] Building context menu for: \(op)")
+      NSLog("DEBUG [\(treeID)] Building context menu for: \(op!)")
 
       // Split into separate entries for src and dst.
 
@@ -578,7 +638,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       if op!.srcNode.isLive {
         let srcSubmenu = NSMenu()
         menu.setSubmenu(srcSubmenu, for: srcItem)
-        self.buildMenuItemsForSingleNode(srcSubmenu, srcPath)
+        self.buildMenuItemsForSingleNode(srcSubmenu, op!.srcNode, srcPath)
       } else {
         srcItem.isEnabled = false
       }
@@ -596,9 +656,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       menu.addItem(dstItem)
 
       if op!.srcNode.isLive {
-        let srcSubmenu = NSMenu()
-        menu.setSubmenu(srcSubmenu, for: dstItem)
-        self.buildMenuItemsForSingleNode(srcSubmenu, srcPath)
+        let dstSubmenu = NSMenu()
+        menu.setSubmenu(dstSubmenu, for: dstItem)
+        self.buildMenuItemsForSingleNode(dstSubmenu, op!.dstNode!, dstPath)
       } else {
         dstItem.isEnabled = false
       }
@@ -612,16 +672,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
       menu.addItem(NSMenuItem.separator())
 
-      self.buildMenuItemsForSingleNode(menu, singlePath)
+      self.buildMenuItemsForSingleNode(menu, sn.node!, singlePath)
     }
 
     if sn.node!.isDir {
-      menu.addItem(NSMenuItem(title: "Expand all", action: #selector(expandAll(_:)), keyEquivalent: ""))
+      let item = MenuItemWithSNList(title: "Expand All", action: #selector(expandAll(_:)), keyEquivalent: "")
+      item.snList = [sn]
+      menu.addItem(item)
     }
 
     if sn.node!.isLive {
       menu.addItem(NSMenuItem.separator())
-      menu.addItem(NSMenuItem(title: "Refresh", action: #selector(refreshSubtree(_:)), keyEquivalent: ""))
+      let item = MenuItemWithSNList(title: "Refresh", action: #selector(refreshSubtree(_:)), keyEquivalent: "")
+      item.snList = [sn]
+      menu.addItem(item)
     }
   }
 
@@ -637,52 +701,150 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return item
   }
 
-  func buildMenuItemsForSingleNode(_ menu: NSMenu, _ singlePath: String) {
-    // TODO
+  func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) {
+    if node.isLive && node.treeType == .LOCAL_DISK {
+      let item = MenuItemWithNodeList(title: "Show in Finder", action: #selector(showInFinder(_:)), keyEquivalent: "")
+      item.nodeList = [node]
+      menu.addItem(item)
+    }
 
+    if node.isLive && !node.isDir {
+      if node.treeType == .GDRIVE {
+        let item = MenuItemWithNodeList(title: "Download from Google Drive", action: #selector(downloadFromGDrive(_:)), keyEquivalent: "")
+        item.nodeList = [node]
+        menu.addItem(item)
+      } else if node.treeType == .LOCAL_DISK {
+        let item = MenuItemWithNodeList(title: "Open with Default App", action: #selector(openFile(_:)), keyEquivalent: "")
+        item.nodeList = [node]
+        menu.addItem(item)
+      }
+    }
 
+    if !node.isLive {
+      let item = NSMenuItem(title: "(does not exist)", action: nil, keyEquivalent: "")
+      item.isEnabled = false
+      menu.addItem(item)
+    }
 
+    if node.isLive && node.isDir && self.con.canChangeRoot {
+      let item = MenuItemWithNodeList(title: "Go Into \"\(node.name)\"", action: #selector(goIntoDir(_:)), keyEquivalent: "")
+      item.nodeList = [node]
+      menu.addItem(item)
+    }
 
-//    menu.addItem(NSMenuItem(title: "Edit", action: #selector(menuEditItemClicked(_:)), keyEquivalent: ""))
-//    menu.addItem(NSMenuItem(title: "Delete", action: #selector(menuDeleteItemClicked(_:)), keyEquivalent: ""))
+    if node.isLive && !(type(of: node) is CategoryNode.Type) {
+      var title = "\"\(node.name)\""
+      if node.isDir {
+        title = "Delete tree \(title)"
+      } else {
+        title = "Delete \(title)"
+      }
+      if node.treeType == .GDRIVE {
+        title += " from Google Drive"
+      }
+      let item = MenuItemWithNodeList(title: title, action: #selector(deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = [node]
+      menu.addItem(item)
+    }
   }
 
   // Context Menu Actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  @objc private func expandAll(_ sender: AnyObject) {
-    guard let clickedGUID = self.getClickedRowGUID() else {
+  @objc private func expandAll(_ sender: MenuItemWithSNList) {
+    guard sender.snList.count > 0 else {
       return
     }
+
 
     // TODO: Expand all
   }
 
-  @objc private func refreshSubtree(_ sender: AnyObject) {
-    guard let clickedGUID = self.getClickedRowGUID() else {
+  @objc private func refreshSubtree(_ sender: MenuItemWithSNList) {
+    guard sender.snList.count > 0 else {
       return
     }
-
-    guard let sn = self.displayStore.getSN(clickedGUID) else {
-      NSLog("ERROR [\(treeID)] Clicked GUID not found: \(clickedGUID)")
-      return
-    }
+    let nodeIdentifier = sender.snList[0].spid
     do {
-      try self.con.backend.enqueueRefreshSubtreeTask(nodeIdentifier: sn.spid, treeID: self.treeID)
+      try self.con.backend.enqueueRefreshSubtreeTask(nodeIdentifier: nodeIdentifier, treeID: self.treeID)
     } catch {
       self.con.reportException("Failed to refresh subtree", error)
     }
   }
 
-  @objc private func menuEditItemClicked(_ sender: AnyObject) {
-    guard let clickedGUID = self.getClickedRowGUID() else {
+  @objc private func showInFinder(_ sender: MenuItemWithNodeList) {
+    guard sender.nodeList.count > 0 else {
       return
+    }
+
+    self.con.app.execAsync {
+      do {
+        // TODO: research how to show in Finder
+      }
     }
   }
 
-  @objc private func menuDeleteItemClicked(_ sender: AnyObject) {
-    guard let clickedGUID = self.getClickedRowGUID() else {
+  @objc private func downloadFromGDrive(_ sender: MenuItemWithNodeList) {
+    guard sender.nodeList.count > 0 else {
       return
+    }
+
+    let node = sender.nodeList[0]
+
+    self.con.app.execAsync {
+      do {
+        try self.con.backend.downloadFileFromGDrive(nodeUID: node.uid, requestorID: self.treeID)
+      } catch {
+        self.con.reportException("Failed to download file from Google Drive", error)
+      }
+    }
+  }
+
+  @objc private func openFile(_ sender: MenuItemWithNodeList) {
+    guard sender.nodeList.count > 0 else {
+      return
+    }
+
+    self.con.app.execAsync {
+      do {
+        // TODO: research how to open file
+
+      }
+    }
+  }
+
+  @objc private func goIntoDir(_ sender: MenuItemWithNodeList) {
+    guard sender.nodeList.count > 0 else {
+      return
+    }
+
+    let node = sender.nodeList[0]
+
+    // TODO
+  }
+
+  @objc private func checkAll(_ sender: MenuItemWithSNList) {
+    let snList: [SPIDNodePair] = sender.snList
+
+    // TODO: UI work
+  }
+
+  @objc private func uncheckAll(_ sender: MenuItemWithSNList) {
+    let snList: [SPIDNodePair] = sender.snList
+
+    // TODO: UI work
+  }
+
+  @objc private func deleteSubtree(_ sender: MenuItemWithNodeList) {
+    var nodeUIDList: [UID] = []
+    for node in sender.nodeList {
+      nodeUIDList.append(node.uid)
+    }
+
+    do {
+      try self.con.backend.deleteSubtree(nodeUIDList: nodeUIDList)
+    } catch {
+      self.con.reportException("Failed to delete subtree", error)
     }
   }
 

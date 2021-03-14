@@ -25,6 +25,8 @@ protocol TreeControllable: HasLifecycle {
   var dispatcher: SignalDispatcher { get }
   var treeID: TreeID { get }
 
+  var canChangeRoot: Bool { get }
+
   var dispatchListener: DispatchListener { get }
 
   func start() throws
@@ -74,6 +76,12 @@ class MockTreeController: TreeControllable {
   var swiftFilterState: SwiftFilterState
 
   var treeView: TreeViewController? = nil
+
+  var canChangeRoot: Bool {
+    get {
+      return true
+    }
+  }
 
   init(_ treeID: String) {
     self.app = MockApp()
