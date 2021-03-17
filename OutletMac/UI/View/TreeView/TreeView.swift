@@ -208,7 +208,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     outlineView.gridStyleMask = .solidHorizontalGridLineMask
     outlineView.autosaveExpandedItems = true
-    outlineView.usesAutomaticRowHeights = true  // set row height to match font (why is this not enabled by default?)
+    outlineView.usesAutomaticRowHeights = true  // set row height to match font
 
     scrollView.documentView = outlineView
     outlineView.frame = scrollView.bounds
@@ -314,7 +314,54 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  private func makeCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+//  private class IconAndTextTableCellView: NSTableCellView {
+//    override var objectValue: Any? {
+//      get {
+//
+//      }
+//    }
+//  }
+
+  private func makeCellWithTextAndIcon(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+
+    let cell = self.makeCellWithText(withIdentifier: identifier)
+
+    guard let node = sn.node else {
+      return cell
+    }
+
+    let icon: NSImage
+    if node.isDir {
+      icon = NSWorkspace.shared.icon(for: .folder)
+    } else {
+      let url = URL(fileURLWithPath: node.firstPath)
+      icon = NSWorkspace.shared.icon(forFileType: url.pathExtension)
+    }
+
+    let imageView = NSImageView(image: icon)
+//    imageView.imageAlignment = .alignBottomRight
+//    imageView.imageScaling = .scaleProportionallyDown
+    cell.addSubview(imageView)
+    cell.imageView = imageView
+
+    // Constrain the text field within the cell
+    cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
+
+    let cellHeight = cell.textField!.bounds.height
+
+    // FIXME
+    icon.size = NSSize(width: cellHeight, height: cellHeight)
+    NSLog("FITTING SIZE: \(cellHeight) rowHeight: \(outlineView.rowHeight)")
+
+    cell.imageView!.sizeToFit()
+
+    return cell
+  }
+
+  private func makeCellWithText(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+    let cell = NSTableCellView()
+    cell.identifier = identifier
+
     let textField = CustomFontNSTextField()
     textField.backgroundColor = NSColor.clear
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -323,9 +370,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.isEditable = false
     textField.customSetFont(TREE_VIEW_NSFONT)
     textField.lineBreakMode = .byTruncatingTail
-
-    let cell = NSTableCellView()
-    cell.identifier = identifier
     cell.addSubview(textField)
     cell.textField = textField
 
@@ -334,8 +378,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
     textField.sizeToFit()
     textField.setFrameOrigin(NSZeroPoint)
-
-    outlineView.rowHeight = 30
 
     return cell
   }
@@ -365,35 +407,35 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       case "name":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCell(withIdentifier: identifier)
+          cell = makeCellWithTextAndIcon(for: sn, withIdentifier: identifier)
         }
         cell!.textField!.stringValue = node.name
         return cell
       case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCell(withIdentifier: identifier)
+          cell = makeCellWithText(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
       case "etc":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCell(withIdentifier: identifier)
+          cell = makeCellWithText(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = String(node.etc)
         return cell
       case "mtime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCell(withIdentifier: identifier)
+          cell = makeCellWithText(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
       case "ctime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCell(withIdentifier: identifier)
+          cell = makeCellWithText(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         return cell

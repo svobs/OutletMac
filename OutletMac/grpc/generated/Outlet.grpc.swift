@@ -51,6 +51,11 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol: GRPCC
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request, Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response>
 
+  func get_icon(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response>
+
   func get_node_for_uid(
     _ request: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request,
     callOptions: CallOptions?
@@ -239,6 +244,24 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeput_configInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to get_icon
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_icon.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_icon(
+    _ request: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.daemon.grpc.generated.Outlet/get_icon",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_iconInterceptors() ?? []
     )
   }
 
@@ -653,6 +676,9 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletClientInterceptorFact
   /// - Returns: Interceptors to use when invoking 'put_config'.
   func makeput_configInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request, Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response>]
 
+  /// - Returns: Interceptors to use when invoking 'get_icon'.
+  func makeget_iconInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response>]
+
   /// - Returns: Interceptors to use when invoking 'get_node_for_uid'.
   func makeget_node_for_uidInterceptors() -> [ClientInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request, Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response>]
 
@@ -754,6 +780,8 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletProvider: CallHandler
 
   func put_config(request: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response>
 
+  func get_icon(request: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response>
+
   func get_node_for_uid(request: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response>
 
   func get_node_for_local_path(request: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response>
@@ -846,6 +874,16 @@ extension Outlet_Backend_Daemon_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.put_config(request: request, context: context)
+        }
+      }
+
+    case "get_icon":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeget_iconInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.get_icon(request: request, context: context)
         }
       }
 
@@ -1092,6 +1130,10 @@ public protocol Outlet_Backend_Daemon_Grpc_Generated_OutletServerInterceptorFact
   /// - Returns: Interceptors to use when handling 'put_config'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeput_configInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request, Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_icon'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_iconInterceptors() -> [ServerInterceptor<Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response>]
 
   /// - Returns: Interceptors to use when handling 'get_node_for_uid'.
   ///   Defaults to calling `self.makeInterceptors()`.
