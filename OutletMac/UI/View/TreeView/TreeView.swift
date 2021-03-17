@@ -345,25 +345,28 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
     }
 
-    // FIXME: need to figure out how to align the icon properly - it is being drawn too far up
+    // FIXME: need to figure out how to align icon and text properly - they are being drawn too far up
 
     let imageView = NSImageView(image: icon)
-    imageView.imageAlignment = .alignBottomLeft
+    imageView.imageAlignment = .alignCenter
     imageView.imageFrameStyle = .none
-    cell.textField!.topAnchor.constraint(equalTo: cell.topAnchor).isActive = true
     cell.addSubview(imageView)
     cell.imageView = imageView
+    
+//    imageView.widthAnchor.constraint(equalTo: cell.widthAnchor).isActive = true
+    imageView.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
+//    cell.imageView!.topAnchor.constraint(equalTo: cell.textField!.topAnchor).isActive = true
 
-    // Constrain the text field within the cell
+    // Make sure the text is placed to the right of the icon:
     cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
 
     // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
     let cellHeight = cell.textField!.bounds.height
 
     // subtract 2 from the cell height because at small cell heights, the image is too far up and gets clipped (see the FIXME above)
-    icon.size = NSSize(width: cellHeight - 2, height: cellHeight - 2)
+    icon.size = NSSize(width: cellHeight, height: cellHeight)
 
-//    cell.imageView!.sizeToFit()
+    cell.imageView!.sizeToFit()
     cell.needsLayout = true
 
     return cell
