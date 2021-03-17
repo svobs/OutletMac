@@ -317,20 +317,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-//  private class IconAndTextTableCellView: NSTableCellView {
-//    override var objectValue: Any? {
-//      get {
-//
-//      }
-//    }
-//  }
-
-  private func makeCellWithTextAndIcon(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-
-    let cell = self.makeCellWithText(withIdentifier: identifier)
-
+  private func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView) -> NSImage? {
     guard let node = sn.node else {
-      return cell
+      return nil
     }
 
     // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
@@ -357,8 +346,18 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     icon.size = NSSize(width: cellHeight, height: cellHeight)
 
+    return icon
+  }
+
+  private func makeCellWithTextAndIcon(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+
+    let cell = self.makeCellWithText(withIdentifier: identifier)
+
     // FIXME: need to figure out how to align icon and text properly AND also make it compact
 
+    guard let icon = self.makeIcon(sn, cell) else {
+      return cell
+    }
     let imageView = NSImageView(image: icon)
     imageView.imageAlignment = .alignCenter  // FIXME: this is not right
     imageView.imageFrameStyle = .none
@@ -428,6 +427,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if cell == nil {
           cell = makeCellWithTextAndIcon(for: sn, withIdentifier: identifier)
         }
+        cell!.imageView!.image = self.makeIcon(sn, cell!)
         cell!.textField!.stringValue = node.name
         return cell
       case "size":
