@@ -37,7 +37,7 @@ class DisplayStore {
       return NULL_GUID
     }
     let guid = self.guidFor(sn!.spid)
-    NSLog("DEBUG [\(self.con.treeID)] GUID \(guid) => \(sn!.spid.uid) \(sn!.spid.getSinglePath())")
+//    NSLog("DEBUG [\(self.con.treeID)] GUID \(guid) => \(sn!.spid.uid) \(sn!.spid.getSinglePath())")
     return guid
   }
 

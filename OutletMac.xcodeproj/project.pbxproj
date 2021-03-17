@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
+		D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */; };
+		D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CB02601FEB600E91EC9 /* Actions.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
@@ -59,6 +61,8 @@
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
+		D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
+		D12C2CB02601FEB600E91EC9 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
@@ -237,6 +241,8 @@
 				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
 				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
 				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
+				D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */,
+				D12C2CB02601FEB600E91EC9 /* Actions.swift */,
 			);
 			path = TreeView;
 			sourceTree = "<group>";
@@ -399,6 +405,7 @@
 				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
 				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
+				D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeView.swift in Sources */,
 				D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
@@ -420,6 +427,7 @@
 				D138ADFE25BFE8D100E4F9E4 /* DateUtil.swift in Sources */,
 				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,
 				D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */,
+				D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */,
 				D16839A925AD532800D76169 /* Node.pb.swift in Sources */,
 				D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */,
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,

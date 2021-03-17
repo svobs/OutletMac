@@ -19,6 +19,8 @@ protocol TreeControllable: HasLifecycle {
 
   var treeView: TreeViewController? { get set }
   var displayStore: DisplayStore { get }
+  var treeActions: TreeActions { get }
+  var contextMenu: TreeContextMenu { get }
 
   // Convenience getters - see extension below
   var backend: OutletBackend { get }
@@ -76,6 +78,8 @@ class MockTreeController: TreeControllable {
   var swiftFilterState: SwiftFilterState
 
   var treeView: TreeViewController? = nil
+  lazy var treeActions: TreeActions = TreeActions(self)
+  lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
 
   var canChangeRoot: Bool {
     get {
@@ -125,6 +129,8 @@ class TreeController: TreeControllable, ObservableObject {
   var tree: DisplayTree
   let dispatchListener: DispatchListener
   lazy var displayStore: DisplayStore = DisplayStore(self)
+  lazy var treeActions: TreeActions = TreeActions(self)
+  lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
