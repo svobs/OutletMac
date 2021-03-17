@@ -163,7 +163,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.cell?.truncatesLastVisibleLine = true
     outlineView.autoresizesOutlineColumn = true
     outlineView.indentationPerLevel = 16
-    outlineView.backgroundColor = .clear
+//    outlineView.backgroundColor = .clear
     outlineView.appearance = NSAppearance(named: NSAppearance.Name.vibrantDark)
 
     outlineView.headerView = NSTableHeaderView()
@@ -206,7 +206,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 //    ctimeCol.isHidden = true
     outlineView.addTableColumn(ctimeCol)
 
-    outlineView.gridStyleMask = .solidHorizontalGridLineMask
+//    outlineView.backgroundColor = .clear
+//    outlineView.usesAlternatingRowBackgroundColors = true // TODO: the colors are screwed up when this is used
+//    outlineView.gridStyleMask = .dashedHorizontalGridLineMask
+//    outlineView.selectionHighlightStyle = .sourceList // selection highlight has rounded corners (TODO: this introduces ugly extra space)
     outlineView.autosaveExpandedItems = true
     outlineView.usesAutomaticRowHeights = true  // set row height to match font
 
@@ -334,26 +337,34 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     if node.isDir {
       icon = NSWorkspace.shared.icon(for: .folder)
     } else {
-      let url = URL(fileURLWithPath: node.firstPath)
-      icon = NSWorkspace.shared.icon(forFileType: url.pathExtension)
+      let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
+      if suffix == "" {
+        icon = NSWorkspace.shared.icon(for: .data)
+      } else {
+        icon = NSWorkspace.shared.icon(forFileType: suffix)
+      }
     }
 
+    // FIXME: need to figure out how to align the icon properly - it is being drawn too far up
+
     let imageView = NSImageView(image: icon)
-//    imageView.imageAlignment = .alignBottomRight
-//    imageView.imageScaling = .scaleProportionallyDown
+    imageView.imageAlignment = .alignBottomLeft
+    imageView.imageFrameStyle = .none
+    cell.textField!.topAnchor.constraint(equalTo: cell.topAnchor).isActive = true
     cell.addSubview(imageView)
     cell.imageView = imageView
 
     // Constrain the text field within the cell
     cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
 
+    // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
     let cellHeight = cell.textField!.bounds.height
 
-    // FIXME
-    icon.size = NSSize(width: cellHeight, height: cellHeight)
-    NSLog("FITTING SIZE: \(cellHeight) rowHeight: \(outlineView.rowHeight)")
+    // subtract 2 from the cell height because at small cell heights, the image is too far up and gets clipped (see the FIXME above)
+    icon.size = NSSize(width: cellHeight - 2, height: cellHeight - 2)
 
-    cell.imageView!.sizeToFit()
+//    cell.imageView!.sizeToFit()
+    cell.needsLayout = true
 
     return cell
   }
@@ -605,7 +616,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return clickedGUID
   }
 
-  func menuNeedsUpdate(_ menu: NSMenu) {
+  func menuWillOpen(_ menu: NSMenu) {
     guard let clickedGUID = self.getClickedRowGUID() else {
       return
     }
@@ -632,6 +643,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
     }
   }
+
+//  func menuNeedsUpdate(_ menu: NSMenu) {
+//  }
 
   /**
    Builds a context menu for multiple selected items.
