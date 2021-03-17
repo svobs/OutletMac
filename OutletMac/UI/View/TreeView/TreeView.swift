@@ -333,7 +333,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return cell
     }
 
-    let icon: NSImage
+    // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
+    let cellHeight = cell.textField!.bounds.height
+    NSLog("CELL HEIGHT: \(cellHeight)")
+
+    var icon: NSImage
     if node.isDir {
       icon = NSWorkspace.shared.icon(for: .folder)
     } else {
@@ -345,26 +349,27 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
     }
 
-    // FIXME: need to figure out how to align icon and text properly - they are being drawn too far up
+    // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
+    if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: cellHeight, height: cellHeight), context: nil, hints: nil) {
+      icon = NSImage(size: imageRep.size)
+      icon.addRepresentation(imageRep)
+    }
+
+    icon.size = NSSize(width: cellHeight, height: cellHeight)
+
+    // FIXME: need to figure out how to align icon and text properly AND also make it compact
 
     let imageView = NSImageView(image: icon)
-    imageView.imageAlignment = .alignCenter
+    imageView.imageAlignment = .alignCenter  // FIXME: this is not right
     imageView.imageFrameStyle = .none
     cell.addSubview(imageView)
     cell.imageView = imageView
-    
-//    imageView.widthAnchor.constraint(equalTo: cell.widthAnchor).isActive = true
-    imageView.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
-//    cell.imageView!.topAnchor.constraint(equalTo: cell.textField!.topAnchor).isActive = true
+
+    imageView.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
+    cell.imageView!.centerYAnchor.constraint(equalTo: cell.textField!.centerYAnchor).isActive = true
 
     // Make sure the text is placed to the right of the icon:
     cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
-
-    // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
-    let cellHeight = cell.textField!.bounds.height
-
-    // subtract 2 from the cell height because at small cell heights, the image is too far up and gets clipped (see the FIXME above)
-    icon.size = NSSize(width: cellHeight, height: cellHeight)
 
     cell.imageView!.sizeToFit()
     cell.needsLayout = true
@@ -388,10 +393,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     cell.textField = textField
 
     // Constrain the text field within the cell
-    textField.widthAnchor.constraint(equalTo: cell.widthAnchor).isActive = true
-    textField.heightAnchor.constraint(equalTo: cell.heightAnchor).isActive = true
+    textField.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
+    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
     textField.sizeToFit()
-    textField.setFrameOrigin(NSZeroPoint)
+//    textField.setFrameOrigin(NSZeroPoint)
 
     return cell
   }

@@ -42,7 +42,7 @@ let DEFAULT_FONT = TEXT_BOX_FONT
 let ROOT_PATH_ENTRY_FONT = TEXT_BOX_FONT
 let FILTER_ENTRY_FONT = TEXT_BOX_FONT
 let BUTTON_PANEL_FONT = TEXT_BOX_FONT
-let TREE_VIEW_NSFONT: NSFont = NSFont.systemFont(ofSize: 14.0)
+let TREE_VIEW_NSFONT: NSFont = NSFont.systemFont(ofSize: 12.0)
 //let TREE_VIEW_NSFONT: NSFont = NSFont.init(name: "Monaco", size: 18.0)!
 //let TREE_ITEM_ICON_HEIGHT: Int = 20
 
