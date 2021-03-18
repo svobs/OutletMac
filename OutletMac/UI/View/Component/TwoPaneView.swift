@@ -213,6 +213,7 @@ struct TwoPaneView: View {
   let conRight: TreeControllable
   let leftPanel: TreePanel
   let rightPanel: TreePanel
+  let icon: NSImage?
 
   init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
@@ -220,6 +221,11 @@ struct TwoPaneView: View {
     self.conRight = conRight
     self.leftPanel = TreePanel(controller: conLeft)
     self.rightPanel = TreePanel(controller: conRight)
+    do {
+      self.icon = try self.app.backend.getIcon(IconId.BTN_GDRIVE)
+    } catch {
+      self.icon = nil
+    }
   }
 
   var body: some View {

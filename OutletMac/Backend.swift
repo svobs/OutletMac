@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 2021-01-25.
 //  Copyright © 2021 Ibotta. All rights reserved.
 //
+import SwiftUI
 
 protocol OutletBackend: HasLifecycle {
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String
@@ -12,6 +13,7 @@ protocol OutletBackend: HasLifecycle {
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
   func putConfigList(_ configDict: [String: String]) throws
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
+  func getIcon(_ iconID: IconId) throws -> NSImage?
   
   //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
@@ -93,6 +95,10 @@ class MockBackend: OutletBackend {
   }
 
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func getIcon(_ iconID: IconId) throws -> NSImage? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

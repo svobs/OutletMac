@@ -635,5 +635,23 @@ class OutletGRPCClient: OutletBackend {
       throw OutletError.grpcFailure("RPC 'putConfig' failed: \(error)")
     }
   }
-  
+
+  func getIcon(_ iconID: IconId) throws -> NSImage? {
+    var request = Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request()
+    request.iconID = iconID.rawValue
+    let call = self.stub.get_icon(request)
+    do {
+      let response = try call.response.wait()
+      if response.hasIcon {
+        assert(iconID.rawValue == response.icon.iconID, "Response iconID (\(response.icon.iconID)) does not match request iconID (\(iconID))")
+        NSLog("DEBUG Got image from server: \(iconID)")
+        return NSImage(data: response.icon.content)
+      } else {
+        NSLog("DEBUG Server returned empty result for requested image: \(iconID)")
+        return nil
+      }
+    } catch {
+      throw OutletError.grpcFailure("RPC 'getIcon' failed: \(error)")
+    }
+  }
 }
