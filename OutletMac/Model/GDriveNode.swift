@@ -185,11 +185,11 @@ class GDriveFolder: GDriveNode {
     }
   }
   
-  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+  override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }
 
-  override func getDirStats() throws -> DirectoryStats? {
+  override func getDirStats() -> DirectoryStats? {
     return self._dirStats
   }
   

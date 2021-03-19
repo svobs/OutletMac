@@ -172,12 +172,12 @@ class Node: CustomStringConvertible {
     }
   }
   
-  func setDirStats(_ dirStats: DirectoryStats?) throws {
-    throw OutletError.invalidOperation("setDirStats(): class does not implement getDirStats(): \(type(of: self))!")
+  func setDirStats(_ dirStats: DirectoryStats?) {
+    preconditionFailure("setDirStats(): class does not implement setDirStats(): \(type(of: self))!")
   }
   
-  func getDirStats() throws -> DirectoryStats? {
-    throw OutletError.invalidOperation("getDirStats(): class does not implement getDirStats(): \(type(of: self))!")
+  func getDirStats() -> DirectoryStats? {
+    preconditionFailure("getDirStats(): class does not implement getDirStats(): \(type(of: self))!")
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {

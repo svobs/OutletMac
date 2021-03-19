@@ -11,9 +11,16 @@ import SwiftUI
 typealias MD5 = String
 typealias SHA256 = String
 
+let SUPER_DEBUG: Bool = false
+
 // --- FRONT END ONLY ---
 
 let APP_NAME = "Outlet"
+
+// Whether to use the system images, or to use the ones from the backend
+let USE_SYSTEM_TOOLBAR_ICONS: Bool = true
+
+let DEFAULT_ICON_SIZE: Int = 24
 
 // Padding in pixels
 let H_PAD: CGFloat = 5
@@ -41,7 +48,6 @@ let TEXT_BOX_FONT = Font.system(size: 20.0)
 let DEFAULT_FONT = TEXT_BOX_FONT
 let ROOT_PATH_ENTRY_FONT = TEXT_BOX_FONT
 let FILTER_ENTRY_FONT = TEXT_BOX_FONT
-let BUTTON_PANEL_FONT = TEXT_BOX_FONT
 let TREE_VIEW_NSFONT: NSFont = NSFont.systemFont(ofSize: 12.0)
 //let TREE_VIEW_NSFONT: NSFont = NSFont.init(name: "Monaco", size: 18.0)!
 //let TREE_ITEM_ICON_HEIGHT: Int = 20
@@ -96,10 +102,13 @@ enum IconNames: String {
   case BTN_LOCAL_DISK_LINUX = "localdisk-linux-btn"
 }
 
+// --- FE + BE SHARED ---
+
 /**
  ENUM IconId
  
- Used for identifying icons in a more compact way, mainly for serialization for RPC
+ Used for identifying icons in a compact way. Each IconId has an associated image which can be retreived from the backend,
+ but may alternatively be represented by a MacOS system image.
  */
 enum IconId: UInt32 {
   case NONE = 0
@@ -142,10 +151,57 @@ enum IconId: UInt32 {
 
   case BTN_GDRIVE = 33
   case BTN_LOCAL_DISK_LINUX = 34
+
+  func isToolbarIcon() -> Bool {
+    // TODO: implement IconId.isToolbarIcon and IconId.isTreeIcon
+    return true
+  }
+
+  /**
+   Each icon can have an associated MacOS system image.
+   Reminder: we can use the "SF Symbols" app to browse system images and their names
+   */
+  func systemImageName() -> String {
+    // Some of these are really bad... unfortunately, Apple doesn't give us a lot to work with
+    switch self {
+      case .ICON_ALERT:
+        return "exclamationmark.triangle.fill"
+      case .ICON_WINDOW:
+        return "macwindow.on.rectangle"
+      case .ICON_REFRESH:
+        return "arrow.clockwise"
+      case .ICON_PLAY:
+        return "play.fill"
+      case .ICON_PAUSE:
+        return "pause.fill"
+      case .ICON_FOLDER_TREE:
+        return "network"
+      case .ICON_MATCH_CASE:
+        return "textformat"
+      case .ICON_IS_SHARED:
+        return "person.2.fill"
+      case .ICON_IS_NOT_SHARED:
+        return "person.fill"
+      case .ICON_IS_TRASHED:
+        return "trash"
+      case .ICON_IS_NOT_TRASHED:
+        return "trash.slash"
+      case .ICON_GDRIVE:
+        return "externaldrive"
+      case .ICON_LOCAL_DISK_LINUX:
+        return "externaldrive"
+      case .BTN_GDRIVE:
+        return "externaldrive"
+      case .BTN_LOCAL_DISK_LINUX:
+        return "externaldrive"
+      default:
+        preconditionFailure("No system image has been defined for: \(self)")
+    }
+  }
 }
 
+let ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME = "multiply.circle.fill"
 
-// --- FE + BE SHARED ---
 
 let ROOT_PATH = "/"
 let GDRIVE_PATH_PREFIX = "gdrive:/"
@@ -259,3 +315,8 @@ enum TreeDisplayMode: UInt32 {
   case ONE_TREE_ALL_ITEMS = 1
   case CHANGES_ONE_TREE_PER_CATEGORY = 2
 }
+
+let CFG_KEY_TREE_ICON_SIZE = "display.image.tree_icon_size"
+let CFG_KEY_TOOLBAR_ICON_SIZE = "display.image.toolbar_icon_size"
+let CFG_KEY_USE_NATIVE_TOOLBAR_ICONS = "display.image.use_native_toolbar_icons"
+

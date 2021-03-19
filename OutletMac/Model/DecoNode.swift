@@ -176,7 +176,7 @@ class DecoDirNode : DecoNode {
     return self._dirStats != nil
   }
   
-  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+  override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }
 }

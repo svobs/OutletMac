@@ -93,29 +93,29 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func receiveServerSignals() throws {
-    NSLog("Subscribing to server signals...")
+    NSLog("DEBUG Subscribing to server signals...")
     let request = Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
       do {
         try self.relaySignalLocally(signalGRPC)
       } catch {
         let signal = Signal(rawValue: signalGRPC.sigInt)!
-        NSLog("Error processing received signal \(signal): \(error)")
+        NSLog("ERROR While relaying received signal \(signal): \(error)")
       }
     }
     
     call.status.whenSuccess { status in
       if status.code == .ok {
         // this should never happen
-        NSLog("Server closed signal subscription")
+        NSLog("INFO  Server closed signal subscription")
       } else {
-        NSLog("ReceiveSignals(): received error: \(status)")
+        NSLog("ERROR ReceiveSignals(): received error: \(status)")
       }
     }
 
     // Wait for the call to end.
     _ = try! call.status.wait()
-    NSLog("receiveServerSignals() returning")
+    NSLog("DEBUG receiveServerSignals() returning")
   }
   
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
@@ -134,7 +134,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
-    NSLog("Requesting DisplayTree for params: \(request)")
+    NSLog("DEBUG Requesting DisplayTree for params: \(request)")
     var grpcRequest = Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeID
@@ -152,7 +152,7 @@ class OutletGRPCClient: OutletBackend {
       let response = try call.response.wait()
       if (response.hasDisplayTreeUiState) {
         let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-        NSLog("Got state: \(state)")
+        NSLog("DEBUG Got state: \(state)")
         return state.toDisplayTree(backend: self)
       } else {
         return nil
@@ -571,7 +571,9 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
-    NSLog("getIntConfig entered")
+    if SUPER_DEBUG {
+      NSLog("DEBUG getIntConfig entered")
+    }
     let defaultValStr: String?
     if defaultVal == nil {
       defaultValStr = nil
@@ -583,11 +585,26 @@ class OutletGRPCClient: OutletBackend {
     if configValInt == nil {
       throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
     } else {
-      NSLog("getIntConfig returning: \(configValInt!)")
+      NSLog("DEBUG getIntConfig returning: \(configValInt!)")
       return configValInt!
     }
   }
-  
+
+  func getBoolConfig(_ configKey: String, defaultVal: Bool? = nil) throws -> Bool {
+    if SUPER_DEBUG {
+      NSLog("DEBUG getBoolConfig entered")
+    }
+    let defaultValStr: String? = (defaultVal == nil) ? nil : String(defaultVal!)
+    let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
+    let configValBool = Bool(configVal.lowercased())
+    if configValBool == nil {
+      throw OutletError.invalidState("Failed to parse value '\(configVal)' as bool for key '\(configKey)'")
+    } else {
+      NSLog("DEBUG getBoolConfig returning: \(configValBool!)")
+      return configValBool!
+    }
+  }
+
   func putConfig(_ configKey: String, _ configVal: String) throws {
     var request = Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request()
     var configEntry = Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry()

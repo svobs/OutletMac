@@ -13,6 +13,7 @@ protocol OutletBackend: HasLifecycle {
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
   func putConfigList(_ configDict: [String: String]) throws
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
+  func getBoolConfig(_ configKey: String, defaultVal: Bool?) throws -> Bool
   func getIcon(_ iconID: IconId) throws -> NSImage?
   
   //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
@@ -52,12 +53,16 @@ protocol OutletBackend: HasLifecycle {
  This may be bad practice. See note at bottom of https://medium.com/@georgetsifrikas/swift-protocols-with-default-values-b7278d3eef22
  */
 extension OutletBackend {
-  func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
-    return try getConfig(configKey, defaultVal: defaultVal)
+  func getConfig(_ configKey: String) throws -> String {
+    return try getConfig(configKey, defaultVal: nil)
   }
 
-  func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
-    return try getIntConfig(configKey, defaultVal: defaultVal)
+  func getIntConfig(_ configKey: String) throws -> Int {
+    return try getIntConfig(configKey, defaultVal: nil)
+  }
+
+  func getBoolConfig(_ configKey: String) throws -> Bool {
+    return try getBoolConfig(configKey, defaultVal: nil)
   }
 }
 
@@ -95,6 +100,10 @@ class MockBackend: OutletBackend {
   }
 
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func getBoolConfig(_ configKey: String, defaultVal: Bool?) throws -> Bool {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

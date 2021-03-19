@@ -27,7 +27,7 @@ class ContainerNode: Node {
     }
   }
   
-  override func setDirStats(_ dirStats: DirectoryStats?) throws {
+  override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }
 }

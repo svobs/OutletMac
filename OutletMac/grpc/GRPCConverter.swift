@@ -172,13 +172,13 @@ class GRPCConverter {
                                 nodeGRPC.isShared, sharedByUserUID: sharedByUserUid, syncTS: syncTs,
                               allChildrenFetched: meta.allChildrenFetched)
           let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-          try node.setDirStats(dirStats)
+          node.setDirStats(dirStats)
         case .localDirMeta(let meta):
           let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
           let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
           node = LocalDirNode(localNodeIdentifier, meta.parentUid, trashed, isLive: meta.isLive)
           let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-          try node.setDirStats(dirStats)
+          node.setDirStats(dirStats)
         case .localFileMeta(let meta):
           let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
           let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
@@ -193,16 +193,16 @@ class GRPCConverter {
         case .containerMeta(let meta):
           node = ContainerNode(nodeIdentifier)
           let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-          try node.setDirStats(dirStats)
+          node.setDirStats(dirStats)
         case .categoryMeta(let meta):
           let opType = UserOpType(rawValue: meta.opType)!
           node = CategoryNode(nodeIdentifier, opType)
           let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-          try node.setDirStats(dirStats)
+          node.setDirStats(dirStats)
         case .rootTypeMeta(let meta):
           node = RootTypeNode(nodeIdentifier)
           let dirStats = try GRPCConverter.dirMetaFromGRPC(meta.dirMeta)
-          try node.setDirStats(dirStats)
+          node.setDirStats(dirStats)
       }
     } else {
       throw OutletError.invalidState("gRPC Node is missing node_type!")

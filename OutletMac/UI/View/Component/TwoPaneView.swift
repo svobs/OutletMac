@@ -31,16 +31,18 @@ struct TodoPlaceholder: View {
  Just a container for all the components for a given tree
  */
 struct TreePanel {
+  let app: OutletApp
   let con: TreeControllable
   let rootPathPanel: RootPathPanel
   let filterPanel: FilterPanel
   let treeView: TreeView
   let status_panel: StatusPanel
 
-  init(controller: TreeControllable) {
+  init(_ app: OutletApp, _ controller: TreeControllable) {
+    self.app = app
     self.con = controller
     self.rootPathPanel = RootPathPanel(controller: self.con, canChangeRoot: true)
-    self.filterPanel = FilterPanel(controller: self.con)
+    self.filterPanel = FilterPanel(self.app, self.con)
     self.treeView = TreeView(controller: self.con)
     self.status_panel = StatusPanel(controller: self.con)
   }
@@ -72,16 +74,18 @@ struct StatusPanel: View {
  */
 struct PlayPauseToggleButton: View {
   @Binding var isPlaying: Bool
+  let iconStore: IconStore
   let dispatcher: SignalDispatcher
   let width: CGFloat = DEFAULT_TERNARY_BTN_WIDTH
   let height: CGFloat = DEFAULT_TERNARY_BTN_HEIGHT
   private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
-   self._isPlaying = isPlaying
-   self.dispatcher = dispatcher
-   self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
- }
+  init(_ iconStore: IconStore, _ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
+    self.iconStore = iconStore
+    self._isPlaying = isPlaying
+    self.dispatcher = dispatcher
+    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
+  }
 
   private func toggleValue() {
     if self.isPlaying {
@@ -96,9 +100,9 @@ struct PlayPauseToggleButton: View {
   var body: some View {
     Button(action: onClickAction!) {
       if isPlaying {
-        RegularImage(systemImageName: "pause.fill", width: width, height: height, font: BUTTON_PANEL_FONT)
+        UnselectedToolIcon(iconStore.getIcon(for: .ICON_PAUSE))
       } else {
-        InvertedWhiteCircleImage(systemImageName: "play.fill", width: width, height: height, font: BUTTON_PANEL_FONT)
+        SelectedToolIcon(iconStore.getIcon(for: .ICON_PLAY))
       }
     }
     .buttonStyle(PlainButtonStyle())
@@ -140,12 +144,14 @@ struct PrefsView: View {
  */
 fileprivate struct ButtonBar: View {
   @EnvironmentObject var settings: GlobalSettings
+  let app: OutletApp
   let conLeft: TreeControllable
   let conRight: TreeControllable
 
   var prefsView: PrefsView?
 
-  init(conLeft: TreeControllable, conRight: TreeControllable) {
+  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
+    self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
   }
@@ -154,7 +160,7 @@ fileprivate struct ButtonBar: View {
     HStack {
       Button("Diff (content-first)", action: self.onDiffButtonClicked)
       Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
-      PlayPauseToggleButton($settings.isPlaying, conLeft.dispatcher)
+      PlayPauseToggleButton(app.iconStore, $settings.isPlaying, conLeft.dispatcher)
       Spacer()
     }
     .padding(.leading, H_PAD)
@@ -213,19 +219,13 @@ struct TwoPaneView: View {
   let conRight: TreeControllable
   let leftPanel: TreePanel
   let rightPanel: TreePanel
-  let icon: NSImage?
 
   init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    self.leftPanel = TreePanel(controller: conLeft)
-    self.rightPanel = TreePanel(controller: conRight)
-    do {
-      self.icon = try self.app.backend.getIcon(IconId.BTN_GDRIVE)
-    } catch {
-      self.icon = nil
-    }
+    self.leftPanel = TreePanel(app, conLeft)
+    self.rightPanel = TreePanel(app, conRight)
   }
 
   var body: some View {
@@ -275,7 +275,7 @@ struct TwoPaneView: View {
         })
 
       // Row4: Button bar & progress bar
-      ButtonBar(conLeft: self.conLeft, conRight: self.conRight)
+      ButtonBar(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
         .frame(alignment: .bottomLeading)
         .background(GeometryReader { geo in
           Color.clear

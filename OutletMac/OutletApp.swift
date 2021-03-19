@@ -15,6 +15,7 @@ import SwiftUI
 protocol OutletApp {
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
+  var iconStore: IconStore { get }
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
@@ -28,10 +29,12 @@ protocol OutletApp {
 class MockApp: OutletApp {
   var dispatcher: SignalDispatcher
   var backend: OutletBackend
+  var iconStore: IconStore
 
   init() {
     self.dispatcher = SignalDispatcher()
     self.backend = MockBackend(self.dispatcher)
+    self.iconStore = IconStore(self.backend)
   }
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
@@ -87,6 +90,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let dispatcher = SignalDispatcher()
   lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
   var _backend: OutletBackend? = nil
+  var _iconStore: IconStore? = nil
   var conLeft: TreeController? = nil
   var conRight: TreeController? = nil
   let taskRunner: TaskRunner = TaskRunner()
@@ -100,15 +104,24 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
+  var iconStore: IconStore {
+    get {
+      return self._iconStore!
+    }
+  }
+
   func start() {
     NSLog("DEBUG OutletMacApp start begin")
 
     do {
       self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+      self._iconStore = IconStore(self.backend)
 
       NSLog("INFO  gRPC client connecting")
       try self.backend.start()
       NSLog("INFO  Backend started")
+
+      try self.iconStore.start()
 
       // Subscribe to app-wide signals here
       try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)

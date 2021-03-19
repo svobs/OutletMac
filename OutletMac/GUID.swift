@@ -21,7 +21,9 @@ class GUIDGenerator {
     }
 
     nextVal -= 1
-    NSLog("Returning next GUID: \(nextVal)")
+    if SUPER_DEBUG {
+      NSLog("DEBUG GUIDGenerator: returning next GUID: \(nextVal)")
+    }
     return nextVal
   }
 }
