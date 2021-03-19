@@ -49,7 +49,7 @@ class CategoryNode: ContainerNode {
     }
   }
   
-  override var defaultIcon: IconId {
+  override var defaultIcon: IconID {
     get {
       return .ICON_GENERIC_DIR
     }
@@ -73,7 +73,7 @@ class RootTypeNode: ContainerNode {
     }
   }
   
-  override var defaultIcon: IconId {
+  override var defaultIcon: IconID {
     get {
       if self.treeType == .LOCAL_DISK {
         return .ICON_LOCAL_DISK_LINUX

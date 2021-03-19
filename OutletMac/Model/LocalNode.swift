@@ -48,7 +48,7 @@ class LocalDirNode: LocalNode {
     }
   }
   
-  override var defaultIcon: IconId {
+  override var defaultIcon: IconID {
     get {
       return .ICON_GENERIC_DIR
     }

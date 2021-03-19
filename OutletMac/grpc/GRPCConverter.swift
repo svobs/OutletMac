@@ -208,7 +208,7 @@ class GRPCConverter {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
 
-    node.customIcon = IconId(rawValue: nodeGRPC.iconID)!
+    node.customIcon = IconID(rawValue: nodeGRPC.iconID)!
 
     if nodeGRPC.decoratorNid > 0 {
       assert(nodeGRPC.decoratorParentNid > 0, "No parent_nid for decorator node! (decorator_nid=\(nodeGRPC.decoratorNid)")

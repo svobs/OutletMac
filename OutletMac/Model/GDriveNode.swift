@@ -150,7 +150,7 @@ class GDriveFolder: GDriveNode {
     }
   }
   
-  override var defaultIcon: IconId {
+  override var defaultIcon: IconID {
     get {
       if self.trashed == .NOT_TRASHED {
         if self.isLive {
@@ -269,7 +269,7 @@ class GDriveFile: GDriveNode {
     }
   }
   
-  override var defaultIcon: IconId {
+  override var defaultIcon: IconID {
     get {
       if self.trashed == .NOT_TRASHED {
         if self.isLive {

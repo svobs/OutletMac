@@ -69,46 +69,6 @@ struct StatusPanel: View {
   }
 }
 
-/**
- TODO: refactor to share code with BoolToggleButton, TernaryToggleButton
- */
-struct PlayPauseToggleButton: View {
-  @Binding var isPlaying: Bool
-  let iconStore: IconStore
-  let dispatcher: SignalDispatcher
-  let width: CGFloat = DEFAULT_TERNARY_BTN_WIDTH
-  let height: CGFloat = DEFAULT_TERNARY_BTN_HEIGHT
-  private var onClickAction: NoArgVoidFunc? = nil
-
-  init(_ iconStore: IconStore, _ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
-    self.iconStore = iconStore
-    self._isPlaying = isPlaying
-    self.dispatcher = dispatcher
-    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
-  }
-
-  private func toggleValue() {
-    if self.isPlaying {
-      NSLog("Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
-      dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
-    } else {
-      NSLog("Play/Pause btn clicked! Sending signal \(Signal.RESUME_OP_EXECUTION)")
-      dispatcher.sendSignal(signal: .RESUME_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
-    }
-  }
-
-  var body: some View {
-    Button(action: onClickAction!) {
-      if isPlaying {
-        UnselectedToolIcon(iconStore.getIcon(for: .ICON_PAUSE))
-      } else {
-        SelectedToolIcon(iconStore.getIcon(for: .ICON_PLAY))
-      }
-    }
-    .buttonStyle(PlainButtonStyle())
-  }
-}
-
 // TODO: from https://troz.net/post/2019/swiftui-for-mac-2/
 struct PrefsView: View {
   @State var prefsWindowDelegate = PrefsWindowDelegate()

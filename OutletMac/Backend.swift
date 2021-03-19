@@ -14,7 +14,7 @@ protocol OutletBackend: HasLifecycle {
   func putConfigList(_ configDict: [String: String]) throws
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
   func getBoolConfig(_ configKey: String, defaultVal: Bool?) throws -> Bool
-  func getIcon(_ iconID: IconId) throws -> NSImage?
+  func getIcon(_ iconID: IconID) throws -> NSImage?
   
   //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
   func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
@@ -107,7 +107,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getIcon(_ iconID: IconId) throws -> NSImage? {
+  func getIcon(_ iconID: IconID) throws -> NSImage? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

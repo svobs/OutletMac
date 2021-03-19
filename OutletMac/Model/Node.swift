@@ -12,7 +12,7 @@ class Node: CustomStringConvertible {
   var nodeIdentifier: NodeIdentifier
   var parentList: [UID]
   var trashed: TrashStatus
-  var _icon: IconId?
+  var _icon: IconID?
   
   public var description: String {
     return "Node(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
@@ -120,7 +120,7 @@ class Node: CustomStringConvertible {
     }
   }
   
-  var defaultIcon: IconId {
+  var defaultIcon: IconID {
     get {
       if self.isLive {
         return .ICON_GENERIC_FILE
@@ -130,13 +130,13 @@ class Node: CustomStringConvertible {
     }
   }
   
-  var icon: IconId {
+  var icon: IconID {
     get {
       return self._icon ?? self.defaultIcon
     }
   }
   
-  var customIcon: IconId? {
+  var customIcon: IconID? {
     get {
       return self._icon
     }

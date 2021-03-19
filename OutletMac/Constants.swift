@@ -105,12 +105,12 @@ enum IconNames: String {
 // --- FE + BE SHARED ---
 
 /**
- ENUM IconId
+ ENUM IconID
  
- Used for identifying icons in a compact way. Each IconId has an associated image which can be retreived from the backend,
+ Used for identifying icons in a compact way. Each IconID has an associated image which can be retreived from the backend,
  but may alternatively be represented by a MacOS system image.
  */
-enum IconId: UInt32 {
+enum IconID: UInt32 {
   case NONE = 0
 
   case ICON_GENERIC_FILE = 1
@@ -153,7 +153,7 @@ enum IconId: UInt32 {
   case BTN_LOCAL_DISK_LINUX = 34
 
   func isToolbarIcon() -> Bool {
-    // TODO: implement IconId.isToolbarIcon and IconId.isTreeIcon
+    // TODO: implement IconID.isToolbarIcon and IconID.isTreeIcon
     return true
   }
 

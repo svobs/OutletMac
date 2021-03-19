@@ -653,7 +653,7 @@ class OutletGRPCClient: OutletBackend {
     }
   }
 
-  func getIcon(_ iconID: IconId) throws -> NSImage? {
+  func getIcon(_ iconID: IconID) throws -> NSImage? {
     var request = Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request()
     request.iconID = iconID.rawValue
     let call = self.stub.get_icon(request)

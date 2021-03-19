@@ -127,7 +127,7 @@ class IconStore: HasLifecycle {
     cache.removeAllObjects()
   }
 
-  func getIcon(for iconID: IconId) -> ImageProvider {
+  func getIcon(for iconID: IconID) -> ImageProvider {
     let key = NSNumber(integerLiteral: Int(iconID.rawValue))
 
     if let cachedIcon = cache.object(forKey: key) {
@@ -140,7 +140,7 @@ class IconStore: HasLifecycle {
     }
   }
 
-  private func getNewImageProvider(for iconID: IconId) -> ImageProvider {
+  private func getNewImageProvider(for iconID: IconID) -> ImageProvider {
     let iconSize: CGFloat
     if iconID.isToolbarIcon() {
       iconSize = toolbarIconSize

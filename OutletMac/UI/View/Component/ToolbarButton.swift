@@ -10,7 +10,7 @@ import SwiftUI
 
 typealias NoArgVoidFunc = () -> Void
 
-struct SelectedToolIcon: View {
+fileprivate struct SelectedToolbarIcon: View {
   let img: ImageProvider
 
   init(_ img: ImageProvider) {
@@ -34,7 +34,7 @@ struct SelectedToolIcon: View {
   }
 }
 
-struct UnselectedToolIcon: View {
+struct UnselectedToolbarIcon: View {
   let img: ImageProvider
 
   init(_ img: ImageProvider) {
@@ -52,13 +52,13 @@ struct UnselectedToolIcon: View {
  */
 struct TernaryToggleButton: View {
   let iconStore: IconStore
-  let iconTrue: IconId
-  let iconFalse: IconId
-  let iconNotSpecified: IconId
+  let iconTrue: IconID
+  let iconFalse: IconID
+  let iconNotSpecified: IconID
   @Binding var isEnabled: Ternary
   private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ iconStore: IconStore, iconTrue: IconId, iconFalse: IconId, iconNotSpecified: IconId? = nil,
+  init(_ iconStore: IconStore, iconTrue: IconID, iconFalse: IconID, iconNotSpecified: IconID? = nil,
        _ isEnabled: Binding<Ternary>, onClickAction: NoArgVoidFunc? = nil) {
     self.iconStore = iconStore
     self.iconTrue = iconTrue
@@ -86,11 +86,11 @@ struct TernaryToggleButton: View {
 
       switch isEnabled {
         case .TRUE:
-          SelectedToolIcon(self.iconStore.getIcon(for: self.iconTrue))
+          SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconTrue))
         case .FALSE:
-          SelectedToolIcon(self.iconStore.getIcon(for: self.iconFalse))
+          SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconFalse))
         case .NOT_SPECIFIED:
-          UnselectedToolIcon(self.iconStore.getIcon(for: self.iconNotSpecified))
+          UnselectedToolbarIcon(self.iconStore.getIcon(for: self.iconNotSpecified))
       }
     }
     .buttonStyle(PlainButtonStyle())
@@ -102,12 +102,12 @@ struct TernaryToggleButton: View {
  */
 struct BoolToggleButton: View {
   let iconStore: IconStore
-  let iconTrue: IconId
-  let iconFalse: IconId
+  let iconTrue: IconID
+  let iconFalse: IconID
   @Binding var isEnabled: Bool
   private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ iconStore: IconStore, iconTrue: IconId, iconFalse: IconId? = nil,
+  init(_ iconStore: IconStore, iconTrue: IconID, iconFalse: IconID? = nil,
        _ isEnabled: Binding<Bool>, onClickAction: NoArgVoidFunc? = nil, font: Font = DEFAULT_FONT) {
     self.iconStore = iconStore
     self.iconTrue = iconTrue
@@ -124,9 +124,47 @@ struct BoolToggleButton: View {
   var body: some View {
     Button(action: onClickAction!) {
       if isEnabled {
-        SelectedToolIcon(self.iconStore.getIcon(for: self.iconTrue))
+        SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconTrue))
       } else {
-        UnselectedToolIcon(self.iconStore.getIcon(for: self.iconFalse))
+        UnselectedToolbarIcon(self.iconStore.getIcon(for: self.iconFalse))
+      }
+    }
+    .buttonStyle(PlainButtonStyle())
+  }
+}
+
+/**
+ CLASS PlayPauseToggleButton
+ */
+struct PlayPauseToggleButton: View {
+  @Binding var isPlaying: Bool
+  let iconStore: IconStore
+  let dispatcher: SignalDispatcher
+  private var onClickAction: NoArgVoidFunc? = nil
+
+  init(_ iconStore: IconStore, _ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
+    self.iconStore = iconStore
+    self._isPlaying = isPlaying
+    self.dispatcher = dispatcher
+    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
+  }
+
+  private func toggleValue() {
+    if self.isPlaying {
+      NSLog("Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
+      dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
+    } else {
+      NSLog("Play/Pause btn clicked! Sending signal \(Signal.RESUME_OP_EXECUTION)")
+      dispatcher.sendSignal(signal: .RESUME_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
+    }
+  }
+
+  var body: some View {
+    Button(action: onClickAction!) {
+      if isPlaying {
+        UnselectedToolbarIcon(iconStore.getIcon(for: .ICON_PAUSE))
+      } else {
+        SelectedToolbarIcon(iconStore.getIcon(for: .ICON_PLAY))
       }
     }
     .buttonStyle(PlainButtonStyle())

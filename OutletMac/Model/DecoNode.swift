@@ -118,7 +118,7 @@ class DecoNode : Node {
     }
   }
   
-  override var icon: IconId {
+  override var icon: IconID {
     get {
       return self.delegate.icon
     }
