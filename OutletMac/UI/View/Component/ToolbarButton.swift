@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+let ICON_PADDING: CGFloat = 8
+
 typealias NoArgVoidFunc = () -> Void
 
 fileprivate struct SelectedToolbarIcon: View {
@@ -21,15 +23,14 @@ fileprivate struct SelectedToolbarIcon: View {
     ZStack {
 
       Circle().fill(Color.white)
-        .frame(width: self.img.width, height: self.img.height)
+        .frame(width: self.img.width + ICON_PADDING, height: self.img.height + ICON_PADDING)
         .shadow(color: .white, radius: BUTTON_SHADOW_RADIUS)
 
       self.img.getImage()
-        .colorInvert()
-        .clipShape(Circle())
+        .if(self.img.isGrayscale) { $0.colorInvert() }
         .shadow(color: .white, radius: BUTTON_SHADOW_RADIUS)
         .accentColor(.white)
-
+        .frame(width: self.img.width + ICON_PADDING, height: self.img.height + ICON_PADDING, alignment: .center)
     }
   }
 }
@@ -44,6 +45,7 @@ struct UnselectedToolbarIcon: View {
   var body: some View {
     self.img.getImage()
       .accentColor(.black)
+      .frame(width: self.img.width + ICON_PADDING, height: self.img.height + ICON_PADDING, alignment: .center)
   }
 }
 

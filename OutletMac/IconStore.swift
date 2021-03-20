@@ -16,6 +16,8 @@ import SwiftUI
 protocol ImageProvider {
   func getImage() -> Image
 
+  var isGrayscale: Bool { get }
+
   var width: CGFloat { get }
   var height: CGFloat { get }
 }
@@ -25,6 +27,12 @@ fileprivate class LocalImage: ImageProvider {
   let height: CGFloat
   let imageName: String
   let font: Font
+
+  var isGrayscale: Bool {
+    get {
+      false
+    }
+  }
 
   init(width: CGFloat, height: CGFloat, imageName: String, font: Font = DEFAULT_FONT) {
     self.width = width
@@ -51,6 +59,12 @@ fileprivate class SystemImage: ImageProvider {
   let systemImageName: String
   let font: Font
 
+  var isGrayscale: Bool {
+    get {
+      true
+    }
+  }
+
   init(width: CGFloat, height: CGFloat, systemImageName: String, font: Font = DEFAULT_FONT) {
     self.width = width
     self.height = height
@@ -74,6 +88,12 @@ fileprivate class NetworkImage: ImageProvider {
   let width: CGFloat
   let height: CGFloat
   let nsImage: NSImage
+
+  var isGrayscale: Bool {
+    get {
+      false
+    }
+  }
 
   init(width: CGFloat, height: CGFloat, nsImage: NSImage) {
     self.width = width
