@@ -146,11 +146,16 @@ enum IconID: UInt32 {
   case ICON_IS_TRASHED = 29
   case ICON_IS_NOT_TRASHED = 30
 
-  case ICON_GDRIVE = 31
-  case ICON_LOCAL_DISK_LINUX = 32
+  case ICON_LOCAL_DISK_LINUX = 31
+  case ICON_LOCAL_DISK_MACOS = 32
+  case ICON_LOCAL_DISK_WINDOWS = 33
+  case ICON_GDRIVE = 34
 
-  case BTN_GDRIVE = 33
-  case BTN_LOCAL_DISK_LINUX = 34
+  case BTN_FOLDER_TREE = 40
+  case BTN_LOCAL_DISK_LINUX = 41
+  case BTN_LOCAL_DISK_MACOS = 42
+  case BTN_LOCAL_DISK_WINDOWS = 43
+  case BTN_GDRIVE = 44
 
   func isToolbarIcon() -> Bool {
     // TODO: implement IconID.isToolbarIcon and IconID.isTreeIcon

@@ -17,7 +17,7 @@ struct RootPathPanel: View {
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
-  init(controller: TreeControllable, canChangeRoot: Bool) {
+  init(_ controller: TreeControllable, canChangeRoot: Bool) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
   }
@@ -30,13 +30,26 @@ struct RootPathPanel: View {
     }
   }
 
+  private func getIconForTreeType(_ treeType: TreeType) -> Image {
+    var iconId: IconID
+
+    switch treeType {
+      case .GDRIVE:
+        iconId = .BTN_GDRIVE
+      case .LOCAL_DISK:
+        // FIXME: need way to distinguish between OSes
+        iconId = .BTN_LOCAL_DISK_LINUX
+      case .MIXED, .NA:
+        iconId = .BTN_FOLDER_TREE
+    }
+    return con.app.iconStore.getIcon(for: iconId).getImage()
+  }
+
   var body: some View {
     HStack(alignment: .center, spacing: H_PAD) {
-      Image(systemName: "folder")
-        .renderingMode(.template)
-//        .frame(width: 32, height: 32)
+
+      self.getIconForTreeType(swiftTreeState.treeType)
         .padding(.leading, H_PAD)
-        .font(ROOT_PATH_ENTRY_FONT)
         .contextMenu {
           // TODO!
           Button("Local filesystem subtree...", action: {})
@@ -44,12 +57,8 @@ struct RootPathPanel: View {
         }
 
       if !self.swiftTreeState.isRootExists {
-        Image(systemName: "exclamationmark.triangle.fill")
-          .renderingMode(.template)
-//          .frame(width: 32, height: 32)
-          .padding(0)
-          .font(ROOT_PATH_ENTRY_FONT)
-          .foregroundColor(.yellow)
+        con.app.iconStore.getIcon(for: .ICON_ALERT).getImage()
+          .foregroundColor(.yellow)  // in case we are using system image (font)
       }
 
       if self.swiftTreeState.isEditingRoot {
@@ -116,7 +125,7 @@ struct RootPathPanel: View {
 
 struct RootPathPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootPathPanel(controller: MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
+    RootPathPanel(MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
   }
 }
 

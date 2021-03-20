@@ -57,11 +57,9 @@ struct FancyTextField: View {
  */
 struct FilterPanel: View {
   @ObservedObject var swiftFilterState: SwiftFilterState
-  let app: OutletApp
   let con: TreeControllable
 
-  init(_ app: OutletApp, _ controller: TreeControllable) {
-    self.app = app
+  init(_ controller: TreeControllable) {
     self.con = controller
     self.swiftFilterState = controller.swiftFilterState
   }
@@ -77,16 +75,16 @@ struct FilterPanel: View {
       })
 
       // Show ancestors
-      BoolToggleButton(app.iconStore, iconTrue: .ICON_FOLDER_TREE, $swiftFilterState.showAncestors)
+      BoolToggleButton(con.app.iconStore, iconTrue: .ICON_FOLDER_TREE, $swiftFilterState.showAncestors)
 
       // Match Case
-      BoolToggleButton(app.iconStore, iconTrue: .ICON_MATCH_CASE, $swiftFilterState.isMatchCase)
+      BoolToggleButton(con.app.iconStore, iconTrue: .ICON_MATCH_CASE, $swiftFilterState.isMatchCase)
 
       // Is Trashed
-      TernaryToggleButton(app.iconStore, iconTrue: .ICON_IS_TRASHED, iconFalse: .ICON_IS_NOT_TRASHED, $swiftFilterState.isTrashed)
+      TernaryToggleButton(con.app.iconStore, iconTrue: .ICON_IS_TRASHED, iconFalse: .ICON_IS_NOT_TRASHED, $swiftFilterState.isTrashed)
 
       // Is Shared
-      TernaryToggleButton(app.iconStore, iconTrue: .ICON_IS_SHARED, iconFalse: .ICON_IS_NOT_SHARED, $swiftFilterState.isShared)
+      TernaryToggleButton(con.app.iconStore, iconTrue: .ICON_IS_SHARED, iconFalse: .ICON_IS_NOT_SHARED, $swiftFilterState.isShared)
     }
     .padding(.bottom, 0)
     .padding(.top, 0)
@@ -100,7 +98,7 @@ struct FilterPanel: View {
 struct FilterPanel_Previews: PreviewProvider {
   static let app = MockApp()
   static var previews: some View {
-    FilterPanel(app, MockTreeController(ID_LEFT_TREE))
+    FilterPanel(MockTreeController(ID_LEFT_TREE))
   }
 }
 

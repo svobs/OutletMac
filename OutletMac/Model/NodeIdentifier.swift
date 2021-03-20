@@ -65,7 +65,7 @@ class NullNodeIdentifier: NodeIdentifier {
  CLASS SinglePathNodeIdentifier
  */
 class SinglePathNodeIdentifier: NodeIdentifier {
-  var _treeType: TreeType
+  private var _treeType: TreeType
   init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
     self._treeType = treeType
     super.init(uid, [singlePath])

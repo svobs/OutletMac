@@ -50,8 +50,9 @@ class SwiftTreeState: ObservableObject {
   @Published var rootPathNonEdit: String = ""
   @Published var rootPath: String = ""
   @Published var statusBarMsg: String = ""
+  @Published var treeType: TreeType = TreeType.NA
 
-  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String) {
+  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String, treeType: TreeType) {
     self.isUIEnabled = isUIEnabled
     self.isRootExists = isRootExists
     self.isEditingRoot = isEditingRoot
@@ -59,6 +60,7 @@ class SwiftTreeState: ObservableObject {
     self.offendingPath = offendingPath
     self.rootPath = rootPath
     self.rootPathNonEdit = rootPathNonEdit
+    self.treeType = treeType
   }
 
   static func toHumanEditableRootPath(_ spid: SPID) -> String {
@@ -75,11 +77,12 @@ class SwiftTreeState: ObservableObject {
     self.isRootExists = newTree.rootExists
     self.isEditingRoot = false
     self.isManualLoadNeeded = newTree.needsManualLoad
+    self.treeType = newTree.rootSPID.treeType
   }
 
   static func from(_ tree: DisplayTree) -> SwiftTreeState {
     return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
-                          offendingPath: tree.state.offendingPath, rootPath: SwiftTreeState.toHumanEditableRootPath(tree.rootSPID), rootPathNonEdit: tree.rootPath)
+                          offendingPath: tree.state.offendingPath, rootPath: SwiftTreeState.toHumanEditableRootPath(tree.rootSPID), rootPathNonEdit: tree.rootPath, treeType: tree.rootSPID.treeType)
   }
 }
 
