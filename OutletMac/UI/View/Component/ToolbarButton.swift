@@ -12,6 +12,7 @@ let ICON_PADDING: CGFloat = 8
 
 typealias NoArgVoidFunc = () -> Void
 
+// TODO: add glow on hover
 fileprivate struct SelectedToolbarIcon: View {
   let img: ImageProvider
 
@@ -35,7 +36,7 @@ fileprivate struct SelectedToolbarIcon: View {
   }
 }
 
-struct UnselectedToolbarIcon: View {
+fileprivate struct UnselectedToolbarIcon: View {
   let img: ImageProvider
 
   init(_ img: ImageProvider) {

@@ -121,9 +121,6 @@ class OutletGRPCClient: OutletBackend {
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
   static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    //    defer {
-    //      try? group.syncShutdownGracefully()
-    //    }
     
     let channel = ClientConnection.insecure(group: group)
       .withConnectionTimeout(minimum: TimeAmount.seconds(3))

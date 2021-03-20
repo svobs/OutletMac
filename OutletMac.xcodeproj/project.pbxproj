@@ -32,7 +32,6 @@
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
 		D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BF0025E9CFC700B4827F /* TaskRunner.swift */; };
 		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
-		D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
 		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
@@ -85,7 +84,6 @@
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
 		D194BF0025E9CFC700B4827F /* TaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRunner.swift; sourceTree = "<group>"; };
 		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
-		D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNodeFactory.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -244,7 +242,6 @@
 			children = (
 				D1E913B925AA735C008E958B /* TreeView.swift */,
 				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
-				D19C531425AADB4300A90474 /* TreeViewNodeFactory.swift */,
 				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
 				D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */,
 				D12C2CB02601FEB600E91EC9 /* Actions.swift */,
@@ -423,7 +420,6 @@
 				D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
-				D19C531525AADB4300A90474 /* TreeViewNodeFactory.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
 				D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
