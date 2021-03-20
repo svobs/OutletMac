@@ -29,8 +29,6 @@ fileprivate struct SelectedToolbarIcon: View {
 
       self.img.getImage()
         .if(self.img.isGrayscale) { $0.colorInvert() }
-        .shadow(color: .white, radius: BUTTON_SHADOW_RADIUS)
-        .accentColor(.white)
         .frame(width: self.img.width + ICON_PADDING, height: self.img.height + ICON_PADDING, alignment: .center)
     }
   }

@@ -76,6 +76,7 @@ fileprivate class SystemImage: ImageProvider {
     let img = Image(systemName: self.systemImageName)
       .renderingMode(.template)
 
+    // FIXME: this doesn't actually do anything. How to return a view?
     let _ = img
       .font(self.font)
       .frame(width: self.width, height: self.height)
@@ -84,6 +85,11 @@ fileprivate class SystemImage: ImageProvider {
   }
 }
 
+/**
+ CLASS NetworkImage
+
+ An image which originated from the server via gRPC
+ */
 fileprivate class NetworkImage: ImageProvider {
   let width: CGFloat
   let height: CGFloat
@@ -102,10 +108,7 @@ fileprivate class NetworkImage: ImageProvider {
   }
 
   func getImage() -> Image {
-    let img = Image(nsImage: self.nsImage)
-    let _ = img
-      .frame(width: self.width, height: self.height)
-    return img
+    return Image(nsImage: self.nsImage)
   }
 }
 

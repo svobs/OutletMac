@@ -48,13 +48,19 @@ struct RootPathPanel: View {
   var body: some View {
     HStack(alignment: .center, spacing: H_PAD) {
 
-      self.getIconForTreeType(swiftTreeState.treeType)
-        .padding(.leading, H_PAD)
-        .contextMenu {
-          // TODO!
-          Button("Local filesystem subtree...", action: {})
-          Button("Google Drive subtree...", action: {})
-        }
+      Button(action: {
+      }) {
+        self.getIconForTreeType(swiftTreeState.treeType)
+          .padding(.leading, H_PAD)
+      }
+      .contextMenu {
+        // TODO!
+        Button("Local filesystem subtree...", action: {})
+        Button("Google Drive subtree...", action: {
+                // FIXME: send treeID
+                NSApp.sendAction(#selector(OutletMacApp.openGDriveRootChooser), to: nil, from:self.con.treeID)})
+      }
+      .buttonStyle(PlainButtonStyle())
 
       if !self.swiftTreeState.isRootExists {
         con.app.iconStore.getIcon(for: .ICON_ALERT).getImage()

@@ -82,7 +82,7 @@ class AppMenu: NSMenu {
 }
 
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
-  var preferencesWindow: NSWindow!
+  var rootChooserView: GDriveRootChooser!
   var window: NSWindow!
 
   let winID = ID_MAIN_WINDOW
@@ -283,21 +283,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // Etc
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  @objc func openPreferencesWindow() {
-    if nil == preferencesWindow {      // create once !!
-      let preferencesView = PrefsView()
-      // Create the preferences window and set content
-      preferencesWindow = NSWindow(
-        contentRect: NSRect(x: 20, y: 20, width: 480, height: 300),
-        styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-        backing: .buffered,
-        defer: false)
-      preferencesWindow.center()
-      preferencesWindow.setFrameAutosaveName("Preferences")
-      preferencesWindow.isReleasedWhenClosed = false
-      preferencesWindow.contentView = NSHostingView(rootView: preferencesView)
+  @objc func openGDriveRootChooser(_ treeID: String) {
+    if rootChooserView != nil && rootChooserView.isOpen {
+      rootChooserView.window.makeKeyAndOrderFront(nil)
+    } else {
+      rootChooserView = GDriveRootChooser(treeID)
     }
-    preferencesWindow.makeKeyAndOrderFront(nil)
   }
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {

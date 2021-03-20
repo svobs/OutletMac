@@ -11,6 +11,7 @@
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
 		D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */; };
 		D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CB02601FEB600E91EC9 /* Actions.swift */; };
+		D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13544F72605E24800C6DADC /* GDriveRootChooser.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
@@ -64,6 +65,7 @@
 		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
 		D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		D12C2CB02601FEB600E91EC9 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		D13544F72605E24800C6DADC /* GDriveRootChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveRootChooser.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 				D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */,
 				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
 				D1FCD9AA25D8EF9E000C8FF3 /* ToolbarButton.swift */,
+				D13544F72605E24800C6DADC /* GDriveRootChooser.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -405,6 +408,7 @@
 				D1D8713425F769B00072CB97 /* GUID.swift in Sources */,
 				D15E7737260572A900D63A14 /* IfView.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
+				D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
 				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
 				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
