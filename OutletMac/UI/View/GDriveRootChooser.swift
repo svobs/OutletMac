@@ -25,15 +25,28 @@ class GDriveRootChooserDelegate: NSObject, NSWindowDelegate {
 }
 
 struct GDriveRootChooserContent: View {
+  @StateObject var heightTracking: HeightTracking = HeightTracking()
+  let app: OutletApp
+  let con: TreeControllable
   let targetTreeID: String
 
-  init(_ targetTreeID: String) {
+  init(_ app: OutletApp, _ con: TreeControllable, _ targetTreeID: String) {
+    self.app = app
+    self.con = con
     self.targetTreeID = targetTreeID
   }
 
   var body: some View {
-    Text("Hello, \(targetTreeID)!")
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
+    GeometryReader { geo in
+      SinglePaneView(self.app, self.con, self.heightTracking)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .contentShape(Rectangle()) // taps should be detected in the whole window
+        .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
+      .onPreferenceChange(ContentAreaPrefKey.self) { key in
+//        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
+        self.heightTracking.mainWindowHeight = key.height
+      }
+    }
   }
 
 }
@@ -62,7 +75,7 @@ class GDriveRootChooser: HasLifecycle {
     self.app = app
     self.targetTreeID = targetTreeID
     self.con = con
-    self.content = GDriveRootChooserContent(targetTreeID)
+    self.content = GDriveRootChooserContent(self.app, self.con, self.targetTreeID)
     self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID))-dialog")
     assert(con.treeID == ID_GDRIVE_DIR_SELECT)
     window = NSWindow()

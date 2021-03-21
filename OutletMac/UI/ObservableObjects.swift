@@ -18,10 +18,6 @@ class GlobalSettings: ObservableObject {
   @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
   @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
-  // These two values are calculated and stored so that the proper height of the OutlineView can be derived
-  @Published var mainWindowHeight: CGFloat = 0
-  @Published var nonTreeViewHeight: CGFloat = 0
-
   /**
    This method will cause an alert to be displayed in the MainContentView.
    */
@@ -32,6 +28,18 @@ class GlobalSettings: ObservableObject {
     self.dismissButtonText = dismissButtonText
     self.showingAlert = true
   }
+}
+
+class HeightTracking: ObservableObject {
+  // These two values are calculated and stored so that the proper height of the OutlineView can be derived
+  @Published var mainWindowHeight: CGFloat = 0
+  @Published var nonTreeViewHeight: CGFloat = 0
+
+  func getTreeViewHeight(_ treeID: String) -> CGFloat {
+    NSLog("getTreeViewHeight(): \(treeID): \(self.mainWindowHeight - self.nonTreeViewHeight)")
+    return self.mainWindowHeight - self.nonTreeViewHeight
+  }
+
 }
 
 

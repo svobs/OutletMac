@@ -81,6 +81,7 @@ fileprivate struct ButtonBar: View {
  */
 struct TwoPaneView: View {
   @EnvironmentObject var settings: GlobalSettings
+  @ObservedObject var heightTracking: HeightTracking
 
   private var columns: [GridItem] = [
     // these specify spacing between columns
@@ -95,12 +96,13 @@ struct TwoPaneView: View {
   let leftPanel: TreePanel
   let rightPanel: TreePanel
 
-  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
+  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    self.leftPanel = TreePanel(app, conLeft)
-    self.rightPanel = TreePanel(app, conRight)
+    self.leftPanel = TreePanel(app, conLeft, heightTracking)
+    self.rightPanel = TreePanel(app, conRight, heightTracking)
+    self.heightTracking = heightTracking
   }
 
   var body: some View {
@@ -175,17 +177,7 @@ struct TwoPaneView: View {
       }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
 //      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.mainWindowHeight))")
-      self.settings.nonTreeViewHeight = totalHeight
+      self.heightTracking.nonTreeViewHeight = totalHeight
     }
-  }
-}
-
-struct TwoPaneView_Previews: PreviewProvider {
-  static let conLeft = MockTreeController(ID_LEFT_TREE)
-  static let conRight = MockTreeController(ID_RIGHT_TREE)
-  static var previews: some View {
-    TwoPaneView(app: MockApp(), conLeft: conLeft, conRight: conRight)
-      .colorScheme(.dark)
-      .environmentObject(GlobalSettings())
   }
 }

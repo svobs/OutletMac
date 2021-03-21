@@ -10,9 +10,11 @@ import LinkedList
 struct TreeView: View {
   let con: TreeControllable
   @EnvironmentObject var settings: GlobalSettings
+  @ObservedObject var heightTracking: HeightTracking
 
-  init(controller: TreeControllable) {
+  init(controller: TreeControllable, _ heightTracking: HeightTracking) {
     self.con = controller
+    self.heightTracking = heightTracking
   }
 
   var body: some View {
@@ -22,7 +24,7 @@ struct TreeView: View {
         .frame(minWidth: 200,
                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                // A redraw of this view should be triggered when either of these values are changed:
-               minHeight: settings.mainWindowHeight - settings.nonTreeViewHeight,
+               minHeight: heightTracking.getTreeViewHeight("test"),
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
     }

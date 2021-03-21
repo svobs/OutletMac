@@ -21,12 +21,12 @@ struct TreePanel {
   let treeView: TreeView
   let status_panel: StatusPanel
 
-  init(_ app: OutletApp, _ controller: TreeControllable) {
+  init(_ app: OutletApp, _ controller: TreeControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = controller
     self.rootPathPanel = RootPathPanel(self.con, canChangeRoot: true)
     self.filterPanel = FilterPanel(self.con)
-    self.treeView = TreeView(controller: self.con)
+    self.treeView = TreeView(controller: self.con, heightTracking)
     self.status_panel = StatusPanel(controller: self.con)
   }
 }
