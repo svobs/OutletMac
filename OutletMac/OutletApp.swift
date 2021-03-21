@@ -12,7 +12,7 @@ import SwiftUI
 /**
  PROTOCOL OutletApp
  */
-protocol OutletApp {
+protocol OutletApp: HasLifecycle {
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
   var iconStore: IconStore { get }
@@ -23,8 +23,10 @@ protocol OutletApp {
   func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
-}
 
+  func registerTreeController(_ treeID: String, _ controller: TreeControllable)
+  func getTreeController(_ treeID: String) -> TreeControllable?
+}
 
 class MockApp: OutletApp {
   var dispatcher: SignalDispatcher
@@ -37,6 +39,11 @@ class MockApp: OutletApp {
     self.iconStore = IconStore(self.backend)
   }
 
+  func start() throws {
+  }
+  func shutdown() throws {
+  }
+
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
   }
   func execSync(_ workItem: @escaping NoArgVoidFunc) {
@@ -47,6 +54,12 @@ class MockApp: OutletApp {
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
     return false
+  }
+
+  func registerTreeController(_ treeID: String, _ controller: TreeControllable) {
+  }
+  func getTreeController(_ treeID: String) -> TreeControllable? {
+    return nil
   }
 }
 
@@ -97,6 +110,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
   private let guidMapper = GUIDMapper()
+  private var treeControllerDict: [String: TreeControllable] = [:]
+  private let treeControllerLock = NSLock()
 
   var backend: OutletBackend {
     get {
@@ -110,7 +125,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  func start() {
+  func start() throws {
     NSLog("DEBUG OutletMacApp start begin")
 
     do {
@@ -126,21 +141,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // Subscribe to app-wide signals here
       try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
       try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
+      try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreeControllerDeregistered)
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
       // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
       let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      let filterCriteriaLeft: FilterCriteria = try backend.getFilterCriteria(treeID: ID_LEFT_TREE)
-      let filterCriteriaRight: FilterCriteria = try backend.getFilterCriteria(treeID: ID_RIGHT_TREE)
-      self.conLeft = TreeController(app: self, tree: treeLeft, filterCriteria: filterCriteriaLeft)
-      self.conRight = TreeController(app: self, tree: treeRight, filterCriteria: filterCriteriaRight)
-
-      try conLeft!.start()
-      try conLeft!.loadTree()
-      try conRight!.start()
-      try conRight!.loadTree()
+      self.conLeft = try self.buildController(treeLeft)
+      self.conRight = try self.buildController(treeRight)
+      try self.conLeft!.loadTree()
+      try self.conRight!.loadTree()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
@@ -151,6 +162,27 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("DEBUG Sleeping 1s to let things settle...")
       sleep(1)
       exit(1)
+    }
+  }
+
+  /**
+   Creates and starts a tree controller for the given tree, but does not load it
+  */
+  func buildController(_ tree: DisplayTree) throws -> TreeController {
+    let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
+    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria)
+
+    try con.start()
+    return con
+  }
+
+  func shutdown() throws {
+    for (treeID, controller) in self.treeControllerDict {
+      do {
+        try controller.shutdown()
+      } catch {
+        NSLog("ERROR [\(treeID)] Failed to shut down controller")
+      }
     }
   }
 
@@ -213,8 +245,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    self.start()
-    self.createWindow()
+    do {
+      try self.start()
+      self.createWindow()
+    } catch {
+      NSLog("ERROR should not have gotten here: \(error)")
+    }
   }
 
   // NSWindowDelegate methods
@@ -242,6 +278,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   @objc func windowWillClose(_ notification: Notification) {
     NSLog("DEBUG User closed main window: closing app")
+    do {
+      try self.shutdown()
+    } catch {
+      NSLog("ERROR During application shutdown: \(error)")
+    }
     // Close the app when window is closed, Windoze-style
     NSApplication.shared.terminate(0)
   }
@@ -268,6 +309,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
+    self.displayError(msg, secondaryMsg)
     DispatchQueue.main.async {
       self.settings.showAlert(title: msg, msg: secondaryMsg)
     }
@@ -280,14 +322,36 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
+  private func onTreeControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    NSLog("DEBUG [\(senderID)] Deregistering tree controller in frontend")
+    self.treeControllerDict.removeValue(forKey: senderID)
+  }
+
   // Etc
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  func displayError(_ msg: String, _ secondaryMsg: String) {
+      DispatchQueue.main.async {
+        self.settings.showAlert(title: msg, msg: secondaryMsg)
+      }
+  }
+
   @objc func openGDriveRootChooser(_ treeID: String) {
     if rootChooserView != nil && rootChooserView.isOpen {
-      rootChooserView.window.makeKeyAndOrderFront(nil)
+      rootChooserView.moveToFront()
     } else {
-      rootChooserView = GDriveRootChooser(treeID)
+      do {
+        let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect()!
+        let con = try self.buildController(tree)
+        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID)
+        try rootChooserView.start()
+      } catch {
+        self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
+      }
     }
   }
 
@@ -299,5 +363,21 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     alert.addButton(withTitle: cancelButtonText)
     alert.alertStyle = .warning
     return alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+  }
+
+  func registerTreeController(_ treeID: String, _ controller: TreeControllable) {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    self.treeControllerDict[treeID] = controller
+  }
+
+  func getTreeController(_ treeID: String) -> TreeControllable? {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    return self.treeControllerDict[treeID]
   }
 }

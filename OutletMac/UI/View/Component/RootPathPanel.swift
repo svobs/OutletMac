@@ -37,8 +37,10 @@ struct RootPathPanel: View {
       case .GDRIVE:
         iconId = .BTN_GDRIVE
       case .LOCAL_DISK:
+        
         // FIXME: need way to distinguish between OSes
-        iconId = .BTN_LOCAL_DISK_LINUX
+
+        iconId = .BTN_LOCAL_DISK_MACOS
       case .MIXED, .NA:
         iconId = .BTN_FOLDER_TREE
     }

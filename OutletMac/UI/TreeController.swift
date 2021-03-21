@@ -31,7 +31,7 @@ protocol TreeControllable: HasLifecycle {
 
   var dispatchListener: DispatchListener { get }
 
-  func start() throws
+  func loadTree() throws
 
   func connectTreeView(_ treeView: TreeViewController)
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
@@ -108,6 +108,9 @@ class MockTreeController: TreeControllable {
   func shutdown() throws {
   }
 
+  func loadTree() throws {
+  }
+
   func connectTreeView(_ treeView: TreeViewController) {
   }
 
@@ -153,6 +156,8 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func start() throws {
+    self.app.registerTreeController(self.treeID, self)
+
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
@@ -166,6 +171,8 @@ class TreeController: TreeControllable, ObservableObject {
 
   func shutdown() throws {
     try self.dispatchListener.unsubscribeAll()
+
+    self.dispatcher.sendSignal(signal: .DEREGISTER_DISPLAY_TREE, senderID: self.treeID)
   }
 
   func loadTree() throws {

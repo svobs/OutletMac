@@ -8,13 +8,15 @@
 
 import Foundation
 
-//class GUINode {
+//class GUINodeIdentifier {
 //  let guid: GUID
-//  let node: Node
+//  let singlePath: String
+//  let uid: UID
 //
-//  init(_ guid: GUID, _ node: Node) {
+//  init(_ guid: GUID, _ singlePath: String, _ uid: UID) {
 //    self.guid = guid
-//    self.node = node
+//    self.singlePath = singlePath
+//    self.uid = uid
 //  }
 //}
 
