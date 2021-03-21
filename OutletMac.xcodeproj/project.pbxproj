@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,6 +30,7 @@
 		D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */; };
 		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
 		D19109A42607292E00C0D9B4 /* TreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A32607292E00C0D9B4 /* TreePanel.swift */; };
+		D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
 		D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BF0025E9CFC700B4827F /* TaskRunner.swift */; };
@@ -84,6 +85,7 @@
 		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
 		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
 		D19109A32607292E00C0D9B4 /* TreePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanel.swift; sourceTree = "<group>"; };
+		D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
 		D194BF0025E9CFC700B4827F /* TaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRunner.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				D1BAC55F25A193C800D951A2 /* MainContentView.swift */,
 				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
 				D13544F72605E24800C6DADC /* GDriveRootChooser.swift */,
+				D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -315,7 +318,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 1120;
 				LastUpgradeCheck = 1240;
-				ORGANIZATIONNAME = Ibotta;
+				ORGANIZATIONNAME = "Matt Svoboda";
 				TargetAttributes = {
 					11DDEECA23A6F9580014C2A6 = {
 						CreatedOnToolsVersion = 11.2.1;
@@ -324,7 +327,7 @@
 				};
 			};
 			buildConfigurationList = 11DDEEC623A6F9580014C2A6 /* Build configuration list for PBXProject "OutletMac" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -429,6 +432,7 @@
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
 				D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */,
+				D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
