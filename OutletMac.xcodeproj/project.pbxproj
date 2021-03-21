@@ -29,10 +29,10 @@
 		D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCE25BA380E00B2A4F5 /* OutletError.swift */; };
 		D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */; };
 		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
+		D19109A42607292E00C0D9B4 /* TreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A32607292E00C0D9B4 /* TreePanel.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
 		D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BF0025E9CFC700B4827F /* TaskRunner.swift */; };
-		D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19C531125AADB3700A90474 /* TreeViewNode.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
 		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
@@ -83,9 +83,9 @@
 		D1767FCE25BA380E00B2A4F5 /* OutletError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutletError.swift; sourceTree = "<group>"; };
 		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
 		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
+		D19109A32607292E00C0D9B4 /* TreePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanel.swift; sourceTree = "<group>"; };
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
 		D194BF0025E9CFC700B4827F /* TaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRunner.swift; sourceTree = "<group>"; };
-		D19C531125AADB3700A90474 /* TreeViewNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeViewNode.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -191,10 +191,11 @@
 		D1175BFF25DCF27300602B7F /* View */ = {
 			isa = PBXGroup;
 			children = (
+				D19109A7260729F600C0D9B4 /* TreePanel */,
 				D1ED5E2525C7D78700A8E5DB /* Component */,
-				D1E913B825AA7342008E958B /* TreeView */,
 				D1BAC55F25A193C800D951A2 /* MainContentView.swift */,
-				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
+				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
+				D13544F72605E24800C6DADC /* GDriveRootChooser.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -221,6 +222,17 @@
 			path = generated;
 			sourceTree = "<group>";
 		};
+		D19109A7260729F600C0D9B4 /* TreePanel */ = {
+			isa = PBXGroup;
+			children = (
+				D1E913B825AA7342008E958B /* TreeView */,
+				D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */,
+				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
+				D19109A32607292E00C0D9B4 /* TreePanel.swift */,
+			);
+			path = TreePanel;
+			sourceTree = "<group>";
+		};
 		D1CB049C25B182A000556B28 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -243,7 +255,6 @@
 			isa = PBXGroup;
 			children = (
 				D1E913B925AA735C008E958B /* TreeView.swift */,
-				D19C531125AADB3700A90474 /* TreeViewNode.swift */,
 				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
 				D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */,
 				D12C2CB02601FEB600E91EC9 /* Actions.swift */,
@@ -257,7 +268,6 @@
 				D1175BFF25DCF27300602B7F /* View */,
 				D1175BFC25DCF25700602B7F /* ObservableObjects.swift */,
 				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
-				D15E7736260572A900D63A14 /* IfView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -265,11 +275,9 @@
 		D1ED5E2525C7D78700A8E5DB /* Component */ = {
 			isa = PBXGroup;
 			children = (
-				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
-				D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */,
-				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
+				D15E7736260572A900D63A14 /* IfView.swift */,
+				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
 				D1FCD9AA25D8EF9E000C8FF3 /* ToolbarButton.swift */,
-				D13544F72605E24800C6DADC /* GDriveRootChooser.swift */,
 			);
 			path = Component;
 			sourceTree = "<group>";
@@ -420,7 +428,6 @@
 				D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */,
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
-				D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */,
 				D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
@@ -439,6 +446,7 @@
 				D15E773326045B9700D63A14 /* IconStore.swift in Sources */,
 				D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */,
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,
+				D19109A42607292E00C0D9B4 /* TreePanel.swift in Sources */,
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
