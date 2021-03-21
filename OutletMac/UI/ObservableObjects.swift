@@ -3,7 +3,6 @@
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 21/2/16.
-//  Copyright © 2021 Ibotta. All rights reserved.
 //
 import SwiftUI
 
@@ -24,7 +23,7 @@ class GlobalSettings: ObservableObject {
   @Published var nonTreeViewHeight: CGFloat = 0
 
   /**
-   This method will cause an alert to be displayed in the ContentView.
+   This method will cause an alert to be displayed in the MainContentView.
    */
   func showAlert(title: String, msg: String, dismissButtonText: String = "Dismiss") {
     NSLog("DEBUG Showing alert with title='\(title)', msg='\(msg)'")

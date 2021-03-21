@@ -1,9 +1,8 @@
 //
-//  AppDelegate.swift
-//  OutlineView
+//  OutletApp.swift
+//  OutletMac
 //
-//  Created by Toph Allen on 4/13/20.
-//  Copyright © 2020 Toph Allen. All rights reserved.
+//  Created by Matthew Svoboda on 1/6/21.
 //
 import AppKit
 import Cocoa
@@ -219,7 +218,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     window.setFrameAutosaveName("OutletMac")
     window.center()
     window.makeKeyAndOrderFront(nil)
-    let contentView = ContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
+    let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
     window.contentView = NSHostingView(rootView: contentView)
   }
 

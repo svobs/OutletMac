@@ -37,7 +37,7 @@
 		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
 		D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* OutletApp.swift */; };
-		D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* ContentView.swift */; };
+		D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* MainContentView.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -92,7 +92,7 @@
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
 		D1BAC55E25A193C800D951A2 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
-		D1BAC55F25A193C800D951A2 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D1BAC55F25A193C800D951A2 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -193,7 +193,7 @@
 			children = (
 				D1ED5E2525C7D78700A8E5DB /* Component */,
 				D1E913B825AA7342008E958B /* TreeView */,
-				D1BAC55F25A193C800D951A2 /* ContentView.swift */,
+				D1BAC55F25A193C800D951A2 /* MainContentView.swift */,
 				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
 			);
 			path = View;
@@ -421,7 +421,7 @@
 				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
 				D19C531225AADB3700A90474 /* TreeViewNode.swift in Sources */,
-				D1BAC56825A193C800D951A2 /* ContentView.swift in Sources */,
+				D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,

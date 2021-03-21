@@ -3,7 +3,6 @@
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-02-01.
-//  Copyright © 2021 Ibotta. All rights reserved.
 //
 import SwiftUI
 import LinkedList

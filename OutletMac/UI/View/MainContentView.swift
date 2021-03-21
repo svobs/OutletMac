@@ -1,15 +1,14 @@
 //
-//  ContentView.swift
-//  OutlineView
+//  MainContentView.swift
 //
-//  Created by Toph Allen on 4/13/20.
-//  Copyright © 2020 Toph Allen. All rights reserved.
+//  Created by Matthew Svoboda on 1/6/21.
 //
 
 import SwiftUI
 
 
-struct ContentView: View {
+// Main window content view
+struct MainContentView: View {
   @EnvironmentObject var settings: GlobalSettings
   let app: OutletApp
   let conLeft: TreeControllable
@@ -49,9 +48,9 @@ struct ContentView: View {
   }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct MainContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
+    MainContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
       .environmentObject(GlobalSettings())
   }
 }

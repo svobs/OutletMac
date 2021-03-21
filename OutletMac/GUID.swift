@@ -3,7 +3,6 @@
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 21/3/9.
-//  Copyright © 2021 Ibotta. All rights reserved.
 //
 
 import Foundation

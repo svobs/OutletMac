@@ -3,7 +3,6 @@
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 21/3/20.
-//  Copyright © 2021 Ibotta. All rights reserved.
 //
 
 import SwiftUI
@@ -81,7 +80,7 @@ class GDriveRootChooser: HasLifecycle {
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady)
     try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateComplete)
 
-    // TODO: create & populate progress bar
+    // TODO: create & populate progress bar to show user that something is being done here
 
     try self.con.loadTree()
   }

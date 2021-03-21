@@ -3,7 +3,6 @@
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-01-31.
-//  Copyright © 2021 Ibotta. All rights reserved.
 //
 import SwiftUI
 
@@ -37,7 +36,7 @@ struct RootPathPanel: View {
       case .GDRIVE:
         iconId = .BTN_GDRIVE
       case .LOCAL_DISK:
-        
+
         // FIXME: need way to distinguish between OSes
 
         iconId = .BTN_LOCAL_DISK_MACOS
