@@ -42,7 +42,7 @@ class DisplayStore {
     return guid
   }
 
-  private func guidFor(_ spid: SPID) -> GUID {
+  func guidFor(_ spid: SPID) -> GUID {
     return self.guidFor(spid.treeType, singlePath: spid.getSinglePath(), uid: spid.uid)
   }
 

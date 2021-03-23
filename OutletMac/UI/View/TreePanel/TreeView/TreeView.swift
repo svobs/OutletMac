@@ -525,6 +525,23 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return guid
   }
 
+  func selectSingleSPID(_ spid: SPID) {
+    let guid = self.displayStore.guidFor(spid)
+    let index = self.outlineView.row(forItem: guid)
+
+    guard index >= 0 else {
+      NSLog("ERROR [\(self.treeID)] Cannot select SPID: not found in OutlineView: \(spid)")
+      return
+    }
+
+    var indexSet = IndexSet()
+    indexSet.insert(index)
+    DispatchQueue.main.async {
+      NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
+      self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+    }
+  }
+
   /**
    EXPAND ROW
   */

@@ -89,10 +89,10 @@ struct GDriveRootChooserContent: View {
         Button("Cancel", action: {self.parentWindow.close()})
           .keyboardShortcut(.cancelAction)
         Button("Select", action: self.selectItem)
-          .keyboardShortcut(.defaultAction)
+          .keyboardShortcut(.defaultAction)  // this will also color the button
       }
-      .padding()
-    }
+      .padding(.bottom).padding(.horizontal)  // we have enough padding above already
+    }.frame(minWidth: 400, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 400, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)  // set minimum window dimensions
   }
 
 }
@@ -104,11 +104,11 @@ class GDriveRootChooser: HasLifecycle {
   var window: NSWindow!
   @State var windowDelegate = GDriveRootChooserDelegate()
   let content: GDriveRootChooserContent
+  let initialSelection: SPID
 
   let app: OutletApp
   let con: TreeControllable
   let dispatchListener: DispatchListener
-  let targetTreeID: String
   private var loadComplete: Bool = false
 
   var isOpen: Bool {
@@ -117,10 +117,10 @@ class GDriveRootChooser: HasLifecycle {
     }
   }
 
-  init(_ app: OutletApp, _ con: TreeControllable, targetTreeID: String) {
+  init(_ app: OutletApp, _ con: TreeControllable, targetTreeID: String, initialSelection: SPID) {
     self.app = app
-    self.targetTreeID = targetTreeID
     self.con = con
+    self.initialSelection = initialSelection
     self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID))-dialog")
     assert(con.treeID == ID_GDRIVE_DIR_SELECT)
     // TODO: save content rect in config
@@ -135,7 +135,7 @@ class GDriveRootChooser: HasLifecycle {
     window.title = "Google Drive Root Chooser"
     // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
 //    window.setFrameAutosaveName(window.title)
-    self.content = GDriveRootChooserContent(self.app, self.con, self.targetTreeID, self.window)
+    self.content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self.window)
     window.delegate = self.windowDelegate
     window.contentView = NSHostingView(rootView: self.content)
 //    window.setDefaultButtonCell(
@@ -145,8 +145,8 @@ class GDriveRootChooser: HasLifecycle {
     self.windowDelegate.parentMeta = self
 
 //    try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged) // TODO
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady)
-    try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateComplete)
+    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady, whitelistSenderID: self.con.treeID)
+    try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateComplete, whitelistSenderID: self.con.treeID)
 
     // TODO: create & populate progress bar to show user that something is being done here
 
@@ -165,6 +165,10 @@ class GDriveRootChooser: HasLifecycle {
     }
   }
 
+  func selectSPID(_ spid: SPID) {
+    self.con.treeView!.selectSingleSPID(spid)
+  }
+
   // DispatchListener callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -175,9 +179,10 @@ class GDriveRootChooser: HasLifecycle {
   }
 
   private func onPopulateComplete(_ senderID: SenderID, _ props: PropDict) throws {
-    NSLog("DEBUG [\(self.con.treeID)] Populate complete! Sending signal \(Signal.EXPAND_AND_SELECT_NODE)")
-    // TODO
-//    dispatcher.send(Signal.EXPAND_AND_SELECT_NODE, sender=ID_GDRIVE_DIR_SELECT, spid=self._initial_selection_spid)
+    NSLog("DEBUG [\(self.con.treeID)] Populate complete! Selecting SPID: \(self.initialSelection)")
+    DispatchQueue.main.async {
+      self.selectSPID(self.initialSelection)
+    }
   }
 
 }

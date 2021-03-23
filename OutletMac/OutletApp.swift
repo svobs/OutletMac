@@ -340,13 +340,22 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   @objc func openGDriveRootChooser(_ treeID: String) {
+    guard let sourceCon = self.getTreeController(treeID) else {
+      NSLog("ERROR [\(treeID)] Cannot open GDrive chooser: could not find controller with this treeID!")
+      return
+    }
+    let currentSPID: SPID = sourceCon.tree.rootSPID
+
     if rootChooserView != nil && rootChooserView.isOpen {
       rootChooserView.moveToFront()
+      rootChooserView.selectSPID(currentSPID)
     } else {
       do {
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect()!
         let con = try self.buildController(tree)
-        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID)
+        con.canChangeRoot = false
+
+        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSPID)
         try rootChooserView.start()
       } catch {
         self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")

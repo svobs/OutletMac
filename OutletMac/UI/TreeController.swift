@@ -272,6 +272,12 @@ class TreeController: TreeControllable, ObservableObject {
     DispatchQueue.main.async {
       self.restoreExpandedRows(toExpandInOrder)
 
+      // FIXME: UID->GUID doesn't map!
+
+
+
+
+
       if rows.selected.count > 0 {
         var indexSet = IndexSet()
         for uid in rows.selected {
@@ -290,6 +296,8 @@ class TreeController: TreeControllable, ObservableObject {
       // remember to kick this off inside the main dispatch queue
       NSLog("DEBUG [\(self.treeID)] Rescheduling stats refresh timer")
       self.statsRefreshTimer.reschedule()
+
+      self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
     }
   }
 
