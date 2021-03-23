@@ -215,7 +215,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       backing: .buffered, defer: false)
     window.delegate = self
     window.title = "OutletMac"
-    window.setFrameAutosaveName("OutletMac")
+//    window.setFrameAutosaveName("OutletMac")
     window.center()
     window.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)

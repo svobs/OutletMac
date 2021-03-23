@@ -202,6 +202,14 @@ class TreeController: TreeControllable, ObservableObject {
     }
   }
 
+  private func clearModelAndTreeView() {
+    // Clear display store & treeview (which draws from display store)
+    self.displayStore.repopulateRoot([])
+    DispatchQueue.main.async {
+      self.treeView!.outlineView.reloadData()
+    }
+  }
+
   private func populateTreeView() throws {
     guard self.treeView != nil else {
       NSLog("DEBUG populateTreeView(): TreeView is nil. Setting readyToPopulate = true")
@@ -219,8 +227,8 @@ class TreeController: TreeControllable, ObservableObject {
       rows = RowsOfInterest() // non-fatal error
     }
 
+    self.clearModelAndTreeView()
     // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
-    self.displayStore.repopulateRoot([])
     self.appendEphemeralNode(nil, "Loading...")
 
     var queue = LinkedList<SPIDNodePair>()
@@ -233,7 +241,7 @@ class TreeController: TreeControllable, ObservableObject {
       self.displayStore.repopulateRoot(topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
-      self.displayStore.repopulateRoot([])
+      self.clearModelAndTreeView()
       self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
       return
     }
@@ -291,7 +299,7 @@ class TreeController: TreeControllable, ObservableObject {
     self.displayStore.populateChildList(parentSN, [childSN])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
-      NSLog("DEBUG [\(self.treeID)] appended ephemeral node: '\(nodeName)'")
+      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")
     }
   }
 

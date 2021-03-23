@@ -26,26 +26,72 @@ class GDriveRootChooserDelegate: NSObject, NSWindowDelegate {
 
 struct GDriveRootChooserContent: View {
   @StateObject var heightTracking: HeightTracking = HeightTracking()
+  var parentWindow: NSWindow
   let app: OutletApp
   let con: TreeControllable
   let targetTreeID: String
 
-  init(_ app: OutletApp, _ con: TreeControllable, _ targetTreeID: String) {
+  init(_ app: OutletApp, _ con: TreeControllable, _ targetTreeID: String, _ parentWindow: NSWindow) {
+    self.parentWindow = parentWindow
     self.app = app
     self.con = con
     self.targetTreeID = targetTreeID
   }
 
+  func selectItem() {
+    guard let selectedGUIDs = self.con.treeView?.getSelectedGUIDs() else {
+      return
+    }
+    guard selectedGUIDs.count == 1 else {
+      return
+    }
+    guard let selectedGUID = selectedGUIDs.first else {
+      return
+    }
+    guard let selectedSN = self.con.displayStore.getSN(selectedGUID) else {
+      return
+    }
+
+    guard let node = selectedSN.node else {
+      return
+    }
+
+    guard node.isDir else {
+      // Should not happen. But just to be careful
+      NSLog("ERROR [\(self.con.treeID)] Not a directory: \(selectedSN.spid)")
+      return
+    }
+
+    NSLog("DEBUG [\(self.con.treeID)] User chose \(selectedSN.spid)")
+    do {
+      let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.targetTreeID, spid: selectedSN.spid)
+    } catch {
+      self.con.reportException("Failed to select item", error)
+    }
+
+    self.parentWindow.close()
+  }
+
   var body: some View {
-    GeometryReader { geo in
-      SinglePaneView(self.app, self.con, self.heightTracking)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .contentShape(Rectangle()) // taps should be detected in the whole window
-        .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
-      .onPreferenceChange(ContentAreaPrefKey.self) { key in
-//        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
-        self.heightTracking.mainWindowHeight = key.height
+    VStack {
+      GeometryReader { geo in
+        SinglePaneView(self.app, self.con, self.heightTracking)
+          .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
+          .contentShape(Rectangle()) // taps should be detected in the whole window
+          .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
+        .onPreferenceChange(ContentAreaPrefKey.self) { key in
+  //        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
+          self.heightTracking.mainWindowHeight = key.height
+        }
       }
+      HStack {
+        Spacer()
+        Button("Cancel", action: {self.parentWindow.close()})
+          .keyboardShortcut(.cancelAction)
+        Button("Select", action: self.selectItem)
+          .keyboardShortcut(.defaultAction)
+      }
+      .padding()
     }
   }
 
@@ -75,19 +121,28 @@ class GDriveRootChooser: HasLifecycle {
     self.app = app
     self.targetTreeID = targetTreeID
     self.con = con
-    self.content = GDriveRootChooserContent(self.app, self.con, self.targetTreeID)
     self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID))-dialog")
     assert(con.treeID == ID_GDRIVE_DIR_SELECT)
-    window = NSWindow()
-    window.title = "Google Drive Root Chooser"
+    // TODO: save content rect in config
     // note: x & y are from lower-left corner
-    window.setFrame(NSRect(x: 200, y: 200, width: 400, height: 200), display: true)
+    let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
+    window = NSWindow(
+      contentRect: contentRect,
+      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+      backing: .buffered, defer: false)
+    // this will override x & y from content rect
+    window.center()
+    window.title = "Google Drive Root Chooser"
+    // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
+//    window.setFrameAutosaveName(window.title)
+    self.content = GDriveRootChooserContent(self.app, self.con, self.targetTreeID, self.window)
+    window.delegate = self.windowDelegate
     window.contentView = NSHostingView(rootView: self.content)
-    window.delegate = windowDelegate
+//    window.setDefaultButtonCell(
   }
 
   func start() throws {
-    windowDelegate.parentMeta = self
+    self.windowDelegate.parentMeta = self
 
 //    try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged) // TODO
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady)

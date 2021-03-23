@@ -24,7 +24,7 @@ struct TreeView: View {
         .frame(minWidth: 200,
                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                // A redraw of this view should be triggered when either of these values are changed:
-               minHeight: heightTracking.getTreeViewHeight("test"),
+               minHeight: heightTracking.getTreeViewHeight(),
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
     }
@@ -331,6 +331,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     var icon: NSImage
     if node.isDir {
       icon = NSWorkspace.shared.icon(for: .folder)
+    } else if node.isEphemeral {
+      // TODO: warning icon
+      icon = NSWorkspace.shared.icon(for: .application)
     } else {
       let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
       if suffix == "" {

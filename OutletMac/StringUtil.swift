@@ -42,4 +42,7 @@ class StringUtil {
     return byteCountFormatter.string(fromByteCount: Int64(sizeBytes))
   }
 
+  static func joinPaths(_ parentPath: String, _ childPath: String) -> String {
+    return URL(fileURLWithPath: parentPath).appendingPathComponent(childPath).path
+  }
 }
