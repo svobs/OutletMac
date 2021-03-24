@@ -157,7 +157,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   private func configureOutlineView(_ scrollView: NSScrollView) {
     outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    outlineView.allowsMultipleSelection = true
+    outlineView.allowsMultipleSelection = self.con.allowMultipleSelection
     outlineView.autosaveTableColumns = true
     outlineView.autosaveExpandedItems = true
     outlineView.rowSizeStyle = .large

@@ -27,6 +27,7 @@ protocol TreeControllable: HasLifecycle {
   var treeID: TreeID { get }
 
   var canChangeRoot: Bool { get }
+  var allowMultipleSelection: Bool { get }
 
   var dispatchListener: DispatchListener { get }
 
@@ -81,6 +82,12 @@ class MockTreeController: TreeControllable {
   lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
 
   var canChangeRoot: Bool
+
+  var allowMultipleSelection: Bool {
+    get {
+      return true
+    }
+  }
 
   init(_ treeID: String, canChangeRoot: Bool) {
     self.app = MockApp()
@@ -139,17 +146,19 @@ class TreeController: TreeControllable, ObservableObject {
   private var readyToPopulate: Bool = false
 
   var canChangeRoot: Bool
+  var allowMultipleSelection: Bool
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
   private lazy var statsRefreshTimer = HoldOffTimer(STATS_REFRESH_HOLDOFF_TIME_MS, self.fireRequestStatsRefresh)
 
-  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool) {
+  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowMultipleSelection: Bool) {
     self.app = app
     self.tree = tree
     self.swiftTreeState = SwiftTreeState.from(tree)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.canChangeRoot = canChangeRoot
+    self.allowMultipleSelection = allowMultipleSelection
   }
 
   func start() throws {

@@ -147,8 +147,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
       let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      self.conLeft = try self.buildController(treeLeft, canChangeRoot: true)
-      self.conRight = try self.buildController(treeRight, canChangeRoot: true)
+      self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowMultipleSelection: true)
+      self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
       try self.conLeft!.loadTree()
       try self.conRight!.loadTree()
 
@@ -167,9 +167,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   /**
    Creates and starts a tree controller for the given tree, but does not load it
   */
-  func buildController(_ tree: DisplayTree, canChangeRoot: Bool) throws -> TreeController {
+  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreeController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot)
+    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
 
     try con.start()
     return con
@@ -352,7 +352,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     } else {
       do {
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect()!
-        let con = try self.buildController(tree, canChangeRoot: false)
+        let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 
         rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSN)
         try rootChooserView.start()
