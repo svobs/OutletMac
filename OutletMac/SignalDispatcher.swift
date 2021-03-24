@@ -35,6 +35,15 @@ class PropDict {
     }
   }
 
+  func getArray(_ key: String) throws -> [Any] {
+    let configVal: Any? = self._propertyDict[key]
+    if configVal == nil {
+      throw OutletError.invalidState("No value for key '\(key)'")
+    } else {
+      return configVal as! [Any]
+    }
+  }
+
   func getString(_ key: String) throws -> String {
     let configVal: Any? = self._propertyDict[key]
     if configVal == nil {

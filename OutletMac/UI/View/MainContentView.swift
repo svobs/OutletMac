@@ -49,7 +49,7 @@ struct MainContentView: View {
 
 struct MainContentView_Previews: PreviewProvider {
   static var previews: some View {
-    MainContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE), conRight: MockTreeController(ID_RIGHT_TREE))
+    MainContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE, canChangeRoot: true), conRight: MockTreeController(ID_RIGHT_TREE, canChangeRoot: true))
       .environmentObject(GlobalSettings())
   }
 }

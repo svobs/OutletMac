@@ -16,7 +16,7 @@ struct RootPathPanel: View {
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
-  init(_ controller: TreeControllable, canChangeRoot: Bool) {
+  init(_ controller: TreeControllable) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
   }
@@ -112,8 +112,10 @@ struct RootPathPanel: View {
         .onTapGesture(count: 1, perform: {
           // cancel any previous edit
           self.con.dispatcher.sendSignal(signal: .CANCEL_OTHER_EDIT_ROOT, senderID: con.treeID)
-          // switch to Editing mode
-          self.swiftTreeState.isEditingRoot = true
+          // switch to Editing mode if allowed
+          if self.con.canChangeRoot {
+            self.swiftTreeState.isEditingRoot = true
+          }
         })
 
       } // editing / not editing
@@ -131,7 +133,7 @@ struct RootPathPanel: View {
 
 struct RootPathPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootPathPanel(MockTreeController(ID_LEFT_TREE), canChangeRoot: true)
+    RootPathPanel(MockTreeController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
 

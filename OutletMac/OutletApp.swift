@@ -147,8 +147,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
       let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
       let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      self.conLeft = try self.buildController(treeLeft)
-      self.conRight = try self.buildController(treeRight)
+      self.conLeft = try self.buildController(treeLeft, canChangeRoot: true)
+      self.conRight = try self.buildController(treeRight, canChangeRoot: true)
       try self.conLeft!.loadTree()
       try self.conRight!.loadTree()
 
@@ -167,9 +167,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   /**
    Creates and starts a tree controller for the given tree, but does not load it
   */
-  func buildController(_ tree: DisplayTree) throws -> TreeController {
+  func buildController(_ tree: DisplayTree, canChangeRoot: Bool) throws -> TreeController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria)
+    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot)
 
     try con.start()
     return con
@@ -344,18 +344,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("ERROR [\(treeID)] Cannot open GDrive chooser: could not find controller with this treeID!")
       return
     }
-    let currentSPID: SPID = sourceCon.tree.rootSPID
+    let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
     if rootChooserView != nil && rootChooserView.isOpen {
       rootChooserView.moveToFront()
-      rootChooserView.selectSPID(currentSPID)
+      rootChooserView.selectSPID(currentSN.spid)
     } else {
       do {
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect()!
-        let con = try self.buildController(tree)
-        con.canChangeRoot = false
+        let con = try self.buildController(tree, canChangeRoot: false)
 
-        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSPID)
+        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSN)
         try rootChooserView.start()
       } catch {
         self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")

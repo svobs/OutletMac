@@ -97,7 +97,7 @@ struct FilterPanel: View {
 struct FilterPanel_Previews: PreviewProvider {
   static let app = MockApp()
   static var previews: some View {
-    FilterPanel(MockTreeController(ID_LEFT_TREE))
+    FilterPanel(MockTreeController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
 

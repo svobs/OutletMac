@@ -80,14 +80,11 @@ class MockTreeController: TreeControllable {
   lazy var treeActions: TreeActions = TreeActions(self)
   lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
 
-  var canChangeRoot: Bool {
-    get {
-      return true
-    }
-  }
+  var canChangeRoot: Bool
 
-  init(_ treeID: String) {
+  init(_ treeID: String, canChangeRoot: Bool) {
     self.app = MockApp()
+    self.canChangeRoot = canChangeRoot
     // dummy data follows
     let spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
     let rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
@@ -141,17 +138,18 @@ class TreeController: TreeControllable, ObservableObject {
   // workaround for race condition, in case we are ready to populate before the UI is ready
   private var readyToPopulate: Bool = false
 
-  var canChangeRoot: Bool = true // TODO
+  var canChangeRoot: Bool
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
   private lazy var statsRefreshTimer = HoldOffTimer(STATS_REFRESH_HOLDOFF_TIME_MS, self.fireRequestStatsRefresh)
 
-  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria) {
+  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool) {
     self.app = app
     self.tree = tree
     self.swiftTreeState = SwiftTreeState.from(tree)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
+    self.canChangeRoot = canChangeRoot
   }
 
   func start() throws {

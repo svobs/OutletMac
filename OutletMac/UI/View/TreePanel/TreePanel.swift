@@ -24,7 +24,7 @@ struct TreePanel {
   init(_ app: OutletApp, _ controller: TreeControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = controller
-    self.rootPathPanel = RootPathPanel(self.con, canChangeRoot: true)
+    self.rootPathPanel = RootPathPanel(self.con)
     self.filterPanel = FilterPanel(self.con)
     self.treeView = TreeView(controller: self.con, heightTracking)
     self.status_panel = StatusPanel(controller: self.con)

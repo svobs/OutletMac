@@ -484,6 +484,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("Failed to report node selection: \(error)")
       }
     }
+
+    var snList: [SPIDNodePair] = []
+
+    for guid in self.getSelectedGUIDs() {
+      if let sn = self.displayStore.getSN(guid) {
+        snList.append(sn)
+      }
+    }
+    self.con.dispatcher.sendSignal(signal: .TREE_SELECTION_CHANGED, senderID: self.con.treeID, ["sn_list": snList])
   }
 
   func getSelectedUIDs() -> Set<UID> {
