@@ -79,7 +79,7 @@ class LocalDirNode: LocalNode {
   
   override var sizeBytes: UInt64? {
     get {
-      self._dirStats!.sizeBytes
+      return self._dirStats?.sizeBytes
     }
     set (sizeBytes) {
       if self._dirStats == nil {
@@ -90,9 +90,7 @@ class LocalDirNode: LocalNode {
   }
   
   func zeroOutStats() {
-    if (self._dirStats != nil) {
-      self._dirStats!.clear()
-    }
+    self._dirStats?.clear()
   }
   
   func isStatsLoaded() -> Bool {
