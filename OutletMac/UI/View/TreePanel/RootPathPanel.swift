@@ -46,6 +46,40 @@ struct RootPathPanel: View {
     return con.app.iconStore.getIcon(for: iconId).getImage()
   }
 
+  func doOpenFileDialog() {
+    let dialog = NSOpenPanel();
+
+    dialog.title                   = "Choose a directory";  // Not shown in Mac OS Big Bug
+    if self.con.tree.treeType == .LOCAL_DISK {
+      // Open to current directory by default (if available):
+      // TODO: only do this for this machine (need to check this somehow)
+      dialog.directoryURL = URL(fileURLWithPath: self.con.tree.rootPath)
+    }
+    dialog.showsResizeIndicator    = true;
+    dialog.showsHiddenFiles        = false;
+    dialog.canChooseFiles          = false;
+    dialog.canChooseDirectories    = true;
+    dialog.canCreateDirectories    = true;
+    dialog.allowsMultipleSelection = false;
+
+    if (dialog.runModal() == .OK) {
+      let result = dialog.url // Pathname of the file
+
+      if (result != nil) {
+        let dirPath = result!.path
+        NSLog("INFO  User chose path: \(dirPath)")
+        do {
+          let _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.treeID, userPath: dirPath)
+        } catch {
+          self.con.reportError("Failed to set tree root path", "Failed to set path (\(dirPath)): \(error)")
+        }
+      }
+    } else {
+      NSLog("DEBUG User cancelled Open File dialog")
+      return
+    }
+  }
+
   var body: some View {
     HStack(alignment: .center, spacing: H_PAD) {
 
@@ -55,8 +89,7 @@ struct RootPathPanel: View {
           .padding(.leading, H_PAD)
       }
       .contextMenu {
-        // TODO!
-        Button("Local filesystem subtree...", action: {})
+        Button("Local filesystem subtree...", action: self.doOpenFileDialog)
         Button("Google Drive subtree...", action: {
                 NSApp.sendAction(#selector(OutletMacApp.openGDriveRootChooser), to: nil, from:self.con.treeID)})
       }

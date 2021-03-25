@@ -26,7 +26,12 @@ class SignalReceiverThread: Thread {
       // TODO: give more thought to handling various "async" code paths
       loopCount += 1
       if loopCount > 3 {
-        // TODO: handle error better
+        // TODO: handle error better. Thoughts:
+        // 1. Cancel all gRPC requests
+        // 2. Kill the trees in the UI
+        // 3. Display a "connecting" indicator until reconnected
+        // OR:
+        // 1. Modal dialog which will auto-close when reconected, with option to quit app
         fatalError("SignalReceiverThread: max failures exceeded!")
       }
       NSLog("DEBUG SignalReceiverThread looping (count: \(loopCount))")

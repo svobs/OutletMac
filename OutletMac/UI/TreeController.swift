@@ -248,8 +248,12 @@ class TreeController: TreeControllable, ObservableObject {
       self.displayStore.repopulateRoot(topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
-      self.clearModelAndTreeView()
-      self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
+      // When both calls below have separate DispatchQueue workitems, sometimes nothing shows up.
+      // Is it possible the workitems can arrive out of order? Need to research this.
+      DispatchQueue.main.async {
+        self.clearModelAndTreeView()
+        self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
+      }
       return
     }
 
@@ -310,8 +314,8 @@ class TreeController: TreeControllable, ObservableObject {
 
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
     let parentGUID = self.displayStore.guidFor(parentSN)
-    let childSN = self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
-    self.displayStore.populateChildList(parentSN, [childSN])
+    let ephemerealChildSN = self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
+    self.displayStore.populateChildList(parentSN, [ephemerealChildSN])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
       NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")

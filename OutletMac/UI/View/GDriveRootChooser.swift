@@ -111,6 +111,18 @@ struct GDriveRootChooserContent: View {
 
 }
 
+class GDriveRootChooserWindow: NSWindow {
+  override func keyDown(with event: NSEvent) {
+    // Pass all key events to the project model
+    NSLog("KEY EVENT: \(event)")
+    // Enable key events
+    interpretKeyEvents([event])
+    if event.keyCode == 13 {
+      NSLog("ENTER KEY PRESSED!")
+    }
+  }
+}
+
 /**
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
@@ -140,7 +152,7 @@ class GDriveRootChooser: HasLifecycle, ObservableObject {
     // TODO: save content rect in config
     // note: x & y are from lower-left corner
     let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
-    window = NSWindow(
+    window = GDriveRootChooserWindow(
       contentRect: contentRect,
       styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered, defer: false)
@@ -158,10 +170,8 @@ class GDriveRootChooser: HasLifecycle, ObservableObject {
   func start() throws {
     self.windowDelegate.parentMeta = self
 
-//    try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged) // TODO
     try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady, whitelistSenderID: self.con.treeID)
     try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateComplete, whitelistSenderID: self.con.treeID)
-
     try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
 
     // TODO: create & populate progress bar to show user that something is being done here
