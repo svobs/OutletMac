@@ -119,6 +119,8 @@ class GDriveRootChooserWindow: NSWindow {
     interpretKeyEvents([event])
     if event.keyCode == 13 {
       NSLog("ENTER KEY PRESSED!")
+    } else {
+      NSLog("User pressed key: \(event.keyCode)")
     }
   }
 }

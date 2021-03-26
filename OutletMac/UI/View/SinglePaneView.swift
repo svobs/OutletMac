@@ -26,19 +26,13 @@ struct SinglePaneView: View {
   let app: OutletApp
   let con: TreeControllable
 
-  // Compiler forces me to init this to nil -> annoying!!
-  var _treePanel: TreePanel? = nil
-  var treePanel: TreePanel {
-    get {
-      return _treePanel!
-    }
-  }
+  var treePanel: TreePanel! = nil
 
   init(_ app: OutletApp, _ con: TreeControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = con
     self.heightTracking = heightTracking
-    self._treePanel = TreePanel(app, con, self.heightTracking)
+    self.treePanel = TreePanel(app, con, self.heightTracking)
   }
 
   var body: some View {

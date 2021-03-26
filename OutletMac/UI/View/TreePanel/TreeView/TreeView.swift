@@ -66,15 +66,7 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
  */
 final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, NSMenuDelegate {
   // Cannot override init(), but this must be set manually before loadView() is called
-  private var _lazyCon: TreeControllable? = nil
-  var con: TreeControllable {
-    get {
-      return _lazyCon!
-    }
-    set (con) {
-      self._lazyCon = con
-    }
-  }
+  var con: TreeControllable! = nil
 
   private let treeController = NSTreeController()
   let outlineView = NSOutlineView()

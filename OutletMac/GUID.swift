@@ -39,7 +39,7 @@ class GUIDMapper {
   func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
     switch (treeType) {
       case .LOCAL_DISK:
-      return GUID(uid)
+        return GUID(uid)
       case .GDRIVE:
         lock.lock()
         defer {

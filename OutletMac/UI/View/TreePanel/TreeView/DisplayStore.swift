@@ -27,7 +27,6 @@ class DisplayStore {
 
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
-  // TODO: create parallel data structures for DUIDs ("display UIDs") which will always be negative
 
   init(_ controllable: TreeControllable) {
     self.con = controllable
@@ -42,6 +41,7 @@ class DisplayStore {
     return guid
   }
 
+  // FIXME: we do not require the path here
   func guidFor(_ spid: SPID) -> GUID {
     return self.guidFor(spid.treeType, singlePath: spid.getSinglePath(), uid: spid.uid)
   }
