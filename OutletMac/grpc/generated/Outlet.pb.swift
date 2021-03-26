@@ -21,7 +21,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_Empty {
+public struct Outlet_Backend_Agent_Grpc_Generated_Empty {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -31,7 +31,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Empty {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry {
+public struct Outlet_Backend_Agent_Grpc_Generated_ConfigEntry {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -45,7 +45,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -57,24 +57,24 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var configList: [Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry] = []
+  public var configList: [Outlet_Backend_Agent_Grpc_Generated_ConfigEntry] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var configList: [Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry] = []
+  public var configList: [Outlet_Backend_Agent_Grpc_Generated_ConfigEntry] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -82,7 +82,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -92,7 +92,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -104,13 +104,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var icon: Outlet_Backend_Daemon_Grpc_Generated_Icon {
-    get {return _icon ?? Outlet_Backend_Daemon_Grpc_Generated_Icon()}
+  public var icon: Outlet_Backend_Agent_Grpc_Generated_Icon {
+    get {return _icon ?? Outlet_Backend_Agent_Grpc_Generated_Icon()}
     set {_icon = newValue}
   }
   /// Returns true if `icon` has been explicitly set.
@@ -122,10 +122,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response {
 
   public init() {}
 
-  fileprivate var _icon: Outlet_Backend_Daemon_Grpc_Generated_Icon? = nil
+  fileprivate var _icon: Outlet_Backend_Agent_Grpc_Generated_Icon? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_Icon {
+public struct Outlet_Backend_Agent_Grpc_Generated_Icon {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -139,7 +139,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Icon {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -151,13 +151,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
-    get {return _filterCriteria ?? Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()}
+  public var filterCriteria: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria {
+    get {return _filterCriteria ?? Outlet_Backend_Agent_Grpc_Generated_FilterCriteria()}
     set {_filterCriteria = newValue}
   }
   /// Returns true if `filterCriteria` has been explicitly set.
@@ -169,18 +169,18 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response {
 
   public init() {}
 
-  fileprivate var _filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria? = nil
+  fileprivate var _filterCriteria: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   public var treeID: String = String()
 
-  public var filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
-    get {return _filterCriteria ?? Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria()}
+  public var filterCriteria: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria {
+    get {return _filterCriteria ?? Outlet_Backend_Agent_Grpc_Generated_FilterCriteria()}
     set {_filterCriteria = newValue}
   }
   /// Returns true if `filterCriteria` has been explicitly set.
@@ -192,11 +192,11 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request {
 
   public init() {}
 
-  fileprivate var _filterCriteria: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria? = nil
+  fileprivate var _filterCriteria: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria? = nil
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -206,7 +206,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -221,7 +221,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -231,7 +231,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -246,7 +246,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -256,7 +256,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -268,7 +268,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -282,7 +282,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -294,7 +294,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -308,13 +308,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var userOp: Outlet_Backend_Daemon_Grpc_Generated_UserOp {
-    get {return _userOp ?? Outlet_Backend_Daemon_Grpc_Generated_UserOp()}
+  public var userOp: Outlet_Backend_Agent_Grpc_Generated_UserOp {
+    get {return _userOp ?? Outlet_Backend_Agent_Grpc_Generated_UserOp()}
     set {_userOp = newValue}
   }
   /// Returns true if `userOp` has been explicitly set.
@@ -326,11 +326,11 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response {
 
   public init() {}
 
-  fileprivate var _userOp: Outlet_Backend_Daemon_Grpc_Generated_UserOp? = nil
+  fileprivate var _userOp: Outlet_Backend_Agent_Grpc_Generated_UserOp? = nil
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -341,7 +341,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -351,7 +351,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement {
+public struct Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -363,7 +363,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -372,16 +372,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request {
 
   public var treeIDRight: String = String()
 
-  public var changeListLeft: [Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair] = []
+  public var changeListLeft: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
 
-  public var changeListRight: [Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair] = []
+  public var changeListRight: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -390,10 +390,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request {
 
   public var dstTreeID: String = String()
 
-  public var srcSnList: [Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair] = []
+  public var srcSnList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
 
-  public var dstSn: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
-    get {return _dstSn ?? Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair()}
+  public var dstSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
+    get {return _dstSn ?? Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()}
     set {_dstSn = newValue}
   }
   /// Returns true if `dstSn` has been explicitly set.
@@ -407,16 +407,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request {
 
   public init() {}
 
-  fileprivate var _dstSn: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair? = nil
+  fileprivate var _dstSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeIdentifier: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
-    get {return _nodeIdentifier ?? Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier()}
+  public var nodeIdentifier: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _nodeIdentifier ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
     set {_nodeIdentifier = newValue}
   }
   /// Returns true if `nodeIdentifier` has been explicitly set.
@@ -430,10 +430,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request {
 
   public init() {}
 
-  fileprivate var _nodeIdentifier: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier? = nil
+  fileprivate var _nodeIdentifier: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -447,7 +447,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -459,7 +459,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred {
+public struct Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -473,7 +473,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_UidContainer {
+public struct Outlet_Backend_Agent_Grpc_Generated_UidContainer {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -485,7 +485,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UidContainer {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -499,7 +499,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -514,7 +514,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -524,15 +524,15 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate {
+public struct Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   public var uid: UInt32 = 0
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -544,18 +544,18 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate {
 
   public init() {}
 
-  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+  fileprivate var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
 }
 
 /// StatsUpdate is sent:
 /// 1. Some period of time after node added / modified / removed from tree (not after *every* update)
 /// 2. If the FE requests it (DEPRECATED behavior)
-public struct Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
+public struct Outlet_Backend_Agent_Grpc_Generated_StatsUpdate {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var dirMetaList: [Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate] = []
+  public var dirMetaList: [Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate] = []
 
   public var statusMsg: String = String()
 
@@ -564,7 +564,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
+public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -573,84 +573,84 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
 
   public var sender: String = String()
 
-  public var signalData: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg.OneOf_SignalData? = nil
+  public var signalData: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData? = nil
 
-  public var empty: Outlet_Backend_Daemon_Grpc_Generated_Empty {
+  public var empty: Outlet_Backend_Agent_Grpc_Generated_Empty {
     get {
       if case .empty(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_Empty()
+      return Outlet_Backend_Agent_Grpc_Generated_Empty()
     }
     set {signalData = .empty(newValue)}
   }
 
-  public var errorOccurred: Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred {
+  public var errorOccurred: Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred {
     get {
       if case .errorOccurred(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred()
+      return Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred()
     }
     set {signalData = .errorOccurred(newValue)}
   }
 
-  public var displayTreeUiState: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState {
+  public var displayTreeUiState: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
     get {
       if case .displayTreeUiState(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState()
+      return Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState()
     }
     set {signalData = .displayTreeUiState(newValue)}
   }
 
-  public var playState: Outlet_Backend_Daemon_Grpc_Generated_PlayState {
+  public var playState: Outlet_Backend_Agent_Grpc_Generated_PlayState {
     get {
       if case .playState(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_PlayState()
+      return Outlet_Backend_Agent_Grpc_Generated_PlayState()
     }
     set {signalData = .playState(newValue)}
   }
 
-  public var uiEnablement: Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement {
+  public var uiEnablement: Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement {
     get {
       if case .uiEnablement(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement()
+      return Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement()
     }
     set {signalData = .uiEnablement(newValue)}
   }
 
-  public var node: Outlet_Backend_Daemon_Grpc_Generated_Node {
+  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
     get {
       if case .node(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_Node()
+      return Outlet_Backend_Agent_Grpc_Generated_Node()
     }
     set {signalData = .node(newValue)}
   }
 
-  public var srcDstNodeList: Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList {
+  public var srcDstNodeList: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
     get {
       if case .srcDstNodeList(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList()
+      return Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList()
     }
     set {signalData = .srcDstNodeList(newValue)}
   }
 
-  public var statusMsg: Outlet_Backend_Daemon_Grpc_Generated_StatusMsg {
+  public var statusMsg: Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
     get {
       if case .statusMsg(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_StatusMsg()
+      return Outlet_Backend_Agent_Grpc_Generated_StatusMsg()
     }
     set {signalData = .statusMsg(newValue)}
   }
 
-  public var downloadMsg: Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg {
+  public var downloadMsg: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg {
     get {
       if case .downloadMsg(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg()
+      return Outlet_Backend_Agent_Grpc_Generated_DownloadMsg()
     }
     set {signalData = .downloadMsg(newValue)}
   }
 
-  public var statsUpdate: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate {
+  public var statsUpdate: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate {
     get {
       if case .statsUpdate(let v)? = signalData {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate()
+      return Outlet_Backend_Agent_Grpc_Generated_StatsUpdate()
     }
     set {signalData = .statsUpdate(newValue)}
   }
@@ -658,19 +658,19 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
-    case empty(Outlet_Backend_Daemon_Grpc_Generated_Empty)
-    case errorOccurred(Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred)
-    case displayTreeUiState(Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState)
-    case playState(Outlet_Backend_Daemon_Grpc_Generated_PlayState)
-    case uiEnablement(Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement)
-    case node(Outlet_Backend_Daemon_Grpc_Generated_Node)
-    case srcDstNodeList(Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList)
-    case statusMsg(Outlet_Backend_Daemon_Grpc_Generated_StatusMsg)
-    case downloadMsg(Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg)
-    case statsUpdate(Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate)
+    case empty(Outlet_Backend_Agent_Grpc_Generated_Empty)
+    case errorOccurred(Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred)
+    case displayTreeUiState(Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState)
+    case playState(Outlet_Backend_Agent_Grpc_Generated_PlayState)
+    case uiEnablement(Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement)
+    case node(Outlet_Backend_Agent_Grpc_Generated_Node)
+    case srcDstNodeList(Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList)
+    case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
+    case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
+    case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
 
   #if !swift(>=4.1)
-    public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
+    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
@@ -724,7 +724,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SignalMsg {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg {
+public struct Outlet_Backend_Agent_Grpc_Generated_DownloadMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -736,7 +736,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_StatusMsg {
+public struct Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -749,7 +749,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StatusMsg {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse {
+public struct Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -759,7 +759,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -776,12 +776,12 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeList: [Outlet_Backend_Daemon_Grpc_Generated_Node] = []
+  public var nodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
 
   /// if max_results exceeded, node_list is empty and this indicates result count
   public var resultExceededCount: UInt32 = 0
@@ -791,13 +791,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
-    get {return _spid ?? Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier()}
+  public var spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _spid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
     set {_spid = newValue}
   }
   /// Returns true if `spid` has been explicitly set.
@@ -811,22 +811,22 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request {
 
   public init() {}
 
-  fileprivate var _spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier? = nil
+  fileprivate var _spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeList: [Outlet_Backend_Daemon_Grpc_Generated_Node] = []
+  public var nodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_PlayState {
+public struct Outlet_Backend_Agent_Grpc_Generated_PlayState {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -838,7 +838,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_PlayState {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -851,7 +851,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -861,15 +861,15 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState {
+public struct Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   public var treeID: String = String()
 
-  public var rootSn: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
-    get {return _rootSn ?? Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair()}
+  public var rootSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
+    get {return _rootSn ?? Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()}
     set {_rootSn = newValue}
   }
   /// Returns true if `rootSn` has been explicitly set.
@@ -891,10 +891,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState {
 
   public init() {}
 
-  fileprivate var _rootSn: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair? = nil
+  fileprivate var _rootSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -907,8 +907,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request {
 
   public var userPath: String = String()
 
-  public var spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
-    get {return _spid ?? Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier()}
+  public var spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _spid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
     set {_spid = newValue}
   }
   /// Returns true if `spid` has been explicitly set.
@@ -922,16 +922,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request {
 
   public init() {}
 
-  fileprivate var _spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier? = nil
+  fileprivate var _spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var displayTreeUiState: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState {
-    get {return _displayTreeUiState ?? Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState()}
+  public var displayTreeUiState: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
+    get {return _displayTreeUiState ?? Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState()}
     set {_displayTreeUiState = newValue}
   }
   /// Returns true if `displayTreeUiState` has been explicitly set.
@@ -943,16 +943,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response {
 
   public init() {}
 
-  fileprivate var _displayTreeUiState: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState? = nil
+  fileprivate var _displayTreeUiState: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var node: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _node ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_node = newValue}
   }
   /// Returns true if `node` has been explicitly set.
@@ -964,10 +964,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response {
 
   public init() {}
 
-  fileprivate var _node: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
+  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -981,7 +981,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -993,7 +993,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1008,7 +1008,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1021,7 +1021,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request {
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1031,7 +1031,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response {
+public struct Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1045,9 +1045,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "outlet.backend.daemon.grpc.generated"
+fileprivate let _protobuf_package = "outlet.backend.agent.grpc.generated"
 
-extension Outlet_Backend_Daemon_Grpc_Generated_Empty: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_Empty: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Empty"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1060,13 +1060,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Empty: SwiftProtobuf.Message, Swi
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Empty, rhs: Outlet_Backend_Daemon_Grpc_Generated_Empty) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Empty, rhs: Outlet_Backend_Agent_Grpc_Generated_Empty) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_ConfigEntry: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ConfigEntry"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "key"),
@@ -1096,7 +1096,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry: SwiftProtobuf.Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry, rhs: Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ConfigEntry, rhs: Outlet_Backend_Agent_Grpc_Generated_ConfigEntry) -> Bool {
     if lhs.key != rhs.key {return false}
     if lhs.val != rhs.val {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1104,7 +1104,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ConfigEntry: SwiftProtobuf.Messag
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetConfig_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "config_key_list"),
@@ -1129,14 +1129,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request) -> Bool {
     if lhs.configKeyList != rhs.configKeyList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetConfig_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "config_list"),
@@ -1161,14 +1161,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Response: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetConfig_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response) -> Bool {
     if lhs.configList != rhs.configList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PutConfig_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "config_list"),
@@ -1193,14 +1193,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request) -> Bool {
     if lhs.configList != rhs.configList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PutConfig_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1213,13 +1213,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_PutConfig_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetIcon_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "icon_id"),
@@ -1244,14 +1244,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request: SwiftProtobuf.Me
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request) -> Bool {
     if lhs.iconID != rhs.iconID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetIcon_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "icon"),
@@ -1276,14 +1276,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetIcon_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response) -> Bool {
     if lhs._icon != rhs._icon {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_Icon: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_Icon: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Icon"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "icon_id"),
@@ -1313,7 +1313,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Icon: SwiftProtobuf.Message, Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Icon, rhs: Outlet_Backend_Daemon_Grpc_Generated_Icon) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Icon, rhs: Outlet_Backend_Agent_Grpc_Generated_Icon) -> Bool {
     if lhs.iconID != rhs.iconID {return false}
     if lhs.content != rhs.content {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1321,7 +1321,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Icon: SwiftProtobuf.Message, Swif
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetFilter_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
@@ -1346,14 +1346,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetFilter_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "filter_criteria"),
@@ -1378,14 +1378,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetFilter_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response) -> Bool {
     if lhs._filterCriteria != rhs._filterCriteria {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UpdateFilter_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
@@ -1415,7 +1415,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request: SwiftProtob
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs._filterCriteria != rhs._filterCriteria {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1423,7 +1423,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Request: SwiftProtob
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UpdateFilter_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1436,13 +1436,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response: SwiftProto
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_UpdateFilter_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SetSelectedRowSet_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "selected_row_uid_set"),
@@ -1472,7 +1472,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request) -> Bool {
     if lhs.selectedRowUidSet != rhs.selectedRowUidSet {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1480,7 +1480,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Request: SwiftP
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SetSelectedRowSet_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1493,13 +1493,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_SetSelectedRowSet_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RemoveExpandedRow_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_uid"),
@@ -1529,7 +1529,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request) -> Bool {
     if lhs.nodeUid != rhs.nodeUid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1537,7 +1537,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Request: SwiftP
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RemoveExpandedRow_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1550,13 +1550,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_RemoveExpandedRow_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRowsOfInterest_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
@@ -1581,14 +1581,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRowsOfInterest_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "expanded_row_uid_set"),
@@ -1618,7 +1618,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response) -> Bool {
     if lhs.expandedRowUidSet != rhs.expandedRowUidSet {return false}
     if lhs.selectedRowUidSet != rhs.selectedRowUidSet {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1626,7 +1626,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetRowsOfInterest_Response: Swift
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetLastPendingOp_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_uid"),
@@ -1651,14 +1651,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request: SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request) -> Bool {
     if lhs.nodeUid != rhs.nodeUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DownloadFromGDrive_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_uid"),
@@ -1688,7 +1688,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request) -> Bool {
     if lhs.nodeUid != rhs.nodeUid {return false}
     if lhs.requestorID != rhs.requestorID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1696,7 +1696,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DownloadFromGDrive_Request: Swift
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetLastPendingOp_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "user_op"),
@@ -1721,14 +1721,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetLastPendingOp_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response) -> Bool {
     if lhs._userOp != rhs._userOp {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Subscribe_Request"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1741,13 +1741,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_Subscribe_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetOpExecPlayState_Request"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -1760,13 +1760,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetOpExecPlayState_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ToggleUiEnablement"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "enable"),
@@ -1791,14 +1791,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement, rhs: Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement, rhs: Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement) -> Bool {
     if lhs.enable != rhs.enable {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GenerateMergeTree_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id_left"),
@@ -1838,7 +1838,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request) -> Bool {
     if lhs.treeIDLeft != rhs.treeIDLeft {return false}
     if lhs.treeIDRight != rhs.treeIDRight {return false}
     if lhs.changeListLeft != rhs.changeListLeft {return false}
@@ -1848,7 +1848,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GenerateMergeTree_Request: SwiftP
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DragDrop_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "src_tree_id"),
@@ -1893,7 +1893,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request) -> Bool {
     if lhs.srcTreeID != rhs.srcTreeID {return false}
     if lhs.dstTreeID != rhs.dstTreeID {return false}
     if lhs.srcSnList != rhs.srcSnList {return false}
@@ -1904,7 +1904,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Request: SwiftProtobuf.M
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RefreshSubtree_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_identifier"),
@@ -1934,7 +1934,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request: SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request) -> Bool {
     if lhs._nodeIdentifier != rhs._nodeIdentifier {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1942,7 +1942,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtree_Request: SwiftProt
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RefreshSubtreeStats_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "root_uid"),
@@ -1972,7 +1972,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request: Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request) -> Bool {
     if lhs.rootUid != rhs.rootUid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1980,7 +1980,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RefreshSubtreeStats_Request: Swif
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeleteSubtree_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_uid_list"),
@@ -2005,14 +2005,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request: SwiftProto
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_DeleteSubtree_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request) -> Bool {
     if lhs.nodeUidList != rhs.nodeUidList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ErrorOccurred"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "msg"),
@@ -2042,7 +2042,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred, rhs: Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred, rhs: Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred) -> Bool {
     if lhs.msg != rhs.msg {return false}
     if lhs.secondaryMsg != rhs.secondaryMsg {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2050,7 +2050,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred: SwiftProtobuf.Mess
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_UidContainer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_UidContainer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UidContainer"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -2075,14 +2075,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UidContainer: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UidContainer, rhs: Outlet_Backend_Daemon_Grpc_Generated_UidContainer) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_UidContainer, rhs: Outlet_Backend_Agent_Grpc_Generated_UidContainer) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StartDiffTrees_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id_left"),
@@ -2112,7 +2112,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request: SwiftProt
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request) -> Bool {
     if lhs.treeIDLeft != rhs.treeIDLeft {return false}
     if lhs.treeIDRight != rhs.treeIDRight {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2120,7 +2120,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Request: SwiftProt
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StartDiffTrees_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id_left"),
@@ -2150,7 +2150,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response: SwiftPro
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response) -> Bool {
     if lhs.treeIDLeft != rhs.treeIDLeft {return false}
     if lhs.treeIDRight != rhs.treeIDRight {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2158,7 +2158,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartDiffTrees_Response: SwiftPro
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DragDrop_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -2171,13 +2171,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_DragDrop_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DirMetaUpdate"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -2207,7 +2207,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate, rhs: Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate, rhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2215,7 +2215,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Mess
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StatsUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StatsUpdate"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta_list"),
@@ -2245,7 +2245,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate: SwiftProtobuf.Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate, rhs: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate, rhs: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate) -> Bool {
     if lhs.dirMetaList != rhs.dirMetaList {return false}
     if lhs.statusMsg != rhs.statusMsg {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2253,7 +2253,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate: SwiftProtobuf.Messag
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "sig_int"),
@@ -2279,7 +2279,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.sigInt) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.sender) }()
       case 10: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_Empty?
+        var v: Outlet_Backend_Agent_Grpc_Generated_Empty?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .empty(let m) = current {v = m}
@@ -2288,7 +2288,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .empty(v)}
       }()
       case 11: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_ErrorOccurred?
+        var v: Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .errorOccurred(let m) = current {v = m}
@@ -2297,7 +2297,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .errorOccurred(v)}
       }()
       case 12: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState?
+        var v: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .displayTreeUiState(let m) = current {v = m}
@@ -2306,7 +2306,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .displayTreeUiState(v)}
       }()
       case 13: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_PlayState?
+        var v: Outlet_Backend_Agent_Grpc_Generated_PlayState?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .playState(let m) = current {v = m}
@@ -2315,7 +2315,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .playState(v)}
       }()
       case 14: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_ToggleUiEnablement?
+        var v: Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .uiEnablement(let m) = current {v = m}
@@ -2324,7 +2324,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .uiEnablement(v)}
       }()
       case 15: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_Node?
+        var v: Outlet_Backend_Agent_Grpc_Generated_Node?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .node(let m) = current {v = m}
@@ -2333,7 +2333,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .node(v)}
       }()
       case 16: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList?
+        var v: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .srcDstNodeList(let m) = current {v = m}
@@ -2342,7 +2342,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .srcDstNodeList(v)}
       }()
       case 17: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_StatusMsg?
+        var v: Outlet_Backend_Agent_Grpc_Generated_StatusMsg?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .statusMsg(let m) = current {v = m}
@@ -2351,7 +2351,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .statusMsg(v)}
       }()
       case 18: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg?
+        var v: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .downloadMsg(let m) = current {v = m}
@@ -2360,7 +2360,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
         if let v = v {self.signalData = .downloadMsg(v)}
       }()
       case 19: try {
-        var v: Outlet_Backend_Daemon_Grpc_Generated_StatsUpdate?
+        var v: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
           if case .statsUpdate(let m) = current {v = m}
@@ -2429,7 +2429,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg, rhs: Outlet_Backend_Daemon_Grpc_Generated_SignalMsg) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) -> Bool {
     if lhs.sigInt != rhs.sigInt {return false}
     if lhs.sender != rhs.sender {return false}
     if lhs.signalData != rhs.signalData {return false}
@@ -2438,7 +2438,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SignalMsg: SwiftProtobuf.Message,
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DownloadMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DownloadMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "filename"),
@@ -2463,14 +2463,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg: SwiftProtobuf.Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg, rhs: Outlet_Backend_Daemon_Grpc_Generated_DownloadMsg) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg) -> Bool {
     if lhs.filename != rhs.filename {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StatusMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StatusMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StatusMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "msg"),
@@ -2495,14 +2495,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StatusMsg: SwiftProtobuf.Message,
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StatusMsg, rhs: Outlet_Backend_Daemon_Grpc_Generated_StatusMsg) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StatusMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_StatusMsg) -> Bool {
     if lhs.msg != rhs.msg {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SendSignalResponse"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -2515,13 +2515,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse, rhs: Outlet_Backend_Daemon_Grpc_Generated_SendSignalResponse) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse, rhs: Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "parent_uid"),
@@ -2556,7 +2556,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request: SwiftProtob
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request) -> Bool {
     if lhs.parentUid != rhs.parentUid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.maxResults != rhs.maxResults {return false}
@@ -2565,7 +2565,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Request: SwiftProtob
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_list"),
@@ -2595,7 +2595,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProto
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response) -> Bool {
     if lhs.nodeList != rhs.nodeList {return false}
     if lhs.resultExceededCount != rhs.resultExceededCount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2603,7 +2603,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetChildList_Response: SwiftProto
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetAncestorList_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "spid"),
@@ -2633,7 +2633,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request: SwiftPro
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request) -> Bool {
     if lhs._spid != rhs._spid {return false}
     if lhs.stopAtPath != rhs.stopAtPath {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2641,7 +2641,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Request: SwiftPro
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetAncestorList_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_list"),
@@ -2666,14 +2666,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response: SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetAncestorList_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response) -> Bool {
     if lhs.nodeList != rhs.nodeList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_PlayState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_PlayState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".PlayState"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "is_enabled"),
@@ -2698,14 +2698,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_PlayState: SwiftProtobuf.Message,
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_PlayState, rhs: Outlet_Backend_Daemon_Grpc_Generated_PlayState) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_PlayState, rhs: Outlet_Backend_Agent_Grpc_Generated_PlayState) -> Bool {
     if lhs.isEnabled != rhs.isEnabled {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StartSubtreeLoad_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
@@ -2730,14 +2730,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request: SwiftPr
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".StartSubtreeLoad_Response"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -2750,13 +2750,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response: SwiftP
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_StartSubtreeLoad_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DisplayTreeUiState"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
@@ -2811,7 +2811,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState, rhs: Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState, rhs: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
     if lhs._rootSn != rhs._rootSn {return false}
     if lhs.rootExists != rhs.rootExists {return false}
@@ -2824,7 +2824,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RequestDisplayTree_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "is_startup"),
@@ -2874,7 +2874,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request) -> Bool {
     if lhs.isStartup != rhs.isStartup {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.returnAsync != rhs.returnAsync {return false}
@@ -2886,7 +2886,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Request: Swift
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RequestDisplayTree_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "display_tree_ui_state"),
@@ -2911,14 +2911,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response: Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_RequestDisplayTree_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response) -> Bool {
     if lhs._displayTreeUiState != rhs._displayTreeUiState {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SingleNode_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "node"),
@@ -2943,14 +2943,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response: SwiftProtobu
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_SingleNode_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response) -> Bool {
     if lhs._node != rhs._node {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetUidForLocalPath_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "full_path"),
@@ -2980,7 +2980,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request: Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request) -> Bool {
     if lhs.fullPath != rhs.fullPath {return false}
     if lhs.uidSuggestion != rhs.uidSuggestion {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2988,7 +2988,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Request: Swift
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetUidForLocalPath_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -3013,14 +3013,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response: Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetUidForLocalPath_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNodeForUid_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -3050,7 +3050,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request: SwiftProto
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs.treeType != rhs.treeType {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -3058,7 +3058,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForUid_Request: SwiftProto
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNodeForLocalPath_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "full_path"),
@@ -3083,14 +3083,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request: Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetNodeForLocalPath_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request) -> Bool {
     if lhs.fullPath != rhs.fullPath {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNextUid_Request"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -3103,13 +3103,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Request) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetNextUid_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -3134,7 +3134,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response: SwiftProtobu
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response, rhs: Outlet_Backend_Daemon_Grpc_Generated_GetNextUid_Response) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

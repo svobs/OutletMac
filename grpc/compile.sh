@@ -1,5 +1,5 @@
 #!/bin/bash
-PY_PKG='outlet/backend/daemon/grpc/generated'
+PY_PKG='outlet/backend/agent/grpc/generated'
 PROTO_PATH="./$PY_PKG"
 OUT_DIR='../OutletMac/grpc/generated'
 

@@ -202,7 +202,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func createWindow() {
-    // FIXME
+    // FIXME: actually get the app to use these values
     do {
       self.contentRect = try self.loadWindowContentRectFromConfig()
     } catch {
@@ -216,7 +216,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     window.delegate = self
     window.title = "OutletMac"
 //    window.setFrameAutosaveName("OutletMac")
-    window.center()
+//    window.center()
     window.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
     window.contentView = NSHostingView(rootView: contentView)

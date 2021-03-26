@@ -21,7 +21,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// nothing
-public struct Outlet_Backend_Daemon_Grpc_Generated_Null {
+public struct Outlet_Backend_Agent_Grpc_Generated_Null {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -31,7 +31,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Null {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
+public struct Outlet_Backend_Agent_Grpc_Generated_UserOp {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -42,8 +42,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
 
   public var opType: UInt32 = 0
 
-  public var srcNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _srcNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_srcNode = newValue}
   }
   /// Returns true if `srcNode` has been explicitly set.
@@ -51,8 +51,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
   /// Clears the value of `srcNode`. Subsequent reads from it will return its default value.
   public mutating func clearSrcNode() {self._srcNode = nil}
 
-  public var dstNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _dstNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_dstNode = newValue}
   }
   /// Returns true if `dstNode` has been explicitly set.
@@ -67,17 +67,17 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_UserOp {
 
   public init() {}
 
-  fileprivate var _srcNode: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
-  fileprivate var _dstNode: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
+  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList {
+public struct Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var srcNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _srcNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_srcNode = newValue}
   }
   /// Returns true if `srcNode` has been explicitly set.
@@ -85,8 +85,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList {
   /// Clears the value of `srcNode`. Subsequent reads from it will return its default value.
   public mutating func clearSrcNode() {self._srcNode = nil}
 
-  public var dstNode: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _dstNode ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_dstNode = newValue}
   }
   /// Returns true if `dstNode` has been explicitly set.
@@ -98,17 +98,17 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList {
 
   public init() {}
 
-  fileprivate var _srcNode: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
-  fileprivate var _dstNode: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
+  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
+public struct Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
-    get {return _spid ?? Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier()}
+  public var spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _spid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
     set {_spid = newValue}
   }
   /// Returns true if `spid` has been explicitly set.
@@ -116,8 +116,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
   /// Clears the value of `spid`. Subsequent reads from it will return its default value.
   public mutating func clearSpid() {self._spid = nil}
 
-  public var node: Outlet_Backend_Daemon_Grpc_Generated_Node {
-    get {return _node ?? Outlet_Backend_Daemon_Grpc_Generated_Node()}
+  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
+    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
     set {_node = newValue}
   }
   /// Returns true if `node` has been explicitly set.
@@ -129,11 +129,11 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair {
 
   public init() {}
 
-  fileprivate var _spid: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier? = nil
-  fileprivate var _node: Outlet_Backend_Daemon_Grpc_Generated_Node? = nil
+  fileprivate var _spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
+  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
+public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -151,7 +151,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
+public struct Outlet_Backend_Agent_Grpc_Generated_Node {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -201,58 +201,58 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
     set {_uniqueStorage()._nodeType = newValue}
   }
 
-  public var containerMeta: Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta {
+  public var containerMeta: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta {
     get {
       if case .containerMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta()
     }
     set {_uniqueStorage()._nodeType = .containerMeta(newValue)}
   }
 
-  public var categoryMeta: Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta {
+  public var categoryMeta: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta {
     get {
       if case .categoryMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta()
     }
     set {_uniqueStorage()._nodeType = .categoryMeta(newValue)}
   }
 
-  public var rootTypeMeta: Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta {
+  public var rootTypeMeta: Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta {
     get {
       if case .rootTypeMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta()
     }
     set {_uniqueStorage()._nodeType = .rootTypeMeta(newValue)}
   }
 
-  public var localDirMeta: Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta {
+  public var localDirMeta: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
     get {
       if case .localDirMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta()
     }
     set {_uniqueStorage()._nodeType = .localDirMeta(newValue)}
   }
 
-  public var localFileMeta: Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta {
+  public var localFileMeta: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta {
     get {
       if case .localFileMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta()
     }
     set {_uniqueStorage()._nodeType = .localFileMeta(newValue)}
   }
 
-  public var gdriveFileMeta: Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta {
+  public var gdriveFileMeta: Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta {
     get {
       if case .gdriveFileMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta()
     }
     set {_uniqueStorage()._nodeType = .gdriveFileMeta(newValue)}
   }
 
-  public var gdriveFolderMeta: Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
+  public var gdriveFolderMeta: Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta {
     get {
       if case .gdriveFolderMeta(let v)? = _storage._nodeType {return v}
-      return Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta()
+      return Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta()
     }
     set {_uniqueStorage()._nodeType = .gdriveFolderMeta(newValue)}
   }
@@ -260,16 +260,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_NodeType: Equatable {
-    case containerMeta(Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta)
-    case categoryMeta(Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta)
-    case rootTypeMeta(Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta)
-    case localDirMeta(Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta)
-    case localFileMeta(Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta)
-    case gdriveFileMeta(Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta)
-    case gdriveFolderMeta(Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta)
+    case containerMeta(Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta)
+    case categoryMeta(Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta)
+    case rootTypeMeta(Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta)
+    case localDirMeta(Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta)
+    case localFileMeta(Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta)
+    case gdriveFileMeta(Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta)
+    case gdriveFolderMeta(Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta)
 
   #if !swift(>=4.1)
-    public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Node.OneOf_NodeType, rhs: Outlet_Backend_Daemon_Grpc_Generated_Node.OneOf_NodeType) -> Bool {
+    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType, rhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType) -> Bool {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
@@ -313,7 +313,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_Node {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
+public struct Outlet_Backend_Agent_Grpc_Generated_FilterCriteria {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -333,7 +333,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_DirMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -357,13 +357,13 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -375,16 +375,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta {
 
   public init() {}
 
-  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+  fileprivate var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -398,16 +398,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta {
 
   public init() {}
 
-  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+  fileprivate var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -419,16 +419,16 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta {
 
   public init() {}
 
-  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+  fileprivate var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -444,10 +444,10 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta {
 
   public init() {}
 
-  fileprivate var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+  fileprivate var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -473,7 +473,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -509,7 +509,7 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta {
   public init() {}
 }
 
-public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -559,8 +559,8 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
     set {_uniqueStorage()._createTs = newValue}
   }
 
-  public var dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta {
-    get {return _storage._dirMeta ?? Outlet_Backend_Daemon_Grpc_Generated_DirMeta()}
+  public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
+    get {return _storage._dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_uniqueStorage()._dirMeta = newValue}
   }
   /// Returns true if `dirMeta` has been explicitly set.
@@ -582,9 +582,9 @@ public struct Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "outlet.backend.daemon.grpc.generated"
+fileprivate let _protobuf_package = "outlet.backend.agent.grpc.generated"
 
-extension Outlet_Backend_Daemon_Grpc_Generated_Null: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_Null: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Null"
   public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
 
@@ -597,13 +597,13 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Null: SwiftProtobuf.Message, Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Null, rhs: Outlet_Backend_Daemon_Grpc_Generated_Null) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Null, rhs: Outlet_Backend_Agent_Grpc_Generated_Null) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".UserOp"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "op_uid"),
@@ -653,7 +653,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, Sw
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_UserOp, rhs: Outlet_Backend_Daemon_Grpc_Generated_UserOp) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_UserOp, rhs: Outlet_Backend_Agent_Grpc_Generated_UserOp) -> Bool {
     if lhs.opUid != rhs.opUid {return false}
     if lhs.batchUid != rhs.batchUid {return false}
     if lhs.opType != rhs.opType {return false}
@@ -665,7 +665,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_UserOp: SwiftProtobuf.Message, Sw
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SrcDstNodeList"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "src_node"),
@@ -695,7 +695,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList: SwiftProtobuf.Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList, rhs: Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList, rhs: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList) -> Bool {
     if lhs._srcNode != rhs._srcNode {return false}
     if lhs._dstNode != rhs._dstNode {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -703,7 +703,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SrcDstNodeList: SwiftProtobuf.Mes
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SPIDNodePair"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "spid"),
@@ -733,7 +733,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair, rhs: Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair, rhs: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair) -> Bool {
     if lhs._spid != rhs._spid {return false}
     if lhs._node != rhs._node {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -741,7 +741,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Messa
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".NodeIdentifier"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -781,7 +781,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier, rhs: Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier, rhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) -> Bool {
     if lhs.uid != rhs.uid {return false}
     if lhs.treeType != rhs.treeType {return false}
     if lhs.pathList != rhs.pathList {return false}
@@ -791,7 +791,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mes
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Node"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
@@ -820,7 +820,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
     var _iconID: UInt32 = 0
     var _decoratorNid: UInt32 = 0
     var _decoratorParentNid: UInt32 = 0
-    var _nodeType: Outlet_Backend_Daemon_Grpc_Generated_Node.OneOf_NodeType?
+    var _nodeType: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType?
 
     static let defaultInstance = _StorageClass()
 
@@ -863,7 +863,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
         case 7: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorNid) }()
         case 8: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorParentNid) }()
         case 10: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .containerMeta(let m) = current {v = m}
@@ -872,7 +872,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .containerMeta(v)}
         }()
         case 11: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .categoryMeta(let m) = current {v = m}
@@ -881,7 +881,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .categoryMeta(v)}
         }()
         case 12: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .rootTypeMeta(let m) = current {v = m}
@@ -890,7 +890,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .rootTypeMeta(v)}
         }()
         case 20: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .localDirMeta(let m) = current {v = m}
@@ -899,7 +899,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .localDirMeta(v)}
         }()
         case 21: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .localFileMeta(let m) = current {v = m}
@@ -908,7 +908,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .localFileMeta(v)}
         }()
         case 22: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .gdriveFileMeta(let m) = current {v = m}
@@ -917,7 +917,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
           if let v = v {_storage._nodeType = .gdriveFileMeta(v)}
         }()
         case 23: try {
-          var v: Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta?
+          var v: Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta?
           if let current = _storage._nodeType {
             try decoder.handleConflictingOneOf()
             if case .gdriveFolderMeta(let m) = current {v = m}
@@ -995,7 +995,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_Node, rhs: Outlet_Backend_Daemon_Grpc_Generated_Node) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Node, rhs: Outlet_Backend_Agent_Grpc_Generated_Node) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -1018,7 +1018,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_Node: SwiftProtobuf.Message, Swif
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_FilterCriteria: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".FilterCriteria"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "search_query"),
@@ -1063,7 +1063,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria: SwiftProtobuf.Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria, rhs: Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria, rhs: Outlet_Backend_Agent_Grpc_Generated_FilterCriteria) -> Bool {
     if lhs.searchQuery != rhs.searchQuery {return false}
     if lhs.isTrashed != rhs.isTrashed {return false}
     if lhs.isShared != rhs.isShared {return false}
@@ -1074,7 +1074,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_FilterCriteria: SwiftProtobuf.Mes
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_DirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_DirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DirMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "has_data"),
@@ -1129,7 +1129,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMeta: SwiftProtobuf.Message, S
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_DirMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_DirMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DirMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_DirMeta) -> Bool {
     if lhs.hasData_p != rhs.hasData_p {return false}
     if lhs.fileCount != rhs.fileCount {return false}
     if lhs.dirCount != rhs.dirCount {return false}
@@ -1142,7 +1142,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_DirMeta: SwiftProtobuf.Message, S
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".ContainerNodeMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta"),
@@ -1167,14 +1167,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta: SwiftProtobuf.
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_ContainerNodeMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta) -> Bool {
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".CategoryNodeMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta"),
@@ -1204,7 +1204,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta) -> Bool {
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.opType != rhs.opType {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -1212,7 +1212,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.M
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RootTypeNodeMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta"),
@@ -1237,14 +1237,14 @@ extension Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_RootTypeNodeMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta) -> Bool {
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LocalDirMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta"),
@@ -1279,7 +1279,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messa
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta) -> Bool {
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.isLive != rhs.isLive {return false}
     if lhs.parentUid != rhs.parentUid {return false}
@@ -1288,7 +1288,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messa
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LocalFileMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "size_bytes"),
@@ -1348,7 +1348,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta) -> Bool {
     if lhs.sizeBytes != rhs.sizeBytes {return false}
     if lhs.syncTs != rhs.syncTs {return false}
     if lhs.modifyTs != rhs.modifyTs {return false}
@@ -1362,7 +1362,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Mess
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GDriveFileMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "goog_id"),
@@ -1447,7 +1447,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Mes
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta) -> Bool {
     if lhs.googID != rhs.googID {return false}
     if lhs.name != rhs.name {return false}
     if lhs.ownerUid != rhs.ownerUid {return false}
@@ -1466,7 +1466,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFileMeta: SwiftProtobuf.Mes
   }
 }
 
-extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+extension Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GDriveFolderMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "goog_id"),
@@ -1492,7 +1492,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.M
     var _syncTs: UInt64 = 0
     var _modifyTs: UInt64 = 0
     var _createTs: UInt64 = 0
-    var _dirMeta: Outlet_Backend_Daemon_Grpc_Generated_DirMeta? = nil
+    var _dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta? = nil
     var _allChildrenFetched: Bool = false
 
     static let defaultInstance = _StorageClass()
@@ -1585,7 +1585,7 @@ extension Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.M
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta, rhs: Outlet_Backend_Daemon_Grpc_Generated_GDriveFolderMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
