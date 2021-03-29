@@ -11,12 +11,12 @@ import SwiftUI
  */
 struct RootPathPanel: View {
   @ObservedObject var swiftTreeState: SwiftTreeState
-  let con: TreeControllable
+  let con: TreePanelControllable
 
   private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
   @State private var fgColor: Color = .gray
 
-  init(_ controller: TreeControllable) {
+  init(_ controller: TreePanelControllable) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
   }
@@ -166,7 +166,7 @@ struct RootPathPanel: View {
 
 struct RootPathPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootPathPanel(MockTreeController(ID_LEFT_TREE, canChangeRoot: true))
+    RootPathPanel(MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
 

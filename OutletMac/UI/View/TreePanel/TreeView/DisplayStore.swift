@@ -23,12 +23,12 @@ import Foundation
  I suppose this class a repository for "ModelView" objects in the MVVC design pattern.
  */
 class DisplayStore {
-  private var con: TreeControllable
+  private var con: TreePanelControllable
 
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
 
-  init(_ controllable: TreeControllable) {
+  init(_ controllable: TreePanelControllable) {
     self.con = controllable
   }
 

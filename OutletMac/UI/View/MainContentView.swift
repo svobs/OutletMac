@@ -12,11 +12,11 @@ struct MainContentView: View {
   @EnvironmentObject var settings: GlobalSettings
   @StateObject var heightTracking: HeightTracking = HeightTracking()
   let app: OutletApp
-  let conLeft: TreeControllable
-  let conRight: TreeControllable
+  let conLeft: TreePanelControllable
+  let conRight: TreePanelControllable
   @State private var window: NSWindow?  // enclosing window(?)
 
-  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
+  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
@@ -49,7 +49,7 @@ struct MainContentView: View {
 
 struct MainContentView_Previews: PreviewProvider {
   static var previews: some View {
-    MainContentView(app: MockApp(), conLeft: MockTreeController(ID_LEFT_TREE, canChangeRoot: true), conRight: MockTreeController(ID_RIGHT_TREE, canChangeRoot: true))
+    MainContentView(app: MockApp(), conLeft: MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true), conRight: MockTreePanelController(ID_RIGHT_TREE, canChangeRoot: true))
       .environmentObject(GlobalSettings())
   }
 }

@@ -24,11 +24,11 @@ struct SinglePaneView: View {
   ]
 
   let app: OutletApp
-  let con: TreeControllable
+  let con: TreePanelControllable
 
   var treePanel: TreePanel! = nil
 
-  init(_ app: OutletApp, _ con: TreeControllable, _ heightTracking: HeightTracking) {
+  init(_ app: OutletApp, _ con: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = con
     self.heightTracking = heightTracking

@@ -39,11 +39,11 @@ struct GDriveRootChooserContent: View {
   @StateObject var heightTracking: HeightTracking = HeightTracking()
   var parentWindow: NSWindow
   let app: OutletApp
-  let con: TreeControllable
+  let con: TreePanelControllable
   let targetTreeID: String
   @ObservedObject var chooserState: ChooserState
 
-  init(_ app: OutletApp, _ con: TreeControllable, _ targetTreeID: String, _ parentWindow: NSWindow, _ chooserState: ChooserState) {
+  init(_ app: OutletApp, _ con: TreePanelControllable, _ targetTreeID: String, _ parentWindow: NSWindow, _ chooserState: ChooserState) {
     self.parentWindow = parentWindow
     self.app = app
     self.con = con
@@ -135,7 +135,7 @@ class GDriveRootChooser: HasLifecycle, ObservableObject {
   let initialSelection: SPIDNodePair
 
   let app: OutletApp
-  let con: TreeControllable
+  let con: TreePanelControllable
   let dispatchListener: DispatchListener
   private var loadComplete: Bool = false
 
@@ -145,7 +145,7 @@ class GDriveRootChooser: HasLifecycle, ObservableObject {
     }
   }
 
-  init(_ app: OutletApp, _ con: TreeControllable, targetTreeID: String, initialSelection: SPIDNodePair) {
+  init(_ app: OutletApp, _ con: TreePanelControllable, targetTreeID: String, initialSelection: SPIDNodePair) {
     self.app = app
     self.con = con
     self.initialSelection = initialSelection

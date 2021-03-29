@@ -52,7 +52,7 @@
 		D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */; };
 		D1ED5E2725C7D7A400A8E5DB /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
-		D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */; };
+		D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */; };
 		D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
@@ -108,7 +108,7 @@
 		D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalReceiverThread.swift; sourceTree = "<group>"; };
 		D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
-		D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
+		D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
 		D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
@@ -270,7 +270,7 @@
 			children = (
 				D1175BFF25DCF27300602B7F /* View */,
 				D1175BFC25DCF25700602B7F /* ObservableObjects.swift */,
-				D1ED5E2C25C8DA7F00A8E5DB /* TreeController.swift */,
+				D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -434,7 +434,7 @@
 				D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */,
 				D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
-				D1ED5E2D25C8DA7F00A8E5DB /* TreeController.swift in Sources */,
+				D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
 				D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,

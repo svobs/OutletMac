@@ -20,6 +20,7 @@ class OutletGRPCClient: OutletBackend {
   var signalReceiverThread: SignalReceiverThread?
   let dispatcher: SignalDispatcher
   let dispatchListener: DispatchListener
+  var isConnected: Bool = true // set to true initially just for logging purposes: we care more to note if it's initially down than up
 
   init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ dispatcher: SignalDispatcher) {
     self.dispatcher = dispatcher
@@ -561,12 +562,17 @@ class OutletGRPCClient: OutletBackend {
   }
 
   func grpcConnectionDown() {
-    NSLog("DEBUG gRPC connection is down!")
-
+    if self.isConnected {
+      self.isConnected = false
+      NSLog("INFO  gRPC connection is DOWN!")
+    }
   }
 
   func grpcConnectionRestored() {
-    NSLog("DEBUG gRPC connection is back up!")
+    if !self.isConnected {
+      self.isConnected = true
+      NSLog("INFO  gRPC connection is UP!")
+    }
     self.signalReceiverThread?.loopCount = 0
   }
 

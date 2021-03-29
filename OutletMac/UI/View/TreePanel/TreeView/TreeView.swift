@@ -8,11 +8,11 @@ import LinkedList
  TreeView: extra layer of TreeView to specify layout
  */
 struct TreeView: View {
-  let con: TreeControllable
+  let con: TreePanelControllable
   @EnvironmentObject var settings: GlobalSettings
   @ObservedObject var heightTracking: HeightTracking
 
-  init(controller: TreeControllable, _ heightTracking: HeightTracking) {
+  init(controller: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.con = controller
     self.heightTracking = heightTracking
   }
@@ -36,14 +36,14 @@ struct TreeView: View {
  TreeViewRepresentable: SwiftUI wrapper for NSOutlineView
  */
 struct TreeViewRepresentable: NSViewControllerRepresentable {
-  let con: TreeControllable
+  let con: TreePanelControllable
 
-  init(controller: TreeControllable) {
+  init(controller: TreePanelControllable) {
     self.con = controller
   }
 
   func makeNSViewController(context: Context) -> TreeViewController {
-    // TOOD: find better names for TreeController/TreeControllable
+    // TOOD: find better names for TreeController/TreePanelControllable
 
     let treeViewController = TreeViewController()
     treeViewController.con = self.con
@@ -66,9 +66,8 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
  */
 final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, NSMenuDelegate {
   // Cannot override init(), but this must be set manually before loadView() is called
-  var con: TreeControllable! = nil
+  var con: TreePanelControllable! = nil
 
-  private let treeController = NSTreeController()
   let outlineView = NSOutlineView()
   var expandContractListenersEnabled: Bool = true
 

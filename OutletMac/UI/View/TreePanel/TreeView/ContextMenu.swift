@@ -17,9 +17,9 @@ class MenuItemWithNodeList: NSMenuItem {
 
 
 class TreeContextMenu {
-  let con: TreeControllable
+  let con: TreePanelControllable
 
-  init(_ controller: TreeControllable) {
+  init(_ controller: TreePanelControllable) {
     self.con = controller
   }
 

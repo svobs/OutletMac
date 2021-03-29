@@ -23,8 +23,8 @@ protocol OutletApp: HasLifecycle {
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 
-  func registerTreeController(_ treeID: String, _ controller: TreeControllable)
-  func getTreeController(_ treeID: String) -> TreeControllable?
+  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
+  func getTreePanelController(_ treeID: String) -> TreePanelControllable?
 }
 
 class MockApp: OutletApp {
@@ -55,9 +55,9 @@ class MockApp: OutletApp {
     return false
   }
 
-  func registerTreeController(_ treeID: String, _ controller: TreeControllable) {
+  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable) {
   }
-  func getTreeController(_ treeID: String) -> TreeControllable? {
+  func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
     return nil
   }
 }
@@ -103,13 +103,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
   var _backend: OutletBackend? = nil
   var _iconStore: IconStore? = nil
-  var conLeft: TreeController? = nil
-  var conRight: TreeController? = nil
+  var conLeft: TreePanelController? = nil
+  var conRight: TreePanelController? = nil
   let taskRunner: TaskRunner = TaskRunner()
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
   private let guidMapper = GUIDMapper()
-  private var treeControllerDict: [String: TreeControllable] = [:]
+  private var treeControllerDict: [String: TreePanelControllable] = [:]
   private let treeControllerLock = NSLock()
 
   var backend: OutletBackend {
@@ -140,7 +140,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // Subscribe to app-wide signals here
       try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
       try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
-      try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreeControllerDeregistered)
+      try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -167,9 +167,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   /**
    Creates and starts a tree controller for the given tree, but does not load it
   */
-  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreeController {
+  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = TreeController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
+    let con = TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
 
     try con.start()
     return con
@@ -321,7 +321,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  private func onTreeControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
+  private func onTreePanelControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
     self.treeControllerLock.lock()
     defer {
       self.treeControllerLock.unlock()
@@ -340,7 +340,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   @objc func openGDriveRootChooser(_ treeID: String) {
-    guard let sourceCon = self.getTreeController(treeID) else {
+    guard let sourceCon = self.getTreePanelController(treeID) else {
       NSLog("ERROR [\(treeID)] Cannot open GDrive chooser: could not find controller with this treeID!")
       return
     }
@@ -372,7 +372,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     return alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
   }
 
-  func registerTreeController(_ treeID: String, _ controller: TreeControllable) {
+  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable) {
     self.treeControllerLock.lock()
     defer {
       self.treeControllerLock.unlock()
@@ -380,7 +380,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.treeControllerDict[treeID] = controller
   }
 
-  func getTreeController(_ treeID: String) -> TreeControllable? {
+  func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
     self.treeControllerLock.lock()
     defer {
       self.treeControllerLock.unlock()

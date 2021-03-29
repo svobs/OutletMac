@@ -15,13 +15,13 @@ import SwiftUI
  */
 struct TreePanel {
   let app: OutletApp
-  let con: TreeControllable
+  let con: TreePanelControllable
   let rootPathPanel: RootPathPanel
   let filterPanel: FilterPanel
   let treeView: TreeView
   let status_panel: StatusPanel
 
-  init(_ app: OutletApp, _ controller: TreeControllable, _ heightTracking: HeightTracking) {
+  init(_ app: OutletApp, _ controller: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = controller
     self.rootPathPanel = RootPathPanel(self.con)
@@ -37,7 +37,7 @@ struct TreePanel {
 struct StatusPanel: View {
   @ObservedObject var swiftTreeState: SwiftTreeState
 
-  init(controller: TreeControllable) {
+  init(controller: TreePanelControllable) {
     self.swiftTreeState = controller.swiftTreeState
   }
 

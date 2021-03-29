@@ -1,5 +1,5 @@
 //
-//  TreeController.swift
+//  TreePanelController.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-02-01.
@@ -8,9 +8,9 @@ import SwiftUI
 import LinkedList
 
 /**
- PROTOCOL TreeControllable
+ PROTOCOL TreePanelControllable
  */
-protocol TreeControllable: HasLifecycle {
+protocol TreePanelControllable: HasLifecycle {
   var app: OutletApp { get }
   var tree: DisplayTree { get }
   var swiftTreeState: SwiftTreeState { get }
@@ -43,7 +43,7 @@ protocol TreeControllable: HasLifecycle {
 /**
  Add convenience methods for commonly used sub-member objects
  */
-extension TreeControllable {
+extension TreePanelControllable {
   var backend: OutletBackend {
     get {
       return app.backend
@@ -64,11 +64,11 @@ extension TreeControllable {
 }
 
 /**
- CLASS MockTreeController
+ CLASS MockTreePanelController
 
- Non-functioning implementation of TreeControllable. Should only be used for testing & previews
+ Non-functioning implementation of TreePanelControllable. Should only be used for testing & previews
  */
-class MockTreeController: TreeControllable {
+class MockTreePanelController: TreePanelControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
@@ -128,9 +128,14 @@ class MockTreeController: TreeControllable {
 }
 
 /**
- CLASS TreeController
+ CLASS TreePanelController
+
+ Serves as the controller for the entire tree panel for a single UI tree.
+
+ Equivalent to "TreeController" in the Python/GTK3 version of the app, but renamed in the Mac version so as not
+ to be confused with the TreeViewController (which is an AppKit controller for NSOutlineView)
  */
-class TreeController: TreeControllable, ObservableObject {
+class TreePanelController: TreePanelControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
@@ -162,7 +167,7 @@ class TreeController: TreeControllable, ObservableObject {
   }
 
   func start() throws {
-    self.app.registerTreeController(self.treeID, self)
+    self.app.registerTreePanelController(self.treeID, self)
 
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
     try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)

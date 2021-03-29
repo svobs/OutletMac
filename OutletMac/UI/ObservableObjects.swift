@@ -100,7 +100,7 @@ class SwiftTreeState: ObservableObject {
  Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
  */
 class SwiftFilterState: ObservableObject, CustomStringConvertible {
-  // See: TreeController.onFilterChanged()
+  // See: TreePanelController.onFilterChanged()
   var onChangeCallback: FilterStateCallback? = nil
 
   @Published var searchQuery: String {

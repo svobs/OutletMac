@@ -30,10 +30,10 @@ struct TodoPlaceholder: View {
 fileprivate struct ButtonBar: View {
   @EnvironmentObject var settings: GlobalSettings
   let app: OutletApp
-  let conLeft: TreeControllable
-  let conRight: TreeControllable
+  let conLeft: TreePanelControllable
+  let conRight: TreePanelControllable
 
-  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable) {
+  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
@@ -91,12 +91,12 @@ struct TwoPaneView: View {
   ]
 
   let app: OutletApp
-  let conLeft: TreeControllable
-  let conRight: TreeControllable
+  let conLeft: TreePanelControllable
+  let conRight: TreePanelControllable
   let leftPanel: TreePanel
   let rightPanel: TreePanel
 
-  init(app: OutletApp, conLeft: TreeControllable, conRight: TreeControllable, _ heightTracking: HeightTracking) {
+  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight

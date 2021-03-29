@@ -56,9 +56,9 @@ struct FancyTextField: View {
  */
 struct FilterPanel: View {
   @ObservedObject var swiftFilterState: SwiftFilterState
-  let con: TreeControllable
+  let con: TreePanelControllable
 
-  init(_ controller: TreeControllable) {
+  init(_ controller: TreePanelControllable) {
     self.con = controller
     self.swiftFilterState = controller.swiftFilterState
   }
@@ -97,7 +97,7 @@ struct FilterPanel: View {
 struct FilterPanel_Previews: PreviewProvider {
   static let app = MockApp()
   static var previews: some View {
-    FilterPanel(MockTreeController(ID_LEFT_TREE, canChangeRoot: true))
+    FilterPanel(MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
 
