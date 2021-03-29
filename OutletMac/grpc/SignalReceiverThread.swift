@@ -18,7 +18,7 @@ class SignalReceiverThread: Thread {
   override func main() {
     while self.isExecuting {
       do {
-        try self.receiveSignals()
+        try self.grpcClient.receiveServerSignals()
       } catch {
         // not clear if we ever get here
         NSLog("ERROR Receiving signals failed: \(error)")
@@ -32,13 +32,11 @@ class SignalReceiverThread: Thread {
         // 3. Display a "connecting" indicator until reconnected
         // OR:
         // 1. Modal dialog which will auto-close when reconected, with option to quit app
-        fatalError("SignalReceiverThread: max failures exceeded!")
+
+        NSLog("SignalReceiverThread: max failures exceeded! Sleeping 3s")
+        Thread.sleep(forTimeInterval: 3)
       }
       NSLog("DEBUG SignalReceiverThread looping (count: \(loopCount))")
     }
-  }
-
-  func receiveSignals() throws {
-    try self.grpcClient.receiveServerSignals()
   }
 }

@@ -97,6 +97,8 @@ class OutletGRPCClient: OutletBackend {
     NSLog("DEBUG Subscribing to server signals...")
     let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
+      NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
+      self.grpcConnectionRestored()
       do {
         try self.relaySignalLocally(signalGRPC)
       } catch {
@@ -109,6 +111,11 @@ class OutletGRPCClient: OutletBackend {
       if status.code == .ok {
         // this should never happen
         NSLog("INFO  Server closed signal subscription")
+      } else if status.code == .unavailable {
+        if SUPER_DEBUG {
+          NSLog("ERROR ReceiveSignals(): Server unavailable: \(status)")
+        }
+        self.grpcConnectionDown()
       } else {
         NSLog("ERROR ReceiveSignals(): received error: \(status)")
       }
@@ -118,7 +125,7 @@ class OutletGRPCClient: OutletBackend {
     _ = try! call.status.wait()
     NSLog("DEBUG receiveServerSignals() returning")
   }
-  
+
   /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
   static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
@@ -143,20 +150,14 @@ class OutletGRPCClient: OutletBackend {
     if let spid = request.spid {
       grpcRequest.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
     }
-    
-    let call = self.stub.request_display_tree_ui_state(grpcRequest)
-    
-    do {
-      let response = try call.response.wait()
-      if (response.hasDisplayTreeUiState) {
-        let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-        NSLog("DEBUG Got state: \(state)")
-        return state.toDisplayTree(backend: self)
-      } else {
-        return nil
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'requestDisplayTree' failed: \(error)")
+
+    let response = try self.callAndTranslateErrors(self.stub.request_display_tree_ui_state(grpcRequest), "requestDisplayTree")
+    if (response.hasDisplayTreeUiState) {
+      let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
+      NSLog("DEBUG Got state: \(state)")
+      return state.toDisplayTree(backend: self)
+    } else {
+      return nil
     }
   }
   
@@ -166,43 +167,32 @@ class OutletGRPCClient: OutletBackend {
     if let tt = treeType?.rawValue {
       request.treeType = tt
     }
-    let call = self.stub.get_node_for_uid(request)
-    do {
-      let response = try call.response.wait()
-      if (response.hasNode) {
-        return try GRPCConverter.nodeFromGRPC(response.node)
-      } else {
-        return nil
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getNodeForUID' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_node_for_uid(request), "getNodeForUID")
+
+    if (response.hasNode) {
+      return try GRPCConverter.nodeFromGRPC(response.node)
+    } else {
+      return nil
     }
   }
   
   func getNodeForLocalPath(fullPath: String) throws -> Node? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request()
     request.fullPath = fullPath
-    let call = self.stub.get_node_for_local_path(request)
-    do {
-      let response = try call.response.wait()
-      if (response.hasNode) {
-        return try GRPCConverter.nodeFromGRPC(response.node)
-      } else {
-        return nil
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getNodeForLocalPath' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_node_for_local_path(request), "getNodeForLocalPath")
+
+    if (response.hasNode) {
+      return try GRPCConverter.nodeFromGRPC(response.node)
+    } else {
+      return nil
     }
   }
   
   func nextUID() throws -> UID {
-    let call = self.stub.get_next_uid(Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request())
-    do {
-      let response = try call.response.wait()
-      return response.uid
-    } catch {
-      throw OutletError.grpcFailure("RPC 'nextUID' failed: \(error)")
-    }
+    let request = Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request()
+    let response = try self.callAndTranslateErrors(self.stub.get_next_uid(request), "nextUID")
+
+    return response.uid
   }
   
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
@@ -211,35 +201,22 @@ class OutletGRPCClient: OutletBackend {
     if uidSuggestion != nil {
       request.uidSuggestion = uidSuggestion!
     }
-    let call = self.stub.get_uid_for_local_path(request)
-    do {
-      let response = try call.response.wait()
-      return response.uid
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getUIDForLocalPath' failed: \(error)")
-    }
+    let response = try self.callAndTranslateErrors(self.stub.get_uid_for_local_path(request), "getUIDForLocalPath")
+
+    return response.uid
   }
   
   func startSubtreeLoad(treeID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request()
     request.treeID = treeID
-    let call = self.stub.start_subtree_load(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'startSubtreeLoad' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.start_subtree_load(request), "startSubtreeLoad")
   }
   
   func getOpExecutionPlayState() throws -> Bool {
-    let call = self.stub.get_op_exec_play_state(Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request())
-    do {
-      let response = try call.response.wait()
-      
-      return response.isEnabled
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getOpExecutionPlayState' failed: \(error)")
-    }
+    let request = Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request()
+    let response = try self.callAndTranslateErrors(self.stub.get_op_exec_play_state(request), "getOpExecutionPlayState")
+
+    return response.isEnabled
   }
   
   func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node] {
@@ -249,14 +226,8 @@ class OutletGRPCClient: OutletBackend {
     }
     request.parentUid = parentUID
     request.maxResults = maxResults ?? 0
-    
-    let call = self.stub.get_child_list_for_node(request)
-    let response: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response
-    do {
-      response = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getChildList' failed: \(error)")
-    }
+
+    let response = try self.callAndTranslateErrors(self.stub.get_child_list_for_node(request), "getChildList")
 
     if response.resultExceededCount > 0 {
       assert (maxResults != nil && maxResults! > 0)
@@ -270,34 +241,25 @@ class OutletGRPCClient: OutletBackend {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request()
     request.stopAtPath = stopAtPath ?? ""
     request.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
-    
-    let call = self.stub.get_ancestor_list_for_spid(request)
-    do {
-      let response = try call.response.wait()
-      return try GRPCConverter.nodeListFromGRPC(response.nodeList)
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getAncestorList' failed: \(error)")
-    }
+
+    let response = try self.callAndTranslateErrors(self.stub.get_ancestor_list_for_spid(request), "getAncestorList")
+    return try GRPCConverter.nodeListFromGRPC(response.nodeList)
   }
 
   func getRowsOfInterest(treeID: String) throws -> RowsOfInterest {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request()
     request.treeID = treeID
 
-    let call = self.stub.get_rows_of_interest(request)
-    do {
-      let response = try call.response.wait()
-      let rows = RowsOfInterest()
-      for uid in response.expandedRowUidSet {
-        rows.expanded.insert(uid)
-      }
-      for uid in response.selectedRowUidSet {
-        rows.selected.insert(uid)
-      }
-      return rows
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getRowsOfInterest' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_rows_of_interest(request), "getRowsOfInterest")
+
+    let rows = RowsOfInterest()
+    for uid in response.expandedRowUidSet {
+      rows.expanded.insert(uid)
     }
+    for uid in response.selectedRowUidSet {
+      rows.selected.insert(uid)
+    }
+    return rows
   }
 
   func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws {
@@ -307,12 +269,7 @@ class OutletGRPCClient: OutletBackend {
     }
     request.treeID = treeID
 
-    let call = self.stub.set_selected_row_set(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'setSelectedRowSet' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.set_selected_row_set(request), "setSelectedRowSet")
   }
 
   func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws {
@@ -320,12 +277,7 @@ class OutletGRPCClient: OutletBackend {
     request.nodeUid = rowUID
     request.treeID = treeID
 
-    let call = self.stub.remove_expanded_row(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'removeExpandedRow' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.remove_expanded_row(request), "removeExpandedRow")
   }
 
   func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
@@ -374,25 +326,20 @@ class OutletGRPCClient: OutletBackend {
       requestGRPC.spid = try GRPCConverter.nodeIdentifierToGRPC(request.spid!)
     }
     requestGRPC.treeDisplayMode = request.treeDisplayMode.rawValue
-    
-    let call = self.stub.request_display_tree_ui_state(requestGRPC)
-    do {
-      let response = try call.response.wait()
-      
-      let tree: DisplayTree?
-      if response.hasDisplayTreeUiState {
-        let state = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-        tree = state.toDisplayTree(backend: self)
-        NSLog("Returning DisplayTree: \(tree!)")
-      } else {
-        tree = nil
-        NSLog("Returning DisplayTree==null")
-      }
-      
-      return tree
-    } catch {
-      throw OutletError.grpcFailure("RPC 'requestDisplayTree' failed: \(error)")
+
+    let response = try self.callAndTranslateErrors(self.stub.request_display_tree_ui_state(requestGRPC), "requestDisplayTree")
+
+    let tree: DisplayTree?
+    if response.hasDisplayTreeUiState {
+      let state = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
+      tree = state.toDisplayTree(backend: self)
+      NSLog("Returning DisplayTree: \(tree!)")
+    } else {
+      tree = nil
+      NSLog("Returning DisplayTree==null")
     }
+
+    return tree
   }
   
   func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws {
@@ -404,29 +351,18 @@ class OutletGRPCClient: OutletBackend {
     }
     request.isInto = isInto
     request.dstSn = try GRPCConverter.snToGRPC(dstSN)
-    
-    let call = self.stub.drop_dragged_nodes(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'dropDraggedNodes' failed: \(error)")
-    }
+
+    let _ = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
   }
   
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs {
     var request = Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request()
     request.treeIDLeft = treeIDLeft
     request.treeIDRight = treeIDRight
-    
-    let call = self.stub.start_diff_trees(request)
-    do {
-      let response = try call.response.wait()
-      
-      let treeIDs = DiffResultTreeIDs(left: response.treeIDLeft, right: response.treeIDRight)
-      return treeIDs
-    } catch {
-      throw OutletError.grpcFailure("RPC 'startDiffTrees' failed: \(error)")
-    }
+
+    let response = try self.callAndTranslateErrors(self.stub.start_diff_trees(request), "startDiffTrees")
+    let treeIDs = DiffResultTreeIDs(left: response.treeIDLeft, right: response.treeIDRight)
+    return treeIDs
   }
   
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws {
@@ -439,103 +375,68 @@ class OutletGRPCClient: OutletBackend {
     for sn in selectedChangeListRight {
       request.changeListRight.append(try GRPCConverter.snToGRPC(sn))
     }
-    
-    let call = self.stub.generate_merge_tree(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'generateMergeTree' failed: \(error)")
-    }
+
+    let _ = try self.callAndTranslateErrors(self.stub.generate_merge_tree(request), "generateMergeTree")
   }
   
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request()
     request.nodeIdentifier = try GRPCConverter.nodeIdentifierToGRPC(nodeIdentifier)
     request.treeID = treeID
-    let call = self.stub.refresh_subtree(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'enqueueRefreshSubtreeTask' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree(request), "enqueueRefreshSubtreeTask")
   }
   
   func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request()
     request.rootUid = rootUID
     request.treeID = treeID
-    let call = self.stub.refresh_subtree_stats(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'enqueueRefreshSubtreeStatsTask' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree_stats(request), "enqueueRefreshSubtreeStatsTask")
   }
   
   func getLastPendingOp(nodeUID: UID) throws -> UserOp? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request()
     request.nodeUid = nodeUID
-    
-    let call = self.stub.get_last_pending_op_for_node(request)
-    do {
-      let response = try call.response.wait()
+
+    let response = try self.callAndTranslateErrors(self.stub.get_last_pending_op_for_node(request), "getLastPendingOp")
       
-      if !response.hasUserOp {
-        return nil
-      }
-      let srcNode = try GRPCConverter.nodeFromGRPC(response.userOp.srcNode)
-      let dstNode: Node?
-      if response.userOp.hasDstNode {
-        dstNode = try GRPCConverter.nodeFromGRPC(response.userOp.dstNode)
-      } else {
-        dstNode = nil
-      }
-      let opType = UserOpType(rawValue: response.userOp.opType)!
-      
-      return UserOp(opUID: response.userOp.opUid, batchUID: response.userOp.batchUid, opType: opType, srcNode: srcNode, dstNode: dstNode)
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getLastPendingOp' failed: \(error)")
+    if !response.hasUserOp {
+      return nil
     }
+    let srcNode = try GRPCConverter.nodeFromGRPC(response.userOp.srcNode)
+    let dstNode: Node?
+    if response.userOp.hasDstNode {
+      dstNode = try GRPCConverter.nodeFromGRPC(response.userOp.dstNode)
+    } else {
+      dstNode = nil
+    }
+    let opType = UserOpType(rawValue: response.userOp.opType)!
+
+    return UserOp(opUID: response.userOp.opUid, batchUID: response.userOp.batchUid, opType: opType, srcNode: srcNode, dstNode: dstNode)
   }
   
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request()
     request.nodeUid = nodeUID
     request.requestorID = requestorID
-    let call = self.stub.download_file_from_gdrive(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'downloadFileFromGDrive' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.download_file_from_gdrive(request), "downloadFileFromGDrive")
   }
   
   func deleteSubtree(nodeUIDList: [UID]) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request()
     request.nodeUidList = nodeUIDList
-    let call = self.stub.delete_subtree(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'deleteSubtree' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.delete_subtree(request), "deleteSubtree")
   }
   
   func getFilterCriteria(treeID: String) throws -> FilterCriteria {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request()
     request.treeID = treeID
-    let call = self.stub.get_filter(request)
-    do {
-      let response = try call.response.wait()
-      if response.hasFilterCriteria {
-        let filterCriteria = try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
-        NSLog("[\(treeID)] Got: \(filterCriteria)")
-        return filterCriteria
-      } else {
-        throw OutletError.invalidState("No FilterCriteria (probably unknown tree) for tree: \(treeID)")
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getFilterCriteria' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_filter(request), "getFilterCriteria")
+    if response.hasFilterCriteria {
+      let filterCriteria = try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
+      NSLog("[\(treeID)] Got: \(filterCriteria)")
+      return filterCriteria
+    } else {
+      throw OutletError.invalidState("No FilterCriteria (probably unknown tree) for tree: \(treeID)")
     }
   }
   
@@ -543,12 +444,7 @@ class OutletGRPCClient: OutletBackend {
     var request = Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request()
     request.treeID = treeID
     request.filterCriteria = try GRPCConverter.filterCriteriaToGRPC(filterCriteria)
-    let call = self.stub.update_filter(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'updateFilterCriteria' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.update_filter(request), "updateFilterCriteria")
   }
 
   func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
@@ -609,30 +505,21 @@ class OutletGRPCClient: OutletBackend {
     configEntry.key = configKey
     configEntry.val = configVal
     request.configList.append(configEntry)
-    let call = self.stub.put_config(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'putConfig' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.put_config(request), "putConfig")
   }
   
   func getConfigList(_ configKeyList: [String]) throws -> [String: String] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request()
     request.configKeyList = configKeyList
-    let call = self.stub.get_config(request)
-    do {
-      let response = try call.response.wait()
-      assert(response.configList.count == configKeyList.count, "getConfigList(): response config count (\(response.configList.count)) "
-              + "does not match request config count (\(configKeyList.count))")
-      var configDict: [String: String] = [:]
-      for config in response.configList {
-        configDict[config.key] = config.val
-      }
-      return configDict
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getConfigList' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_config(request), "getConfigList")
+
+    assert(response.configList.count == configKeyList.count, "getConfigList(): response config count (\(response.configList.count)) "
+            + "does not match request config count (\(configKeyList.count))")
+    var configDict: [String: String] = [:]
+    for config in response.configList {
+      configDict[config.key] = config.val
     }
+    return configDict
   }
   
   func putConfigList(_ configDict: [String: String]) throws {
@@ -643,30 +530,44 @@ class OutletGRPCClient: OutletBackend {
       configEntry.val = configVal
       request.configList.append(configEntry)
     }
-    let call = self.stub.put_config(request)
-    do {
-      let _ = try call.response.wait()
-    } catch {
-      throw OutletError.grpcFailure("RPC 'putConfig' failed: \(error)")
-    }
+    let _ = try self.callAndTranslateErrors(self.stub.put_config(request), "putConfigList")
   }
 
   func getIcon(_ iconID: IconID) throws -> NSImage? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request()
     request.iconID = iconID.rawValue
-    let call = self.stub.get_icon(request)
-    do {
-      let response = try call.response.wait()
-      if response.hasIcon {
-        assert(iconID.rawValue == response.icon.iconID, "Response iconID (\(response.icon.iconID)) does not match request iconID (\(iconID))")
-        NSLog("DEBUG Got image from server: \(iconID)")
-        return NSImage(data: response.icon.content)
-      } else {
-        NSLog("DEBUG Server returned empty result for requested image: \(iconID)")
-        return nil
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getIcon' failed: \(error)")
+    let response = try self.callAndTranslateErrors(self.stub.get_icon(request), "getIcon")
+
+    if response.hasIcon {
+      assert(iconID.rawValue == response.icon.iconID, "Response iconID (\(response.icon.iconID)) does not match request iconID (\(iconID))")
+      NSLog("DEBUG Got image from server: \(iconID)")
+      return NSImage(data: response.icon.content)
+    } else {
+      NSLog("DEBUG Server returned empty result for requested image: \(iconID)")
+      return nil
     }
   }
+
+  func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
+    do {
+      return try call.response.wait()
+    } catch is NIOConnectionError {
+      self.grpcConnectionDown()
+      throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
+    } catch {
+      // General failure. Maybe server internal error, or bad data, or something else
+      throw OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+    }
+  }
+
+  func grpcConnectionDown() {
+    NSLog("DEBUG gRPC connection is down!")
+
+  }
+
+  func grpcConnectionRestored() {
+    NSLog("DEBUG gRPC connection is back up!")
+    self.signalReceiverThread?.loopCount = 0
+  }
+
 }
