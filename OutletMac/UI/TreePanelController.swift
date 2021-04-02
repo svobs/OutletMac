@@ -93,8 +93,8 @@ class MockTreePanelController: TreePanelControllable {
     self.app = MockApp()
     self.canChangeRoot = canChangeRoot
     // dummy data follows
-    let spid = NodeIdentifierFactory.getRootConstantLocalDiskSPID()
-    let rootSN = (NodeIdentifierFactory.getRootConstantLocalDiskSPID(), LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
+    let spid = LocalNodeIdentifier(NULL_UID, deviceUID: NULL_UID, ROOT_PATH)
+    let rootSN = (spid, LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
     self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
     self.swiftTreeState = SwiftTreeState.from(self.tree)
     let filterCriteria = FilterCriteria()
@@ -249,7 +249,7 @@ class TreePanelController: TreePanelControllable {
       let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
       NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
 
-      let topLevelSNList: [SPIDNodePair] = self.displayStore.convertChildList(self.tree.rootSN, topLevelNodeList)
+      let topLevelSNList: [SPIDNodePair] = try self.displayStore.convertChildList(self.tree.rootSN, topLevelNodeList)
       self.displayStore.repopulateRoot(topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
@@ -274,7 +274,7 @@ class TreePanelController: TreePanelControllable {
           let childNodeList: [Node] = try self.tree.getChildList(node)
           NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childNodeList.count) child nodes for parent \(node.uid)")
 
-          let childSNList: [SPIDNodePair] = self.displayStore.convertChildList(sn, childNodeList)
+          let childSNList: [SPIDNodePair] = try self.displayStore.convertChildList(sn, childNodeList)
           self.displayStore.populateChildList(sn, childSNList)
           queue.append(contentsOf: childSNList)
 
@@ -319,8 +319,13 @@ class TreePanelController: TreePanelControllable {
 
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
     let parentGUID = self.displayStore.guidFor(parentSN)
-    let ephemerealChildSN = self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
-    self.displayStore.populateChildList(parentSN, [ephemerealChildSN])
+    do {
+      let ephemerealChildSN = try self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
+      self.displayStore.populateChildList(parentSN, [ephemerealChildSN])
+    } catch {
+      NSLog("ERROR [\(self.treeID)] Failed to append ephemeral node: \(error)")
+      return
+    }
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
       NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")

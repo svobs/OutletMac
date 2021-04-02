@@ -21,6 +21,8 @@ class OutletGRPCClient: OutletBackend {
   let dispatcher: SignalDispatcher
   let dispatchListener: DispatchListener
   var isConnected: Bool = true // set to true initially just for logging purposes: we care more to note if it's initially down than up
+  lazy var grpcConverter = GRPCConverter(self)
+  lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
 
   init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ dispatcher: SignalDispatcher) {
     self.dispatcher = dispatcher
@@ -65,7 +67,7 @@ class OutletGRPCClient: OutletBackend {
 
     switch signal {
       case .DISPLAY_TREE_CHANGED, .GENERATE_MERGE_TREE_DONE:
-        let displayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
+        let displayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
         let tree: DisplayTree = displayTreeUiState.toDisplayTree(backend: self)
         argDict["tree"] = tree
       case .OP_EXECUTION_PLAY_STATE_CHANGED:
@@ -76,10 +78,10 @@ class OutletGRPCClient: OutletBackend {
         argDict["msg"] = signalGRPC.errorOccurred.msg
         argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
       case .NODE_UPSERTED, .NODE_REMOVED:
-        argDict["node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.node)
+        argDict["node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.node)
       case .NODE_MOVED:
-        argDict["src_node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.srcNode)
-        argDict["dst_node"] = try GRPCConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.dstNode)
+        argDict["src_node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.srcNode)
+        argDict["dst_node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.dstNode)
       case .SET_STATUS:
         argDict["status_msg"] = signalGRPC.statusMsg.msg
       case .DOWNLOAD_FROM_GDRIVE_DONE:
@@ -149,12 +151,12 @@ class OutletGRPCClient: OutletBackend {
     grpcRequest.treeDisplayMode = request.treeDisplayMode.rawValue
     
     if let spid = request.spid {
-      grpcRequest.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
+      grpcRequest.spid = try self.grpcConverter.nodeIdentifierToGRPC(spid)
     }
 
-    let response = try self.callAndTranslateErrors(self.stub.request_display_tree_ui_state(grpcRequest), "requestDisplayTree")
+    let response = try self.callAndTranslateErrors(self.stub.request_display_tree(grpcRequest), "requestDisplayTree")
     if (response.hasDisplayTreeUiState) {
-      let state: DisplayTreeUiState = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
+      let state: DisplayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
       NSLog("DEBUG Got state: \(state)")
       return state.toDisplayTree(backend: self)
     } else {
@@ -162,33 +164,21 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
-  func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node? {
+  func getNodeForUID(uid: UID, deviceUID: UID?) throws -> Node? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request()
     request.uid = uid
-    if let tt = treeType?.rawValue {
-      request.treeType = tt
+    if let deviceUID = deviceUID {
+      request.deviceUid = deviceUID
     }
     let response = try self.callAndTranslateErrors(self.stub.get_node_for_uid(request), "getNodeForUID")
 
     if (response.hasNode) {
-      return try GRPCConverter.nodeFromGRPC(response.node)
+      return try self.grpcConverter.nodeFromGRPC(response.node)
     } else {
       return nil
     }
   }
-  
-  func getNodeForLocalPath(fullPath: String) throws -> Node? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request()
-    request.fullPath = fullPath
-    let response = try self.callAndTranslateErrors(self.stub.get_node_for_local_path(request), "getNodeForLocalPath")
 
-    if (response.hasNode) {
-      return try GRPCConverter.nodeFromGRPC(response.node)
-    } else {
-      return nil
-    }
-  }
-  
   func nextUID() throws -> UID {
     let request = Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request()
     let response = try self.callAndTranslateErrors(self.stub.get_next_uid(request), "nextUID")
@@ -219,6 +209,19 @@ class OutletGRPCClient: OutletBackend {
 
     return response.isEnabled
   }
+
+  func getDeviceList() throws -> [Device] {
+    let request = Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request()
+    let response = try self.callAndTranslateErrors(self.stub.get_device_list(request), "getDeviceList")
+
+    var deviceList: [Device] = []
+    for deviceGRPC in response.deviceList {
+      let treeType: TreeType = TreeType(rawValue: deviceGRPC.treeType)!
+      deviceList.append(Device(device_uid: deviceGRPC.deviceUid, long_device_id: deviceGRPC.longDeviceID, treeType: treeType, friendlyName: deviceGRPC.friendlyName))
+    }
+
+    return deviceList
+  }
   
   func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request()
@@ -235,16 +238,16 @@ class OutletGRPCClient: OutletBackend {
       throw OutletError.maxResultsExceeded(actualCount: response.resultExceededCount)
     }
 
-    return try GRPCConverter.nodeListFromGRPC(response.nodeList)
+    return try self.grpcConverter.nodeListFromGRPC(response.nodeList)
   }
   
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request()
     request.stopAtPath = stopAtPath ?? ""
-    request.spid = try GRPCConverter.nodeIdentifierToGRPC(spid)
+    request.spid = try self.grpcConverter.nodeIdentifierToGRPC(spid)
 
     let response = try self.callAndTranslateErrors(self.stub.get_ancestor_list_for_spid(request), "getAncestorList")
-    return try GRPCConverter.nodeListFromGRPC(response.nodeList)
+    return try self.grpcConverter.nodeListFromGRPC(response.nodeList)
   }
 
   func getRowsOfInterest(treeID: String) throws -> RowsOfInterest {
@@ -281,8 +284,8 @@ class OutletGRPCClient: OutletBackend {
     let _ = try self.callAndTranslateErrors(self.stub.remove_expanded_row(request), "removeExpandedRow")
   }
 
-  func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
-    let spid = NodeIdentifierFactory.getRootConstantGDriveSPID()
+  func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree? {
+    let spid = self.nodeIdentifierFactory.getRootConstantGDriveSPID(deviceUID)
     let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
@@ -324,15 +327,15 @@ class OutletGRPCClient: OutletBackend {
     requestGRPC.returnAsync = request.returnAsync
     requestGRPC.userPath = request.userPath ?? ""
     if request.spid != nil {
-      requestGRPC.spid = try GRPCConverter.nodeIdentifierToGRPC(request.spid!)
+      requestGRPC.spid = try self.grpcConverter.nodeIdentifierToGRPC(request.spid!)
     }
     requestGRPC.treeDisplayMode = request.treeDisplayMode.rawValue
 
-    let response = try self.callAndTranslateErrors(self.stub.request_display_tree_ui_state(requestGRPC), "requestDisplayTree")
+    let response = try self.callAndTranslateErrors(self.stub.request_display_tree(requestGRPC), "requestDisplayTree")
 
     let tree: DisplayTree?
     if response.hasDisplayTreeUiState {
-      let state = try GRPCConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
+      let state = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
       tree = state.toDisplayTree(backend: self)
       NSLog("Returning DisplayTree: \(tree!)")
     } else {
@@ -348,10 +351,10 @@ class OutletGRPCClient: OutletBackend {
     request.srcTreeID = srcTreeID
     request.dstTreeID = dstTreeID
     for srcSN in srcSNList {
-      request.srcSnList.append(try GRPCConverter.snToGRPC(srcSN))
+      request.srcSnList.append(try self.grpcConverter.snToGRPC(srcSN))
     }
     request.isInto = isInto
-    request.dstSn = try GRPCConverter.snToGRPC(dstSN)
+    request.dstSn = try self.grpcConverter.snToGRPC(dstSN)
 
     let _ = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
   }
@@ -371,10 +374,10 @@ class OutletGRPCClient: OutletBackend {
     request.treeIDLeft = treeIDLeft
     request.treeIDRight = treeIDRight
     for sn in selectedChangeListLeft {
-      request.changeListLeft.append(try GRPCConverter.snToGRPC(sn))
+      request.changeListLeft.append(try self.grpcConverter.snToGRPC(sn))
     }
     for sn in selectedChangeListRight {
-      request.changeListRight.append(try GRPCConverter.snToGRPC(sn))
+      request.changeListRight.append(try self.grpcConverter.snToGRPC(sn))
     }
 
     let _ = try self.callAndTranslateErrors(self.stub.generate_merge_tree(request), "generateMergeTree")
@@ -382,7 +385,7 @@ class OutletGRPCClient: OutletBackend {
   
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request()
-    request.nodeIdentifier = try GRPCConverter.nodeIdentifierToGRPC(nodeIdentifier)
+    request.nodeIdentifier = try self.grpcConverter.nodeIdentifierToGRPC(nodeIdentifier)
     request.treeID = treeID
     let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree(request), "enqueueRefreshSubtreeTask")
   }
@@ -403,10 +406,10 @@ class OutletGRPCClient: OutletBackend {
     if !response.hasUserOp {
       return nil
     }
-    let srcNode = try GRPCConverter.nodeFromGRPC(response.userOp.srcNode)
+    let srcNode = try self.grpcConverter.nodeFromGRPC(response.userOp.srcNode)
     let dstNode: Node?
     if response.userOp.hasDstNode {
-      dstNode = try GRPCConverter.nodeFromGRPC(response.userOp.dstNode)
+      dstNode = try self.grpcConverter.nodeFromGRPC(response.userOp.dstNode)
     } else {
       dstNode = nil
     }
@@ -433,7 +436,7 @@ class OutletGRPCClient: OutletBackend {
     request.treeID = treeID
     let response = try self.callAndTranslateErrors(self.stub.get_filter(request), "getFilterCriteria")
     if response.hasFilterCriteria {
-      let filterCriteria = try GRPCConverter.filterCriteriaFromGRPC(response.filterCriteria)
+      let filterCriteria = try self.grpcConverter.filterCriteriaFromGRPC(response.filterCriteria)
       NSLog("[\(treeID)] Got: \(filterCriteria)")
       return filterCriteria
     } else {
@@ -444,7 +447,7 @@ class OutletGRPCClient: OutletBackend {
   func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request()
     request.treeID = treeID
-    request.filterCriteria = try GRPCConverter.filterCriteriaToGRPC(filterCriteria)
+    request.filterCriteria = try self.grpcConverter.filterCriteriaToGRPC(filterCriteria)
     let _ = try self.callAndTranslateErrors(self.stub.update_filter(request), "updateFilterCriteria")
   }
 

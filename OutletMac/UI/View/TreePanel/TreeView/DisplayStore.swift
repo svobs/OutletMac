@@ -53,13 +53,13 @@ class DisplayStore {
   /**
    Derives list of SPIDNodePairs from a list of Nodes and their parent SPID
   */
-  func convertChildList(_ parentSN: SPIDNodePair, _ childNodeList: [Node]) -> [SPIDNodePair] {
+  func convertChildList(_ parentSN: SPIDNodePair, _ childNodeList: [Node]) throws -> [SPIDNodePair] {
     var childSNList = [SPIDNodePair]()
 
     let parentPath: String = parentSN.spid.getSinglePath()
     for childNode in childNodeList {
       let singlePath: String = URL(fileURLWithPath: parentPath).appendingPathComponent(childNode.name).path
-      let childSPID = SinglePathNodeIdentifier.from(childNode.nodeIdentifier, singlePath)
+      let childSPID = try self.con.backend.nodeIdentifierFactory.singlePath(from: childNode.nodeIdentifier, with: singlePath)
       let childSN: SPIDNodePair = (childSPID, childNode)
       childSNList.append(childSN)
     }
@@ -67,10 +67,10 @@ class DisplayStore {
     return childSNList
   }
 
-  func convertSingleNode(_ parentSN: SPIDNodePair?, node: Node) -> SPIDNodePair {
+  func convertSingleNode(_ parentSN: SPIDNodePair?, node: Node) throws -> SPIDNodePair {
     let parentPath: String = parentSN == nil ? self.con.tree.rootPath : parentSN!.spid.getSinglePath()
     let singlePath: String = URL(fileURLWithPath: parentPath).appendingPathComponent(node.name).path
-    let childSPID = SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath)
+    let childSPID = try self.con.backend.nodeIdentifierFactory.singlePath(from: node.nodeIdentifier, with: singlePath)
     return (childSPID, node)
   }
 

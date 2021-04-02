@@ -351,7 +351,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       rootChooserView.selectSPID(currentSN.spid)
     } else {
       do {
-        let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect()!
+        let deviceUID: UID = NULL_UID
+        let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 
         rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSN)

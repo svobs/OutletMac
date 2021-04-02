@@ -140,7 +140,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
 
   public var uid: UInt32 = 0
 
-  public var treeType: UInt32 = 0
+  public var deviceUid: UInt32 = 0
 
   public var pathList: [String] = []
 
@@ -161,9 +161,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
     set {_uniqueStorage()._uid = newValue}
   }
 
-  public var treeType: UInt32 {
-    get {return _storage._treeType}
-    set {_uniqueStorage()._treeType = newValue}
+  public var deviceUid: UInt32 {
+    get {return _storage._deviceUid}
+    set {_uniqueStorage()._deviceUid = newValue}
   }
 
   public var pathList: [String] {
@@ -745,7 +745,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
   public static let protoMessageName: String = _protobuf_package + ".NodeIdentifier"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
-    2: .standard(proto: "tree_type"),
+    2: .standard(proto: "device_uid"),
     3: .standard(proto: "path_list"),
     4: .standard(proto: "is_single_path"),
   ]
@@ -757,7 +757,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.treeType) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
       case 4: try { try decoder.decodeSingularBoolField(value: &self.isSinglePath) }()
       default: break
@@ -769,8 +769,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     if self.uid != 0 {
       try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
-    if self.treeType != 0 {
-      try visitor.visitSingularUInt32Field(value: self.treeType, fieldNumber: 2)
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 2)
     }
     if !self.pathList.isEmpty {
       try visitor.visitRepeatedStringField(value: self.pathList, fieldNumber: 3)
@@ -783,7 +783,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier, rhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) -> Bool {
     if lhs.uid != rhs.uid {return false}
-    if lhs.treeType != rhs.treeType {return false}
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.pathList != rhs.pathList {return false}
     if lhs.isSinglePath != rhs.isSinglePath {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -795,7 +795,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
   public static let protoMessageName: String = _protobuf_package + ".Node"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
-    2: .standard(proto: "tree_type"),
+    2: .standard(proto: "device_uid"),
     3: .standard(proto: "path_list"),
     4: .same(proto: "trashed"),
     5: .standard(proto: "is_shared"),
@@ -813,7 +813,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
 
   fileprivate class _StorageClass {
     var _uid: UInt32 = 0
-    var _treeType: UInt32 = 0
+    var _deviceUid: UInt32 = 0
     var _pathList: [String] = []
     var _trashed: UInt32 = 0
     var _isShared: Bool = false
@@ -828,7 +828,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
 
     init(copying source: _StorageClass) {
       _uid = source._uid
-      _treeType = source._treeType
+      _deviceUid = source._deviceUid
       _pathList = source._pathList
       _trashed = source._trashed
       _isShared = source._isShared
@@ -855,7 +855,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
         // enabled. https://github.com/apple/swift-protobuf/issues/1034
         switch fieldNumber {
         case 1: try { try decoder.decodeSingularUInt32Field(value: &_storage._uid) }()
-        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._treeType) }()
+        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._deviceUid) }()
         case 3: try { try decoder.decodeRepeatedStringField(value: &_storage._pathList) }()
         case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._trashed) }()
         case 5: try { try decoder.decodeSingularBoolField(value: &_storage._isShared) }()
@@ -936,8 +936,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
       if _storage._uid != 0 {
         try visitor.visitSingularUInt32Field(value: _storage._uid, fieldNumber: 1)
       }
-      if _storage._treeType != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._treeType, fieldNumber: 2)
+      if _storage._deviceUid != 0 {
+        try visitor.visitSingularUInt32Field(value: _storage._deviceUid, fieldNumber: 2)
       }
       if !_storage._pathList.isEmpty {
         try visitor.visitRepeatedStringField(value: _storage._pathList, fieldNumber: 3)
@@ -1001,7 +1001,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
         let _storage = _args.0
         let rhs_storage = _args.1
         if _storage._uid != rhs_storage._uid {return false}
-        if _storage._treeType != rhs_storage._treeType {return false}
+        if _storage._deviceUid != rhs_storage._deviceUid {return false}
         if _storage._pathList != rhs_storage._pathList {return false}
         if _storage._trashed != rhs_storage._trashed {return false}
         if _storage._isShared != rhs_storage._isShared {return false}

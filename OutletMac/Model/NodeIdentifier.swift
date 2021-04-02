@@ -13,23 +13,25 @@ import Foundation
  */
 class NodeIdentifier: CustomStringConvertible {
   let uid: UID
+  let deviceUID: UID
   // TODO: when I get better with Swift, pursue union type
   var pathList: [String]
   
-  init(_ uid: UID, _ pathList: [String]) {
+  init(_ uid: UID, deviceUID: UID, _ pathList: [String]) {
     self.uid = uid
+    self.deviceUID = deviceUID
     self.pathList = pathList
   }
   
   func copy(with uid: UID? = nil) -> NodeIdentifier {
     let uidToCopy: UID = uid ?? self.uid
-    return NodeIdentifier(uidToCopy, self.pathList)
+    return NodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.pathList)
   }
 
   public var description: String {
     return "∣\(TreeType.display(treeType))-\(uid)⩨\(pathList)∣"
   }
-  
+
   var treeType: TreeType {
     get {
       return .NA
@@ -52,7 +54,7 @@ class NodeIdentifier: CustomStringConvertible {
  */
 class NullNodeIdentifier: NodeIdentifier {
   init() {
-    super.init(NULL_UID, [])
+    super.init(NULL_UID, deviceUID: NULL_UID, [])
   }
 
   override public var description: String {
@@ -62,26 +64,12 @@ class NullNodeIdentifier: NodeIdentifier {
 
 /**
  CLASS SinglePathNodeIdentifier
+
+ Should not be instantiated! Use child classes only!
  */
 class SinglePathNodeIdentifier: NodeIdentifier {
-  private var _treeType: TreeType
-  init(_ uid: UID, _ singlePath: String, _ treeType: TreeType) {
-    self._treeType = treeType
-    super.init(uid, [singlePath])
-  }
-  
-  override func copy(with uid: UID? = nil) -> SinglePathNodeIdentifier {
-    let uidToCopy: UID = uid ?? self.uid
-    return SinglePathNodeIdentifier(uidToCopy, self.getSinglePath(), self.treeType)
-  }
-  
-  override var treeType: TreeType {
-    get {
-      return self._treeType
-    }
-    set (treeType) {
-      self._treeType = treeType
-    }
+  init(_ uid: UID, deviceUID: UID, _ singlePath: String) {
+    super.init(uid, deviceUID: deviceUID, [singlePath])
   }
 
   override func isSPID() -> Bool {
@@ -95,13 +83,56 @@ class SinglePathNodeIdentifier: NodeIdentifier {
   override public var description: String {
     return "∣\(TreeType.display(treeType))-\(uid)⩨\"\(getSinglePath())\"∣"
   }
-
-  static func from(_ nodeIdentifier: NodeIdentifier, _ singlePath: String) -> SinglePathNodeIdentifier {
-    return SinglePathNodeIdentifier(nodeIdentifier.uid, singlePath, nodeIdentifier.treeType)
-  }
 }
 
 typealias SPID = SinglePathNodeIdentifier
+
+/**
+ CLASS GDriveSPID
+
+ A SPID for GDrive nodes
+ */
+class GDriveSPID: SinglePathNodeIdentifier {
+
+  override func copy(with uid: UID? = nil) -> GDriveSPID {
+    let uidToCopy: UID = uid ?? self.uid
+    return GDriveSPID(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath())
+  }
+
+  override var treeType: TreeType {
+    get {
+      return TreeType.GDRIVE
+    }
+  }
+
+  static func from(_ nodeIdentifier: NodeIdentifier, _ singlePath: String) -> GDriveSPID {
+    return GDriveSPID(nodeIdentifier.uid, deviceUID: nodeIdentifier.deviceUID, singlePath)
+  }
+}
+
+/**
+ CLASS MixedSPID
+
+ A SPID for Mixed tree types
+ */
+class MixedSPID: SinglePathNodeIdentifier {
+
+  override func copy(with uid: UID? = nil) -> GDriveSPID {
+    let uidToCopy: UID = uid ?? self.uid
+    return GDriveSPID(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath())
+  }
+
+  static func from(_ nodeIdentifier: NodeIdentifier, _ singlePath: String) -> MixedSPID {
+    return MixedSPID(nodeIdentifier.uid, deviceUID: nodeIdentifier.deviceUID, singlePath)
+  }
+
+  override var treeType: TreeType {
+    get {
+      return TreeType.MIXED
+    }
+  }
+
+}
 
 
 /**
@@ -116,7 +147,7 @@ class GDriveIdentifier: NodeIdentifier {
   
   override func copy(with uid: UID? = nil) -> GDriveIdentifier {
     let uidToCopy: UID = uid ?? self.uid
-    return GDriveIdentifier(uidToCopy, self.pathList)
+    return GDriveIdentifier(uidToCopy, deviceUID: self.deviceUID, self.pathList)
   }
 
 }
@@ -125,12 +156,16 @@ class GDriveIdentifier: NodeIdentifier {
  CLASS LocalNodeIdentifier
  */
 class LocalNodeIdentifier: SinglePathNodeIdentifier {
-  init(_ uid: UID, _ singlePath: String) {
-    super.init(uid, singlePath, .LOCAL_DISK)
-  }
   
   override func copy(with uid: UID? = nil) -> LocalNodeIdentifier {
     let uidToCopy: UID = uid ?? self.uid
-    return LocalNodeIdentifier(uidToCopy, self.getSinglePath())
+    return LocalNodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath())
   }
+
+  override var treeType: TreeType {
+    get {
+      return TreeType.LOCAL_DISK
+    }
+  }
+
 }

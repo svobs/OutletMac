@@ -7,6 +7,8 @@
 import SwiftUI
 
 protocol OutletBackend: HasLifecycle {
+  var nodeIdentifierFactory: NodeIdentifierFactory { get }
+
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String
   func putConfig(_ configKey: String, _ configVal: String) throws
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
@@ -16,19 +18,19 @@ protocol OutletBackend: HasLifecycle {
   func getIcon(_ iconID: IconID) throws -> NSImage?
   
   //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
-  func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node?
-  func getNodeForLocalPath(fullPath: String) throws -> Node?
+  func getNodeForUID(uid: UID, deviceUID: UID?) throws -> Node?
   func nextUID() throws -> UID
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID?
   func startSubtreeLoad(treeID: String) throws
   func getOpExecutionPlayState() throws -> Bool
+  func getDeviceList() throws -> [Device]
   func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node]
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node]
   func getRowsOfInterest(treeID: String) throws -> RowsOfInterest
   func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws
   func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws
   
-  func createDisplayTreeForGDriveSelect() throws -> DisplayTree?
+  func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree?
   func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree?
   func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
   func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree?
@@ -72,6 +74,7 @@ extension OutletBackend {
  */
 class MockBackend: OutletBackend {
   let dipatcher: SignalDispatcher
+  lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
   init(_ d: SignalDispatcher? = nil) {
     self.dipatcher = d ?? SignalDispatcher()
   }
@@ -110,11 +113,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getNodeForUID(uid: UID, treeType: TreeType?) throws -> Node? {
-    throw OutletError.invalidOperation("Cannot call MockBackend methods")
-  }
-
-  func getNodeForLocalPath(fullPath: String) throws -> Node? {
+  func getNodeForUID(uid: UID, deviceUID: UID?) throws -> Node? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -130,6 +129,10 @@ class MockBackend: OutletBackend {
   }
 
   func getOpExecutionPlayState() throws -> Bool {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func getDeviceList() throws -> [Device] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -153,7 +156,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createDisplayTreeForGDriveSelect() throws -> DisplayTree? {
+  func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

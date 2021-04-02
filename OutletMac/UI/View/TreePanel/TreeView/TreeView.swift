@@ -569,7 +569,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       defer {
         outlineView.endUpdates()
       }
-      let childSNList: [SPIDNodePair] = self.displayStore.convertChildList(parentSN, childNodeList)
+      let childSNList: [SPIDNodePair] = try self.displayStore.convertChildList(parentSN, childNodeList)
       self.displayStore.populateChildList(parentSN, childSNList)
       self.outlineView.reloadItem(parentGUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)

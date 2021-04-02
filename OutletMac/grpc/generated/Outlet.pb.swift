@@ -139,6 +139,47 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Icon {
   public init() {}
 }
 
+/// nothing
+public struct Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var deviceList: [Outlet_Backend_Agent_Grpc_Generated_Device] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_Device {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var deviceUid: UInt32 = 0
+
+  public var longDeviceID: String = String()
+
+  public var treeType: UInt32 = 0
+
+  public var friendlyName: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -1000,20 +1041,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request {
 
   public var uid: UInt32 = 0
 
-  /// optional
-  public var treeType: UInt32 = 0
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public struct Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var fullPath: String = String()
+  /// optional (but encouraged!)
+  public var deviceUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1316,6 +1345,107 @@ extension Outlet_Backend_Agent_Grpc_Generated_Icon: SwiftProtobuf.Message, Swift
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Icon, rhs: Outlet_Backend_Agent_Grpc_Generated_Icon) -> Bool {
     if lhs.iconID != rhs.iconID {return false}
     if lhs.content != rhs.content {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetDeviceList_Request"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let _ = try decoder.nextFieldNumber() {
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetDeviceList_Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "device_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.deviceList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.deviceList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.deviceList, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response) -> Bool {
+    if lhs.deviceList != rhs.deviceList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_Device: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".Device"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "device_uid"),
+    2: .standard(proto: "long_device_id"),
+    3: .standard(proto: "tree_type"),
+    4: .standard(proto: "friendly_name"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.longDeviceID) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.treeType) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.friendlyName) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 1)
+    }
+    if !self.longDeviceID.isEmpty {
+      try visitor.visitSingularStringField(value: self.longDeviceID, fieldNumber: 2)
+    }
+    if self.treeType != 0 {
+      try visitor.visitSingularUInt32Field(value: self.treeType, fieldNumber: 3)
+    }
+    if !self.friendlyName.isEmpty {
+      try visitor.visitSingularStringField(value: self.friendlyName, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Device, rhs: Outlet_Backend_Agent_Grpc_Generated_Device) -> Bool {
+    if lhs.deviceUid != rhs.deviceUid {return false}
+    if lhs.longDeviceID != rhs.longDeviceID {return false}
+    if lhs.treeType != rhs.treeType {return false}
+    if lhs.friendlyName != rhs.friendlyName {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -3024,7 +3154,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request: SwiftProtob
   public static let protoMessageName: String = _protobuf_package + ".GetNodeForUid_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "uid"),
-    2: .standard(proto: "tree_type"),
+    2: .standard(proto: "device_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -3034,7 +3164,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request: SwiftProtob
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.treeType) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
       default: break
       }
     }
@@ -3044,47 +3174,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request: SwiftProtob
     if self.uid != 0 {
       try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
-    if self.treeType != 0 {
-      try visitor.visitSingularUInt32Field(value: self.treeType, fieldNumber: 2)
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request) -> Bool {
     if lhs.uid != rhs.uid {return false}
-    if lhs.treeType != rhs.treeType {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".GetNodeForLocalPath_Request"
-  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "full_path"),
-  ]
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.fullPath) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.fullPath.isEmpty {
-      try visitor.visitSingularStringField(value: self.fullPath, fieldNumber: 1)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetNodeForLocalPath_Request) -> Bool {
-    if lhs.fullPath != rhs.fullPath {return false}
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

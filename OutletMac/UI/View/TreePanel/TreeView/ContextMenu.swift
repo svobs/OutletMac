@@ -138,7 +138,7 @@ class TreeContextMenu {
       if op!.srcNode.isLive {
         let srcSubmenu = NSMenu()
         menu.setSubmenu(srcSubmenu, for: srcItem)
-        self.buildMenuItemsForSingleNode(srcSubmenu, op!.srcNode, srcPath)
+        try self.buildMenuItemsForSingleNode(srcSubmenu, op!.srcNode, srcPath)
       } else {
         srcItem.isEnabled = false
       }
@@ -158,7 +158,7 @@ class TreeContextMenu {
       if op!.srcNode.isLive {
         let dstSubmenu = NSMenu()
         menu.setSubmenu(dstSubmenu, for: dstItem)
-        self.buildMenuItemsForSingleNode(dstSubmenu, op!.dstNode!, dstPath)
+        try self.buildMenuItemsForSingleNode(dstSubmenu, op!.dstNode!, dstPath)
       } else {
         dstItem.isEnabled = false
       }
@@ -172,7 +172,7 @@ class TreeContextMenu {
 
       menu.addItem(NSMenuItem.separator())
 
-      self.buildMenuItemsForSingleNode(menu, sn.node!, singlePath)
+      try self.buildMenuItemsForSingleNode(menu, sn.node!, singlePath)
     }
 
     if sn.node!.isDir {
@@ -203,8 +203,9 @@ class TreeContextMenu {
     return item
   }
 
-  private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) {
-    let sn: SPIDNodePair = (SinglePathNodeIdentifier.from(node.nodeIdentifier, singlePath), node)
+  private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) throws {
+    let spid: SPID = try self.con.backend.nodeIdentifierFactory.singlePath(from: node.nodeIdentifier, with: singlePath)
+    let sn: SPIDNodePair = (spid, node)
 
     if node.isLive && node.treeType == .LOCAL_DISK {
       let item = MenuItemWithNodeList(title: "Show in Finder", action: #selector(self.con.treeActions.showInFinder(_:)), keyEquivalent: "")

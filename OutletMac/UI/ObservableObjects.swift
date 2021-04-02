@@ -36,7 +36,7 @@ class HeightTracking: ObservableObject {
   @Published var nonTreeViewHeight: CGFloat = 0
 
   func getTreeViewHeight() -> CGFloat {
-    NSLog("DEBUG getTreeViewHeight(): \(self.mainWindowHeight) - \(self.nonTreeViewHeight)")
+//    NSLog("DEBUG getTreeViewHeight(): \(self.mainWindowHeight) - \(self.nonTreeViewHeight)")
     return self.mainWindowHeight - self.nonTreeViewHeight
   }
 
