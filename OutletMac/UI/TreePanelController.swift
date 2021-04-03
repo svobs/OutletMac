@@ -178,6 +178,11 @@ class TreePanelController: TreePanelControllable {
     try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: self.treeID)
+
+    try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: self.treeID)
+    try self.dispatchListener.subscribe(signal: .NODE_MOVED, self.onNodeMoved, whitelistSenderID: self.treeID)
+
   }
 
   func shutdown() throws {
@@ -432,6 +437,27 @@ class TreePanelController: TreePanelControllable {
   private func onRefreshStatsDone(_ senderID: SenderID, _ props: PropDict) throws {
     let statusBarMsg = try props.getString("status_msg")
     self.updateStatusBarMsg(statusBarMsg)
+  }
+
+  private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
+    let node = try props.get("node") as! Node
+
+    // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
+  }
+
+  private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
+    let node = try props.get("node") as! Node
+
+    // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
+
+  }
+
+  private func onNodeMoved(_ senderID: SenderID, _ props: PropDict) throws {
+    let srcNode = try props.get("src_node")
+    let dstNode = try props.get("dst_node")
+
+    try self.onNodeRemoved(senderID, PropDict(["node": srcNode]))
+    try self.onNodeUpserted(senderID, PropDict(["node": dstNode]))
   }
 
   // Other callbacks
