@@ -320,8 +320,8 @@ class TreePanelController: TreePanelControllable {
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
     let parentGUID = self.displayStore.guidFor(parentSN)
     do {
-      let ephemerealChildSN = try self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
-      self.displayStore.populateChildList(parentSN, [ephemerealChildSN])
+      let ephemeralChildSN = try self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
+      self.displayStore.populateChildList(parentSN, [ephemeralChildSN])
     } catch {
       NSLog("ERROR [\(self.treeID)] Failed to append ephemeral node: \(error)")
       return

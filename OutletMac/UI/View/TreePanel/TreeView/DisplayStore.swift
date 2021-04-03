@@ -67,6 +67,9 @@ class DisplayStore {
     return childSNList
   }
 
+  /**
+   Comvert a node to a SPIDNodePair, using data from its parent SPIDNodePair
+ */
   func convertSingleNode(_ parentSN: SPIDNodePair?, node: Node) throws -> SPIDNodePair {
     let parentPath: String = parentSN == nil ? self.con.tree.rootPath : parentSN!.spid.getSinglePath()
     let singlePath: String = URL(fileURLWithPath: parentPath).appendingPathComponent(node.name).path

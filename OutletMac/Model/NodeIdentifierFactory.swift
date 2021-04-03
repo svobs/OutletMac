@@ -9,11 +9,22 @@ import Foundation
 
 class NodeIdentifierFactory {
   let backend: OutletBackend
+  // cache device list
+  var deviceList: [Device] = []
+
   init(_ backend: OutletBackend) {
     self.backend = backend
   }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {
+    if deviceList.count == 0 {
+      // lazy load device list from server.
+      // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body
+      // of another gRPC call
+      try DispatchQueue.global(qos: .userInitiated).sync { [unowned self] in
+        self.deviceList = try self.backend.getDeviceList()
+      }
+    }
     for device in try self.backend.getDeviceList() {
       if device.uid == deviceUID {
         return device.treeType
@@ -54,7 +65,8 @@ class NodeIdentifierFactory {
   }
 
   func singlePath(from nodeIdentifier: NodeIdentifier, with singlePath: String) throws -> SinglePathNodeIdentifier {
-    assert(nodeIdentifier.pathList.contains(singlePath), "NodeIdentifier (\(nodeIdentifier)) does not contain path (\(singlePath))")
+    // disabled this check cuz I'm abusing this method a bit to make it work with EmptyNodes
+//    assert(nodeIdentifier.pathList.contains(singlePath), "NodeIdentifier (\(nodeIdentifier)) does not contain path (\(singlePath))")
     return try self.forValues(nodeIdentifier.uid, deviceUID: nodeIdentifier.deviceUID, [singlePath], mustBeSinglePath: true)
       as! SinglePathNodeIdentifier
   }

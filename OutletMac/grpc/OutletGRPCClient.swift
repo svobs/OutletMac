@@ -211,15 +211,14 @@ class OutletGRPCClient: OutletBackend {
   }
 
   func getDeviceList() throws -> [Device] {
+    var deviceList: [Device] = []
     let request = Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request()
     let response = try self.callAndTranslateErrors(self.stub.get_device_list(request), "getDeviceList")
 
-    var deviceList: [Device] = []
     for deviceGRPC in response.deviceList {
       let treeType: TreeType = TreeType(rawValue: deviceGRPC.treeType)!
       deviceList.append(Device(device_uid: deviceGRPC.deviceUid, long_device_id: deviceGRPC.longDeviceID, treeType: treeType, friendlyName: deviceGRPC.friendlyName))
     }
-
     return deviceList
   }
   
