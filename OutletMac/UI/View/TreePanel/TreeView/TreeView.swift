@@ -286,7 +286,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    Tell whether the row is expandable
    */
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    return displayStore.isDir(itemToGUID(item))
+    return displayStore.getChildList(itemToGUID(item)).count > 0
   }
 
   /**

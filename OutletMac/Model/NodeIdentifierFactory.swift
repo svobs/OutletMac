@@ -25,7 +25,7 @@ class NodeIdentifierFactory {
         self.deviceList = try self.backend.getDeviceList()
       }
     }
-    for device in try self.backend.getDeviceList() {
+    for device in self.deviceList {
       if device.uid == deviceUID {
         return device.treeType
       }
