@@ -339,6 +339,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       }
   }
 
+  // TODO: this is TEMPORARY
+  func getDefaultGDriveDeviceUID() throws -> UID {
+    var deviceUID: UID? = nil
+    for device in try self.backend.getDeviceList() {
+      if device.treeType == .GDRIVE {
+        if deviceUID != nil {
+          throw OutletError.invalidState("Multiple Google Drive accounts found but this is not supported!")
+        } else {
+          deviceUID = device.uid
+        }
+      }
+    }
+    if deviceUID == nil {
+      throw OutletError.invalidState("No Google Drive accounts found!")
+    } else {
+      return deviceUID!
+    }
+  }
+
   @objc func openGDriveRootChooser(_ treeID: String) {
     guard let sourceCon = self.getTreePanelController(treeID) else {
       NSLog("ERROR [\(treeID)] Cannot open GDrive chooser: could not find controller with this treeID!")
@@ -351,7 +370,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       rootChooserView.selectSPID(currentSN.spid)
     } else {
       do {
-        let deviceUID: UID = NULL_UID
+        let deviceUID: UID = try self.getDefaultGDriveDeviceUID()
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 

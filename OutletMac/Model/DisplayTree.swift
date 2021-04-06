@@ -51,6 +51,12 @@ class DisplayTree {
     }
   }
 
+  var rootDeviceUID: UID {
+    get {
+      return self.state.rootSN.spid.deviceUID
+    }
+  }
+
   var treeType: TreeType {
     get {
       return self.state.rootSN.spid.treeType
@@ -133,15 +139,17 @@ struct DiffResultTreeIDs {
 struct DisplayTreeRequest: CustomStringConvertible {
   let treeID: TreeID
   let returnAsync: Bool
+  let deviceUID: UID?
   let userPath: String?
   let spid: SPID?
   let isStartup: Bool
   let treeDisplayMode: TreeDisplayMode
   
-  init(treeID: TreeID, returnAsync: Bool, userPath: String? = nil, spid: SPID? = nil, isStartup: Bool = false,
+  init(treeID: TreeID, returnAsync: Bool, userPath: String? = nil, deviceUID: UID? = nil, spid: SPID? = nil, isStartup: Bool = false,
        treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS) {
     self.treeID = treeID
     self.returnAsync = returnAsync
+    self.deviceUID = deviceUID
     self.userPath = userPath
     self.spid = spid
     self.isStartup = isStartup
@@ -150,7 +158,7 @@ struct DisplayTreeRequest: CustomStringConvertible {
 
   var description: String {
     get {
-      return "DisplayTreeRequest(treeID=\(quoted(self.treeID)) spid=\(descOrNil(self.spid)) userPath=\(quotedOrNil(self.userPath)) isStartup='\(self.isStartup)' treeDisplayMode=\(self.treeDisplayMode) returnAsync=\(self.returnAsync))"
+      return "DisplayTreeRequest(treeID=\(quoted(self.treeID)) spid=\(descOrNil(self.spid)) deviceUID=\(descOrNil(deviceUID)) userPath=\(quotedOrNil(self.userPath)) isStartup='\(self.isStartup)' treeDisplayMode=\(self.treeDisplayMode) returnAsync=\(self.returnAsync))"
     }
   }
 }

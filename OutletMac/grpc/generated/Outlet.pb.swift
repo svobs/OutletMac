@@ -948,6 +948,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request {
 
   public var userPath: String = String()
 
+  public var deviceUid: UInt32 = 0
+
   public var spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
     get {return _spid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
     set {_spid = newValue}
@@ -2961,8 +2963,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
     2: .standard(proto: "tree_id"),
     3: .standard(proto: "return_async"),
     4: .standard(proto: "user_path"),
-    5: .same(proto: "spid"),
-    6: .standard(proto: "tree_display_mode"),
+    5: .standard(proto: "device_uid"),
+    6: .same(proto: "spid"),
+    7: .standard(proto: "tree_display_mode"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2975,8 +2978,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
       case 3: try { try decoder.decodeSingularBoolField(value: &self.returnAsync) }()
       case 4: try { try decoder.decodeSingularStringField(value: &self.userPath) }()
-      case 5: try { try decoder.decodeSingularMessageField(value: &self._spid) }()
-      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.treeDisplayMode) }()
+      case 5: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 6: try { try decoder.decodeSingularMessageField(value: &self._spid) }()
+      case 7: try { try decoder.decodeSingularUInt32Field(value: &self.treeDisplayMode) }()
       default: break
       }
     }
@@ -2995,11 +2999,14 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
     if !self.userPath.isEmpty {
       try visitor.visitSingularStringField(value: self.userPath, fieldNumber: 4)
     }
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 5)
+    }
     if let v = self._spid {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
     }
     if self.treeDisplayMode != 0 {
-      try visitor.visitSingularUInt32Field(value: self.treeDisplayMode, fieldNumber: 6)
+      try visitor.visitSingularUInt32Field(value: self.treeDisplayMode, fieldNumber: 7)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -3009,6 +3016,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
     if lhs.treeID != rhs.treeID {return false}
     if lhs.returnAsync != rhs.returnAsync {return false}
     if lhs.userPath != rhs.userPath {return false}
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs._spid != rhs._spid {return false}
     if lhs.treeDisplayMode != rhs.treeDisplayMode {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

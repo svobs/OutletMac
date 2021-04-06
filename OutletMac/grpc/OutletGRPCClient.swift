@@ -147,6 +147,7 @@ class OutletGRPCClient: OutletBackend {
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeID
     grpcRequest.userPath = request.userPath ?? ""
+    grpcRequest.deviceUid = request.deviceUID ?? 0
     grpcRequest.returnAsync = request.returnAsync
     grpcRequest.treeDisplayMode = request.treeDisplayMode.rawValue
     
@@ -300,9 +301,9 @@ class OutletGRPCClient: OutletBackend {
     return try self.requestDisplayTree(request)
   }
   
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree? {
+  func createDisplayTreeFromUserPath(treeID: String, userPath: String, deviceUID: UID) throws -> DisplayTree? {
     // Note: this shouldn't actually return anything, as returnAsync==true
-    let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, userPath: userPath, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, userPath: userPath, deviceUID: deviceUID, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
 

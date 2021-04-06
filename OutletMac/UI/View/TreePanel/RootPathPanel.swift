@@ -23,9 +23,11 @@ struct RootPathPanel: View {
 
   func submitRootPath() {
     do {
-      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.swiftTreeState.rootPath)
+      _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.tree.treeID, userPath: self.swiftTreeState.rootPath, deviceUID: self.swiftTreeState.rootDeviceUID)
     } catch {
       NSLog("Failed to submit root path \"\(self.swiftTreeState.rootPath)\": \(error)")
+      // restore root path to value received from server
+      self.swiftTreeState.rootPath = self.con.tree.rootPath
     }
   }
 
@@ -46,7 +48,34 @@ struct RootPathPanel: View {
     return con.app.iconStore.getIcon(for: iconId).getImage()
   }
 
+  // TODO: this is TEMPORARY until we support multiple drives
+  func getDefaultLocalDeviceUID() throws -> UID {
+    var deviceUID: UID? = nil
+    for device in try self.con.backend.getDeviceList() {
+      if device.treeType == .LOCAL_DISK {
+        if deviceUID != nil {
+          throw OutletError.invalidState("Multiple local disks found but this is not supported!")
+        } else {
+          deviceUID = device.uid
+        }
+      }
+    }
+    if deviceUID == nil {
+      throw OutletError.invalidState("No local disks found!")
+    } else {
+      return deviceUID!
+    }
+  }
+
   func doOpenFileDialog() {
+    let deviceUID: UID
+    do {
+      deviceUID = try self.getDefaultLocalDeviceUID()
+    } catch {
+      self.con.reportError("Failed to open file dialog", "\(error)")
+      return
+    }
+
     let dialog = NSOpenPanel();
 
     dialog.title                   = "Choose a directory";  // Not shown in Mac OS Big Bug
@@ -69,7 +98,7 @@ struct RootPathPanel: View {
         let dirPath = result!.path
         NSLog("INFO  User chose path: \(dirPath)")
         do {
-          let _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.treeID, userPath: dirPath)
+          let _ = try self.con.backend.createDisplayTreeFromUserPath(treeID: self.con.treeID, userPath: dirPath, deviceUID: deviceUID)
         } catch {
           self.con.reportError("Failed to set tree root path", "Failed to set path (\(dirPath)): \(error)")
         }

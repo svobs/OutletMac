@@ -42,6 +42,7 @@ class DisplayStore {
   }
 
   // FIXME: we do not require the path here
+  // TODO: try to figure out what my above statement meant
   func guidFor(_ spid: SPID) -> GUID {
     return self.guidFor(spid.treeType, singlePath: spid.getSinglePath(), uid: spid.uid)
   }

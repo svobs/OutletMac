@@ -33,7 +33,7 @@ protocol OutletBackend: HasLifecycle {
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree?
   func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree?
   func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree?
+  func createDisplayTreeFromUserPath(treeID: String, userPath: String, deviceUID: UID) throws -> DisplayTree?
   func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree?
   
@@ -168,7 +168,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String) throws -> DisplayTree? {
+  func createDisplayTreeFromUserPath(treeID: String, userPath: String, deviceUID: UID) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
