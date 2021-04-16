@@ -115,7 +115,7 @@ class Node: CustomStringConvertible {
   
   var uid: UID {
     get {
-      return self.nodeIdentifier.uid
+      return self.nodeIdentifier.nodeUID
     }
   }
   
@@ -147,6 +147,12 @@ class Node: CustomStringConvertible {
   var treeType: TreeType {
     get {
       return self.nodeIdentifier.treeType
+    }
+  }
+
+  var deviceUID: UID {
+    get {
+      return self.nodeIdentifier.deviceUID
     }
   }
   
@@ -255,14 +261,14 @@ class DirectoryStats {
 }
 
 /**
- CLASS EmptyNode
- Is an ephemeral node (not much content)
+ CLASS EphemeralNode
+ Is an empty node (not much content)
  */
-class EmptyNode: Node {
+class EphemeralNode: Node {
   let _name: String
-  init(_ name: String) {
+  init(_ name: String, parent: SPID?) {
     self._name = name
-    super.init(NullNodeIdentifier(), [], .NOT_TRASHED)
+    super.init(EphemeralNodeIdentifier(parent: parent), [], .NOT_TRASHED)
   }
 
   override var name: String {

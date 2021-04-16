@@ -35,7 +35,7 @@ class TreeActions {
 
     func process(_ sn: SPIDNodePair) {
       if sn.node!.isDir {
-        let guid = self.con.displayStore.guidFor(sn)
+        let guid = sn.spid.guid
         if !outlineView.isItemExpanded(guid) {
           outlineView.animator().expandItem(guid)
         }
@@ -49,7 +49,7 @@ class TreeActions {
 
     while !queue.isEmpty {
       let parentSN = queue.popFirst()!
-      let parentGUID = self.con.displayStore.guidFor(parentSN)
+      let parentGUID = parentSN.spid.guid
       for sn in self.con.displayStore.getChildList(parentGUID) {
         process(sn)
       }

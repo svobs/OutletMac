@@ -269,7 +269,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    */
   func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
     if let child  = displayStore.getChild(itemToGUID(item), index) {
-      return displayStore.guidFor(child)
+      return child.spid.guid
     } else {
       return NULL_GUID
     }
@@ -464,12 +464,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    SELECTION CHANGED
   */
   func outlineViewSelectionDidChange(_ notification: Notification) {
-    let uidSet: Set<UID> = self.getSelectedUIDs()
-    NSLog("DEBUG [\(treeID)] User selected UIDs: \(uidSet)")
+    let guidSet: Set<GUID> = self.getSelectedGUIDs()
+    NSLog("DEBUG [\(treeID)] User selected GUIDs: \(guidSet)")
 
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
-        try self.con.backend.setSelectedRowSet(uidSet, self.treeID)
+        try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
       } catch {
         // Not a serious error: don't show to user
         NSLog("Failed to report node selection: \(error)")
@@ -486,13 +486,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     self.con.dispatcher.sendSignal(signal: .TREE_SELECTION_CHANGED, senderID: self.con.treeID, ["sn_list": snList])
   }
 
+  // TODO: DEPRECATE THIS
   func getSelectedUIDs() -> Set<UID> {
     var uidSet = Set<UID>()
     for selectedRow in outlineView.selectedRowIndexes {
       if let item = outlineView.item(atRow: selectedRow) {
         if let guid = item as? GUID {
           if let sn = displayStore.getSN(guid) {
-            uidSet.insert(sn.spid.uid)
+            uidSet.insert(sn.spid.nodeUID)
           }
         }
       }
@@ -500,6 +501,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return uidSet
   }
 
+  // Note: currently this will include any selected ephemeral nodes. It's currently not worth the cycles
+  // to weed them out.
   func getSelectedGUIDs() -> Set<GUID> {
     var guidSet = Set<GUID>()
     for selectedRow in outlineView.selectedRowIndexes {
@@ -526,7 +529,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   }
 
   func selectSingleSPID(_ spid: SPID) {
-    let guid = self.displayStore.guidFor(spid)
+    let guid = spid.guid
     let index = self.outlineView.row(forItem: guid)
 
     guard index >= 0 else {
@@ -558,19 +561,16 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return
     }
 
-    let parentUID: UID = parentSN.spid.uid
-
     NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
 
     do {
-      let childNodeList = try self.con.backend.getChildList(parentUID: parentUID, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+      let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
 
       outlineView.beginUpdates()
       defer {
         outlineView.endUpdates()
       }
-      let childSNList: [SPIDNodePair] = try self.displayStore.convertChildList(parentSN, childNodeList)
-      self.displayStore.populateChildList(parentSN, childSNList)
+      self.displayStore.putChildList(parentSN, childSNList)
       self.outlineView.reloadItem(parentGUID, reloadChildren: true)
 //      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
     } catch OutletError.maxResultsExceeded(let actualCount) {
@@ -606,7 +606,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     */
 
     do {
-      try self.con.backend.removeExpandedRow(parentSN.spid.uid, self.treeID)
+      try self.con.backend.removeExpandedRow(parentSN.spid.guid, self.treeID)
     } catch {
       NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
     }

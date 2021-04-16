@@ -116,7 +116,7 @@ class TreeContextMenu {
       return
     }
 
-    let op: UserOp? = try self.con.backend.getLastPendingOp(nodeUID: sn.spid.uid)
+    let op: UserOp? = try self.con.backend.getLastPendingOp(nodeUID: sn.spid.nodeUID)
 
     let singlePath = sn.spid.getSinglePath()
 
@@ -155,7 +155,7 @@ class TreeContextMenu {
       let dstItem = self.buildFullPathDisplayItem(preamble: "Dst: ", op!.dstNode!, singlePath: dstPath)
       menu.addItem(dstItem)
 
-      if op!.srcNode.isLive {
+      if op!.dstNode!.isLive {
         let dstSubmenu = NSMenu()
         menu.setSubmenu(dstSubmenu, for: dstItem)
         try self.buildMenuItemsForSingleNode(dstSubmenu, op!.dstNode!, dstPath)
@@ -204,8 +204,10 @@ class TreeContextMenu {
   }
 
   private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) throws {
-    let spid: SPID = try self.con.backend.nodeIdentifierFactory.singlePath(from: node.nodeIdentifier, with: singlePath)
-    let sn: SPIDNodePair = (spid, node)
+    guard let sn: SPIDNodePair = try self.con.backend.getSNFor(nodeUID: node.uid, deviceUID: node.deviceUID, fullPath: singlePath) else {
+      NSLog("ERROR [\(treeID)] Backend couldn't find: \(node.nodeIdentifier)")
+      return
+    }
 
     if node.isLive && node.treeType == .LOCAL_DISK {
       let item = MenuItemWithNodeList(title: "Show in Finder", action: #selector(self.con.treeActions.showInFinder(_:)), keyEquivalent: "")

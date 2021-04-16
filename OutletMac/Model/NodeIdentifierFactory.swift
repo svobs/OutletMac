@@ -38,36 +38,30 @@ class NodeIdentifierFactory {
   }
   
   func getRootConstantGDriveSPID(_ deviceUID: UID) -> SinglePathNodeIdentifier {
-    return GDriveSPID(GDRIVE_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
+    return GDriveSPID(GDRIVE_ROOT_UID, deviceUID: deviceUID, pathUID: ROOT_PATH_UID, ROOT_PATH)
   }
   
   func getRootConstantLocalDiskSPID(_ deviceUID: UID) -> SinglePathNodeIdentifier {
     return LocalNodeIdentifier(LOCAL_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
   }
 
-  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], mustBeSinglePath: Bool) throws -> NodeIdentifier {
+  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID) throws -> NodeIdentifier {
     let treeType = try self.getTreeType(for: deviceUID)
 
     if treeType == .LOCAL_DISK {
       // LocalNodeIdentifier is always a SPID
       return LocalNodeIdentifier(uid, deviceUID: deviceUID, pathList[0])
     } else if treeType == .GDRIVE {
-      if mustBeSinglePath {
+      if pathUID > NULL_UID { // non-null value indicates that it must be single path
         if pathList.count > 1 {
             throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): mustBeSinglePath=true but paths count is: \(pathList.count)")
         }
-        return GDriveSPID(uid, deviceUID: deviceUID, pathList[0])
+        return GDriveSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0])
       }
       return GDriveIdentifier(uid, deviceUID: deviceUID, pathList)
     }
     
-    throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), deviceUID=\(deviceUID), treeType=\(treeType), pathList=\(pathList), mustBeSinglePath=\(mustBeSinglePath)")
+    throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), deviceUID=\(deviceUID), treeType=\(treeType), pathList=\(pathList), pathUID=\(pathUID)")
   }
 
-  func singlePath(from nodeIdentifier: NodeIdentifier, with singlePath: String) throws -> SinglePathNodeIdentifier {
-    // disabled this check cuz I'm abusing this method a bit to make it work with EmptyNodes
-//    assert(nodeIdentifier.pathList.contains(singlePath), "NodeIdentifier (\(nodeIdentifier)) does not contain path (\(singlePath))")
-    return try self.forValues(nodeIdentifier.uid, deviceUID: nodeIdentifier.deviceUID, [singlePath], mustBeSinglePath: true)
-      as! SinglePathNodeIdentifier
-  }
 }

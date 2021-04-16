@@ -61,7 +61,7 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request, Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response>
 
-  func get_child_list_for_node(
+  func get_child_list_for_spid(
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request,
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>
@@ -70,16 +70,6 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request,
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response>
-
-  func get_filter(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>
-
-  func update_filter(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
 
   func get_rows_of_interest(
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request,
@@ -95,6 +85,16 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     _ request: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request,
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response>
+
+  func get_filter(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>
+
+  func update_filter(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
 
   func request_display_tree(
     _ request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request,
@@ -130,6 +130,11 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request,
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request, Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response>
+
+  func get_sn_for(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response>
 
   func start_diff_trees(
     _ request: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request,
@@ -172,7 +177,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     return "outlet.backend.agent.grpc.generated.Outlet"
   }
 
-  /// Server streaming call to subscribe_to_signals
+  /// Signal
   ///
   /// - Parameters:
   ///   - request: Request to send to subscribe_to_signals.
@@ -211,7 +216,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     )
   }
 
-  /// Unary call to get_config
+  /// Config
   ///
   /// - Parameters:
   ///   - request: Request to send to get_config.
@@ -283,21 +288,21 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     )
   }
 
-  /// Unary call to get_child_list_for_node
+  /// TreeView
   ///
   /// - Parameters:
-  ///   - request: Request to send to get_child_list_for_node.
+  ///   - request: Request to send to get_child_list_for_spid.
   ///   - callOptions: Call options.
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func get_child_list_for_node(
+  public func get_child_list_for_spid(
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request,
     callOptions: CallOptions? = nil
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response> {
     return self.makeUnaryCall(
-      path: "/outlet.backend.agent.grpc.generated.Outlet/get_child_list_for_node",
+      path: "/outlet.backend.agent.grpc.generated.Outlet/get_child_list_for_spid",
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makeget_child_list_for_nodeInterceptors() ?? []
+      interceptors: self.interceptors?.makeget_child_list_for_spidInterceptors() ?? []
     )
   }
 
@@ -316,42 +321,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeget_ancestor_list_for_spidInterceptors() ?? []
-    )
-  }
-
-  /// Unary call to get_filter
-  ///
-  /// - Parameters:
-  ///   - request: Request to send to get_filter.
-  ///   - callOptions: Call options.
-  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func get_filter(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response> {
-    return self.makeUnaryCall(
-      path: "/outlet.backend.agent.grpc.generated.Outlet/get_filter",
-      request: request,
-      callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
-    )
-  }
-
-  /// Unary call to update_filter
-  ///
-  /// - Parameters:
-  ///   - request: Request to send to update_filter.
-  ///   - callOptions: Call options.
-  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func update_filter(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response> {
-    return self.makeUnaryCall(
-      path: "/outlet.backend.agent.grpc.generated.Outlet/update_filter",
-      request: request,
-      callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
     )
   }
 
@@ -406,6 +375,42 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeremove_expanded_rowInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to get_filter
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_filter.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_filter(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.agent.grpc.generated.Outlet/get_filter",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to update_filter
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to update_filter.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func update_filter(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.agent.grpc.generated.Outlet/update_filter",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
     )
   }
 
@@ -532,6 +537,24 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
       interceptors: self.interceptors?.makeget_uid_for_local_pathInterceptors() ?? []
+    )
+  }
+
+  /// Unary call to get_sn_for
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_sn_for.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_sn_for(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.agent.grpc.generated.Outlet/get_sn_for",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_sn_forInterceptors() ?? []
     )
   }
 
@@ -682,17 +705,11 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
   /// - Returns: Interceptors to use when invoking 'get_device_list'.
   func makeget_device_listInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request, Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response>]
 
-  /// - Returns: Interceptors to use when invoking 'get_child_list_for_node'.
-  func makeget_child_list_for_nodeInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>]
+  /// - Returns: Interceptors to use when invoking 'get_child_list_for_spid'.
+  func makeget_child_list_for_spidInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>]
 
   /// - Returns: Interceptors to use when invoking 'get_ancestor_list_for_spid'.
   func makeget_ancestor_list_for_spidInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response>]
-
-  /// - Returns: Interceptors to use when invoking 'get_filter'.
-  func makeget_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>]
-
-  /// - Returns: Interceptors to use when invoking 'update_filter'.
-  func makeupdate_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
 
   /// - Returns: Interceptors to use when invoking 'get_rows_of_interest'.
   func makeget_rows_of_interestInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request, Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response>]
@@ -702,6 +719,12 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
 
   /// - Returns: Interceptors to use when invoking 'remove_expanded_row'.
   func makeremove_expanded_rowInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response>]
+
+  /// - Returns: Interceptors to use when invoking 'get_filter'.
+  func makeget_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>]
+
+  /// - Returns: Interceptors to use when invoking 'update_filter'.
+  func makeupdate_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
 
   /// - Returns: Interceptors to use when invoking 'request_display_tree'.
   func makerequest_display_treeInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>]
@@ -723,6 +746,9 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
 
   /// - Returns: Interceptors to use when invoking 'get_uid_for_local_path'.
   func makeget_uid_for_local_pathInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request, Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response>]
+
+  /// - Returns: Interceptors to use when invoking 'get_sn_for'.
+  func makeget_sn_forInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response>]
 
   /// - Returns: Interceptors to use when invoking 'start_diff_trees'.
   func makestart_diff_treesInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request, Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response>]
@@ -772,10 +798,12 @@ public final class Outlet_Backend_Agent_Grpc_Generated_OutletClient: Outlet_Back
 public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerProvider {
   var interceptors: Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFactoryProtocol? { get }
 
+  /// Signal
   func subscribe_to_signals(request: Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request, context: StreamingResponseCallContext<Outlet_Backend_Agent_Grpc_Generated_SignalMsg>) -> EventLoopFuture<GRPCStatus>
 
   func send_signal(request: Outlet_Backend_Agent_Grpc_Generated_SignalMsg, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse>
 
+  /// Config
   func get_config(request: Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response>
 
   func put_config(request: Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response>
@@ -784,19 +812,20 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerP
 
   func get_device_list(request: Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response>
 
-  func get_child_list_for_node(request: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>
+  /// TreeView
+  func get_child_list_for_spid(request: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>
 
   func get_ancestor_list_for_spid(request: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response>
-
-  func get_filter(request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>
-
-  func update_filter(request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
 
   func get_rows_of_interest(request: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response>
 
   func set_selected_row_set(request: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response>
 
   func remove_expanded_row(request: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response>
+
+  func get_filter(request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>
+
+  func update_filter(request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
 
   func request_display_tree(request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -811,6 +840,8 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerP
   func get_node_for_uid(request: Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response>
 
   func get_uid_for_local_path(request: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response>
+
+  func get_sn_for(request: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response>
 
   func start_diff_trees(request: Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response>
 
@@ -897,13 +928,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
         }
       }
 
-    case "get_child_list_for_node":
+    case "get_child_list_for_spid":
       return CallHandlerFactory.makeUnary(
         callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_child_list_for_nodeInterceptors() ?? []
+        interceptors: self.interceptors?.makeget_child_list_for_spidInterceptors() ?? []
       ) { context in
         return { request in
-          self.get_child_list_for_node(request: request, context: context)
+          self.get_child_list_for_spid(request: request, context: context)
         }
       }
 
@@ -914,26 +945,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.get_ancestor_list_for_spid(request: request, context: context)
-        }
-      }
-
-    case "get_filter":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_filter(request: request, context: context)
-        }
-      }
-
-    case "update_filter":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.update_filter(request: request, context: context)
         }
       }
 
@@ -964,6 +975,26 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.remove_expanded_row(request: request, context: context)
+        }
+      }
+
+    case "get_filter":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.get_filter(request: request, context: context)
+        }
+      }
+
+    case "update_filter":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.update_filter(request: request, context: context)
         }
       }
 
@@ -1034,6 +1065,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
       ) { context in
         return { request in
           self.get_uid_for_local_path(request: request, context: context)
+        }
+      }
+
+    case "get_sn_for":
+      return CallHandlerFactory.makeUnary(
+        callHandlerContext: callHandlerContext,
+        interceptors: self.interceptors?.makeget_sn_forInterceptors() ?? []
+      ) { context in
+        return { request in
+          self.get_sn_for(request: request, context: context)
         }
       }
 
@@ -1139,21 +1180,13 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeget_device_listInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request, Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response>]
 
-  /// - Returns: Interceptors to use when handling 'get_child_list_for_node'.
+  /// - Returns: Interceptors to use when handling 'get_child_list_for_spid'.
   ///   Defaults to calling `self.makeInterceptors()`.
-  func makeget_child_list_for_nodeInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>]
+  func makeget_child_list_for_spidInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>]
 
   /// - Returns: Interceptors to use when handling 'get_ancestor_list_for_spid'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeget_ancestor_list_for_spidInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request, Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response>]
-
-  /// - Returns: Interceptors to use when handling 'get_filter'.
-  ///   Defaults to calling `self.makeInterceptors()`.
-  func makeget_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>]
-
-  /// - Returns: Interceptors to use when handling 'update_filter'.
-  ///   Defaults to calling `self.makeInterceptors()`.
-  func makeupdate_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
 
   /// - Returns: Interceptors to use when handling 'get_rows_of_interest'.
   ///   Defaults to calling `self.makeInterceptors()`.
@@ -1166,6 +1199,14 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   /// - Returns: Interceptors to use when handling 'remove_expanded_row'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeremove_expanded_rowInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_filter'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>]
+
+  /// - Returns: Interceptors to use when handling 'update_filter'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeupdate_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree'.
   ///   Defaults to calling `self.makeInterceptors()`.
@@ -1194,6 +1235,10 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   /// - Returns: Interceptors to use when handling 'get_uid_for_local_path'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeget_uid_for_local_pathInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request, Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_sn_for'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_sn_forInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response>]
 
   /// - Returns: Interceptors to use when handling 'start_diff_trees'.
   ///   Defaults to calling `self.makeInterceptors()`.

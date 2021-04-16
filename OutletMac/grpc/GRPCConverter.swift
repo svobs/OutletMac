@@ -40,7 +40,7 @@ class GRPCConverter {
     }
 
     // NodeIdentifier fields:
-    grpc.uid = nodeIdentifier.uid
+    grpc.uid = nodeIdentifier.nodeUID
     grpc.deviceUid = nodeIdentifier.deviceUID
     grpc.pathList = nodeIdentifier.pathList
 
@@ -141,7 +141,7 @@ class GRPCConverter {
       // this can indicate that the entire node doesn't exist or is invalid
       throw OutletError.invalidState("GRPC node's deviceUID is invalid!")
     }
-    let nodeIdentifier: NodeIdentifier = try self.backend.nodeIdentifierFactory.forValues(nodeGRPC.uid, deviceUID: nodeGRPC.deviceUid, nodeGRPC.pathList, mustBeSinglePath: false)
+    let nodeIdentifier: NodeIdentifier = try self.backend.nodeIdentifierFactory.forValues(nodeGRPC.uid, deviceUID: nodeGRPC.deviceUid, nodeGRPC.pathList, pathUID: NULL_UID)
 
     var node: Node
 
@@ -277,15 +277,17 @@ class GRPCConverter {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func nodeIdentifierFromGRPC(_ spidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    return try self.backend.nodeIdentifierFactory.forValues(spidGRPC.uid, deviceUID: spidGRPC.deviceUid, spidGRPC.pathList, mustBeSinglePath: spidGRPC.isSinglePath)
+    return try self.backend.nodeIdentifierFactory.forValues(spidGRPC.uid, deviceUID: spidGRPC.deviceUid, spidGRPC.pathList, pathUID: spidGRPC.pathUid)
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
     var grpc = Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()
-    grpc.uid = nodeIdentifier.uid
+    grpc.uid = nodeIdentifier.nodeUID
     grpc.deviceUid = nodeIdentifier.deviceUID
     grpc.pathList = nodeIdentifier.pathList
-    grpc.isSinglePath = nodeIdentifier.isSPID()
+    if let spid = nodeIdentifier as? SPID {
+      grpc.pathUid = spid.pathUID
+    }
     return grpc
   }
 
@@ -315,6 +317,14 @@ class GRPCConverter {
       node = nil
     }
     return SPIDNodePair(spid: spid, node: node)
+  }
+
+  func snListFromGRPC(_ snGRPCList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair]) throws -> [SPIDNodePair] {
+    var snList: [SPIDNodePair] = []
+    for snGRPC in snGRPCList {
+      snList.append(try self.snFromGRPC(snGRPC))
+    }
+    return snList
   }
 
   // FilterCriteria

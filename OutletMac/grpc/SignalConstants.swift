@@ -63,6 +63,9 @@ enum Signal: UInt32 {
   /** This is fired by the UI when it has finished populating the UI tree */
   case POPULATE_UI_TREE_DONE = 54
 
+  /** A Device was added or updated (includes the relevant Device in the msg) */
+  case DEVICE_UPSERTED = 55
+
   case DRAG_AND_DROP = 60
   case DRAG_AND_DROP_DIRECT = 61
 

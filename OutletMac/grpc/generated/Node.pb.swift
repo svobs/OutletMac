@@ -144,7 +144,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
 
   public var pathList: [String] = []
 
-  public var isSinglePath: Bool = false
+  /// If nonzero, is single path
+  public var pathUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -747,7 +748,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     1: .same(proto: "uid"),
     2: .standard(proto: "device_uid"),
     3: .standard(proto: "path_list"),
-    4: .standard(proto: "is_single_path"),
+    4: .standard(proto: "path_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -759,7 +760,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
       case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
-      case 4: try { try decoder.decodeSingularBoolField(value: &self.isSinglePath) }()
+      case 4: try { try decoder.decodeSingularUInt32Field(value: &self.pathUid) }()
       default: break
       }
     }
@@ -775,8 +776,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     if !self.pathList.isEmpty {
       try visitor.visitRepeatedStringField(value: self.pathList, fieldNumber: 3)
     }
-    if self.isSinglePath != false {
-      try visitor.visitSingularBoolField(value: self.isSinglePath, fieldNumber: 4)
+    if self.pathUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.pathUid, fieldNumber: 4)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -785,7 +786,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     if lhs.uid != rhs.uid {return false}
     if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.pathList != rhs.pathList {return false}
-    if lhs.isSinglePath != rhs.isSinglePath {return false}
+    if lhs.pathUid != rhs.pathUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

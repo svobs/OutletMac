@@ -21,32 +21,33 @@ protocol OutletBackend: HasLifecycle {
   func getNodeForUID(uid: UID, deviceUID: UID?) throws -> Node?
   func nextUID() throws -> UID
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID?
-  func startSubtreeLoad(treeID: String) throws
+  func getSNFor(nodeUID: UID, deviceUID: UID, fullPath: String) throws -> SPIDNodePair?
+  func startSubtreeLoad(treeID: TreeID) throws
   func getOpExecutionPlayState() throws -> Bool
   func getDeviceList() throws -> [Device]
-  func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node]
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node]
-  func getRowsOfInterest(treeID: String) throws -> RowsOfInterest
-  func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws
-  func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws
+  func getChildList(parentSPID: SPID, treeID: TreeID?, maxResults: UInt32?) throws -> [SPIDNodePair]
+  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair]
+  func getRowsOfInterest(treeID: TreeID) throws -> RowsOfInterest
+  func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws
+  func removeExpandedRow(_ rowUID: GUID, _ treeID: TreeID) throws
   
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree?
-  func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree?
-  func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String, deviceUID: UID) throws -> DisplayTree?
-  func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
+  func createDisplayTreeFromConfig(treeID: TreeID, isStartup: Bool) throws -> DisplayTree?
+  func createDisplayTreeFromSPID(treeID: TreeID, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
+  func createDisplayTreeFromUserPath(treeID: TreeID, userPath: String, deviceUID: UID) throws -> DisplayTree?
+  func createExistingDisplayTree(treeID: TreeID, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree?
   
-  func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws
+  func dropDraggedNodes(srcTreeID: TreeID, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: TreeID, dstSN: SPIDNodePair) throws
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws
-  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws
+  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
+  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws
   func getLastPendingOp(nodeUID: UID) throws -> UserOp?
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
   func deleteSubtree(nodeUIDList: [UID]) throws
-  func getFilterCriteria(treeID: String) throws -> FilterCriteria
-  func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws
+  func getFilterCriteria(treeID: TreeID) throws -> FilterCriteria
+  func updateFilterCriteria(treeID: TreeID, filterCriteria: FilterCriteria) throws
 }
 
 /**
@@ -124,7 +125,11 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func startSubtreeLoad(treeID: String) throws {
+  func getSNFor(nodeUID: UID, deviceUID: UID, fullPath: String) throws -> SPIDNodePair? {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func startSubtreeLoad(treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -136,23 +141,23 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getChildList(parentUID: UID, treeID: String?, maxResults: UInt32?) throws -> [Node] {
+  func getChildList(parentSPID: SPID, treeID: TreeID?, maxResults: UInt32?) throws -> [SPIDNodePair] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [Node] {
+  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getRowsOfInterest(treeID: String) throws -> RowsOfInterest {
+  func getRowsOfInterest(treeID: TreeID) throws -> RowsOfInterest {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func setSelectedRowSet(_ selected: Set<UID>, _ treeID: String) throws {
+  func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func removeExpandedRow(_ rowUID: UID, _ treeID: String) throws {
+  func removeExpandedRow(_ rowUID: GUID, _ treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -160,19 +165,19 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createDisplayTreeFromConfig(treeID: String, isStartup: Bool) throws -> DisplayTree? {
+  func createDisplayTreeFromConfig(treeID: TreeID, isStartup: Bool) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createDisplayTreeFromSPID(treeID: String, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
+  func createDisplayTreeFromSPID(treeID: TreeID, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createDisplayTreeFromUserPath(treeID: String, userPath: String, deviceUID: UID) throws -> DisplayTree? {
+  func createDisplayTreeFromUserPath(treeID: TreeID, userPath: String, deviceUID: UID) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func createExistingDisplayTree(treeID: String, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
+  func createExistingDisplayTree(treeID: TreeID, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -180,7 +185,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func dropDraggedNodes(srcTreeID: String, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: String, dstSN: SPIDNodePair) throws {
+  func dropDraggedNodes(srcTreeID: TreeID, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: TreeID, dstSN: SPIDNodePair) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -192,11 +197,11 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: String) throws {
+  func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: String) throws {
+  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -212,11 +217,11 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getFilterCriteria(treeID: String) throws -> FilterCriteria {
+  func getFilterCriteria(treeID: TreeID) throws -> FilterCriteria {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func updateFilterCriteria(treeID: String, filterCriteria: FilterCriteria) throws {
+  func updateFilterCriteria(treeID: TreeID, filterCriteria: FilterCriteria) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

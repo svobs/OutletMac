@@ -252,7 +252,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var selectedRowUidSet: [UInt32] = []
+  public var selectedRowGuidSet: [String] = []
 
   public var treeID: String = String()
 
@@ -277,7 +277,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeUid: UInt32 = 0
+  public var rowGuid: String = String()
 
   public var treeID: String = String()
 
@@ -314,9 +314,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var expandedRowUidSet: [UInt32] = []
+  public var expandedRowGuidSet: [String] = []
 
-  public var selectedRowUidSet: [UInt32] = []
+  public var selectedRowGuidSet: [String] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -696,6 +696,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .statsUpdate(newValue)}
   }
 
+  public var device: Outlet_Backend_Agent_Grpc_Generated_Device {
+    get {
+      if case .device(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_Device()
+    }
+    set {signalData = .device(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -709,6 +717,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
+    case device(Outlet_Backend_Agent_Grpc_Generated_Device)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -754,6 +763,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
       }()
       case (.statsUpdate, .statsUpdate): return {
         guard case .statsUpdate(let l) = lhs, case .statsUpdate(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.device, .device): return {
+        guard case .device(let l) = lhs, case .device(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -805,7 +818,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var parentUid: UInt32 = 0
+  public var parentSpid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _parentSpid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
+    set {_parentSpid = newValue}
+  }
+  /// Returns true if `parentSpid` has been explicitly set.
+  public var hasParentSpid: Bool {return self._parentSpid != nil}
+  /// Clears the value of `parentSpid`. Subsequent reads from it will return its default value.
+  public mutating func clearParentSpid() {self._parentSpid = nil}
 
   public var treeID: String = String()
 
@@ -815,6 +835,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+
+  fileprivate var _parentSpid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response {
@@ -822,7 +844,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
+  public var childList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
 
   /// if max_results exceeded, node_list is empty and this indicates result count
   public var resultExceededCount: UInt32 = 0
@@ -860,7 +882,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var nodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
+  public var ancestorList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1034,6 +1056,43 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response {
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var nodeUid: UInt32 = 0
+
+  public var deviceUid: UInt32 = 0
+
+  public var fullPath: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var sn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
+    get {return _sn ?? Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()}
+    set {_sn = newValue}
+  }
+  /// Returns true if `sn` has been explicitly set.
+  public var hasSn: Bool {return self._sn != nil}
+  /// Clears the value of `sn`. Subsequent reads from it will return its default value.
+  public mutating func clearSn() {self._sn = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _sn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request {
@@ -1577,7 +1636,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response: SwiftProtob
 extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SetSelectedRowSet_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "selected_row_uid_set"),
+    1: .standard(proto: "selected_row_guid_set"),
     2: .standard(proto: "tree_id"),
   ]
 
@@ -1587,7 +1646,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request: SwiftPr
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.selectedRowUidSet) }()
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.selectedRowGuidSet) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
       default: break
       }
@@ -1595,8 +1654,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request: SwiftPr
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.selectedRowUidSet.isEmpty {
-      try visitor.visitPackedUInt32Field(value: self.selectedRowUidSet, fieldNumber: 1)
+    if !self.selectedRowGuidSet.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.selectedRowGuidSet, fieldNumber: 1)
     }
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
@@ -1605,7 +1664,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request: SwiftPr
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request) -> Bool {
-    if lhs.selectedRowUidSet != rhs.selectedRowUidSet {return false}
+    if lhs.selectedRowGuidSet != rhs.selectedRowGuidSet {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1634,7 +1693,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response: SwiftP
 extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".RemoveExpandedRow_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_uid"),
+    1: .standard(proto: "row_guid"),
     2: .standard(proto: "tree_id"),
   ]
 
@@ -1644,7 +1703,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request: SwiftPr
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self.rowGuid) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
       default: break
       }
@@ -1652,8 +1711,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request: SwiftPr
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.nodeUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
+    if !self.rowGuid.isEmpty {
+      try visitor.visitSingularStringField(value: self.rowGuid, fieldNumber: 1)
     }
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
@@ -1662,7 +1721,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request: SwiftPr
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request) -> Bool {
-    if lhs.nodeUid != rhs.nodeUid {return false}
+    if lhs.rowGuid != rhs.rowGuid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -1723,8 +1782,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request: SwiftPr
 extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetRowsOfInterest_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "expanded_row_uid_set"),
-    2: .standard(proto: "selected_row_uid_set"),
+    1: .standard(proto: "expanded_row_guid_set"),
+    2: .standard(proto: "selected_row_guid_set"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1733,26 +1792,26 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response: SwiftP
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.expandedRowUidSet) }()
-      case 2: try { try decoder.decodeRepeatedUInt32Field(value: &self.selectedRowUidSet) }()
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.expandedRowGuidSet) }()
+      case 2: try { try decoder.decodeRepeatedStringField(value: &self.selectedRowGuidSet) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.expandedRowUidSet.isEmpty {
-      try visitor.visitPackedUInt32Field(value: self.expandedRowUidSet, fieldNumber: 1)
+    if !self.expandedRowGuidSet.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.expandedRowGuidSet, fieldNumber: 1)
     }
-    if !self.selectedRowUidSet.isEmpty {
-      try visitor.visitPackedUInt32Field(value: self.selectedRowUidSet, fieldNumber: 2)
+    if !self.selectedRowGuidSet.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.selectedRowGuidSet, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response) -> Bool {
-    if lhs.expandedRowUidSet != rhs.expandedRowUidSet {return false}
-    if lhs.selectedRowUidSet != rhs.selectedRowUidSet {return false}
+    if lhs.expandedRowGuidSet != rhs.expandedRowGuidSet {return false}
+    if lhs.selectedRowGuidSet != rhs.selectedRowGuidSet {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -2400,6 +2459,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     17: .standard(proto: "status_msg"),
     18: .standard(proto: "download_msg"),
     19: .standard(proto: "stats_update"),
+    20: .same(proto: "device"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2500,6 +2560,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .statsUpdate(v)}
       }()
+      case 20: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_Device?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .device(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .device(v)}
+      }()
       default: break
       }
     }
@@ -2555,6 +2624,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     case .statsUpdate?: try {
       guard case .statsUpdate(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 19)
+    }()
+    case .device?: try {
+      guard case .device(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
     }()
     case nil: break
     }
@@ -2656,7 +2729,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse: SwiftProtobuf.
 extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "parent_uid"),
+    1: .standard(proto: "parent_spid"),
     2: .standard(proto: "tree_id"),
     3: .standard(proto: "max_results"),
   ]
@@ -2667,7 +2740,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._parentSpid) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
       case 3: try { try decoder.decodeSingularUInt32Field(value: &self.maxResults) }()
       default: break
@@ -2676,8 +2749,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.parentUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 1)
+    if let v = self._parentSpid {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     }
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
@@ -2689,7 +2762,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request) -> Bool {
-    if lhs.parentUid != rhs.parentUid {return false}
+    if lhs._parentSpid != rhs._parentSpid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.maxResults != rhs.maxResults {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -2700,7 +2773,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
 extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetChildList_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_list"),
+    1: .standard(proto: "child_list"),
     2: .standard(proto: "result_exceeded_count"),
   ]
 
@@ -2710,7 +2783,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response: SwiftProtob
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.nodeList) }()
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.childList) }()
       case 2: try { try decoder.decodeSingularUInt32Field(value: &self.resultExceededCount) }()
       default: break
       }
@@ -2718,8 +2791,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response: SwiftProtob
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.nodeList.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.nodeList, fieldNumber: 1)
+    if !self.childList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.childList, fieldNumber: 1)
     }
     if self.resultExceededCount != 0 {
       try visitor.visitSingularUInt32Field(value: self.resultExceededCount, fieldNumber: 2)
@@ -2728,7 +2801,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response: SwiftProtob
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response) -> Bool {
-    if lhs.nodeList != rhs.nodeList {return false}
+    if lhs.childList != rhs.childList {return false}
     if lhs.resultExceededCount != rhs.resultExceededCount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -2776,7 +2849,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request: SwiftProt
 extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetAncestorList_Response"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_list"),
+    1: .standard(proto: "ancestor_list"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2785,21 +2858,21 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response: SwiftPro
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.nodeList) }()
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.ancestorList) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.nodeList.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.nodeList, fieldNumber: 1)
+    if !self.ancestorList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.ancestorList, fieldNumber: 1)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response) -> Bool {
-    if lhs.nodeList != rhs.nodeList {return false}
+    if lhs.ancestorList != rhs.ancestorList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -3153,6 +3226,82 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response: Swift
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response) -> Bool {
     if lhs.uid != rhs.uid {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetSnFor_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "node_uid"),
+    2: .standard(proto: "device_uid"),
+    3: .standard(proto: "full_path"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.fullPath) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.nodeUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
+    }
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 2)
+    }
+    if !self.fullPath.isEmpty {
+      try visitor.visitSingularStringField(value: self.fullPath, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request) -> Bool {
+    if lhs.nodeUid != rhs.nodeUid {return false}
+    if lhs.deviceUid != rhs.deviceUid {return false}
+    if lhs.fullPath != rhs.fullPath {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetSnFor_Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "sn"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._sn) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if let v = self._sn {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response) -> Bool {
+    if lhs._sn != rhs._sn {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

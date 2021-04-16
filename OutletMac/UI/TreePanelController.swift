@@ -221,7 +221,7 @@ class TreePanelController: TreePanelControllable {
 
   private func clearModelAndTreeView() {
     // Clear display store & treeview (which draws from display store)
-    self.displayStore.repopulateRoot([])
+    self.displayStore.putRootChildList([])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadData()
     }
@@ -251,11 +251,10 @@ class TreePanelController: TreePanelControllable {
     var queue = LinkedList<SPIDNodePair>()
 
     do {
-      let topLevelNodeList: [Node] = try self.tree.getChildListForRoot()
-      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelNodeList.count) top-level nodes for root")
+      let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
+      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root")
 
-      let topLevelSNList: [SPIDNodePair] = try self.displayStore.convertChildList(self.tree.rootSN, topLevelNodeList)
-      self.displayStore.repopulateRoot(topLevelSNList)
+      self.displayStore.putRootChildList(topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue workitems, sometimes nothing shows up.
@@ -273,14 +272,14 @@ class TreePanelController: TreePanelControllable {
 
       let sn = queue.popFirst()!
       let node = sn.node!
-      if node.isDir && rows.expanded.contains(node.uid) {
-        toExpandInOrder.append(self.displayStore.guidFor(sn))
+      if node.isDir && rows.expanded.contains(sn.spid.guid) {
+        // only expand rows which are actually present:
+        toExpandInOrder.append(sn.spid.guid)
         do {
-          let childNodeList: [Node] = try self.tree.getChildList(node)
-          NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childNodeList.count) child nodes for parent \(node.uid)")
+          let childSNList: [SPIDNodePair] = try self.tree.getChildList(sn.spid)
+          NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) child nodes for parent \(sn.spid)")
 
-          let childSNList: [SPIDNodePair] = try self.displayStore.convertChildList(sn, childNodeList)
-          self.displayStore.populateChildList(sn, childSNList)
+          self.displayStore.putChildList(sn, childSNList)
           queue.append(contentsOf: childSNList)
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
@@ -291,28 +290,9 @@ class TreePanelController: TreePanelControllable {
     }
 
     DispatchQueue.main.async {
-      self.restoreExpandedRows(toExpandInOrder)
+      self.restoreRowExpansionState(toExpandInOrder)
 
-      // FIXME: UID->GUID doesn't map!
-
-
-
-
-
-      if rows.selected.count > 0 {
-        var indexSet = IndexSet()
-        for uid in rows.selected {
-          let index = self.treeView!.outlineView.row(forItem: uid)
-          if index >= 0 {
-            indexSet.insert(index)
-          } else {
-            NSLog("DEBUG [\(self.treeID)] populateTreeView(): could not select row because it was not found: \(uid)")
-          }
-        }
-
-        NSLog("DEBUG [\(self.treeID)] populateTreeView(): selecting \(indexSet.count) rows")
-        self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
-      }
+      self.restoreRowSelectionState(rows.selected)
 
       // remember to kick this off inside the main dispatch queue
       NSLog("DEBUG [\(self.treeID)] Rescheduling stats refresh timer")
@@ -323,21 +303,37 @@ class TreePanelController: TreePanelControllable {
   }
 
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
-    let parentGUID = self.displayStore.guidFor(parentSN)
-    do {
-      let ephemeralChildSN = try self.displayStore.convertSingleNode(parentSN, node: EmptyNode(nodeName))
-      self.displayStore.populateChildList(parentSN, [ephemeralChildSN])
-    } catch {
-      NSLog("ERROR [\(self.treeID)] Failed to append ephemeral node: \(error)")
-      return
-    }
+    let parentGUID = parentSN?.spid.guid
+    let ephemeralNode = EphemeralNode(nodeName, parent: parentSN?.spid ?? nil)
+    let ephemeralSN = (ephemeralNode.nodeIdentifier as! SPID, ephemeralNode)
+    self.displayStore.putChildList(parentSN, [ephemeralSN])
+    
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
       NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")
     }
   }
 
-  private func restoreExpandedRows(_ toExpandInOrder: [GUID]) {
+  private func restoreRowSelectionState(_ selected: Set<GUID>) {
+    guard selected.count > 0 else {
+      return
+    }
+
+    var indexSet = IndexSet()
+    for guid in selected {
+      let index = self.treeView!.outlineView.row(forItem: guid)
+      if index >= 0 {
+        indexSet.insert(index)
+      } else {
+        NSLog("DEBUG [\(self.treeID)] restoreRowSelectionState(): could not select row because it was not found: \(guid)")
+      }
+    }
+
+    NSLog("DEBUG [\(self.treeID)] restoreRowSelectionState(): selecting \(indexSet.count) rows")
+    self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+  }
+
+  private func restoreRowExpansionState(_ toExpandInOrder: [GUID]) {
     self.treeView!.outlineView.beginUpdates()
     defer {
       self.treeView!.outlineView.endUpdates()
@@ -491,7 +487,7 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
-        try self.backend.enqueueRefreshSubtreeStatsTask(rootUID: self.tree.rootSPID.uid, treeID: self.treeID)
+        try self.backend.enqueueRefreshSubtreeStatsTask(rootUID: self.tree.rootSPID.nodeUID, treeID: self.treeID)
       } catch {
         reportException("Request to refresh stats failed", error)
       }

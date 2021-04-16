@@ -19,8 +19,6 @@ protocol OutletApp: HasLifecycle {
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
 
-  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID
-
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 
   func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
@@ -46,9 +44,6 @@ class MockApp: OutletApp {
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
   }
   func execSync(_ workItem: @escaping NoArgVoidFunc) {
-  }
-  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
-    return 0
   }
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
@@ -108,7 +103,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let taskRunner: TaskRunner = TaskRunner()
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
-  private let guidMapper = GUIDMapper()
   private var treeControllerDict: [String: TreePanelControllable] = [:]
   private let treeControllerLock = NSLock()
 
@@ -295,10 +289,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   public func execSync(_ workItem: @escaping NoArgVoidFunc) {
     self.taskRunner.execSync(workItem)
-  }
-
-  func guidFor(_ treeType: TreeType, singlePath: String, uid: UID) -> GUID {
-    return self.guidMapper.guidFor(treeType, singlePath: singlePath, uid: uid)
   }
 
   // SignalDispatcher callbacks

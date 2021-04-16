@@ -7,8 +7,6 @@
 
 import Foundation
 
-typealias TreeID = String
-
 /**
  CLASS DisplayTree
  */
@@ -81,20 +79,20 @@ class DisplayTree {
     }
   }
 
-  func getChildListForRoot() throws -> [Node] {
-    let rootNode = self.rootNode
-    if rootNode == nil {
+  func getChildListForRoot() throws -> [SPIDNodePair] {
+    let rootSN = self.rootSN
+    if rootSN.node == nil {
       NSLog("DEBUG [\(treeID)] Root does not exist; returning empty child list")
       return []
     } else {
-      NSLog("DEBUG [\(treeID)] Getting child list for root: \(rootNode!.uid)")
-      return try self.getChildList(rootNode!)
+      NSLog("DEBUG [\(treeID)] Getting child list for root: \(rootSN.spid)")
+      return try self.getChildList(rootSN.spid)
     }
   }
 
-  func getChildList(_ parentNode: Node) throws -> [Node] {
-    let result = try self.backend.getChildList(parentUID: parentNode.uid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
-    NSLog("DEBUG [\(treeID)] Got \(result.count) children for parent \(parentNode.uid)")
+  func getChildList(_ parentSPID: SPID) throws -> [SPIDNodePair] {
+    let result = try self.backend.getChildList(parentSPID: parentSPID, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+    NSLog("DEBUG [\(treeID)] Got \(result.count) children for parent \(parentSPID.guid)")
     return result
   }
 }
@@ -110,10 +108,10 @@ class MockDisplayTree: DisplayTree {
  CLASS RowsOfInterest
  */
 class RowsOfInterest {
-  var expanded: Set<UID>
-  var selected: Set<UID>
+  var expanded: Set<GUID>
+  var selected: Set<GUID>
 
-  init(expanded: Set<UID> = Set(), selected: Set<UID> = Set()) {
+  init(expanded: Set<GUID> = Set(), selected: Set<GUID> = Set()) {
     self.expanded = expanded
     self.selected = selected
   }

@@ -217,6 +217,8 @@ let ZEROCONF_SERVICE_VERSION = "1.0.0"
 let ZEROCONF_SERVICE_TYPE = "_outlet._tcp.local."
 
 typealias UID = UInt32
+typealias GUID = String
+typealias TreeID = String
 
 /**
  ENUM TrashStatus
@@ -299,10 +301,11 @@ let NULL_UID: UID = TreeType.NA.rawValue
 let SUPER_ROOT_UID = TreeType.MIXED.rawValue
 let LOCAL_ROOT_UID = TreeType.LOCAL_DISK.rawValue
 let GDRIVE_ROOT_UID = TreeType.GDRIVE.rawValue
+let ROOT_PATH_UID = LOCAL_ROOT_UID
 
 let MIN_FREE_UID: UID = 100
 
-let NULL_GUID: Int32 = 0
+let NULL_GUID: String = ""
 
 
 let GDRIVE_FOLDER_MIME_TYPE_UID: UID = 1
