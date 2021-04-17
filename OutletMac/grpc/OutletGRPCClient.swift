@@ -100,7 +100,7 @@ class OutletGRPCClient: OutletBackend {
     NSLog("DEBUG Subscribing to server signals...")
     let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
-      NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
+//      NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
       self.grpcConnectionRestored()
       do {
         try self.relaySignalLocally(signalGRPC)

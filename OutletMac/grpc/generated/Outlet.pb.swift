@@ -570,7 +570,23 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: UInt32 = 0
+  public var key: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate.OneOf_Key? = nil
+
+  public var guid: String {
+    get {
+      if case .guid(let v)? = key {return v}
+      return String()
+    }
+    set {key = .guid(newValue)}
+  }
+
+  public var uid: UInt32 {
+    get {
+      if case .uid(let v)? = key {return v}
+      return 0
+    }
+    set {key = .uid(newValue)}
+  }
 
   public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
     get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
@@ -582,6 +598,30 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate {
   public mutating func clearDirMeta() {self._dirMeta = nil}
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public enum OneOf_Key: Equatable {
+    case guid(String)
+    case uid(UInt32)
+
+  #if !swift(>=4.1)
+    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate.OneOf_Key, rhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate.OneOf_Key) -> Bool {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch (lhs, rhs) {
+      case (.guid, .guid): return {
+        guard case .guid(let l) = lhs, case .guid(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.uid, .uid): return {
+        guard case .uid(let l) = lhs, case .uid(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      default: return false
+      }
+    }
+  #endif
+  }
 
   public init() {}
 
@@ -2371,8 +2411,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response: SwiftProtobuf.M
 extension Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DirMetaUpdate"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "uid"),
-    2: .standard(proto: "dir_meta"),
+    1: .same(proto: "guid"),
+    2: .same(proto: "uid"),
+    3: .standard(proto: "dir_meta"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2381,25 +2422,47 @@ extension Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate: SwiftProtobuf.Messa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
+      case 1: try {
+        if self.key != nil {try decoder.handleConflictingOneOf()}
+        var v: String?
+        try decoder.decodeSingularStringField(value: &v)
+        if let v = v {self.key = .guid(v)}
+      }()
+      case 2: try {
+        if self.key != nil {try decoder.handleConflictingOneOf()}
+        var v: UInt32?
+        try decoder.decodeSingularUInt32Field(value: &v)
+        if let v = v {self.key = .uid(v)}
+      }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.uid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every case branch when no optimizations are
+    // enabled. https://github.com/apple/swift-protobuf/issues/1034
+    switch self.key {
+    case .guid?: try {
+      guard case .guid(let v)? = self.key else { preconditionFailure() }
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    }()
+    case .uid?: try {
+      guard case .uid(let v)? = self.key else { preconditionFailure() }
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 2)
+    }()
+    case nil: break
     }
     if let v = self._dirMeta {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate, rhs: Outlet_Backend_Agent_Grpc_Generated_DirMetaUpdate) -> Bool {
-    if lhs.uid != rhs.uid {return false}
+    if lhs.key != rhs.key {return false}
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

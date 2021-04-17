@@ -307,7 +307,7 @@ class TreePanelController: TreePanelControllable {
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSN?.spid ?? nil)
     let ephemeralSN = (ephemeralNode.nodeIdentifier as! SPID, ephemeralNode)
     self.displayStore.putChildList(parentSN, [ephemeralSN])
-    
+
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
       NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")

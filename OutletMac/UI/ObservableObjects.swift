@@ -149,6 +149,16 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
     }
   }
 
+  func isFlatList() -> Bool {
+    let hasCriteria = self.hasCriteria()
+    let notShowAncestors = !self.showAncestors
+    return hasCriteria && notShowAncestors
+  }
+
+  func hasCriteria() -> Bool {
+    return searchQuery != "" || isTrashed != .NOT_SPECIFIED || isShared != .NOT_SPECIFIED
+  }
+
   init(onChangeCallback: FilterStateCallback? = nil, searchQuery: String, isMatchCase: Bool, isTrashed: Ternary, isShared: Ternary, showAncestors: Bool) {
     self.onChangeCallback = onChangeCallback
     self.searchQuery = searchQuery

@@ -286,7 +286,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
    Tell whether the row is expandable
    */
   func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-    return displayStore.getChildList(itemToGUID(item)).count > 0
+    // TODO: in the future, we'll want to download the contents of each child directory so that we
+    // can tell whether it is expandable (or at least download a flag saying it has at least 1 child)
+
+    return displayStore.isDir(itemToGUID(item)) && !self.con.swiftFilterState.isFlatList()
   }
 
   /**
@@ -486,7 +489,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     self.con.dispatcher.sendSignal(signal: .TREE_SELECTION_CHANGED, senderID: self.con.treeID, ["sn_list": snList])
   }
 
-  // TODO: DEPRECATE THIS
   func getSelectedUIDs() -> Set<UID> {
     var uidSet = Set<UID>()
     for selectedRow in outlineView.selectedRowIndexes {
@@ -598,11 +600,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      once in the same UI tree.
      However, the BE currently has no idea what a GUID is.
      This is expected to be a minor issue but let's fix it in the future by adding BE support.
-    */
-
-    /*
-     FIXME: need to remove all children from the list of epxanded rows. Otherwise we'll end up restoring the expanded
-     state of any nested directories when we expand again. Some may consider this a feature
     */
 
     do {
