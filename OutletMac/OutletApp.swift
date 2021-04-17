@@ -135,6 +135,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
       try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
       try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
+      try dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -318,6 +319,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
     NSLog("DEBUG [\(senderID)] Deregistering tree controller in frontend")
     self.treeControllerDict.removeValue(forKey: senderID)
+  }
+
+  private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
+    try self.shutdown()
   }
 
   // Etc

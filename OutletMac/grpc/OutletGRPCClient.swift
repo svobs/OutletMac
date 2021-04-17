@@ -88,6 +88,23 @@ class OutletGRPCClient: OutletBackend {
         argDict["filename"] = signalGRPC.downloadMsg.filename
       case .REFRESH_SUBTREE_STATS_DONE:
         argDict["status_msg"] = signalGRPC.statsUpdate.statusMsg
+
+        if signalGRPC.statsUpdate.dirMetaList.count > 0 {
+          // TODO: this API could be improved by adding separate fields for UID-based vs GUID-based entries
+          if signalGRPC.statsUpdate.dirMetaList[0].uid > 0 {
+            var dirStatsDict: [UID:DirectoryStats] = [:]
+            for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaList {
+              dirStatsDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
+            }
+            argDict["dir_stats_dict_uid"] = dirStatsDict
+          } else {
+            var dirStatsDict: [GUID:DirectoryStats] = [:]
+            for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaList {
+              dirStatsDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
+            }
+            argDict["dir_stats_dict_guid"] = dirStatsDict
+          }
+        }
       default:
         break
     }
@@ -158,7 +175,7 @@ class OutletGRPCClient: OutletBackend {
     let response = try self.callAndTranslateErrors(self.stub.request_display_tree(grpcRequest), "requestDisplayTree")
     if (response.hasDisplayTreeUiState) {
       let state: DisplayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-      NSLog("DEBUG Got state: \(state)")
+      NSLog("DEBUG [\(request.treeID)] Got state: \(state)")
       return state.toDisplayTree(backend: self)
     } else {
       return nil
