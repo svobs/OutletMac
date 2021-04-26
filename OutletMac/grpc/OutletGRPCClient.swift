@@ -78,10 +78,7 @@ class OutletGRPCClient: OutletBackend {
         argDict["msg"] = signalGRPC.errorOccurred.msg
         argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
       case .NODE_UPSERTED, .NODE_REMOVED:
-        argDict["node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.node)
-      case .NODE_MOVED:
-        argDict["src_node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.srcNode)
-        argDict["dst_node"] = try self.grpcConverter.nodeFromGRPC(signalGRPC.srcDstNodeList.dstNode)
+        argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
       case .SET_STATUS:
         argDict["status_msg"] = signalGRPC.statusMsg.msg
       case .DOWNLOAD_FROM_GDRIVE_DONE:
@@ -159,7 +156,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
-    NSLog("DEBUG Requesting DisplayTree for params: \(request)")
+    NSLog("DEBUG [\(request.treeID)] Requesting DisplayTree for params: \(request)")
     var grpcRequest = Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeID

@@ -81,8 +81,8 @@ class DisplayTree {
 
   func getChildListForRoot() throws -> [SPIDNodePair] {
     let rootSN = self.rootSN
-    if rootSN.node == nil {
-      NSLog("DEBUG [\(treeID)] Root does not exist; returning empty child list")
+    if !self.state.rootExists {
+      NSLog("INFO [\(treeID)] Root does not exist; returning empty child list")
       return []
     } else {
       NSLog("DEBUG [\(treeID)] Getting child list for root: \(rootSN.spid)")

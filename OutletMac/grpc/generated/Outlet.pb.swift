@@ -696,20 +696,12 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .uiEnablement(newValue)}
   }
 
-  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
+  public var sn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
     get {
-      if case .node(let v)? = signalData {return v}
-      return Outlet_Backend_Agent_Grpc_Generated_Node()
+      if case .sn(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()
     }
-    set {signalData = .node(newValue)}
-  }
-
-  public var srcDstNodeList: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
-    get {
-      if case .srcDstNodeList(let v)? = signalData {return v}
-      return Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList()
-    }
-    set {signalData = .srcDstNodeList(newValue)}
+    set {signalData = .sn(newValue)}
   }
 
   public var statusMsg: Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
@@ -752,8 +744,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case displayTreeUiState(Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState)
     case playState(Outlet_Backend_Agent_Grpc_Generated_PlayState)
     case uiEnablement(Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement)
-    case node(Outlet_Backend_Agent_Grpc_Generated_Node)
-    case srcDstNodeList(Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList)
+    case sn(Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair)
     case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
@@ -785,12 +776,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
         guard case .uiEnablement(let l) = lhs, case .uiEnablement(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
-      case (.node, .node): return {
-        guard case .node(let l) = lhs, case .node(let r) = rhs else { preconditionFailure() }
-        return l == r
-      }()
-      case (.srcDstNodeList, .srcDstNodeList): return {
-        guard case .srcDstNodeList(let l) = lhs, case .srcDstNodeList(let r) = rhs else { preconditionFailure() }
+      case (.sn, .sn): return {
+        guard case .sn(let l) = lhs, case .sn(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       case (.statusMsg, .statusMsg): return {
@@ -2517,8 +2504,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     12: .standard(proto: "display_tree_ui_state"),
     13: .standard(proto: "play_state"),
     14: .standard(proto: "ui_enablement"),
-    15: .same(proto: "node"),
-    16: .standard(proto: "src_dst_node_list"),
+    15: .same(proto: "sn"),
     17: .standard(proto: "status_msg"),
     18: .standard(proto: "download_msg"),
     19: .standard(proto: "stats_update"),
@@ -2579,22 +2565,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         if let v = v {self.signalData = .uiEnablement(v)}
       }()
       case 15: try {
-        var v: Outlet_Backend_Agent_Grpc_Generated_Node?
+        var v: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
-          if case .node(let m) = current {v = m}
+          if case .sn(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .node(v)}
-      }()
-      case 16: try {
-        var v: Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList?
-        if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
-          if case .srcDstNodeList(let m) = current {v = m}
-        }
-        try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .srcDstNodeList(v)}
+        if let v = v {self.signalData = .sn(v)}
       }()
       case 17: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_StatusMsg?
@@ -2668,13 +2645,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       guard case .uiEnablement(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 14)
     }()
-    case .node?: try {
-      guard case .node(let v)? = self.signalData else { preconditionFailure() }
+    case .sn?: try {
+      guard case .sn(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
-    }()
-    case .srcDstNodeList?: try {
-      guard case .srcDstNodeList(let v)? = self.signalData else { preconditionFailure() }
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 16)
     }()
     case .statusMsg?: try {
       guard case .statusMsg(let v)? = self.signalData else { preconditionFailure() }

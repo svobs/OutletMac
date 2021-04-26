@@ -53,7 +53,6 @@ enum Signal: UInt32 {
   case GDRIVE_RELOADED = 45
   case NODE_UPSERTED = 46
   case NODE_REMOVED = 47
-  case NODE_MOVED = 48
   case EXIT_DIFF_MODE = 49
   case ERROR_OCCURRED = 50
   case REFRESH_SUBTREE_STATS_DONE = 51

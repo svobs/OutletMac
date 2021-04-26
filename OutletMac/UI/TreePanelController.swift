@@ -181,8 +181,6 @@ class TreePanelController: TreePanelControllable {
 
     try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: self.treeID)
     try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .NODE_MOVED, self.onNodeMoved, whitelistSenderID: self.treeID)
-
   }
 
   func shutdown() throws {
@@ -194,6 +192,7 @@ class TreePanelController: TreePanelControllable {
   func loadTree() throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
+        NSLog("INFO [\(self.treeID)] Requesting start subtree load")
         // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
         try self.backend.startSubtreeLoad(treeID: self.treeID)
       } catch {
@@ -228,8 +227,9 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func populateTreeView() throws {
+    NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
-      NSLog("DEBUG populateTreeView(): TreeView is nil. Setting readyToPopulate = true")
+      NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate = true")
       readyToPopulate = true
       return
     }
@@ -436,24 +436,16 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
-    let node = try props.get("node") as! Node
+    let sn = try props.get("sn") as! SPIDNodePair
 
     // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
   }
 
   private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
-    let node = try props.get("node") as! Node
+    let sn = try props.get("sn") as! SPIDNodePair
 
     // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
 
-  }
-
-  private func onNodeMoved(_ senderID: SenderID, _ props: PropDict) throws {
-    let srcNode = try props.get("src_node")
-    let dstNode = try props.get("dst_node")
-
-    try self.onNodeRemoved(senderID, PropDict(["node": srcNode]))
-    try self.onNodeUpserted(senderID, PropDict(["node": dstNode]))
   }
 
   // Other callbacks

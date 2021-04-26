@@ -210,7 +210,7 @@ class SignalDispatcher {
         }
       }
 
-      NSLog("DEBUG Dispatcher: Sent signal \(signal) to \(countNotified) of \(countTotal) subscribers")
+      NSLog("DEBUG Dispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
     } else {
       NSLog("DEBUG No subscribers found for signal \(signal)")
     }
