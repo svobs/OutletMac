@@ -17,6 +17,10 @@ class NodeIdentifierFactory {
   }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {
+    guard deviceUID != NULL_UID else {
+      throw OutletError.invalidState("getTreeType(): deviceUID is null!")
+    }
+
     if deviceList.count == 0 {
       // lazy load device list from server.
       // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body

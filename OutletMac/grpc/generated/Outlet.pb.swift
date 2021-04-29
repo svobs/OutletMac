@@ -654,6 +654,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
 
   public var sender: String = String()
 
+  /// for NODE_UPSERTED
+  public var parentGuid: String = String()
+
   public var signalData: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData? = nil
 
   public var empty: Outlet_Backend_Agent_Grpc_Generated_Empty {
@@ -696,6 +699,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .uiEnablement(newValue)}
   }
 
+  /// for NODE_UPSERTED, NODE_REMOVED
   public var sn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
     get {
       if case .sn(let v)? = signalData {return v}
@@ -744,6 +748,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case displayTreeUiState(Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState)
     case playState(Outlet_Backend_Agent_Grpc_Generated_PlayState)
     case uiEnablement(Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement)
+    /// for NODE_UPSERTED, NODE_REMOVED
     case sn(Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair)
     case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
@@ -2499,6 +2504,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "sig_int"),
     2: .same(proto: "sender"),
+    3: .standard(proto: "parent_guid"),
     10: .same(proto: "empty"),
     11: .standard(proto: "error_occurred"),
     12: .standard(proto: "display_tree_ui_state"),
@@ -2519,6 +2525,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.sigInt) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.sender) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.parentGuid) }()
       case 10: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_Empty?
         if let current = self.signalData {
@@ -2621,6 +2628,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     if !self.sender.isEmpty {
       try visitor.visitSingularStringField(value: self.sender, fieldNumber: 2)
     }
+    if !self.parentGuid.isEmpty {
+      try visitor.visitSingularStringField(value: self.parentGuid, fieldNumber: 3)
+    }
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every case branch when no optimizations are
     // enabled. https://github.com/apple/swift-protobuf/issues/1034
@@ -2673,6 +2683,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) -> Bool {
     if lhs.sigInt != rhs.sigInt {return false}
     if lhs.sender != rhs.sender {return false}
+    if lhs.parentGuid != rhs.parentGuid {return false}
     if lhs.signalData != rhs.signalData {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

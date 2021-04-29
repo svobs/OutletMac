@@ -77,7 +77,10 @@ class OutletGRPCClient: OutletBackend {
       case .ERROR_OCCURRED:
         argDict["msg"] = signalGRPC.errorOccurred.msg
         argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
-      case .NODE_UPSERTED, .NODE_REMOVED:
+      case .NODE_UPSERTED:
+        argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
+        argDict["parent_guid"] = signalGRPC.parentGuid
+      case .NODE_REMOVED:
         argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
       case .SET_STATUS:
         argDict["status_msg"] = signalGRPC.statusMsg.msg

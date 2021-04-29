@@ -437,7 +437,7 @@ class TreePanelController: TreePanelControllable {
 
   private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
     let sn = try props.get("sn") as! SPIDNodePair
-
+    let parentGUID = try props.get("parent_guid") as! String
     // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
   }
 

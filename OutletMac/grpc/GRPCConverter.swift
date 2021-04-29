@@ -276,8 +276,12 @@ class GRPCConverter {
   // NodeIdentifier
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func nodeIdentifierFromGRPC(_ spidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    return try self.backend.nodeIdentifierFactory.forValues(spidGRPC.uid, deviceUID: spidGRPC.deviceUid, spidGRPC.pathList, pathUID: spidGRPC.pathUid)
+  func nodeIdentifierFromGRPC(_ nidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
+    guard nidGRPC.uid != NULL_UID else {
+        throw OutletError.invalidState("nodeIdentifierFromGRPC(): nodeUID is null!")
+    }
+
+    return try self.backend.nodeIdentifierFactory.forValues(nidGRPC.uid, deviceUID: nidGRPC.deviceUid, nidGRPC.pathList, pathUID: nidGRPC.pathUid)
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
