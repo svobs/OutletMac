@@ -530,6 +530,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return guid
   }
 
+  // NOTE: this MUST be called on the main thread!
   func getIndexSetFor(_ guid: GUID) -> IndexSet {
     let index = self.outlineView.row(forItem: guid)
 
@@ -545,9 +546,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   func selectSingleSPID(_ spid: SPID) {
     let guid = spid.guid
-    let indexSet = self.getIndexSetFor(guid)
-    if !indexSet.isEmpty {
-      DispatchQueue.main.async {
+
+    DispatchQueue.main.async {
+      let indexSet = self.getIndexSetFor(guid)
+      if !indexSet.isEmpty {
         NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
         self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
       }
@@ -557,9 +559,24 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   func reloadItem(_ guid: GUID, reloadChildren: Bool) {
     // remember, GUID at root of tree is nil
     let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
+
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? "ROOT") (reloadChildren=\(reloadChildren))")
       self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
+    }
+  }
+
+  // GAH. Not needed.
+  private func removeItem(_ guid: GUID, parentGUID: GUID) {
+    // remember, GUID at root of tree is nil
+    let effectiveParent = (parentGUID == self.con.tree.rootSPID.guid) ? nil : parentGUID
+
+    DispatchQueue.main.async {
+      let indexSet = self.getIndexSetFor(guid)
+      if !indexSet.isEmpty {
+        NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? "ROOT")")
+        self.outlineView.removeItems(at: indexSet, inParent: parentGUID, withAnimation: .effectFade)
+      }
     }
   }
 

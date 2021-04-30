@@ -452,13 +452,12 @@ class TreePanelController: TreePanelControllable {
 
   private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
     let sn = try props.get("sn") as! SPIDNodePair
+    let parentGUID = try props.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
 
-    let alreadyPresent = self.displayStore.removeSN(sn.spid.guid)
-    if alreadyPresent {
-      NSLog("DEBUG [\(self.treeID)] Removing item from TreeView: \(sn.spid.guid)")
-      self.treeView!.reloadItem(sn.spid.guid, reloadChildren: true)
-    }
+    let _ = self.displayStore.removeSN(sn.spid.guid)
+    // It seems that the only bug-free way to remove the node is to reload its parent:
+    self.treeView!.reloadItem(parentGUID, reloadChildren: true)
   }
 
   // Other callbacks

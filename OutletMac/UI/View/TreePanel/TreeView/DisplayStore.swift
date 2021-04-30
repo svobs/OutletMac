@@ -131,9 +131,9 @@ class DisplayStore {
       self.parentChildListDict.removeValue(forKey: guid)
 
       if self.primaryDict.removeValue(forKey: guid) == nil {
-        NSLog("WARN  Could not remove GUID because it wasn't found: \(guid)")
+        NSLog("WARN  Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
       } else {
-        NSLog("DEBUG GUID removed: \(guid)")
+        NSLog("DEBUG GUID removed from DisplayStore: \(guid)")
         removed = true
       }
     }
