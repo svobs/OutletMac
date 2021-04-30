@@ -20,6 +20,27 @@ class DisplayStore {
     self.con = controllable
   }
 
+  private func appendToParentChildDict(parentGUID: GUID?, _ childSN: SPIDNodePair) {
+    var realParentGUID: GUID = (parentGUID == nil) ? NULL_GUID : parentGUID!
+    if realParentGUID == self.con.tree.rootSPID.guid {
+      realParentGUID = NULL_GUID
+    }
+
+    // note: top-level's parent is 'nil' in OutlineView, but is NULL_GUID in DisplayStore
+    if self.parentChildListDict[realParentGUID] == nil {
+      self.parentChildListDict[realParentGUID] = []
+    }
+    // TODO: this may get slow for very large directories...
+    for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
+      if existing.spid.guid == childSN.spid.guid {
+        // found: replace existing
+        self.parentChildListDict[realParentGUID]![index] = childSN
+        return
+      }
+    }
+    self.parentChildListDict[realParentGUID]!.append(childSN)
+  }
+
   // "Put" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -49,6 +70,19 @@ class DisplayStore {
       let parentGUID = parentSN == nil ? NULL_GUID : parentSN!.spid.guid
       self.parentChildListDict[parentGUID] = childSNList
     }
+  }
+
+  func upsertSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
+    var wasPresent: Bool = false
+    con.app.execSync {
+      if self.primaryDict[childSN.spid.guid] != nil {
+        wasPresent = true
+      }
+      self.primaryDict[childSN.spid.guid] = childSN
+      self.appendToParentChildDict(parentGUID: parentGUID, childSN)
+    }
+
+    return wasPresent
   }
 
   // "Get" operations
@@ -86,6 +120,24 @@ class DisplayStore {
       }
     }
     return sn
+  }
+
+  // Other
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  func removeSN(_ guid: GUID) -> Bool {
+    var removed: Bool = false
+    con.app.execSync {
+      self.parentChildListDict.removeValue(forKey: guid)
+
+      if self.primaryDict.removeValue(forKey: guid) == nil {
+        NSLog("WARN  Could not remove GUID because it wasn't found: \(guid)")
+      } else {
+        NSLog("DEBUG GUID removed: \(guid)")
+        removed = true
+      }
+    }
+    return removed
   }
 
   func isDir(_ guid: GUID) -> Bool {

@@ -438,14 +438,27 @@ class TreePanelController: TreePanelControllable {
   private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
     let sn = try props.get("sn") as! SPIDNodePair
     let parentGUID = try props.get("parent_guid") as! String
-    // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
+    NSLog("DEBUG [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
+
+    let alreadyPresent: Bool = self.displayStore.upsertSN(parentGUID, sn)
+
+    if alreadyPresent {
+      NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(sn.spid.guid)")
+      self.treeView!.reloadItem(sn.spid.guid, reloadChildren: true)
+    } else {
+      self.treeView!.reloadItem(parentGUID, reloadChildren: true)
+    }
   }
 
   private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
     let sn = try props.get("sn") as! SPIDNodePair
+    NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
 
-    // FIXME: need to refactor BE to give us GUIDs and single paths! Can't do this otherwise
-
+    let alreadyPresent = self.displayStore.removeSN(sn.spid.guid)
+    if alreadyPresent {
+      NSLog("DEBUG [\(self.treeID)] Removing item from TreeView: \(sn.spid.guid)")
+      self.treeView!.reloadItem(sn.spid.guid, reloadChildren: true)
+    }
   }
 
   // Other callbacks

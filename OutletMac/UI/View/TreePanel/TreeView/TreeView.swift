@@ -530,20 +530,36 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return guid
   }
 
-  func selectSingleSPID(_ spid: SPID) {
-    let guid = spid.guid
+  func getIndexSetFor(_ guid: GUID) -> IndexSet {
     let index = self.outlineView.row(forItem: guid)
 
+    var indexSet = IndexSet()
     guard index >= 0 else {
-      NSLog("ERROR [\(self.treeID)] Cannot select SPID: not found in OutlineView: \(spid)")
-      return
+      NSLog("ERROR [\(self.treeID)] Index not found for: \(guid). Returning empty index set")
+      return indexSet
     }
 
-    var indexSet = IndexSet()
     indexSet.insert(index)
+    return indexSet
+  }
+
+  func selectSingleSPID(_ spid: SPID) {
+    let guid = spid.guid
+    let indexSet = self.getIndexSetFor(guid)
+    if !indexSet.isEmpty {
+      DispatchQueue.main.async {
+        NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
+        self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+      }
+    }
+  }
+
+  func reloadItem(_ guid: GUID, reloadChildren: Bool) {
+    // remember, GUID at root of tree is nil
+    let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
     DispatchQueue.main.async {
-      NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
-      self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+      NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? "ROOT") (reloadChildren=\(reloadChildren))")
+      self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
     }
   }
 
