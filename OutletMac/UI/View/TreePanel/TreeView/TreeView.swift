@@ -254,7 +254,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   private func itemToGUID(_ item: Any?) -> GUID {
     if item == nil {
-      return NULL_GUID
+      return TOPMOST_GUID
     } else {
       return item as! GUID
     }
@@ -271,7 +271,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     if let child  = displayStore.getChild(itemToGUID(item), index) {
       return child.spid.guid
     } else {
-      return NULL_GUID
+      return TOPMOST_GUID
     }
   }
 
@@ -561,7 +561,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
 
     DispatchQueue.main.async {
-      NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? "ROOT") (reloadChildren=\(reloadChildren))")
+      NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
       self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
     }
   }
@@ -574,9 +574,100 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     DispatchQueue.main.async {
       let indexSet = self.getIndexSetFor(guid)
       if !indexSet.isEmpty {
-        NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? "ROOT")")
+        NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? TOPMOST_GUID)")
         self.outlineView.removeItems(at: indexSet, inParent: parentGUID, withAnimation: .effectFade)
       }
+    }
+  }
+
+  private func getParentGUID(_ childGUID: GUID) -> GUID {
+    return self.itemToGUID(self.outlineView.parent(forItem: childGUID))
+  }
+
+  private func onCellCheckboxToggled(_ guid: GUID) {
+    guard let sn = self.displayStore.getSN(guid) else {
+      self.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
+      return
+    }
+    if let isEphemeral = sn.node?.isEphemeral {
+      if isEphemeral {
+        return
+      }
+    }
+
+    let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(nodeUID: sn.spid.nodeUID)
+    self.setNodeChecked(guid, newIsCheckedValue)
+  }
+
+  private func isCellCheckboxChecked(_ guid: GUID) -> Bool {
+    // TODO
+    return false
+  }
+
+  private func isCellCheckboxMixed(_ guid: GUID) -> Bool {
+    // TODO
+    return false
+  }
+
+  private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+    // Update both UI and DisplayStore tracking
+
+    // TODO:
+    fatalError("TODO: update checkboxes in UI")
+
+    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
+  }
+
+  func setNodeChecked(_ guid: GUID, _ newIsCheckedValue: Bool) {
+    /*
+     1. Siblings
+
+     Housekeeping. Need to update all the siblings (children of parent) because their checked state may not be tracked.
+     We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
+     But if the parent is mixed, we must track the state of ALL of its children.
+     */
+    let parentGUID = self.getParentGUID(guid)
+    if parentGUID != TOPMOST_GUID {
+      for siblingSN in self.displayStore.getChildList(parentGUID) {
+        let siblingGUID = siblingSN.spid.guid
+        let isChecked = self.isCellCheckboxChecked(siblingGUID)
+        let isMixed = self.isCellCheckboxMixed(siblingGUID)
+        self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: isChecked, isMixed: isMixed)
+      }
+    }
+
+    /*
+     2. Children
+     Need to update all the children of the node to match its checked state, both in UI and tracking.
+    */
+    let applyFunc: ApplyToSNFunc = { sn in self.setCheckedState(sn, isChecked: newIsCheckedValue, isMixed: false) }
+    self.displayStore.doForSelfAndAllDescendants(guid, applyFunc)
+
+    /*
+     3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
+    */
+    var ancestorGUID: GUID = guid
+    while true {
+      ancestorGUID = self.getParentGUID(ancestorGUID)
+      if ancestorGUID == TOPMOST_GUID {
+        break
+      }
+      var hasChecked = false
+      var hasUnchecked = false
+      var hasMixed = false
+      for childSN in self.displayStore.getChildList(ancestorGUID) {
+        let nodeUID = childSN.spid.nodeUID
+        if self.displayStore.isCheckboxChecked(nodeUID: nodeUID) {
+          hasChecked = true
+        } else {
+          hasUnchecked = true
+        }
+        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(nodeUID: nodeUID)
+      }
+      let isChecked = hasChecked && !hasUnchecked && !hasMixed
+      let isMixed = hasMixed || (hasChecked && hasUnchecked)
+      let ancestorSN = self.displayStore.getSN(ancestorGUID)
+      self.setCheckedState(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
     }
   }
 

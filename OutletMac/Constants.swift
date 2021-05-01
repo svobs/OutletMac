@@ -305,7 +305,8 @@ let ROOT_PATH_UID = LOCAL_ROOT_UID
 
 let MIN_FREE_UID: UID = 100
 
-let NULL_GUID: String = ""
+// This is used as a token in the DisplayStore, which serves as a friendlier GUID than the nil value used by NSOutlineView for the topmost "item" (ID)
+let TOPMOST_GUID: String = "TOP"
 
 
 let GDRIVE_FOLDER_MIME_TYPE_UID: UID = 1
