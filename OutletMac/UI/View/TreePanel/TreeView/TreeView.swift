@@ -349,7 +349,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   class CellCheckboxButton: NSButton {
     let parent: TreeViewController
-    let guid: GUID
+    var guid: GUID
 
     init(sn: SPIDNodePair, parent: TreeViewController, action: Selector?) {
       self.parent = parent
@@ -368,7 +368,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     func updateState(_ sn: SPIDNodePair) {
-      let state = self.parent.displayStore.getCheckboxState(nodeUID: sn.spid.nodeUID)
+      self.guid = sn.spid.guid
+      let state = self.parent.displayStore.getCheckboxState(sn)
       if state == .mixed {
           self.allowsMixedState = true
       }
@@ -661,7 +662,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
     }
 
-    let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(nodeUID: sn.spid.nodeUID)
+    let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(sn)
     NSLog("DEBUG [\(treeID)] Setting new checked value for node_uid: \(sn.spid.nodeUID) => \(newIsCheckedValue)")
     self.setNodeCheckedState(sender.guid, newIsCheckedValue)
   }
@@ -692,7 +693,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking siblings of \(guid) (parent_guid=\(parentGUID))")
     if parentGUID != TOPMOST_GUID {
       for siblingSN in self.displayStore.getChildList(parentGUID) {
-        let state = self.displayStore.getCheckboxState(nodeUID: siblingSN.spid.nodeUID)
+        let state = self.displayStore.getCheckboxState(siblingSN)
         self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
       }
     }
@@ -720,13 +721,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       var hasUnchecked = false
       var hasMixed = false
       for childSN in self.displayStore.getChildList(ancestorGUID) {
-        let nodeUID = childSN.spid.nodeUID
-        if self.displayStore.isCheckboxChecked(nodeUID: nodeUID) {
+        if self.displayStore.isCheckboxChecked(childSN) {
           hasChecked = true
         } else {
           hasUnchecked = true
         }
-        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(nodeUID: nodeUID)
+        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childSN)
       }
       let isChecked = hasChecked && !hasUnchecked && !hasMixed
       let isMixed = hasMixed || (hasChecked && hasUnchecked)

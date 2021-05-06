@@ -220,7 +220,7 @@ class TreePanelController: TreePanelControllable {
 
   private func clearModelAndTreeView() {
     // Clear display store & treeview (which draws from display store)
-    self.displayStore.putRootChildList([])
+    self.displayStore.putRootChildList(self.tree.rootSN, [])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadData()
     }
@@ -254,7 +254,7 @@ class TreePanelController: TreePanelControllable {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
       NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root")
 
-      self.displayStore.putRootChildList(topLevelSNList)
+      self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue workitems, sometimes nothing shows up.

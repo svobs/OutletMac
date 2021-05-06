@@ -76,7 +76,7 @@ class DisplayStore {
   /**
    Clears all data structures. Populates the data structures with the given SNs, then returns them.
   */
-  func putRootChildList(_ topLevelSNList: [SPIDNodePair]) -> Void {
+  func putRootChildList(_ rootSN: SPIDNodePair, _ topLevelSNList: [SPIDNodePair]) -> Void {
     con.app.execSync {
       self.primaryDict.removeAll()
       self.childParentDict.removeAll()
@@ -84,6 +84,7 @@ class DisplayStore {
       self.checkedNodeSet.removeAll()
       self.mixedNodeSet.removeAll()
 
+      self.primaryDict[TOPMOST_GUID] = rootSN // needed for determining implicitly checked checkboxes
       self.parentChildListDict[TOPMOST_GUID] = topLevelSNList
       for childSN in topLevelSNList {
         let childGUID = childSN.spid.guid
@@ -174,14 +175,84 @@ class DisplayStore {
     return parentGUID
   }
 
+  private func getParentSN_NoLock(_ childGUID: GUID) -> SPIDNodePair? {
+    if let parentGUID = self.childParentDict[childGUID] {
+      return self.primaryDict[parentGUID]
+    }
+    NSLog("ERROR Could not find parent of GUID \(childGUID) in childParentDict!")
+    return nil
+  }
+
   func getParentSN(_ childGUID: GUID) -> SPIDNodePair? {
     var parentSN: SPIDNodePair? = nil
     con.app.execSync {
-      if let parentGUID = self.childParentDict[childGUID] {
-        parentSN = self.primaryDict[parentGUID]
-      }
+      parentSN = self.getParentSN_NoLock(childGUID)
     }
     return parentSN
+  }
+
+  // Checkbox State
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
+    if self.checkedNodeSet.contains(sn.spid.nodeUID) {
+      return true
+    } else if self.checkedNodeSet.contains(self.getParentSN_NoLock(sn.spid.guid)!.spid.nodeUID) {
+      // implcitly on:
+      return true
+    }
+    return false
+  }
+
+  // includes implicit values based on parent
+  func getCheckboxState(_ sn: SPIDNodePair) -> NSControl.StateValue {
+    var state: NSControl.StateValue = .off
+    con.app.execSync {
+      if self.checkedNodeSet.contains(sn.spid.nodeUID) {
+        state = .on
+      } else if self.isCheckboxChecked_NoLock(sn) {
+        state = .on
+      } else if self.mixedNodeSet.contains(sn.spid.nodeUID) {
+        state = .mixed
+      } else {
+        state = .off
+      }
+    }
+    return state
+  }
+
+  func isCheckboxChecked(_ sn: SPIDNodePair) -> Bool {
+    var isChecked: Bool = false
+    con.app.execSync {
+      isChecked = self.isCheckboxChecked_NoLock(sn)
+    }
+    return isChecked
+  }
+
+  func isCheckboxMixed(_ sn: SPIDNodePair) -> Bool {
+    var isMixed: Bool = false
+    con.app.execSync {
+      isMixed = self.mixedNodeSet.contains(sn.spid.nodeUID)
+    }
+    return isMixed
+  }
+
+  func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+    let nodeUID: UID = sn.spid.nodeUID
+
+    con.app.execSync {
+      if isChecked {
+        self.checkedNodeSet.insert(nodeUID)
+      } else {
+        self.checkedNodeSet.remove(nodeUID)
+      }
+
+      if isMixed {
+        self.mixedNodeSet.insert(nodeUID)
+      } else {
+        self.mixedNodeSet.remove(nodeUID)
+      }
+    }
   }
 
   // Other
@@ -209,55 +280,6 @@ class DisplayStore {
 
   func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node!.isDir ?? false
-  }
-
-  /** Returns (isChecked, isMixed) */
-  func getCheckboxState(nodeUID: UID) -> NSControl.StateValue {
-    var state: NSControl.StateValue = .off
-    con.app.execSync {
-      if self.checkedNodeSet.contains(nodeUID) {
-        state = .on
-      } else if self.mixedNodeSet.contains(nodeUID) {
-        state = .mixed
-      } else {
-        state = .off
-      }
-    }
-    return state
-  }
-
-  func isCheckboxChecked(nodeUID: UID) -> Bool {
-    var isChecked: Bool = false
-    con.app.execSync {
-      isChecked = self.checkedNodeSet.contains(nodeUID)
-    }
-    return isChecked
-  }
-
-  func isCheckboxMixed(nodeUID: UID) -> Bool {
-    var isMixed: Bool = false
-    con.app.execSync {
-      isMixed = self.mixedNodeSet.contains(nodeUID)
-    }
-    return isMixed
-  }
-
-  func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let nodeUID: UID = sn.spid.nodeUID
-
-    con.app.execSync {
-      if isChecked {
-        self.checkedNodeSet.insert(nodeUID)
-      } else {
-        self.checkedNodeSet.remove(nodeUID)
-      }
-
-      if isMixed {
-        self.mixedNodeSet.insert(nodeUID)
-      } else {
-        self.mixedNodeSet.remove(nodeUID)
-      }
-    }
   }
 
   func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
