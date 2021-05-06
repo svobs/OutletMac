@@ -178,7 +178,7 @@ class GDriveRootChooser: HasLifecycle, ObservableObject {
 
     // TODO: create & populate progress bar to show user that something is being done here
 
-    try self.con.loadTree()
+    try self.con.requestTreeLoad()
   }
 
   func shutdown() throws {

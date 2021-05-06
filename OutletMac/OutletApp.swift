@@ -136,6 +136,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
       try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
       try dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
+      try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, onDiffTreesDone)
+
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -144,8 +146,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
       self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowMultipleSelection: true)
       self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
-      try self.conLeft!.loadTree()
-      try self.conRight!.loadTree()
+      try self.conLeft!.requestTreeLoad()
+      try self.conRight!.requestTreeLoad()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
@@ -323,6 +325,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
     try self.shutdown()
+  }
+
+  private func onDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
+    // TODO: change button bar
   }
 
   // Etc

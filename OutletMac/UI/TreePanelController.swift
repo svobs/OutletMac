@@ -31,7 +31,7 @@ protocol TreePanelControllable: HasLifecycle {
 
   var dispatchListener: DispatchListener { get }
 
-  func loadTree() throws
+  func requestTreeLoad() throws
 
   func connectTreeView(_ treeView: TreeViewController)
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
@@ -111,7 +111,7 @@ class MockTreePanelController: TreePanelControllable {
   func shutdown() throws {
   }
 
-  func loadTree() throws {
+  func requestTreeLoad() throws {
   }
 
   func connectTreeView(_ treeView: TreeViewController) {
@@ -138,7 +138,7 @@ class MockTreePanelController: TreePanelControllable {
 class TreePanelController: TreePanelControllable {
   let app: OutletApp
   var tree: DisplayTree
-  let dispatchListener: DispatchListener
+  var dispatchListener: DispatchListener
   lazy var displayStore: DisplayStore = DisplayStore(self)
   lazy var treeActions: TreeActions = TreeActions(self)
   lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
@@ -169,18 +169,9 @@ class TreePanelController: TreePanelControllable {
   func start() throws {
     self.app.registerTreePanelController(self.treeID, self)
 
-    self.swiftFilterState.onChangeCallback = self.onFilterChanged
-    try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
-    try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: self.treeID)
+    try self.reattachListeners(self.treeID)
 
-    try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: self.treeID)
-    try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: self.treeID)
+    self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
 
   func shutdown() throws {
@@ -189,7 +180,24 @@ class TreePanelController: TreePanelControllable {
     self.dispatcher.sendSignal(signal: .DEREGISTER_DISPLAY_TREE, senderID: self.treeID)
   }
 
-  func loadTree() throws {
+  func reattachListeners(_ newTreeID: TreeID) throws {
+    try self.dispatchListener.unsubscribeAll()
+
+    self.dispatchListener = self.app.dispatcher.createListener(newTreeID)
+    try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
+    try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: newTreeID)
+
+    try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: newTreeID)
+    try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
+  }
+
+  func requestTreeLoad() throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
@@ -407,13 +415,26 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
-    self.tree = try props.get("tree") as! DisplayTree
+    let newTree = try props.get("tree") as! DisplayTree
+
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
+    self.app.execSync {
+      if newTree.treeID != self.tree.treeID {
+        NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")
+        do {
+          try self.reattachListeners(newTree.treeID)
+        } catch {
+          self.reportException("Failed to reattach listeners", error)
+        }
+      }
+      self.tree = newTree
+    }
+    
     DispatchQueue.main.async {
       self.swiftTreeState.updateFrom(self.tree)
     }
 
-    try self.loadTree()
+    try self.requestTreeLoad()
   }
 
   private func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
