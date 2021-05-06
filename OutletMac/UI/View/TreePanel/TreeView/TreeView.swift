@@ -4,8 +4,6 @@ import SwiftUI
 import Foundation
 import LinkedList
 
-let CELL_HEIGHT: CGFloat = 32.0
-
 /**
  TreeView: extra layer of TreeView to specify layout
  */
@@ -148,120 +146,23 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     view = NSView()
   }
 
-  private func configureOutlineView(_ scrollView: NSScrollView) {
-    outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    outlineView.autosaveTableColumns = true
-    outlineView.autosaveExpandedItems = true
-    outlineView.rowSizeStyle = .large
-    outlineView.lineBreakMode = .byTruncatingTail
-    outlineView.cell?.truncatesLastVisibleLine = true
-    outlineView.autoresizesOutlineColumn = true
-    outlineView.indentationPerLevel = 16
-//    outlineView.backgroundColor = .clear
-    outlineView.appearance = NSAppearance(named: NSAppearance.Name.vibrantDark)
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-    outlineView.headerView = NSTableHeaderView()
-
-    // Columns:
-
-    let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
-    nodeColumn.title = "Name"
-    nodeColumn.width = 300
-    nodeColumn.minWidth = 150
-    nodeColumn.isEditable = false
-    outlineView.addTableColumn(nodeColumn)
-
-    let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
-    sizeBytesCol.title = "Size"
-    sizeBytesCol.width = 70
-    sizeBytesCol.minWidth = 70
-    sizeBytesCol.isEditable = false
-    outlineView.addTableColumn(sizeBytesCol)
-
-    let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
-    etcCol.title = "Etc"
-    etcCol.width = 200
-    etcCol.minWidth = 100
-    etcCol.isEditable = false
-    outlineView.addTableColumn(etcCol)
-
-    let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "mtime"))
-    mtimeCol.title = "Modification Time"
-    mtimeCol.width = 200
-    mtimeCol.minWidth = 100
-    mtimeCol.isEditable = false
-    outlineView.addTableColumn(mtimeCol)
-
-    let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "ctime"))
-    ctimeCol.title = "Meta Change Time"
-    ctimeCol.width = 200
-    ctimeCol.minWidth = 100
-    ctimeCol.isEditable = false
-//    ctimeCol.isHidden = true
-    outlineView.addTableColumn(ctimeCol)
-
-//    outlineView.backgroundColor = .clear
-//    outlineView.usesAlternatingRowBackgroundColors = true // TODO: the colors are screwed up when this is used
-//    outlineView.gridStyleMask = .dashedHorizontalGridLineMask
-//    outlineView.selectionHighlightStyle = .sourceList // selection highlight has rounded corners (TODO: this introduces ugly extra space)
-    outlineView.autosaveExpandedItems = true
-    outlineView.usesAutomaticRowHeights = true  // set row height to match font
-
-    scrollView.documentView = outlineView
-    outlineView.frame = scrollView.bounds
-    outlineView.delegate = self
-    outlineView.dataSource = self
+    OutlineViewFactory.buildOutlineView(self.view, outlineView: outlineView)
 
     outlineView.allowsMultipleSelection = self.con.allowMultipleSelection
 
     // Hook up double-click handler
     outlineView.doubleAction = #selector(doubleClickedItem)
 
+    outlineView.delegate = self
+    outlineView.dataSource = self
     outlineView.menu = self.initContextMenu()
-  }
-
-  private func addScrollView() -> NSScrollView {
-    let scrollView = NSScrollView()
-
-    scrollView.backgroundColor = NSColor.clear
-    scrollView.drawsBackground = false
-    scrollView.hasHorizontalScroller = true
-    scrollView.hasVerticalScroller = true
-    scrollView.horizontalPageScroll = 10
-    scrollView.verticalLineScroll = 19
-    scrollView.verticalPageScroll = 10
-    scrollView.automaticallyAdjustsContentInsets = true
-
-    self.view.addSubview(scrollView)
-    scrollView.translatesAutoresizingMaskIntoConstraints = false
-    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .left, relatedBy: .equal, toItem: self.view, attribute: .left, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .right, relatedBy: .equal, toItem: self.view, attribute: .right, multiplier: 1.0, constant: 0))
-    self.view.addConstraint(NSLayoutConstraint(item: scrollView, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1.0, constant: 0))
-
-    return scrollView
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    // ScrollView
-    let scrollView = self.addScrollView()
-
-    // OutlineView
-    self.configureOutlineView(scrollView)
   }
 
   // DataSource methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  private func itemToGUID(_ item: Any?) -> GUID {
-    if item == nil {
-      return TOPMOST_GUID
-    } else {
-      return item as! GUID
-    }
-  }
 
   /**
    Returns a GUID corresponding to the item with the given parameters
@@ -405,6 +306,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   // Utility methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  private func itemToGUID(_ item: Any?) -> GUID {
+    if item == nil {
+      return TOPMOST_GUID
+    } else {
+      return item as! GUID
+    }
+  }
 
   func getSelectedUIDs() -> Set<UID> {
     var uidSet = Set<UID>()

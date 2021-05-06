@@ -20,6 +20,8 @@ let APP_NAME = "Outlet"
 let USE_SYSTEM_TOOLBAR_ICONS: Bool = true
 
 let DEFAULT_ICON_SIZE: Int = 24
+let TREE_VIEW_CELL_HEIGHT: CGFloat = 32.0
+
 
 // Padding in pixels
 let H_PAD: CGFloat = 5

@@ -54,7 +54,7 @@ class CellFactory {
           cell = makeNameCell(for: sn, withIdentifier: identifier, tvc)
         }
         cell!.checkbox!.updateState(sn)
-        cell!.imageView!.image = self.makeIcon(sn, cell!, CELL_HEIGHT)
+        cell!.imageView!.image = self.makeIcon(sn, cell!, TREE_VIEW_CELL_HEIGHT)
         cell!.textField!.stringValue = node.name
         cell!.needsLayout = true
 
@@ -136,7 +136,7 @@ class CellFactory {
     cell.checkbox = checkbox
 
     // 2. Icon
-    guard let icon = self.makeIcon(sn, cell, CELL_HEIGHT) else {
+    guard let icon = self.makeIcon(sn, cell, TREE_VIEW_CELL_HEIGHT) else {
       return cell
     }
     let imageView = NSImageView(image: icon)
