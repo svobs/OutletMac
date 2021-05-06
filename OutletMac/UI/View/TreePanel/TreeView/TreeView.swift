@@ -351,27 +351,28 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let parent: TreeViewController
     let guid: GUID
 
-    init(sn: SPIDNodePair, parent: TreeViewController) {
+    init(sn: SPIDNodePair, parent: TreeViewController, action: Selector?) {
       self.parent = parent
       self.guid = sn.spid.guid
       // NOTE: *MUST* use this constructor when subclassing. All other constructors will crash at runtime.
       // Thanks Apple!
       super.init(frame: NSRect(x: 150, y: 200, width: 20, height: 20))
       self.title = ""
+      self.action = action
       self.target = parent
       self.setButtonType(.switch)
       self.bezelStyle = .texturedRounded
       self.translatesAutoresizingMaskIntoConstraints = false
 
-      let (isChecked, isMixed) = self.parent.displayStore.getCheckboxState(nodeUID: sn.spid.nodeUID)
-      if isChecked {
-        self.state = .on
-      } else if isMixed {
-        self.allowsMixedState = true
-        self.state = .mixed
-      } else {
-        self.state = .off
+      self.updateState(sn)
+    }
+
+    func updateState(_ sn: SPIDNodePair) {
+      let state = self.parent.displayStore.getCheckboxState(nodeUID: sn.spid.nodeUID)
+      if state == .mixed {
+          self.allowsMixedState = true
       }
+      self.state = state
     }
 
     required init?(coder: NSCoder) {
@@ -379,23 +380,25 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  private func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-    let cell = NSTableCellView()
+  class NameCellView : NSTableCellView {
+    var checkbox: CellCheckboxButton? = nil
+  }
+
+  private func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NameCellView {
+    let cell = NameCellView()
     cell.identifier = identifier
 
     // 1. Checkbox (if applicable)
-    let checkbox = CellCheckboxButton(sn: sn, parent: self)
-    checkbox.action = #selector(self.toggleCellCheckbox(_:))
+    let checkbox = CellCheckboxButton(sn: sn, parent: self, action: #selector(self.onCellCheckboxToggled(_:)))
+    checkbox.sizeToFit()
     cell.addSubview(checkbox)
-
-//    checkbox.sizeToFit()
+    cell.checkbox = checkbox
 
     // 2. Icon
     guard let icon = self.makeIcon(sn, cell, CELL_HEIGHT) else {
       return cell
     }
     let imageView = NSImageView(image: icon)
-    imageView.imageAlignment = .alignCenter  // FIXME: this is not right
     imageView.imageFrameStyle = .none
     imageView.imageScaling = .scaleProportionallyDown
     cell.addSubview(imageView)
@@ -422,32 +425,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       prev = widget
     }
 
-    // Square image
-//    imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.0).isActive = true
-
-    // Checkbox goes leftmost
-//    checkbox.leftAnchor.constraint(equalTo: cell.leftAnchor).isActive = true
-    // Match center of checkbox to center of cell:
-//    checkbox.centerYAnchor.constraint(equalTo: cell.imageView!.centerYAnchor).isActive = true
-//    checkbox.topAnchor.constraint(equalTo: cell.topAnchor).isActive = true
-//    checkbox.sizeToFit()
-
-//    checkbox.rightAnchor.constraint(equalTo: cell.imageView!.leftAnchor).isActive = true
-
-//    checkbox.setFrameOrigin(NSZeroPoint)
-
-    // FIXME: need to figure out how to align icon and text properly AND also make it compact
-
-    // Match top of image with top of cell:
-//    imageView.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
-    // Match center of image to center of text:
-//    cell.imageView!.centerYAnchor.constraint(equalTo: cell.textField!.centerYAnchor).isActive = true
-
-    // Make sure the text is placed to the right of the icon:
-//    imageView.leftAnchor.constraint(equalTo: checkbox.rightAnchor).isActive = true
-//    cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
-
-//    cell.imageView!.sizeToFit()
     cell.needsLayout = true
 
     return cell
@@ -504,14 +481,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let node = sn.node!
     switch identifier.rawValue {
       case "name":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NameCellView
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier)
         }
-        // TODO: update checkbox
-
+        cell!.checkbox!.updateState(sn)
         cell!.imageView!.image = self.makeIcon(sn, cell!, CELL_HEIGHT)
         cell!.textField!.stringValue = node.name
+        cell!.needsLayout = true
 
         return cell
       case "size":
@@ -669,7 +646,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return self.itemToGUID(self.outlineView.parent(forItem: childGUID))
   }
 
-  @objc func toggleCellCheckbox(_ sender: CellCheckboxButton) {
+  @objc func onCellCheckboxToggled(_ sender: CellCheckboxButton) {
     assert(sender.state.rawValue != -1, "User should never be allowed to toggle checkbox into Mixed state!")
     let isChecked = sender.state.rawValue == 1
     NSLog("DEBUG [\(treeID)] Checkbox toggled: \(sender.guid) => \(isChecked)")
@@ -677,12 +654,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // If checkbox was previously in Mixed state, it is now either Off or On. But we need to actively
     // prevent them from toggling it into Mixed again.
     sender.allowsMixedState = false
-    self.onCellCheckboxToggled(sender.guid)
-  }
 
-  private func onCellCheckboxToggled(_ guid: GUID) {
-    guard let sn = self.displayStore.getSN(guid) else {
-      self.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
+    guard let sn = self.displayStore.getSN(sender.guid) else {
+      self.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(sender.guid)")
       return
     }
     if let isEphemeral = sn.node?.isEphemeral {
@@ -692,12 +666,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(nodeUID: sn.spid.nodeUID)
-    self.setNodeCheckedState(guid, newIsCheckedValue)
+    self.setNodeCheckedState(sender.guid, newIsCheckedValue)
   }
 
   private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    // We assume that the UI has already updated the checked state there, so we just need to update our model.
+    let guid = sn.spid.guid
+    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) => \(isChecked)/\(isMixed)")
+
+    // Update model here:
     self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
+
+    // Now update the node in the UI:
+    DispatchQueue.main.async {
+      self.outlineView.reloadItem(guid, reloadChildren: false)
+    }
   }
 
   func setNodeCheckedState(_ guid: GUID, _ newIsCheckedValue: Bool) {
@@ -708,11 +690,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
      But if the parent is mixed, we must track the state of ALL of its children.
      */
+
+
+    // FIXME: there's a bug here!
     let parentGUID = self.getParentGUID(guid)
     if parentGUID != TOPMOST_GUID {
       for siblingSN in self.displayStore.getChildList(parentGUID) {
-        let (isChecked, isMixed) = self.displayStore.getCheckboxState(nodeUID: siblingSN.spid.nodeUID)
-        self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: isChecked, isMixed: isMixed)
+        let state = self.displayStore.getCheckboxState(nodeUID: siblingSN.spid.nodeUID)
+        self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
       }
     }
 
@@ -778,7 +763,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
       self.displayStore.putChildList(parentSN, childSNList)
       self.outlineView.reloadItem(parentGUID, reloadChildren: true)
-//      self.outlineView.insertItems(at: IndexSet(0...0), inParent: parent, withAnimation: .effectFade)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
     } catch {

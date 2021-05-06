@@ -5,7 +5,7 @@
 //  Created by Matthew Svoboda on 21/2/21.
 //
 
-import Foundation
+import AppKit
 import LinkedList
 
 typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
@@ -183,14 +183,18 @@ class DisplayStore {
   }
 
   /** Returns (isChecked, isMixed) */
-  func getCheckboxState(nodeUID: UID) -> (Bool, Bool) {
-    var isChecked: Bool = false
-    var isMixed: Bool = false
+  func getCheckboxState(nodeUID: UID) -> NSControl.StateValue {
+    var state: NSControl.StateValue = .off
     con.app.execSync {
-      isChecked = self.checkedNodeSet.contains(nodeUID)
-      isMixed = self.mixedNodeSet.contains(nodeUID)
+      if self.checkedNodeSet.contains(nodeUID) {
+        state = .on
+      } else if self.mixedNodeSet.contains(nodeUID) {
+        state = .mixed
+      } else {
+        state = .off
+      }
     }
-    return (isChecked, isMixed)
+    return state
   }
 
   func isCheckboxChecked(nodeUID: UID) -> Bool {
