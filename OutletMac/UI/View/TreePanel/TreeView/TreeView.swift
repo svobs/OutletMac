@@ -319,7 +319,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
-    let cellHeight = cell.textField!.bounds.height
+//    let cellHeight = cell.textField!.bounds.height
 //    NSLog("CELL HEIGHT: \(cellHeight)")
 
     var icon: NSImage
@@ -337,6 +337,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       }
     }
 
+    let cellHeight: Int = 15 // TODO
+
     // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
     if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: cellHeight, height: cellHeight), context: nil, hints: nil) {
       icon = NSImage(size: imageRep.size)
@@ -348,12 +350,51 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return icon
   }
 
-  private func makeCellWithTextAndIcon(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+  class NameCellView: NSTableCellView {
+  }
 
-    let cell = self.makeCellWithText(withIdentifier: identifier)
+  class CellCheckboxButton: NSButton {
+    let parent: TreeViewController
+    let guid: GUID
 
-    // FIXME: need to figure out how to align icon and text properly AND also make it compact
+    init(sn: SPIDNodePair, parent: TreeViewController) {
+      self.parent = parent
+      self.guid = sn.spid.guid
+      // NOTE: *MUST* use this constructor when subclassing. All other constructors will crash at runtime.
+      // Thanks Apple!
+      super.init(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
+      self.title = ""
+      self.target = parent
+      self.setButtonType(.switch)
+      self.bezelStyle = .texturedRounded
+      self.translatesAutoresizingMaskIntoConstraints = true
 
+      let (isChecked, isMixed) = self.parent.displayStore.getCheckboxState(nodeUID: sn.spid.nodeUID)
+      if isChecked {
+        self.state = .on
+      } else if isMixed {
+        self.allowsMixedState = true
+        self.state = .mixed
+      } else {
+        self.state = .off
+      }
+    }
+
+    required init?(coder: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
+  }
+
+  private func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+    let cell = NameCellView()
+    cell.identifier = identifier
+
+    // 1. Checkbox (if applicable)
+    let checkbox = CellCheckboxButton(sn: sn, parent: self)
+    checkbox.action = #selector(self.toggleCellCheckbox(_:))
+    cell.addSubview(checkbox)
+
+    // 2. Icon
     guard let icon = self.makeIcon(sn, cell) else {
       return cell
     }
@@ -363,10 +404,36 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     cell.addSubview(imageView)
     cell.imageView = imageView
 
+    // 3. Text field
+    let textField = makeCellTextField()
+    cell.addSubview(textField)
+    cell.textField = textField
+
+     // Constrain the text field within the cell
+//     textField.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
+    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+    textField.sizeToFit()
+
+    // Checkbox goes leftmost
+//    checkbox.leftAnchor.constraint(equalTo: cell.leftAnchor).isActive = true
+    // Match center of checkbox to center of cell:
+//    checkbox.centerYAnchor.constraint(equalTo: cell.imageView!.centerYAnchor).isActive = true
+//    checkbox.topAnchor.constraint(equalTo: cell.topAnchor).isActive = true
+//    checkbox.sizeToFit()
+
+//    checkbox.rightAnchor.constraint(equalTo: cell.imageView!.leftAnchor).isActive = true
+
+//    textField.setFrameOrigin(NSZeroPoint)
+
+    // FIXME: need to figure out how to align icon and text properly AND also make it compact
+
+    // Match top of image with top of cell:
     imageView.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
+    // Match center of image to center of text:
     cell.imageView!.centerYAnchor.constraint(equalTo: cell.textField!.centerYAnchor).isActive = true
 
     // Make sure the text is placed to the right of the icon:
+//    imageView.leftAnchor.constraint(equalTo: checkbox.rightAnchor).isActive = true
     cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
 
     cell.imageView!.sizeToFit()
@@ -375,10 +442,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return cell
   }
 
-  private func makeCellWithText(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-    let cell = NSTableCellView()
-    cell.identifier = identifier
-
+  private func makeCellTextField() -> CustomFontNSTextField {
     let textField = CustomFontNSTextField()
     textField.backgroundColor = NSColor.clear
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -387,6 +451,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     textField.isEditable = false
     textField.customSetFont(TREE_VIEW_NSFONT)
     textField.lineBreakMode = .byTruncatingTail
+    return textField
+  }
+
+  private func makeTextOnlyCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
+    let cell = NSTableCellView()
+    cell.identifier = identifier
+
+    let textField = makeCellTextField()
     cell.addSubview(textField)
     cell.textField = textField
 
@@ -403,8 +475,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   /**
-   Makes contents of the cell
-   From NSOutlineViewDelegate
+   Makes contents of the cell. From NSOutlineViewDelegate
    */
   public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
@@ -424,38 +495,38 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       case "name":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCellWithTextAndIcon(for: sn, withIdentifier: identifier)
+          cell = makeNameCell(for: sn, withIdentifier: identifier)
+          cell!.textField!.stringValue = node.name
         }
-        cell!.imageView!.image = self.makeIcon(sn, cell!)
-        cell!.textField!.stringValue = node.name
+
         return cell
       case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCellWithText(withIdentifier: identifier)
+          cell = makeTextOnlyCell(withIdentifier: identifier)
+          cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         }
-        cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
       case "etc":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCellWithText(withIdentifier: identifier)
+          cell = makeTextOnlyCell(withIdentifier: identifier)
+          cell!.textField!.stringValue = String(node.etc)
         }
-        cell!.textField!.stringValue = String(node.etc)
         return cell
       case "mtime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCellWithText(withIdentifier: identifier)
+          cell = makeTextOnlyCell(withIdentifier: identifier)
+          cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         }
-        cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
       case "ctime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
-          cell = makeCellWithText(withIdentifier: identifier)
+          cell = makeTextOnlyCell(withIdentifier: identifier)
+          cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         }
-        cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         return cell
       default:
         NSLog("ERROR [\(treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
@@ -584,6 +655,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return self.itemToGUID(self.outlineView.parent(forItem: childGUID))
   }
 
+  @objc func toggleCellCheckbox(_ sender: CellCheckboxButton) {
+    assert(sender.state.rawValue != -1, "User should never be allowed to toggle checkbox into Mixed state!")
+    let isChecked = sender.state.rawValue == 1
+    NSLog("DEBUG [\(treeID)] Checkbox toggled: \(sender.guid) => \(isChecked)")
+
+    // If checkbox was previously in Mixed state, it is now either Off or On. But we need to actively
+    // prevent them from toggling it into Mixed again.
+    sender.allowsMixedState = false
+    self.onCellCheckboxToggled(sender.guid)
+  }
+
   private func onCellCheckboxToggled(_ guid: GUID) {
     guard let sn = self.displayStore.getSN(guid) else {
       self.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
@@ -596,29 +678,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(nodeUID: sn.spid.nodeUID)
-    self.setNodeChecked(guid, newIsCheckedValue)
-  }
-
-  private func isCellCheckboxChecked(_ guid: GUID) -> Bool {
-    // TODO
-    return false
-  }
-
-  private func isCellCheckboxMixed(_ guid: GUID) -> Bool {
-    // TODO
-    return false
+    self.setNodeCheckedState(guid, newIsCheckedValue)
   }
 
   private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    // Update both UI and DisplayStore tracking
-
-    // TODO:
-    fatalError("TODO: update checkboxes in UI")
-
+    // We assume that the UI has already updated the checked state there, so we just need to update our model.
     self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
   }
 
-  func setNodeChecked(_ guid: GUID, _ newIsCheckedValue: Bool) {
+  func setNodeCheckedState(_ guid: GUID, _ newIsCheckedValue: Bool) {
     /*
      1. Siblings
 
@@ -629,9 +697,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     let parentGUID = self.getParentGUID(guid)
     if parentGUID != TOPMOST_GUID {
       for siblingSN in self.displayStore.getChildList(parentGUID) {
-        let siblingGUID = siblingSN.spid.guid
-        let isChecked = self.isCellCheckboxChecked(siblingGUID)
-        let isMixed = self.isCellCheckboxMixed(siblingGUID)
+        let (isChecked, isMixed) = self.displayStore.getCheckboxState(nodeUID: siblingSN.spid.nodeUID)
         self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: isChecked, isMixed: isMixed)
       }
     }

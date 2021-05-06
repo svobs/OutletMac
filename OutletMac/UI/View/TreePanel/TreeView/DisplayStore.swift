@@ -113,10 +113,14 @@ class DisplayStore {
   // "Get" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  private func getSN_NoLock(_ guid: GUID) -> SPIDNodePair? {
+    return self.primaryDict[guid] ?? nil
+  }
+
   func getSN(_ guid: GUID) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     con.app.execSync {
-      sn = self.primaryDict[guid] ?? nil
+      sn = self.getSN_NoLock(guid)
     }
     return sn
   }
@@ -178,6 +182,17 @@ class DisplayStore {
     return self.getSN(guid)?.node!.isDir ?? false
   }
 
+  /** Returns (isChecked, isMixed) */
+  func getCheckboxState(nodeUID: UID) -> (Bool, Bool) {
+    var isChecked: Bool = false
+    var isMixed: Bool = false
+    con.app.execSync {
+      isChecked = self.checkedNodeSet.contains(nodeUID)
+      isMixed = self.mixedNodeSet.contains(nodeUID)
+    }
+    return (isChecked, isMixed)
+  }
+
   func isCheckboxChecked(nodeUID: UID) -> Bool {
     var isChecked: Bool = false
     con.app.execSync {
@@ -220,7 +235,7 @@ class DisplayStore {
     var workQueue = LinkedList<SPIDNodePair>()
 
     con.app.execSync {
-      if var sn = self.getSN(guid) {
+      if var sn = self.getSN_NoLock(guid) {
         searchQueue.append(sn)
         workQueue.append(sn)
 
