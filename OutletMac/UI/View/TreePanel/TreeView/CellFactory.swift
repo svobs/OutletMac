@@ -37,6 +37,25 @@ class CellFactory {
 
   private class NameCellView : NSTableCellView {
     var checkbox: CellCheckboxButton? = nil
+
+    /** Returns a list of the components, in order */
+    func getComponentList() -> [NSControl] {
+      var list: [NSControl] = []
+
+      if let imageView = self.imageView {
+        list.append(imageView)
+      }
+
+      if let checkbox = self.checkbox {
+        list.append(checkbox)
+      }
+
+      if let textField = self.textField {
+        list.append(textField)
+      }
+
+      return list
+    }
   }
 
   static func upsertCellToOutlineView(_ tvc: TreeViewController, _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
@@ -53,7 +72,7 @@ class CellFactory {
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier, tvc)
         }
-        cell!.checkbox!.updateState(sn)
+        cell!.checkbox?.updateState(sn)  // checkbox is optional
         cell!.imageView!.image = self.makeIcon(sn, cell!, TREE_VIEW_CELL_HEIGHT)
         cell!.textField!.stringValue = node.name
         cell!.needsLayout = true
@@ -130,10 +149,12 @@ class CellFactory {
     cell.identifier = identifier
 
     // 1. Checkbox (if applicable)
-    let checkbox = CellCheckboxButton(sn: sn, parent: tvc)
-    checkbox.sizeToFit()
-    cell.addSubview(checkbox)
-    cell.checkbox = checkbox
+    if tvc.con.swiftTreeState.hasCheckboxes {
+      let checkbox = CellCheckboxButton(sn: sn, parent: tvc)
+      checkbox.sizeToFit()
+      cell.addSubview(checkbox)
+      cell.checkbox = checkbox
+    }
 
     // 2. Icon
     guard let icon = self.makeIcon(sn, cell, TREE_VIEW_CELL_HEIGHT) else {
@@ -154,7 +175,7 @@ class CellFactory {
     textField.sizeToFit()
 
     var prev: NSControl?
-    for widget in [imageView, checkbox, textField] {
+    for widget in cell.getComponentList() {
       widget.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
 
       if let previous = prev {

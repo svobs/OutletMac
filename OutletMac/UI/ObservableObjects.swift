@@ -59,8 +59,9 @@ class SwiftTreeState: ObservableObject {
   @Published var rootDeviceUID: UID = NULL_UID
   @Published var statusBarMsg: String = ""
   @Published var treeType: TreeType = TreeType.NA
+  @Published var hasCheckboxes: Bool
 
-  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String, rootDeviceUID: UID, treeType: TreeType) {
+  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String, rootDeviceUID: UID, treeType: TreeType, hasCheckboxes: Bool) {
     self.isUIEnabled = isUIEnabled
     self.isRootExists = isRootExists
     self.isEditingRoot = isEditingRoot
@@ -70,6 +71,7 @@ class SwiftTreeState: ObservableObject {
     self.rootPathNonEdit = rootPathNonEdit
     self.rootDeviceUID = rootDeviceUID
     self.treeType = treeType
+    self.hasCheckboxes = hasCheckboxes
   }
 
   static func toHumanEditableRootPath(_ spid: SPID) -> String {
@@ -88,12 +90,13 @@ class SwiftTreeState: ObservableObject {
     self.isManualLoadNeeded = newTree.needsManualLoad
     self.rootDeviceUID = newTree.rootDeviceUID
     self.treeType = newTree.rootSPID.treeType
+    self.hasCheckboxes = newTree.hasCheckboxes
   }
 
   static func from(_ tree: DisplayTree) -> SwiftTreeState {
     return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
                           offendingPath: tree.state.offendingPath, rootPath: SwiftTreeState.toHumanEditableRootPath(tree.rootSPID),
-                          rootPathNonEdit: tree.rootPath, rootDeviceUID: tree.rootDeviceUID, treeType: tree.rootSPID.treeType)
+                          rootPathNonEdit: tree.rootPath, rootDeviceUID: tree.rootDeviceUID, treeType: tree.rootSPID.treeType, hasCheckboxes: tree.hasCheckboxes)
   }
 }
 
