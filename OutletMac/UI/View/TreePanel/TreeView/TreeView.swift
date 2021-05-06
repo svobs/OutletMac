@@ -4,6 +4,8 @@ import SwiftUI
 import Foundation
 import LinkedList
 
+let CELL_HEIGHT: CGFloat = 32.0
+
 /**
  TreeView: extra layer of TreeView to specify layout
  */
@@ -313,14 +315,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  private func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView) -> NSImage? {
+  // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
+  private func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat) -> NSImage? {
     guard let node = sn.node else {
       return nil
     }
-
-    // At this point, the text field should know its desired height, which will also (eventually) be the height of the cell
-//    let cellHeight = cell.textField!.bounds.height
-//    NSLog("CELL HEIGHT: \(cellHeight)")
 
     var icon: NSImage
     if node.isDir {
@@ -336,8 +335,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         icon = NSWorkspace.shared.icon(forFileType: suffix)
       }
     }
-
-    let cellHeight: Int = 15 // TODO
 
     // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
     if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: cellHeight, height: cellHeight), context: nil, hints: nil) {
@@ -367,7 +364,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       self.target = parent
       self.setButtonType(.switch)
       self.bezelStyle = .texturedRounded
-      self.translatesAutoresizingMaskIntoConstraints = true
+      self.translatesAutoresizingMaskIntoConstraints = false
 
       let (isChecked, isMixed) = self.parent.displayStore.getCheckboxState(nodeUID: sn.spid.nodeUID)
       if isChecked {
@@ -395,12 +392,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     cell.addSubview(checkbox)
 
     // 2. Icon
-    guard let icon = self.makeIcon(sn, cell) else {
+    guard let icon = self.makeIcon(sn, cell, CELL_HEIGHT) else {
       return cell
     }
     let imageView = NSImageView(image: icon)
     imageView.imageAlignment = .alignCenter  // FIXME: this is not right
     imageView.imageFrameStyle = .none
+    imageView.imageScaling = .scaleProportionallyDown
     cell.addSubview(imageView)
     cell.imageView = imageView
 
@@ -411,8 +409,25 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
      // Constrain the text field within the cell
 //     textField.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
-    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+//    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
     textField.sizeToFit()
+
+    var prev: NSControl?
+    for widget in [checkbox, imageView, textField] {
+      widget.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+//      widget.heightAnchor.constraint(equalToConstant: 15.0).isActive = true
+
+      if let previous = prev {
+        widget.leadingAnchor.constraint(equalTo: previous.trailingAnchor).isActive = true
+      } else {
+//        widget.leadingAnchor.constraint(equalTo: cell.trailingAnchor).isActive = true
+      }
+
+      prev = widget
+    }
+
+    // Square image
+    imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.0).isActive = true
 
     // Checkbox goes leftmost
 //    checkbox.leftAnchor.constraint(equalTo: cell.leftAnchor).isActive = true
@@ -428,16 +443,16 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // FIXME: need to figure out how to align icon and text properly AND also make it compact
 
     // Match top of image with top of cell:
-    imageView.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
+//    imageView.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
     // Match center of image to center of text:
-    cell.imageView!.centerYAnchor.constraint(equalTo: cell.textField!.centerYAnchor).isActive = true
+//    cell.imageView!.centerYAnchor.constraint(equalTo: cell.textField!.centerYAnchor).isActive = true
 
     // Make sure the text is placed to the right of the icon:
 //    imageView.leftAnchor.constraint(equalTo: checkbox.rightAnchor).isActive = true
-    cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
+//    cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
 
-    cell.imageView!.sizeToFit()
-    cell.needsLayout = true
+//    cell.imageView!.sizeToFit()
+//    cell.needsLayout = true
 
     return cell
   }
@@ -496,37 +511,40 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier)
-          cell!.textField!.stringValue = node.name
         }
+        // TODO: update checkbox
+        
+        cell!.imageView!.image = self.makeIcon(sn, cell!, CELL_HEIGHT)
+        cell!.textField!.stringValue = node.name
 
         return cell
       case "size":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
-          cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         }
+        cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
       case "etc":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
-          cell!.textField!.stringValue = String(node.etc)
         }
+        cell!.textField!.stringValue = String(node.etc)
         return cell
       case "mtime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
-          cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         }
+        cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
       case "ctime":
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
-          cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         }
+        cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
         return cell
       default:
         NSLog("ERROR [\(treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
