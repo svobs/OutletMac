@@ -40,6 +40,8 @@
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
 		D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* OutletApp.swift */; };
 		D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* MainContentView.swift */; };
+		D1C20DFE264489410068C3FC /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C20DFD264489410068C3FC /* CellFactory.swift */; };
+		D1C20E0026448D1C0068C3FC /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -96,6 +98,8 @@
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
 		D1BAC55E25A193C800D951A2 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
 		D1BAC55F25A193C800D951A2 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
+		D1C20DFD264489410068C3FC /* CellFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
+		D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -261,6 +265,8 @@
 				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
 				D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */,
 				D12C2CB02601FEB600E91EC9 /* Actions.swift */,
+				D1C20DFD264489410068C3FC /* CellFactory.swift */,
+				D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */,
 			);
 			path = TreeView;
 			sourceTree = "<group>";
@@ -436,6 +442,7 @@
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
+				D1C20DFE264489410068C3FC /* CellFactory.swift in Sources */,
 				D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
@@ -443,6 +450,7 @@
 				D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */,
 				D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */,
 				D138ADFE25BFE8D100E4F9E4 /* DateUtil.swift in Sources */,
+				D1C20E0026448D1C0068C3FC /* CellCheckboxButton.swift in Sources */,
 				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,
 				D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */,
 				D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */,

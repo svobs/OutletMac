@@ -150,7 +150,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
   private func configureOutlineView(_ scrollView: NSScrollView) {
     outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
-    outlineView.allowsMultipleSelection = self.con.allowMultipleSelection
     outlineView.autosaveTableColumns = true
     outlineView.autosaveExpandedItems = true
     outlineView.rowSizeStyle = .large
@@ -212,6 +211,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     outlineView.frame = scrollView.bounds
     outlineView.delegate = self
     outlineView.dataSource = self
+
+    outlineView.allowsMultipleSelection = self.con.allowMultipleSelection
 
     // Hook up double-click handler
     outlineView.doubleAction = #selector(doubleClickedItem)
@@ -294,177 +295,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return displayStore.isDir(itemToGUID(item)) && !self.con.swiftFilterState.isFlatList()
   }
 
-  /**
-   Thanks to "jnpdx" from here for this:
-   https://stackoverflow.com/questions/66165528/how-to-change-nstextfield-font-size-when-used-in-swiftui
-   */
-  private class CustomFontNSTextField : NSTextField {
-    func customSetFont(_ font: NSFont?) {
-      super.font = font
-    }
-
-    /**
-     There seems to be a bug in Apple's code in Big Sur which causes font to be continuously set to system font, size 18.
-     Override this to prevent this from happening.
-     */
-    override var font: NSFont? {
-      get {
-        return super.font
-      }
-      set {}
-    }
-  }
-
-  // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
-  private func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat) -> NSImage? {
-    guard let node = sn.node else {
-      return nil
-    }
-
-    var icon: NSImage
-    if node.isDir {
-      icon = NSWorkspace.shared.icon(for: .folder)
-    } else if node.isEphemeral {
-      // TODO: warning icon
-      icon = NSWorkspace.shared.icon(for: .application)
-    } else {
-      let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
-      if suffix == "" {
-        icon = NSWorkspace.shared.icon(for: .data)
-      } else {
-        icon = NSWorkspace.shared.icon(forFileType: suffix)
-      }
-    }
-
-    // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
-    if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: cellHeight, height: cellHeight), context: nil, hints: nil) {
-      icon = NSImage(size: imageRep.size)
-      icon.addRepresentation(imageRep)
-    }
-
-    icon.size = NSSize(width: cellHeight, height: cellHeight)
-
-    return icon
-  }
-
-  class CellCheckboxButton: NSButton {
-    let parent: TreeViewController
-    var guid: GUID
-
-    init(sn: SPIDNodePair, parent: TreeViewController, action: Selector?) {
-      self.parent = parent
-      self.guid = sn.spid.guid
-      // NOTE: *MUST* use this constructor when subclassing. All other constructors will crash at runtime.
-      // Thanks Apple!
-      super.init(frame: NSRect(x: 150, y: 200, width: 20, height: 20))
-      self.title = ""
-      self.action = action
-      self.target = parent
-      self.setButtonType(.switch)
-      self.bezelStyle = .texturedRounded
-      self.translatesAutoresizingMaskIntoConstraints = false
-
-      self.updateState(sn)
-    }
-
-    func updateState(_ sn: SPIDNodePair) {
-      self.guid = sn.spid.guid
-      let state = self.parent.displayStore.getCheckboxState(sn)
-      if state == .mixed {
-          self.allowsMixedState = true
-      }
-      self.state = state
-    }
-
-    required init?(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
-    }
-  }
-
-  class NameCellView : NSTableCellView {
-    var checkbox: CellCheckboxButton? = nil
-  }
-
-  private func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NameCellView {
-    let cell = NameCellView()
-    cell.identifier = identifier
-
-    // 1. Checkbox (if applicable)
-    let checkbox = CellCheckboxButton(sn: sn, parent: self, action: #selector(self.onCellCheckboxToggled(_:)))
-    checkbox.sizeToFit()
-    cell.addSubview(checkbox)
-    cell.checkbox = checkbox
-
-    // 2. Icon
-    guard let icon = self.makeIcon(sn, cell, CELL_HEIGHT) else {
-      return cell
-    }
-    let imageView = NSImageView(image: icon)
-    imageView.imageFrameStyle = .none
-    imageView.imageScaling = .scaleProportionallyDown
-    cell.addSubview(imageView)
-    cell.imageView = imageView
-
-    // 3. Text field
-    let textField = makeCellTextField()
-    cell.addSubview(textField)
-    cell.textField = textField
-
-     // Constrain the text field within the cell
-    textField.sizeToFit()
-
-    var prev: NSControl?
-    for widget in [imageView, checkbox, textField] {
-      widget.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
-
-      if let previous = prev {
-        widget.leadingAnchor.constraint(equalTo: previous.trailingAnchor, constant: 4.0).isActive = true
-      } else {
-        widget.leadingAnchor.constraint(equalTo: cell.leadingAnchor).isActive = true
-      }
-
-      prev = widget
-    }
-
-    cell.needsLayout = true
-
-    return cell
-  }
-
-  private func makeCellTextField() -> CustomFontNSTextField {
-    let textField = CustomFontNSTextField()
-    textField.backgroundColor = NSColor.clear
-    textField.translatesAutoresizingMaskIntoConstraints = false
-    textField.isBordered = false
-    textField.isBezeled = false
-    textField.isEditable = false
-    textField.customSetFont(TREE_VIEW_NSFONT)
-    textField.lineBreakMode = .byTruncatingTail
-    return textField
-  }
-
-  private func makeTextOnlyCell(withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-    let cell = NSTableCellView()
-    cell.identifier = identifier
-
-    let textField = makeCellTextField()
-    cell.addSubview(textField)
-    cell.textField = textField
-
-    // Constrain the text field within the cell
-    textField.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
-    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
-    textField.sizeToFit()
-//    textField.setFrameOrigin(NSZeroPoint)
-
-    return cell
-  }
-
   // NSOutlineViewDelegate methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   /**
-   Makes contents of the cell. From NSOutlineViewDelegate
+   Make cell view.
+   From NSOutlineViewDelegate
    */
   public func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
     guard let identifier = tableColumn?.identifier else { return nil }
@@ -474,60 +310,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return nil
     }
 
-    guard let sn = self.displayStore.getSN(guid) else {
-      NSLog("ERROR [\(treeID)] viewForTableColumn(): node not found with GUID: \(guid)")
-      return nil
-    }
-
-    let node = sn.node!
-    switch identifier.rawValue {
-      case "name":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NameCellView
-        if cell == nil {
-          cell = makeNameCell(for: sn, withIdentifier: identifier)
-        }
-        cell!.checkbox!.updateState(sn)
-        cell!.imageView!.image = self.makeIcon(sn, cell!, CELL_HEIGHT)
-        cell!.textField!.stringValue = node.name
-        cell!.needsLayout = true
-
-        return cell
-      case "size":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
-        if cell == nil {
-          cell = makeTextOnlyCell(withIdentifier: identifier)
-        }
-        cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
-        return cell
-      case "etc":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
-        if cell == nil {
-          cell = makeTextOnlyCell(withIdentifier: identifier)
-        }
-        cell!.textField!.stringValue = String(node.etc)
-        return cell
-      case "mtime":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
-        if cell == nil {
-          cell = makeTextOnlyCell(withIdentifier: identifier)
-        }
-        cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
-        return cell
-      case "ctime":
-        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
-        if cell == nil {
-          cell = makeTextOnlyCell(withIdentifier: identifier)
-        }
-        cell!.textField!.stringValue = DateUtil.formatTS(node.changeTS)
-        return cell
-      default:
-        NSLog("ERROR [\(treeID)] unrecognized identifier (ignoring): \(identifier.rawValue)")
-        return nil
-    }
+    return CellFactory.upsertCellToOutlineView(self, identifier, guid)
   }
 
   /**
-   SELECTION CHANGED
+   Post Selection Change
+   From NSOutlineViewDelegate
   */
   func outlineViewSelectionDidChange(_ notification: Notification) {
     let guidSet: Set<GUID> = self.getSelectedGUIDs()
@@ -551,6 +339,72 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
     self.con.dispatcher.sendSignal(signal: .TREE_SELECTION_CHANGED, senderID: self.con.treeID, ["sn_list": snList])
   }
+
+  /**
+   Pre Row Expand
+   From NSOutlineViewDelegate
+   */
+  func outlineViewItemWillExpand(_ notification: Notification) {
+    guard self.expandContractListenersEnabled else {
+      return
+    }
+
+    guard let parentGUID: GUID = getKey(notification) else {
+      return
+    }
+
+    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
+      return
+    }
+
+    NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
+
+    do {
+      let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+
+      outlineView.beginUpdates()
+      defer {
+        outlineView.endUpdates()
+      }
+      self.displayStore.putChildList(parentSN, childSNList)
+      self.outlineView.reloadItem(parentGUID, reloadChildren: true)
+    } catch OutletError.maxResultsExceeded(let actualCount) {
+      self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
+    } catch {
+      self.con.reportException("Failed to expand node", error)
+    }
+  }
+
+  /**
+   Pre Row Collapse
+   From NSOutlineViewDelegate
+   */
+  func outlineViewItemWillCollapse(_ notification: Notification) {
+    guard let parentGUID: GUID = getKey(notification) else {
+      return
+    }
+    NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
+    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
+      return
+    }
+
+    /*
+     FIXME: we have a broken model here. The BE stores expanded/collapsed UIDs, but we need it to store GUIDs.
+     Continuing to use UIDs will result in GDrive nodes being incorrectly expanded if they are linked more than
+     once in the same UI tree.
+     However, the BE currently has no idea what a GUID is.
+     This is expected to be a minor issue but let's fix it in the future by adding BE support.
+    */
+
+    do {
+      try self.con.backend.removeExpandedRow(parentSN.spid.guid, self.treeID)
+    } catch {
+      NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
+    }
+  }
+
+  // Utility methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func getSelectedUIDs() -> Set<UID> {
     var uidSet = Set<UID>()
@@ -619,6 +473,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
+  /**
+   Reloads the row with the given GUID in the NSOutlineView. Convenience function for use by external classes
+   */
   func reloadItem(_ guid: GUID, reloadChildren: Bool) {
     // remember, GUID at root of tree is nil
     let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
@@ -640,159 +497,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? TOPMOST_GUID)")
         self.outlineView.removeItems(at: indexSet, inParent: parentGUID, withAnimation: .effectFade)
       }
-    }
-  }
-
-  @objc func onCellCheckboxToggled(_ sender: CellCheckboxButton) {
-    assert(sender.state.rawValue != -1, "User should never be allowed to toggle checkbox into Mixed state!")
-    let isChecked = sender.state.rawValue == 1
-    NSLog("DEBUG [\(treeID)] User toggled checkbox for: \(sender.guid) => \(isChecked)")
-
-    // If checkbox was previously in Mixed state, it is now either Off or On. But we need to actively
-    // prevent them from toggling it into Mixed again.
-    sender.allowsMixedState = false
-
-    guard let sn = self.displayStore.getSN(sender.guid) else {
-      self.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(sender.guid)")
-      return
-    }
-    if let isEphemeral = sn.node?.isEphemeral {
-      if isEphemeral {
-        return
-      }
-    }
-
-    let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(sn)
-    NSLog("DEBUG [\(treeID)] Setting new checked value for node_uid: \(sn.spid.nodeUID) => \(newIsCheckedValue)")
-    self.setNodeCheckedState(sender.guid, newIsCheckedValue)
-  }
-
-  private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let guid = sn.spid.guid
-    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
-
-    // Update model here:
-    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
-
-    // Now update the node in the UI:
-    DispatchQueue.main.async {
-      self.outlineView.reloadItem(guid, reloadChildren: false)
-    }
-  }
-
-  func setNodeCheckedState(_ guid: GUID, _ newIsCheckedValue: Bool) {
-    /*
-     1. Siblings
-
-     Housekeeping. Need to update all the siblings (children of parent) because their checked state may not be tracked.
-     We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
-     But if the parent is mixed, we must track the state of ALL of its children.
-     */
-
-    let parentGUID = self.displayStore.getParentGUID(guid)!
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking siblings of \(guid) (parent_guid=\(parentGUID))")
-    if parentGUID != TOPMOST_GUID {
-      for siblingSN in self.displayStore.getChildList(parentGUID) {
-        let state = self.displayStore.getCheckboxState(siblingSN)
-        self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
-      }
-    }
-
-    /*
-     2. Children
-     Need to update all the children of the node to match its checked state, both in UI and tracking.
-    */
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking self and descendants of \(guid)")
-    let applyFunc: ApplyToSNFunc = { sn in self.setCheckedState(sn, isChecked: newIsCheckedValue, isMixed: false) }
-    self.displayStore.doForSelfAndAllDescendants(guid, applyFunc)
-
-    /*
-     3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
-    */
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking ancestors of \(guid)")
-    var ancestorGUID: GUID = guid
-    while true {
-      ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
-      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): next higher ancestor: \(ancestorGUID)")
-      if ancestorGUID == TOPMOST_GUID {
-        break
-      }
-      var hasChecked = false
-      var hasUnchecked = false
-      var hasMixed = false
-      for childSN in self.displayStore.getChildList(ancestorGUID) {
-        if self.displayStore.isCheckboxChecked(childSN) {
-          hasChecked = true
-        } else {
-          hasUnchecked = true
-        }
-        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childSN)
-      }
-      let isChecked = hasChecked && !hasUnchecked && !hasMixed
-      let isMixed = hasMixed || (hasChecked && hasUnchecked)
-      let ancestorSN = self.displayStore.getSN(ancestorGUID)
-      self.setCheckedState(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
-    }
-  }
-
-  /**
-   EXPAND ROW
-  */
-  func outlineViewItemWillExpand(_ notification: Notification) {
-    guard self.expandContractListenersEnabled else {
-      return
-    }
-
-    guard let parentGUID: GUID = getKey(notification) else {
-      return
-    }
-
-    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
-      return
-    }
-
-    NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
-
-    do {
-      let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
-
-      outlineView.beginUpdates()
-      defer {
-        outlineView.endUpdates()
-      }
-      self.displayStore.putChildList(parentSN, childSNList)
-      self.outlineView.reloadItem(parentGUID, reloadChildren: true)
-    } catch OutletError.maxResultsExceeded(let actualCount) {
-      self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
-    } catch {
-      self.con.reportException("Failed to expand node", error)
-    }
-  }
-
-  /**
-   COLLAPSE ROW
-  */
-  func outlineViewItemWillCollapse(_ notification: Notification) {
-    guard let parentGUID: GUID = getKey(notification) else {
-      return
-    }
-    NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
-    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
-      return
-    }
-
-    /*
-     FIXME: we have a broken model here. The BE stores expanded/collapsed UIDs, but we need it to store GUIDs.
-     Continuing to use UIDs will result in GDrive nodes being incorrectly expanded if they are linked more than
-     once in the same UI tree.
-     However, the BE currently has no idea what a GUID is.
-     This is expected to be a minor issue but let's fix it in the future by adding BE support.
-    */
-
-    do {
-      try self.con.backend.removeExpandedRow(parentSN.spid.guid, self.treeID)
-    } catch {
-      NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
     }
   }
 

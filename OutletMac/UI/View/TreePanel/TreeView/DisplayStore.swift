@@ -195,6 +195,11 @@ class DisplayStore {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
+    if let node = sn.node {
+      if node.isEphemeral {
+        return false
+      }
+    }
     if self.checkedNodeSet.contains(sn.spid.nodeUID) {
       return true
     } else if self.checkedNodeSet.contains(self.getParentSN_NoLock(sn.spid.guid)!.spid.nodeUID) {
