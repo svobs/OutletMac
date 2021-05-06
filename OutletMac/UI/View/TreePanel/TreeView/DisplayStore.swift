@@ -18,6 +18,7 @@ class DisplayStore {
 
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
+  private var childParentDict: [GUID: GUID] = [:]
 
   /*
    Track the checkbox states here. For increased speed and to accommodate lazy loading strategies,
@@ -43,25 +44,30 @@ class DisplayStore {
     self.con = controllable
   }
 
-  private func appendToParentChildDict(parentGUID: GUID?, _ childSN: SPIDNodePair) {
+  private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
+    let childGUID: GUID = childSN.spid.guid
     var realParentGUID: GUID = (parentGUID == nil) ? TOPMOST_GUID : parentGUID!
     if realParentGUID == self.con.tree.rootSPID.guid {
       realParentGUID = TOPMOST_GUID
     }
 
+    // Parent -> Child
     // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
     if self.parentChildListDict[realParentGUID] == nil {
       self.parentChildListDict[realParentGUID] = []
     }
     // TODO: this may get slow for very large directories...
     for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
-      if existing.spid.guid == childSN.spid.guid {
+      if existing.spid.guid == childGUID {
         // found: replace existing
         self.parentChildListDict[realParentGUID]![index] = childSN
         return
       }
     }
     self.parentChildListDict[realParentGUID]!.append(childSN)
+
+    // Child -> Parent
+    self.childParentDict[childGUID] = realParentGUID
   }
 
   // "Put" operations
@@ -72,27 +78,31 @@ class DisplayStore {
   */
   func putRootChildList(_ topLevelSNList: [SPIDNodePair]) -> Void {
     con.app.execSync {
-      var nodeDict: [GUID: SPIDNodePair] = [:]
-      for sn in topLevelSNList {
-        nodeDict[sn.spid.guid] = sn
-      }
-
+      self.primaryDict.removeAll()
+      self.childParentDict.removeAll()
       self.parentChildListDict.removeAll()
-      self.parentChildListDict[TOPMOST_GUID] = topLevelSNList
-      self.primaryDict = nodeDict
       self.checkedNodeSet.removeAll()
       self.mixedNodeSet.removeAll()
+
+      self.parentChildListDict[TOPMOST_GUID] = topLevelSNList
+      for childSN in topLevelSNList {
+        let childGUID = childSN.spid.guid
+        self.primaryDict[childGUID] = childSN
+        self.childParentDict[childGUID] = TOPMOST_GUID
+      }
     }
   }
 
   func putChildList(_ parentSN: SPIDNodePair?, _ childSNList: [SPIDNodePair]) {
     con.app.execSync {
-
-      for childSN in childSNList {
-        self.primaryDict[childSN.spid.guid] = childSN
-      }
       // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
       let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
+
+      for childSN in childSNList {
+        let childGUID = childSN.spid.guid
+        self.primaryDict[childGUID] = childSN
+        self.childParentDict[childGUID] = parentGUID
+      }
       self.parentChildListDict[parentGUID] = childSNList
     }
   }
@@ -100,11 +110,12 @@ class DisplayStore {
   func upsertSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
     var wasPresent: Bool = false
     con.app.execSync {
-      if self.primaryDict[childSN.spid.guid] != nil {
+      let childGUID = childSN.spid.guid
+      if self.primaryDict[childGUID] != nil {
         wasPresent = true
       }
-      self.primaryDict[childSN.spid.guid] = childSN
-      self.appendToParentChildDict(parentGUID: parentGUID, childSN)
+      self.primaryDict[childGUID] = childSN
+      self.upsertParentChildRelationship_NoLock(parentGUID: parentGUID, childSN)
     }
 
     return wasPresent
@@ -153,6 +164,24 @@ class DisplayStore {
       }
     }
     return sn
+  }
+
+  func getParentGUID(_ childGUID: GUID) -> GUID? {
+    var parentGUID: GUID? = nil
+    con.app.execSync {
+      parentGUID = self.childParentDict[childGUID]
+    }
+    return parentGUID
+  }
+
+  func getParentSN(_ childGUID: GUID) -> SPIDNodePair? {
+    var parentSN: SPIDNodePair? = nil
+    con.app.execSync {
+      if let parentGUID = self.childParentDict[childGUID] {
+        parentSN = self.primaryDict[parentGUID]
+      }
+    }
+    return parentSN
   }
 
   // Other
@@ -240,6 +269,7 @@ class DisplayStore {
 
     con.app.execSync {
       if var sn = self.getSN_NoLock(guid) {
+        NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
         searchQueue.append(sn)
         workQueue.append(sn)
 
@@ -255,6 +285,7 @@ class DisplayStore {
 
     while !workQueue.isEmpty {
       let sn = workQueue.popFirst()!
+      NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
       applyFunc(sn)
     }
   }

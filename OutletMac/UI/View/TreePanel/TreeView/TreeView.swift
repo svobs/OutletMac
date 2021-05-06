@@ -642,14 +642,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
   }
 
-  private func getParentGUID(_ childGUID: GUID) -> GUID {
-    return self.itemToGUID(self.outlineView.parent(forItem: childGUID))
-  }
-
   @objc func onCellCheckboxToggled(_ sender: CellCheckboxButton) {
     assert(sender.state.rawValue != -1, "User should never be allowed to toggle checkbox into Mixed state!")
     let isChecked = sender.state.rawValue == 1
-    NSLog("DEBUG [\(treeID)] Checkbox toggled: \(sender.guid) => \(isChecked)")
+    NSLog("DEBUG [\(treeID)] User toggled checkbox for: \(sender.guid) => \(isChecked)")
 
     // If checkbox was previously in Mixed state, it is now either Off or On. But we need to actively
     // prevent them from toggling it into Mixed again.
@@ -666,12 +662,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(nodeUID: sn.spid.nodeUID)
+    NSLog("DEBUG [\(treeID)] Setting new checked value for node_uid: \(sn.spid.nodeUID) => \(newIsCheckedValue)")
     self.setNodeCheckedState(sender.guid, newIsCheckedValue)
   }
 
   private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
     let guid = sn.spid.guid
-    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) => \(isChecked)/\(isMixed)")
+    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
 
     // Update model here:
     self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
@@ -691,9 +688,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      But if the parent is mixed, we must track the state of ALL of its children.
      */
 
-
-    // FIXME: there's a bug here!
-    let parentGUID = self.getParentGUID(guid)
+    let parentGUID = self.displayStore.getParentGUID(guid)!
+    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking siblings of \(guid) (parent_guid=\(parentGUID))")
     if parentGUID != TOPMOST_GUID {
       for siblingSN in self.displayStore.getChildList(parentGUID) {
         let state = self.displayStore.getCheckboxState(nodeUID: siblingSN.spid.nodeUID)
@@ -705,15 +701,18 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      2. Children
      Need to update all the children of the node to match its checked state, both in UI and tracking.
     */
+    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking self and descendants of \(guid)")
     let applyFunc: ApplyToSNFunc = { sn in self.setCheckedState(sn, isChecked: newIsCheckedValue, isMixed: false) }
     self.displayStore.doForSelfAndAllDescendants(guid, applyFunc)
 
     /*
      3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
     */
+    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking ancestors of \(guid)")
     var ancestorGUID: GUID = guid
     while true {
-      ancestorGUID = self.getParentGUID(ancestorGUID)
+      ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
+      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): next higher ancestor: \(ancestorGUID)")
       if ancestorGUID == TOPMOST_GUID {
         break
       }
