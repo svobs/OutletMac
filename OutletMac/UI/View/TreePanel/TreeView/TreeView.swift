@@ -347,9 +347,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     return icon
   }
 
-  class NameCellView: NSTableCellView {
-  }
-
   class CellCheckboxButton: NSButton {
     let parent: TreeViewController
     let guid: GUID
@@ -359,7 +356,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       self.guid = sn.spid.guid
       // NOTE: *MUST* use this constructor when subclassing. All other constructors will crash at runtime.
       // Thanks Apple!
-      super.init(frame: NSRect(x: 0, y: 0, width: 20, height: 20))
+      super.init(frame: NSRect(x: 150, y: 200, width: 20, height: 20))
       self.title = ""
       self.target = parent
       self.setButtonType(.switch)
@@ -383,13 +380,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
   }
 
   private func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-    let cell = NameCellView()
+    let cell = NSTableCellView()
     cell.identifier = identifier
 
     // 1. Checkbox (if applicable)
     let checkbox = CellCheckboxButton(sn: sn, parent: self)
     checkbox.action = #selector(self.toggleCellCheckbox(_:))
     cell.addSubview(checkbox)
+
+//    checkbox.sizeToFit()
 
     // 2. Icon
     guard let icon = self.makeIcon(sn, cell, CELL_HEIGHT) else {
@@ -408,26 +407,23 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     cell.textField = textField
 
      // Constrain the text field within the cell
-//     textField.heightAnchor.constraint(lessThanOrEqualTo: cell.heightAnchor).isActive = true
-//    textField.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
     textField.sizeToFit()
 
     var prev: NSControl?
-    for widget in [checkbox, imageView, textField] {
+    for widget in [imageView, checkbox, textField] {
       widget.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
-//      widget.heightAnchor.constraint(equalToConstant: 15.0).isActive = true
 
       if let previous = prev {
-        widget.leadingAnchor.constraint(equalTo: previous.trailingAnchor).isActive = true
+        widget.leadingAnchor.constraint(equalTo: previous.trailingAnchor, constant: 4.0).isActive = true
       } else {
-//        widget.leadingAnchor.constraint(equalTo: cell.trailingAnchor).isActive = true
+        widget.leadingAnchor.constraint(equalTo: cell.leadingAnchor).isActive = true
       }
 
       prev = widget
     }
 
     // Square image
-    imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.0).isActive = true
+//    imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 1.0).isActive = true
 
     // Checkbox goes leftmost
 //    checkbox.leftAnchor.constraint(equalTo: cell.leftAnchor).isActive = true
@@ -438,7 +434,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
 //    checkbox.rightAnchor.constraint(equalTo: cell.imageView!.leftAnchor).isActive = true
 
-//    textField.setFrameOrigin(NSZeroPoint)
+//    checkbox.setFrameOrigin(NSZeroPoint)
 
     // FIXME: need to figure out how to align icon and text properly AND also make it compact
 
@@ -452,7 +448,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 //    cell.textField!.leftAnchor.constraint(equalTo: imageView.rightAnchor).isActive = true
 
 //    cell.imageView!.sizeToFit()
-//    cell.needsLayout = true
+    cell.needsLayout = true
 
     return cell
   }
@@ -513,7 +509,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
           cell = makeNameCell(for: sn, withIdentifier: identifier)
         }
         // TODO: update checkbox
-        
+
         cell!.imageView!.image = self.makeIcon(sn, cell!, CELL_HEIGHT)
         cell!.textField!.stringValue = node.name
 
