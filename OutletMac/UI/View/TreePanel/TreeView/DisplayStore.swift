@@ -200,9 +200,16 @@ class DisplayStore {
         return false
       }
     }
+
     if self.checkedNodeSet.contains(sn.spid.nodeUID) {
       return true
-    } else if self.checkedNodeSet.contains(self.getParentSN_NoLock(sn.spid.guid)!.spid.nodeUID) {
+    }
+
+    guard let parentSN = self.getParentSN_NoLock(sn.spid.guid) else {
+      fatalError("ERROR Could not find parent of GUID \(sn.spid.guid) (SPID=\(sn.spid))")
+    }
+
+    if self.checkedNodeSet.contains(parentSN.spid.nodeUID) {
       // implcitly on:
       return true
     }

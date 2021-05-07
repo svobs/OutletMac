@@ -10,15 +10,16 @@ import LinkedList
 struct TreeView: View {
   let con: TreePanelControllable
   @EnvironmentObject var settings: GlobalSettings
+  @ObservedObject var swiftTreeState: SwiftTreeState
   @ObservedObject var heightTracking: HeightTracking
 
   init(controller: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.con = controller
+    self.swiftTreeState = self.con.swiftTreeState
     self.heightTracking = heightTracking
   }
 
-  var body: some View {
-    HStack {
+  private func makeTreeView() -> some View {
       TreeViewRepresentable(controller: self.con)
         .padding(.top)
         .frame(minWidth: 200,
@@ -27,6 +28,17 @@ struct TreeView: View {
                minHeight: heightTracking.getTreeViewHeight(),
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
+  }
+
+  var body: some View {
+    HStack {
+      // Here we really want to just wipe out the NSOutlineView and rebuild it from scratch if the
+      // value of 'hasCheckboxes' changes. This accomplishes that in an almost-clean way:
+      if swiftTreeState.hasCheckboxes {
+        makeTreeView()
+      } else {
+        makeTreeView()
+      }
     }
     .frame(alignment: .topLeading)
   }
@@ -43,8 +55,6 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
   }
 
   func makeNSViewController(context: Context) -> TreeViewController {
-    // TOOD: find better names for TreeController/TreePanelControllable
-
     let treeViewController = TreeViewController()
     treeViewController.con = self.con
     return treeViewController
@@ -211,6 +221,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return nil
     }
 
+    if guid == TOPMOST_GUID {
+      // TODO: why is this happening for change trees?
+      NSLog("ERROR [\(treeID)] Should not be creating a row for the root GUID!")
+      return nil
+    }
+
     return CellFactory.upsertCellToOutlineView(self, identifier, guid)
   }
 
@@ -285,20 +301,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       return
     }
     NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
-    guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
-      return
-    }
-
-    /*
-     FIXME: we have a broken model here. The BE stores expanded/collapsed UIDs, but we need it to store GUIDs.
-     Continuing to use UIDs will result in GDrive nodes being incorrectly expanded if they are linked more than
-     once in the same UI tree.
-     However, the BE currently has no idea what a GUID is.
-     This is expected to be a minor issue but let's fix it in the future by adding BE support.
-    */
 
     do {
-      try self.con.backend.removeExpandedRow(parentSN.spid.guid, self.treeID)
+      // Tell BE to remove the GUID from its peresisted state of expanded rows. (No need to make a
+      // similar call when the row is expanded; the BE does this automatically when getChildList() called)
+      NSLog("DEBUG [\(treeID)] Reporting collapsed node to BE: \(parentGUID)")
+      try self.con.backend.removeExpandedRow(parentGUID, self.treeID)
     } catch {
       NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
     }

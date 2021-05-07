@@ -173,11 +173,10 @@ class DisplayTreeUiState: CustomStringConvertible {
   let treeDisplayMode: TreeDisplayMode
   let hasCheckboxes: Bool
   
-  init(treeID: TreeID, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String? = nil,
-       treeDisplayMode: TreeDisplayMode = TreeDisplayMode.ONE_TREE_ALL_ITEMS, hasCheckboxes: Bool = false) {
+  init(treeID: TreeID, rootSN: SPIDNodePair, rootExists: Bool, offendingPath: String?, needsManualLoad: Bool,
+       treeDisplayMode: TreeDisplayMode, hasCheckboxes: Bool) {
     self.treeID = treeID
-    /**SPIDNodePair is needed to clarify the (albeit very rare) case where the root node resolves to multiple paths.
-     Each display tree can only have one root path.*/
+    /**We require a SPID because a display tree can only have one root path.*/
     self.rootSN = rootSN
     self.rootExists = rootExists
     self.offendingPath = offendingPath
@@ -186,12 +185,12 @@ class DisplayTreeUiState: CustomStringConvertible {
     
     /**If True, the UI should display a "Load" button in order to kick off the backend data load.
      If False; the backend will automatically start loading in the background.*/
-    self.needsManualLoad = false
+    self.needsManualLoad = needsManualLoad
   }
 
   var description: String {
     get {
-      return "DisplayTreeUiState(treeID='\(self.treeID)' rootSN=\(self.rootSN) rootExists=\(self.rootExists) offendingPath='\(self.offendingPath ?? "nil")' treeDisplayMode=\(self.treeDisplayMode) hasCheckboxes=\(self.hasCheckboxes))"
+      return "DisplayTreeUiState(treeID='\(self.treeID)' rootSN=\(self.rootSN) rootExists=\(self.rootExists) offendingPath='\(self.offendingPath ?? "nil")' needsManualLoad=\(self.needsManualLoad) treeDisplayMode=\(self.treeDisplayMode) hasCheckboxes=\(self.hasCheckboxes))"
     }
   }
   

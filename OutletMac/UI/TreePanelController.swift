@@ -95,7 +95,7 @@ class MockTreePanelController: TreePanelControllable {
     // dummy data follows
     let spid = LocalNodeIdentifier(NULL_UID, deviceUID: NULL_UID, ROOT_PATH)
     let rootSN = (spid, LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
-    self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
+    self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, needsManualLoad: false, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
     self.swiftTreeState = try SwiftTreeState.from(self.tree)
     let filterCriteria = FilterCriteria()
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
@@ -417,7 +417,7 @@ class TreePanelController: TreePanelControllable {
   private func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
     let newTree = try props.get("tree") as! DisplayTree
 
-    NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(self.tree.rootPath))")
+    NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
     self.app.execSync {
       if newTree.treeID != self.tree.treeID {
         NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")

@@ -364,7 +364,9 @@ class GRPCConverter {
 
   func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
     let rootSn: SPIDNodePair = try self.snFromGRPC(stateGRPC.rootSn)
+    let treeDisplayMode = TreeDisplayMode(rawValue: stateGRPC.treeDisplayMode)!
     NSLog("DEBUG [\(stateGRPC.treeID)] Got rootSN: \(rootSn)")
-    return DisplayTreeUiState(treeID: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists)
+    // note: I have absolutely no clue why gRPC renames "hasCheckboxes" to "hasCheckboxes_p"
+    return DisplayTreeUiState(treeID: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists, offendingPath: stateGRPC.offendingPath, needsManualLoad: stateGRPC.needsManualLoad, treeDisplayMode: treeDisplayMode, hasCheckboxes: stateGRPC.hasCheckboxes_p)
   }
 }
