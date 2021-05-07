@@ -654,7 +654,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
 
   public var sender: String = String()
 
-  /// for NODE_UPSERTED
+  /// for NODE_UPSERTED, NODE_REMOVED
   public var parentGuid: String = String()
 
   public var signalData: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData? = nil

@@ -195,7 +195,7 @@ struct RootPathPanel: View {
 
 struct RootPathPanel_Previews: PreviewProvider {
   static var previews: some View {
-    RootPathPanel(MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
+    RootPathPanel(try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
 

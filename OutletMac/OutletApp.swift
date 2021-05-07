@@ -166,7 +166,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   */
   func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
+    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
 
     try con.start()
     return con

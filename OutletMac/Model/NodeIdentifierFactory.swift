@@ -35,7 +35,7 @@ class NodeIdentifierFactory {
       }
     }
     throw OutletError.invalidState("Could not find device with UID: \(deviceUID)")
-  }
+  }  
 
   func getRootConstantGDriveIdentifier(_ deviceUID: UID) -> GDriveIdentifier {
     return GDriveIdentifier(GDRIVE_ROOT_UID, deviceUID: deviceUID, [ROOT_PATH])
@@ -49,7 +49,20 @@ class NodeIdentifierFactory {
     return LocalNodeIdentifier(LOCAL_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
   }
 
-  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID) throws -> NodeIdentifier {
+  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32? = nil) throws -> NodeIdentifier {
+    if let opType = opType {
+      if opType > 0 {
+        // ChangeTreeSPID (we must be coming from gRPC)
+        let opTypeEnum: UserOpType?
+        if opType == GRPC_CHANGE_TREE_NO_OP {
+          opTypeEnum = nil
+        } else {
+          opTypeEnum = UserOpType(rawValue: opType)
+        }
+        return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum)
+      }
+    }
+
     let treeType = try self.getTreeType(for: deviceUID)
 
     if treeType == .LOCAL_DISK {

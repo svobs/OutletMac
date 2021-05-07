@@ -12,6 +12,8 @@ typealias SHA256 = String
 
 let SUPER_DEBUG: Bool = false
 
+let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
+
 // --- FRONT END ONLY ---
 
 let APP_NAME = "Outlet"

@@ -281,7 +281,7 @@ class GRPCConverter {
         throw OutletError.invalidState("nodeIdentifierFromGRPC(): nodeUID is null!")
     }
 
-    return try self.backend.nodeIdentifierFactory.forValues(nidGRPC.uid, deviceUID: nidGRPC.deviceUid, nidGRPC.pathList, pathUID: nidGRPC.pathUid)
+    return try self.backend.nodeIdentifierFactory.forValues(nidGRPC.uid, deviceUID: nidGRPC.deviceUid, nidGRPC.pathList, pathUID: nidGRPC.pathUid, opType: nidGRPC.opType)
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
@@ -291,6 +291,14 @@ class GRPCConverter {
     grpc.pathList = nodeIdentifier.pathList
     if let spid = nodeIdentifier as? SPID {
       grpc.pathUid = spid.pathUID
+    }
+    if nodeIdentifier is ChangeTreeSPID {
+      let changeTreeSPID = nodeIdentifier as! ChangeTreeSPID
+      if let opType = changeTreeSPID.opType {
+        grpc.opType = opType.rawValue
+      } else {
+        grpc.opType = GRPC_CHANGE_TREE_NO_OP
+      }
     }
     return grpc
   }

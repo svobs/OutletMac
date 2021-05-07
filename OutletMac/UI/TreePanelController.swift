@@ -89,14 +89,14 @@ class MockTreePanelController: TreePanelControllable {
     }
   }
 
-  init(_ treeID: String, canChangeRoot: Bool) {
+  init(_ treeID: String, canChangeRoot: Bool) throws {
     self.app = MockApp()
     self.canChangeRoot = canChangeRoot
     // dummy data follows
     let spid = LocalNodeIdentifier(NULL_UID, deviceUID: NULL_UID, ROOT_PATH)
     let rootSN = (spid, LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
     self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
-    self.swiftTreeState = SwiftTreeState.from(self.tree)
+    self.swiftTreeState = try SwiftTreeState.from(self.tree)
     let filterCriteria = FilterCriteria()
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
 
@@ -156,10 +156,10 @@ class TreePanelController: TreePanelControllable {
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
   private lazy var statsRefreshTimer = HoldOffTimer(STATS_REFRESH_HOLDOFF_TIME_MS, self.fireRequestStatsRefresh)
 
-  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowMultipleSelection: Bool) {
+  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowMultipleSelection: Bool) throws {
     self.app = app
     self.tree = tree
-    self.swiftTreeState = SwiftTreeState.from(tree)
+    self.swiftTreeState = try SwiftTreeState.from(tree)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.canChangeRoot = canChangeRoot
@@ -429,9 +429,13 @@ class TreePanelController: TreePanelControllable {
       }
       self.tree = newTree
     }
-    
+
     DispatchQueue.main.async {
-      self.swiftTreeState.updateFrom(self.tree)
+      do {
+        try self.swiftTreeState.updateFrom(self.tree)
+      } catch {
+        self.reportException("Failed to update Swift tree state", error)
+      }
     }
 
     try self.requestTreeLoad()
