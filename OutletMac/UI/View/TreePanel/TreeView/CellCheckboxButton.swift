@@ -33,7 +33,7 @@ class CellCheckboxButton: NSButton {
     super.init(frame: NSRect(x: 150, y: 200, width: 20, height: 20))
     self.title = ""
     self.action = #selector(self.onCellCheckboxToggled(_:))
-    self.target = parent
+    self.target = self
     self.setButtonType(.switch)
     self.bezelStyle = .texturedRounded
     self.translatesAutoresizingMaskIntoConstraints = false
@@ -44,9 +44,9 @@ class CellCheckboxButton: NSButton {
   func updateState(_ sn: SPIDNodePair) {
     self.guid = sn.spid.guid
     let state = self.parent.displayStore.getCheckboxState(sn)
-    if state == .mixed {
-        self.allowsMixedState = true
-    }
+    // Need to disable this in most cases, because we cannot preemptively prevent the user from
+    // toggling into the Mixed state if it is enabled. Enable only when we want to display the mixed state:
+    self.allowsMixedState = state == .mixed
     self.state = state
   }
 
@@ -60,14 +60,15 @@ class CellCheckboxButton: NSButton {
   @objc func onCellCheckboxToggled(_ sender: CellCheckboxButton) {
     assert(sender.state.rawValue != -1, "User should never be allowed to toggle checkbox into Mixed state!")
     let isChecked = sender.state.rawValue == 1
-    NSLog("DEBUG [\(treeID)] User toggled checkbox for: \(sender.guid) => \(isChecked)")
+    let guid: GUID = sender.guid
+    NSLog("DEBUG [\(treeID)] User toggled checkbox for: \(guid) => \(isChecked)")
 
     // If checkbox was previously in Mixed state, it is now either Off or On. But we need to actively
     // prevent them from toggling it into Mixed again.
     sender.allowsMixedState = false
 
-    guard let sn = self.displayStore.getSN(sender.guid) else {
-      self.parent.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(sender.guid)")
+    guard let sn = self.displayStore.getSN(guid) else {
+      self.parent.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
       return
     }
     if let isEphemeral = sn.node?.isEphemeral {
@@ -76,46 +77,10 @@ class CellCheckboxButton: NSButton {
       }
     }
 
-    let newIsCheckedValue: Bool = !self.displayStore.isCheckboxChecked(sn)
-    NSLog("DEBUG [\(treeID)] Setting new checked value for node_uid: \(sn.spid.nodeUID) => \(newIsCheckedValue)")
-    self.setNodeCheckedState(sender.guid, newIsCheckedValue)
-  }
-
-  private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let guid = sn.spid.guid
-    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
-
-    // Update model here:
-    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
-
-    // Now update the node in the UI:
-    self.parent.reloadItem(guid, reloadChildren: false)
-  }
-
-  func setNodeCheckedState(_ guid: GUID, _ newIsCheckedValue: Bool) {
-    /*
-     1. Siblings
-
-     Housekeeping. Need to update all the siblings (children of parent) because their checked state may not be tracked.
-     We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
-     But if the parent is mixed, we must track the state of ALL of its children.
-     */
-    let parentGUID = self.displayStore.getParentGUID(guid)!
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking siblings of \(guid) (parent_guid=\(parentGUID))")
-    if parentGUID != TOPMOST_GUID {
-      for siblingSN in self.displayStore.getChildList(parentGUID) {
-        let state = self.displayStore.getCheckboxState(siblingSN)
-        self.displayStore.updateCheckedStateTracking(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
-      }
-    }
-
-    /*
-     2. Children
-     Need to update all the children of the node to match its checked state, both in UI and tracking.
-     */
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking self and descendants of \(guid)")
-    let applyFunc: ApplyToSNFunc = { sn in self.setCheckedState(sn, isChecked: newIsCheckedValue, isMixed: false) }
-    self.displayStore.doForSelfAndAllDescendants(guid, applyFunc)
+    // What a mouthful. At least we are handling the bulk of the work in one batch:
+    self.displayStore.updateCheckboxStateForSameLevelAndBelow(guid, isChecked, self.treeID)
+    // Now update all of those in the UI:
+    self.parent.reloadItem(guid, reloadChildren: true)
 
     /*
      3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
@@ -142,8 +107,20 @@ class CellCheckboxButton: NSButton {
       let isChecked = hasChecked && !hasUnchecked && !hasMixed
       let isMixed = hasMixed || (hasChecked && hasUnchecked)
       let ancestorSN = self.displayStore.getSN(ancestorGUID)
+      NSLog("DEBUG [\(treeID)] Ancestor: \(ancestorGUID) hasChecked=\(hasChecked) hasUnchecked=\(hasUnchecked) hasMixed=\(hasMixed) => isChecked=\(isChecked) isMixed=\(isMixed)")
       self.setCheckedState(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
     }
+  }
+
+  private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+    let guid = sn.spid.guid
+    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
+
+    // Update model here:
+    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
+
+    // Now update the node in the UI:
+    self.parent.reloadItem(guid, reloadChildren: false)
   }
 
 }

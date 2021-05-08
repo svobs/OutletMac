@@ -14,6 +14,7 @@ typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
  I suppose this class a repository for "ModelView" objects in the MVVC design pattern.
  */
 class DisplayStore {
+  private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
   private var con: TreePanelControllable
 
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
@@ -98,11 +99,17 @@ class DisplayStore {
     con.app.execSync {
       // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
       let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
+      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.spid.nodeUID)
 
       for childSN in childSNList {
         let childGUID = childSN.spid.guid
         self.primaryDict[childGUID] = childSN
         self.childParentDict[childGUID] = parentGUID
+
+        if parentChecked {
+          // all children are implicitly checked:
+          self.checkedNodeSet.insert(childSN.spid.nodeUID)
+        }
       }
       self.parentChildListDict[parentGUID] = childSNList
     }
@@ -141,14 +148,14 @@ class DisplayStore {
     return self.getChildList(TOPMOST_GUID)
   }
 
-  private func getChildListNoLock(_ parentGUID: GUID?) -> [SPIDNodePair] {
+  private func getChildList_NoLock(_ parentGUID: GUID?) -> [SPIDNodePair] {
     return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
   }
 
   func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     con.app.execSync {
-      snList = self.getChildListNoLock(parentGUID)
+      snList = self.getChildList_NoLock(parentGUID)
     }
     return snList
   }
@@ -205,30 +212,57 @@ class DisplayStore {
       return true
     }
 
-    guard let parentSN = self.getParentSN_NoLock(sn.spid.guid) else {
-      fatalError("ERROR Could not find parent of GUID \(sn.spid.guid) (SPID=\(sn.spid))")
-    }
-
-    if self.checkedNodeSet.contains(parentSN.spid.nodeUID) {
-      // implcitly on:
-      return true
-    }
     return false
+  }
+
+  func updateCheckboxStateForSameLevelAndBelow(_ guid: GUID, _ newIsCheckedValue: Bool, _ treeID: TreeID) {
+    con.app.execSync {
+
+      /*
+       1. Self and children
+       Need to update all the children of the node to match its checked state.
+       This will not update it in the UI, however.
+       */
+      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): setting self and descendants of \(guid): checked => \(newIsCheckedValue)")
+      let applyFunc: ApplyToSNFunc = { sn in self.updateCheckedStateTracking_NoLock(sn, isChecked: newIsCheckedValue, isMixed: false) }
+      self.doForSelfAndAllDescendants(guid, applyFunc)
+
+      /*
+       2. Siblings
+
+       Housekeeping. Need to update all the siblings (children of parent) because their checked state may not be tracked.
+       We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
+       But if the parent is mixed, we must track the state of ALL of its children.
+       */
+      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): updating siblings of \(guid)")
+      let parentSN = self.getParentSN_NoLock(guid)!
+      let parentGUID = parentSN.spid.guid
+
+      if parentGUID != TOPMOST_GUID {
+        for siblingSN in self.getChildList_NoLock(parentGUID) {
+          let state = self.getCheckboxState_NoLock(siblingSN)
+          NSLog("DEBUG Sibling \(siblingSN.spid.guid) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
+          self.updateCheckedStateTracking_NoLock(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
+        }
+      }
+    }
+  }
+
+  private func getCheckboxState_NoLock(_ sn: SPIDNodePair) -> NSControl.StateValue {
+    if self.isCheckboxChecked_NoLock(sn) {
+      return .on
+    } else if self.mixedNodeSet.contains(sn.spid.nodeUID) {
+      return .mixed
+    } else {
+      return .off
+    }
   }
 
   // includes implicit values based on parent
   func getCheckboxState(_ sn: SPIDNodePair) -> NSControl.StateValue {
     var state: NSControl.StateValue = .off
     con.app.execSync {
-      if self.checkedNodeSet.contains(sn.spid.nodeUID) {
-        state = .on
-      } else if self.isCheckboxChecked_NoLock(sn) {
-        state = .on
-      } else if self.mixedNodeSet.contains(sn.spid.nodeUID) {
-        state = .mixed
-      } else {
-        state = .off
-      }
+      state = self.getCheckboxState_NoLock(sn)
     }
     return state
   }
@@ -249,21 +283,28 @@ class DisplayStore {
     return isMixed
   }
 
-  func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+  private func updateCheckedStateTracking_NoLock(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
     let nodeUID: UID = sn.spid.nodeUID
 
-    con.app.execSync {
-      if isChecked {
-        self.checkedNodeSet.insert(nodeUID)
-      } else {
-        self.checkedNodeSet.remove(nodeUID)
-      }
+    NSLog("DEBUG Setting node \(nodeUID): checked=\(isChecked) mixed=\(isMixed)")
 
-      if isMixed {
-        self.mixedNodeSet.insert(nodeUID)
-      } else {
-        self.mixedNodeSet.remove(nodeUID)
-      }
+    if isChecked {
+      self.checkedNodeSet.insert(nodeUID)
+    } else {
+      self.checkedNodeSet.remove(nodeUID)
+    }
+
+    if isMixed {
+      self.mixedNodeSet.insert(nodeUID)
+    } else {
+      self.mixedNodeSet.remove(nodeUID)
+    }
+
+  }
+
+  func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+    con.app.execSync {
+      self.updateCheckedStateTracking_NoLock(sn, isChecked: isChecked, isMixed: isMixed)
     }
   }
 
@@ -297,30 +338,21 @@ class DisplayStore {
   func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-
     var searchQueue = LinkedList<SPIDNodePair>()
-    var workQueue = LinkedList<SPIDNodePair>()
 
-    con.app.execSync {
-      if var sn = self.getSN_NoLock(guid) {
-        NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
-        searchQueue.append(sn)
-        workQueue.append(sn)
+    if var sn = self.getSN_NoLock(guid) {
+      NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      searchQueue.append(sn)
 
-        while !searchQueue.isEmpty {
-          sn = searchQueue.popFirst()!
-          for childSN in self.getChildListNoLock(sn.spid.guid) {
-              searchQueue.append(childSN)
-              workQueue.append(childSN)
-          }
+      while !searchQueue.isEmpty {
+        sn = searchQueue.popFirst()!
+        NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+        applyFunc(sn)
+
+        for childSN in self.getChildList_NoLock(sn.spid.guid) {
+            searchQueue.append(childSN)
         }
       }
-    }
-
-    while !workQueue.isEmpty {
-      let sn = workQueue.popFirst()!
-      NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
-      applyFunc(sn)
     }
   }
 }
