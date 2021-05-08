@@ -132,11 +132,19 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       try self.iconStore.start()
 
       // Subscribe to app-wide signals here
-      try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
       try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
       try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
       try dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
-      try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, onDiffTreesDone)
+      try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
+      try dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
+      try dispatchListener.subscribe(signal: .EXIT_DIFF_MODE, afterDiffExited)
+      try dispatchListener.subscribe(signal: .COMPLETE_MERGE, afterDiffExited)
+      try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
+      try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
+
+      try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+
+      try dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
 
 
       settings.isPlaying = try self.backend.getOpExecutionPlayState()
@@ -294,6 +302,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.taskRunner.execSync(workItem)
   }
 
+  private func sendEnableUISingal(enable: Bool) {
+    self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": enable])
+  }
+
+  private func changeWindowMode(_ newMode: WindowMode) {
+    DispatchQueue.main.async {
+      self.settings.mode = newMode
+    }
+  }
+
+  /**
+   Reload the given tree in regular mode. This will tell the backend to discard the diff information, and in turn the
+   backend will provide us with our old tree_id
+   */
+  private func reloadTree(_ con: TreePanelControllable) throws {
+    let newTree = try self.backend.createExistingDisplayTree(treeID: con.treeID, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
+    try con.changeTree(to: newTree!)
+  }
+
   // SignalDispatcher callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -327,8 +354,60 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.shutdown()
   }
 
-  private func onDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
-    // TODO: change button bar
+  private func afterDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
+    // This will change the button bar:
+    self.changeWindowMode(.DIFF)
+    self.sendEnableUISingal(enable: true)
+  }
+
+  private func afterDiffTreesFailed(senderID: SenderID, propDict: PropDict) throws {
+    // Change button bar back:
+    self.changeWindowMode(.BROWSING)
+    self.sendEnableUISingal(enable: true)
+  }
+
+  private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
+    // This will change the button bar:
+    self.changeWindowMode(.BROWSING)
+    try self.reloadTree(self.conLeft!)
+    try self.reloadTree(self.conRight!)
+    self.sendEnableUISingal(enable: true)
+  }
+
+  private func afterMergeTreeGenerated(senderID: SenderID, propDict: PropDict) throws {
+    // TODO: show Merge Tree dialog
+
+
+  }
+
+  private func afterGenMergeTreeFailed(senderID: SenderID, propDict: PropDict) throws {
+    // Re-enable UI:
+    self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
+  }
+
+  private func afterDisplayTreeChanged_TwoPane(senderID: SenderID, propDict: PropDict) throws {
+    let newTree = try propDict.get("tree") as! DisplayTree
+
+    if newTree.state.treeDisplayMode != .ONE_TREE_ALL_ITEMS {
+      return
+    }
+
+    if senderID == self.conLeft!.treeID && self.conRight!.tree.state.treeDisplayMode == .CHANGES_ONE_TREE_PER_CATEGORY {
+      // If displaying a diff and right root changed, reload left display
+      // (note: right will update its own display)
+      NSLog("DEBUG Detected that \(self.conLeft!.treeID) changed root and changed display mode. Reloading \(self.conRight!.treeID)")
+      try self.reloadTree(self.conRight!)
+    } else if senderID == self.conRight!.treeID && self.conLeft!.tree.state.treeDisplayMode == .CHANGES_ONE_TREE_PER_CATEGORY {
+      // Mirror of above
+      NSLog("DEBUG Detected that \(self.conRight!.treeID) changed root and changed display mode. Reloading \(self.conLeft!.treeID)")
+      try self.reloadTree(self.conLeft!)
+    } else {
+      // Doesn't apply to us
+      return
+    }
+
+    // Change button bar back:
+    self.changeWindowMode(.BROWSING)
   }
 
   // Etc

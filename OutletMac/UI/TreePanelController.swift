@@ -31,6 +31,7 @@ protocol TreePanelControllable: HasLifecycle {
 
   var dispatchListener: DispatchListener { get }
 
+  func changeTree(to newTree: DisplayTree) throws
   func requestTreeLoad() throws
 
   func connectTreeView(_ treeView: TreeViewController)
@@ -109,6 +110,9 @@ class MockTreePanelController: TreePanelControllable {
   }
 
   func shutdown() throws {
+  }
+
+  public func changeTree(to newTree: DisplayTree) throws {
   }
 
   func requestTreeLoad() throws {
@@ -197,6 +201,31 @@ class TreePanelController: TreePanelControllable {
 
     try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: newTreeID)
     try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
+  }
+
+  public func changeTree(to newTree: DisplayTree) throws {
+    NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
+    self.app.execSync {
+      if newTree.treeID != self.tree.treeID {
+        NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")
+        do {
+          try self.reattachListeners(newTree.treeID)
+        } catch {
+          self.reportException("Failed to reattach listeners", error)
+        }
+      }
+      self.tree = newTree
+    }
+
+    DispatchQueue.main.async {
+      do {
+        try self.swiftTreeState.updateFrom(self.tree)
+      } catch {
+        self.reportException("Failed to update Swift tree state", error)
+      }
+    }
+
+    try self.requestTreeLoad()
   }
 
   func requestTreeLoad() throws {
@@ -390,18 +419,18 @@ class TreePanelController: TreePanelControllable {
   // DispatchListener callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func onEnableUIToggled(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onEnableUIToggled(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.canChangeRoot {
       assert(!self.swiftTreeState.isUIEnabled)
       return
     }
-    let isEnabled = try props.getBool("enable")
+    let isEnabled = try propDict.getBool("enable")
     DispatchQueue.main.async {
       self.swiftTreeState.isUIEnabled = isEnabled
     }
   }
 
-  private func onLoadStarted(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onLoadStarted(_ senderID: SenderID, _ propDict: PropDict) throws {
     if self.swiftTreeState.isManualLoadNeeded {
       DispatchQueue.main.async {
         self.swiftTreeState.isManualLoadNeeded = false
@@ -409,7 +438,7 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onLoadSubtreeDone(_ senderID: SenderID, _ propDict: PropDict) throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
         self.enableNodeUpdateSignals = true
@@ -422,34 +451,12 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func onDisplayTreeChanged(_ senderID: SenderID, _ props: PropDict) throws {
-    let newTree = try props.get("tree") as! DisplayTree
-
-    NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
-    self.app.execSync {
-      if newTree.treeID != self.tree.treeID {
-        NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")
-        do {
-          try self.reattachListeners(newTree.treeID)
-        } catch {
-          self.reportException("Failed to reattach listeners", error)
-        }
-      }
-      self.tree = newTree
-    }
-
-    DispatchQueue.main.async {
-      do {
-        try self.swiftTreeState.updateFrom(self.tree)
-      } catch {
-        self.reportException("Failed to update Swift tree state", error)
-      }
-    }
-
-    try self.requestTreeLoad()
+  private func onDisplayTreeChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let newTree = try propDict.get("tree") as! DisplayTree
+    try self.changeTree(to: newTree)
   }
 
-  private func onEditingRootCancelled(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onEditingRootCancelled(_ senderID: SenderID, _ propDict: PropDict) throws {
     NSLog("DEBUG [\(self.treeID)] Editing cancelled (was: \(self.swiftTreeState.isEditingRoot)); setting rootPath to \(self.tree.rootPath)")
     DispatchQueue.main.async {
       // restore root path to value received from server
@@ -458,24 +465,24 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func onSetStatus(_ senderID: SenderID, _ props: PropDict) throws {
-    let statusBarMsg = try props.getString("status_msg")
+  private func onSetStatus(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let statusBarMsg = try propDict.getString("status_msg")
     self.updateStatusBarMsg(statusBarMsg)
   }
 
-  private func onRefreshStatsDone(_ senderID: SenderID, _ props: PropDict) throws {
-    let statusBarMsg = try props.getString("status_msg")
+  private func onRefreshStatsDone(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let statusBarMsg = try propDict.getString("status_msg")
     self.updateStatusBarMsg(statusBarMsg)
   }
 
-  private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onNodeUpserted(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
       NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
       return
     }
 
-    let sn = try props.get("sn") as! SPIDNodePair
-    let parentGUID = try props.get("parent_guid") as! String
+    let sn = try propDict.get("sn") as! SPIDNodePair
+    let parentGUID = try propDict.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
 
     let alreadyPresent: Bool = self.displayStore.upsertSN(parentGUID, sn)
@@ -488,14 +495,14 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
+  private func onNodeRemoved(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
       NSLog("DEBUG [\(self.treeID)] Ignoring remove signal: signals are disabled")
       return
     }
 
-    let sn = try props.get("sn") as! SPIDNodePair
-    let parentGUID = try props.get("parent_guid") as! String
+    let sn = try propDict.get("sn") as! SPIDNodePair
+    let parentGUID = try propDict.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
 
     let _ = self.displayStore.removeSN(sn.spid.guid)

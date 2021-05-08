@@ -12,6 +12,8 @@ import SwiftUI
 class GlobalSettings: ObservableObject {
   @Published var isPlaying = false
 
+  @Published var mode: WindowMode = .BROWSING
+
   // Alert stuff:
   @Published var showingAlert = false
   @Published var alertTitle: String = "Alert" // placeholder msg

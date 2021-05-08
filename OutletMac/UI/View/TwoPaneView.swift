@@ -41,8 +41,13 @@ fileprivate struct ButtonBar: View {
 
   var body: some View {
     HStack {
-      Button("Diff (content-first)", action: self.onDiffButtonClicked)
-      Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
+      if settings.mode == .BROWSING {
+        Button("Diff (content-first)", action: self.onDiffButtonClicked)
+        Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
+      } else if settings.mode == .DIFF {
+        Button("Merge...", action: self.onMergeButtonClicked)
+        Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
+      }
       PlayPauseToggleButton(app.iconStore, $settings.isPlaying, conLeft.dispatcher)
       Spacer()
     }
@@ -57,7 +62,7 @@ fileprivate struct ButtonBar: View {
     NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
-    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
+    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": false])
 
     // Now ask BE to start the diff
     do {
@@ -65,12 +70,23 @@ fileprivate struct ButtonBar: View {
       //  We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
     } catch {
       NSLog("ERROR Failed to start tree diff: \(error)")
+      self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
     }
   }
 
   func onDownloadFromGDriveButtonClicked() {
     NSLog("DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
     self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_MAIN_WINDOW)
+  }
+
+  func onMergeButtonClicked() {
+
+    
+  }
+
+  func onCancelDiffButtonClicked() {
+    NSLog("CancelDiff btn clicked! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
+    self.conLeft.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_MAIN_WINDOW)
   }
 }
 

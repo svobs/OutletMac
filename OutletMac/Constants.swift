@@ -55,6 +55,11 @@ let TREE_VIEW_NSFONT: NSFont = NSFont.systemFont(ofSize: 12.0)
 //let TREE_VIEW_NSFONT: NSFont = NSFont.init(name: "Monaco", size: 18.0)!
 //let TREE_ITEM_ICON_HEIGHT: Int = 20
 
+enum WindowMode: Int {
+  case BROWSING = 1
+  case DIFF = 2
+}
+
 /**
  ENUM IconNames
  
