@@ -150,6 +150,8 @@ class TreePanelController: TreePanelControllable {
   // workaround for race condition, in case we are ready to populate before the UI is ready
   private var readyToPopulate: Bool = false
 
+  var enableNodeUpdateSignals: Bool = false
+
   var canChangeRoot: Bool
   var allowMultipleSelection: Bool
 
@@ -202,6 +204,7 @@ class TreePanelController: TreePanelControllable {
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
         // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
+        self.enableNodeUpdateSignals = false
         try self.backend.startSubtreeLoad(treeID: self.treeID)
       } catch {
         NSLog("ERROR [\(self.treeID)] Failed to load tree: \(error)")
@@ -246,7 +249,7 @@ class TreePanelController: TreePanelControllable {
     let rows: RowsOfInterest
     do {
       rows = try self.app.backend.getRowsOfInterest(treeID: self.treeID)
-      NSLog("DEBUG [\(treeID)] Got expanded rows: \(rows.expanded) and selected rows: \(rows.selected)")
+      NSLog("DEBUG [\(treeID)] Got expanded=\(rows.expanded), selected=\(rows.selected)")
     } catch {
       reportException("Failed to fetch expanded node list", error)
       rows = RowsOfInterest() // non-fatal error
@@ -282,6 +285,7 @@ class TreePanelController: TreePanelControllable {
       let node = sn.node!
       if node.isDir && rows.expanded.contains(sn.spid.guid) {
         // only expand rows which are actually present:
+        NSLog("DEBUG [\(treeID)] populateTreeView(): Will expand row: \(sn.spid.guid)")
         toExpandInOrder.append(sn.spid.guid)
         do {
           let childSNList: [SPIDNodePair] = try self.tree.getChildList(sn.spid)
@@ -298,6 +302,10 @@ class TreePanelController: TreePanelControllable {
     }
 
     DispatchQueue.main.async {
+      // Reload entire tree:
+      self.treeView!.outlineView.reloadItem(nil, reloadChildren: true)
+
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): Expanding rows: \(toExpandInOrder)")
       self.restoreRowExpansionState(toExpandInOrder)
 
       self.restoreRowSelectionState(rows.selected)
@@ -347,14 +355,13 @@ class TreePanelController: TreePanelControllable {
       self.treeView!.outlineView.endUpdates()
     }
 
-    self.treeView!.outlineView.reloadData()
-
     // disable listeners while we restore expansion state
     self.treeView!.expandContractListenersEnabled = false
     defer {
       self.treeView!.expandContractListenersEnabled = true
     }
     for guid in toExpandInOrder {
+      NSLog("DEBUG [\(self.treeID)] Expanding item: \"\(guid)\"")
       self.treeView!.outlineView.expandItem(guid)
     }
   }
@@ -405,6 +412,7 @@ class TreePanelController: TreePanelControllable {
   private func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
+        self.enableNodeUpdateSignals = true
         try self.populateTreeView()
       } catch {
         NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
@@ -461,6 +469,11 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func onNodeUpserted(_ senderID: SenderID, _ props: PropDict) throws {
+    if !self.enableNodeUpdateSignals {
+      NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
+      return
+    }
+
     let sn = try props.get("sn") as! SPIDNodePair
     let parentGUID = try props.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
@@ -476,6 +489,11 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func onNodeRemoved(_ senderID: SenderID, _ props: PropDict) throws {
+    if !self.enableNodeUpdateSignals {
+      NSLog("DEBUG [\(self.treeID)] Ignoring remove signal: signals are disabled")
+      return
+    }
+
     let sn = try props.get("sn") as! SPIDNodePair
     let parentGUID = try props.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
