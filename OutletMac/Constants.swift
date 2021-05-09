@@ -317,7 +317,8 @@ let SUPER_ROOT_DEVICE_UID = SUPER_ROOT_UID
 let MIN_FREE_UID: UID = 100
 
 // This is used as a token in the DisplayStore, which serves as a friendlier GUID than the nil value used by NSOutlineView for the topmost "item" (ID)
-let TOPMOST_GUID: String = "TOP"
+let TOPMOST_GUID: GUID = "TOP"
+let EPHEMERAL_GUID: GUID = "0:0:0:E"
 
 
 let GDRIVE_FOLDER_MIME_TYPE_UID: UID = 1

@@ -34,6 +34,7 @@ protocol TreePanelControllable: HasLifecycle {
   func updateDisplayTree(to newTree: DisplayTree) throws
   func requestTreeLoad() throws
   func generateCheckedRowList() throws -> [SPIDNodePair]
+  func setChecked(_ guid: GUID, _ isChecked: Bool) throws
 
   func connectTreeView(_ treeView: TreeViewController)
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
@@ -114,6 +115,9 @@ class MockTreePanelController: TreePanelControllable {
   }
 
   func updateDisplayTree(to newTree: DisplayTree) throws {
+  }
+
+  func setChecked(_ guid: GUID, _ isChecked: Bool) throws {
   }
 
   func generateCheckedRowList() throws -> [SPIDNodePair] {
@@ -407,8 +411,69 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
+  func setChecked(_ guid: GUID, _ isChecked: Bool) throws {
+    guard let sn = self.displayStore.getSN(guid) else {
+      self.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
+      return
+    }
+    if let isEphemeral = sn.node?.isEphemeral {
+      if isEphemeral {
+        return
+      }
+    }
+
+    // What a mouthful. At least we are handling the bulk of the work in one batch:
+    self.displayStore.updateCheckboxStateForSameLevelAndBelow(guid, isChecked, self.treeID)
+    // Now update all of those in the UI:
+    self.treeView!.reloadItem(guid, reloadChildren: true)
+
+    /*
+     3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
+     */
+    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking ancestors of \(guid)")
+    var ancestorGUID: GUID = guid
+    while true {
+      ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
+      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): next higher ancestor: \(ancestorGUID)")
+      if ancestorGUID == TOPMOST_GUID {
+        break
+      }
+      var hasChecked = false
+      var hasUnchecked = false
+      var hasMixed = false
+      for childSN in self.displayStore.getChildList(ancestorGUID) {
+        if self.displayStore.isCheckboxChecked(childSN) {
+          hasChecked = true
+        } else {
+          hasUnchecked = true
+        }
+        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childSN)
+      }
+      let isChecked = hasChecked && !hasUnchecked && !hasMixed
+      let isMixed = hasMixed || (hasChecked && hasUnchecked)
+      let ancestorSN = self.displayStore.getSN(ancestorGUID)
+      NSLog("DEBUG [\(treeID)] Ancestor: \(ancestorGUID) hasChecked=\(hasChecked) hasUnchecked=\(hasUnchecked) hasMixed=\(hasMixed) => isChecked=\(isChecked) isMixed=\(isMixed)")
+      self.setCheckedStateForSingleNode(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
+    }
+  }
+
+  private func setCheckedStateForSingleNode(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+    let guid = sn.spid.guid
+    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
+
+    // Update model here:
+    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
+
+    // Now update the node in the UI:
+    self.treeView!.reloadItem(guid, reloadChildren: false)
+  }
+
   func generateCheckedRowList() throws -> [SPIDNodePair] {
     let (checkedNodeSet, mixedNodeSet) = self.displayStore.getCheckedAndMixedRows()
+
+    // FIXME FIXME FIXME: Need to use GUIDs instead!
+
+    NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Checked nodes: \(checkedNodeSet). Mixed nodes: \(mixedNodeSet)")
 
     var checkedRowList: [SPIDNodePair] = []
 
@@ -426,40 +491,56 @@ class TreePanelController: TreePanelControllable {
       }
     }
 
+    NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining mixed-state node list...")
+
     while !secondaryScreening.isEmpty {
       let mixedDirSN = secondaryScreening.popFirst()!
+      NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next mixed-state dir: \(mixedDirSN.spid)")
       assert(mixedDirSN.node!.isDir, "Expected a dir-type node: \(mixedDirSN.node!)")  // only dir nodes can be mixed
 
-      if !(mixedDirSN.node!.isDisplayOnly || mixedDirSN.node!.isLive) {
-        // Even an inconsistent MKDIR node must be included as a checked item:
-        checkedRowList.append(mixedDirSN)
-      }
+//      if !(mixedDirSN.node!.isDisplayOnly || mixedDirSN.node!.isLive) {
+//        // Even an inconsistent MKDIR node must be included as a checked item:
+//        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): adding mixed-state MKDIR to CHECKED list: \(mixedDirSN.spid.guid)")
+//        checkedRowList.append(mixedDirSN)
+//      }
 
       // Check each child of a mixed dir for checked or mixed status
       for childSN in try self.tree.getChildList(mixedDirSN.spid) {
+        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid) nodeUID=\(childSN.node!.uid)")
         if checkedNodeSet.contains(childSN.node!.uid) {
+          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to whitelist: \(childSN.spid)")
           whitelist.append(childSN)
         } else if mixedNodeSet.contains(childSN.node!.uid) {
+          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to mixed list: \(childSN.spid)")
           secondaryScreening.append(childSN)
         }
       }
 
+      NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining whitelist...")
+
       // Whitelist contains nothing but trees full of checked items
       while !whitelist.isEmpty {
         let chosenSN = whitelist.popFirst()!
-        if !(chosenSN.node!.isDisplayOnly || chosenSN.node!.isLive) {
-          checkedRowList.append(chosenSN)
-        }
+        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next node in whitelist: \(chosenSN.spid) isDisplayOnly=\(chosenSN.node!.isDisplayOnly) isLive=\(chosenSN.node!.isLive)")
+//        if !(chosenSN.node!.isDisplayOnly || chosenSN.node!.isLive) {
+//          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to CHECKED list: \(chosenSN.spid.guid)")
+//          checkedRowList.append(chosenSN)
+//        }
 
         // Drill down into all descendants of nodes in the whitelist.
         if chosenSN.node!.isDir {
           for childSN in try self.tree.getChildList(chosenSN.spid) {
+            NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to whitelist: \(chosenSN.spid.guid)")
             whitelist.append(childSN)
           }
+        } else { // not a dir
+          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to CHECKED list: \(chosenSN.spid.guid)")
+          checkedRowList.append(chosenSN)
         }
       }
     }
 
+    NSLog("DEBUG [\(treeID)] generateCheckedRowList(): returning \(checkedRowList.count) checked items")
     return checkedRowList
   }
 

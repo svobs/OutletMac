@@ -127,16 +127,24 @@ class TreeActions {
     }
   }
 
+  private func setChecked(_ snList: [SPIDNodePair], _ checked: Bool) {
+    do {
+      for sn in snList {
+        try self.con.setChecked(sn.spid.guid, checked)
+      }
+    } catch {
+      self.con.reportException("Error while toggling checkbox", error)
+    }
+  }
+
   @objc public func checkAll(_ sender: MenuItemWithSNList) {
     let snList: [SPIDNodePair] = sender.snList
-
-    // TODO: UI work
+    self.setChecked(snList, true)
   }
 
   @objc public func uncheckAll(_ sender: MenuItemWithSNList) {
     let snList: [SPIDNodePair] = sender.snList
-
-    // TODO: UI work
+    self.setChecked(snList, false)
   }
 
   @objc func deleteSubtree(_ sender: MenuItemWithNodeList) {

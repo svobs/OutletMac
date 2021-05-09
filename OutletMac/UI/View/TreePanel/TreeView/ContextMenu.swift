@@ -116,7 +116,7 @@ class TreeContextMenu {
       return
     }
 
-    let op: UserOp? = try self.con.backend.getLastPendingOp(nodeUID: sn.spid.nodeUID)
+    let op: UserOp? = try self.con.backend.getLastPendingOp(nodeUID: sn.node!.uid)
 
     let singlePath = sn.spid.getSinglePath()
 

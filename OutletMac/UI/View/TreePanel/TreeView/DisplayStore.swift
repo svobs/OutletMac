@@ -99,7 +99,7 @@ class DisplayStore {
     con.app.execSync {
       // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
       let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
-      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.spid.nodeUID)
+      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.node!.uid)
 
       for childSN in childSNList {
         let childGUID = childSN.spid.guid
@@ -108,7 +108,7 @@ class DisplayStore {
 
         if parentChecked {
           // all children are implicitly checked:
-          self.checkedNodeSet.insert(childSN.spid.nodeUID)
+          self.checkedNodeSet.insert(childSN.node!.uid)
         }
       }
       self.parentChildListDict[parentGUID] = childSNList
@@ -131,10 +131,6 @@ class DisplayStore {
 
   // "Get" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  func getCheckedAndMixedRows() -> (Set<UID>, Set<UID>) {
-    return (self.checkedNodeSet, self.mixedNodeSet)
-  }
 
   private func getSN_NoLock(_ guid: GUID) -> SPIDNodePair? {
     return self.primaryDict[guid] ?? nil
@@ -205,6 +201,10 @@ class DisplayStore {
   // Checkbox State
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  func getCheckedAndMixedRows() -> (Set<UID>, Set<UID>) {
+    return (self.checkedNodeSet, self.mixedNodeSet)
+  }
+
   private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
     if let node = sn.node {
       if node.isEphemeral {
@@ -212,7 +212,7 @@ class DisplayStore {
       }
     }
 
-    if self.checkedNodeSet.contains(sn.spid.nodeUID) {
+    if self.checkedNodeSet.contains(sn.node!.uid) {
       return true
     }
 
@@ -255,7 +255,7 @@ class DisplayStore {
   private func getCheckboxState_NoLock(_ sn: SPIDNodePair) -> NSControl.StateValue {
     if self.isCheckboxChecked_NoLock(sn) {
       return .on
-    } else if self.mixedNodeSet.contains(sn.spid.nodeUID) {
+    } else if self.mixedNodeSet.contains(sn.node!.uid) {
       return .mixed
     } else {
       return .off
@@ -282,13 +282,13 @@ class DisplayStore {
   func isCheckboxMixed(_ sn: SPIDNodePair) -> Bool {
     var isMixed: Bool = false
     con.app.execSync {
-      isMixed = self.mixedNodeSet.contains(sn.spid.nodeUID)
+      isMixed = self.mixedNodeSet.contains(sn.node!.uid)
     }
     return isMixed
   }
 
   private func updateCheckedStateTracking_NoLock(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let nodeUID: UID = sn.spid.nodeUID
+    let nodeUID: UID = sn.node!.uid
 
     NSLog("DEBUG Setting node \(nodeUID): checked=\(isChecked) mixed=\(isMixed)")
 
@@ -318,7 +318,7 @@ class DisplayStore {
   func removeSN(_ guid: GUID) -> Bool {
     var removed: Bool = false
     if let sn: SPIDNodePair = self.getSN(guid) {
-      let nodeUID = sn.spid.nodeUID
+      let nodeUID = sn.node!.uid
       con.app.execSync {
         self.checkedNodeSet.remove(nodeUID)
         self.mixedNodeSet.remove(nodeUID)

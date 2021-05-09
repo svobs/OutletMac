@@ -84,8 +84,8 @@ fileprivate struct ButtonBar: View {
       let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
       let selectedChangeListRight = try self.conRight.generateCheckedRowList()
 
-      NSLog("DEBUG Selected changes (Left): \(selectedChangeListLeft.map({"\($0.spid)"}).joined(separator: ","))")
-      NSLog("DEBUG Selected changes (Right): \(selectedChangeListRight.map({"\($0.spid)"}).joined(separator: ","))")
+      NSLog("INFO  Selected changes (Left): \(selectedChangeListLeft.map({"\($0.spid)"}).joined(separator: ","))")
+      NSLog("INFO  Selected changes (Right): \(selectedChangeListRight.map({"\($0.spid)"}).joined(separator: ","))")
 
       self.app.sendEnableUISignal(enable: false)
 
@@ -99,7 +99,7 @@ fileprivate struct ButtonBar: View {
   }
 
   func onCancelDiffButtonClicked() {
-    NSLog("CancelDiff btn clicked! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
+    NSLog("DEBUG CancelDiff btn clicked! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
     self.conLeft.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_MAIN_WINDOW)
   }
 }

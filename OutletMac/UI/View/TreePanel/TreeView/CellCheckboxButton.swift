@@ -67,60 +67,11 @@ class CellCheckboxButton: NSButton {
     // prevent them from toggling it into Mixed again.
     sender.allowsMixedState = false
 
-    guard let sn = self.displayStore.getSN(guid) else {
-      self.parent.con.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
-      return
+    do {
+      try self.parent.con.setChecked(guid, isChecked)
+    } catch {
+      self.parent.con.reportException("Error while toggling checkbox", error)
     }
-    if let isEphemeral = sn.node?.isEphemeral {
-      if isEphemeral {
-        return
-      }
-    }
-
-    // What a mouthful. At least we are handling the bulk of the work in one batch:
-    self.displayStore.updateCheckboxStateForSameLevelAndBelow(guid, isChecked, self.treeID)
-    // Now update all of those in the UI:
-    self.parent.reloadItem(guid, reloadChildren: true)
-
-    /*
-     3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
-     */
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking ancestors of \(guid)")
-    var ancestorGUID: GUID = guid
-    while true {
-      ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
-      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): next higher ancestor: \(ancestorGUID)")
-      if ancestorGUID == TOPMOST_GUID {
-        break
-      }
-      var hasChecked = false
-      var hasUnchecked = false
-      var hasMixed = false
-      for childSN in self.displayStore.getChildList(ancestorGUID) {
-        if self.displayStore.isCheckboxChecked(childSN) {
-          hasChecked = true
-        } else {
-          hasUnchecked = true
-        }
-        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childSN)
-      }
-      let isChecked = hasChecked && !hasUnchecked && !hasMixed
-      let isMixed = hasMixed || (hasChecked && hasUnchecked)
-      let ancestorSN = self.displayStore.getSN(ancestorGUID)
-      NSLog("DEBUG [\(treeID)] Ancestor: \(ancestorGUID) hasChecked=\(hasChecked) hasUnchecked=\(hasUnchecked) hasMixed=\(hasMixed) => isChecked=\(isChecked) isMixed=\(isMixed)")
-      self.setCheckedState(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
-    }
-  }
-
-  private func setCheckedState(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let guid = sn.spid.guid
-    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
-
-    // Update model here:
-    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
-
-    // Now update the node in the UI:
-    self.parent.reloadItem(guid, reloadChildren: false)
   }
 
 }

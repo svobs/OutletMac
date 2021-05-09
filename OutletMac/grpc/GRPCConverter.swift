@@ -25,24 +25,8 @@ class GRPCConverter {
 
   func nodeToGRPC(_ node: Node) throws -> Outlet_Backend_Agent_Grpc_Generated_Node {
     var grpc = Outlet_Backend_Agent_Grpc_Generated_Node()
-    let nodeIdentifier: NodeIdentifier
-    if node.isDecorator {
-      grpc.decoratorNid = node.uid
-      grpc.decoratorParentNid = node.parentList[0]
-
-      if let decoNode = node as? DecoNode {
-        nodeIdentifier = decoNode.nodeIdentifier
-      } else {
-        throw OutletError.invalidState("Expected to be a DecoNode: \(node)")
-      }
-    } else {
-      nodeIdentifier = node.nodeIdentifier
-    }
-
     // NodeIdentifier fields:
-    grpc.uid = nodeIdentifier.nodeUID
-    grpc.deviceUid = nodeIdentifier.deviceUID
-    grpc.pathList = nodeIdentifier.pathList
+    grpc.nodeIdentifier = try self.nodeIdentifierToGRPC(node.nodeIdentifier)
 
     // Node common fields:
     grpc.trashed = node.trashed.rawValue
@@ -137,11 +121,7 @@ class GRPCConverter {
   }
 
   func nodeFromGRPC(_ nodeGRPC: Outlet_Backend_Agent_Grpc_Generated_Node) throws -> Node {
-    if nodeGRPC.deviceUid == 0 {
-      // this can indicate that the entire node doesn't exist or is invalid
-      throw OutletError.invalidState("GRPC node's deviceUID is invalid!")
-    }
-    let nodeIdentifier: NodeIdentifier = try self.backend.nodeIdentifierFactory.forValues(nodeGRPC.uid, deviceUID: nodeGRPC.deviceUid, nodeGRPC.pathList, pathUID: NULL_UID)
+    let nodeIdentifier: NodeIdentifier = try self.nodeIdentifierFromGRPC(nodeGRPC.nodeIdentifier)
 
     var node: Node
 
@@ -214,11 +194,6 @@ class GRPCConverter {
 
     node.customIcon = IconID(rawValue: nodeGRPC.iconID)!
 
-    if nodeGRPC.decoratorNid > 0 {
-      assert(nodeGRPC.decoratorParentNid > 0, "No parent_nid for decorator node! (decorator_nid=\(nodeGRPC.decoratorNid)")
-      node = DecoratorFactory.decorate(node, nodeGRPC.decoratorNid, nodeGRPC.decoratorParentNid)
-    }
-
     return node
   }
 
@@ -277,10 +252,6 @@ class GRPCConverter {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func nodeIdentifierFromGRPC(_ nidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    guard nidGRPC.uid != NULL_UID else {
-        throw OutletError.invalidState("nodeIdentifierFromGRPC(): nodeUID is null!")
-    }
-
     return try self.backend.nodeIdentifierFactory.forValues(nidGRPC.uid, deviceUID: nidGRPC.deviceUid, nidGRPC.pathList, pathUID: nidGRPC.pathUid, opType: nidGRPC.opType)
   }
 

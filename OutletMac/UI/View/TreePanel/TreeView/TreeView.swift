@@ -329,7 +329,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
       if let item = outlineView.item(atRow: selectedRow) {
         if let guid = item as? GUID {
           if let sn = displayStore.getSN(guid) {
-            uidSet.insert(sn.spid.nodeUID)
+            uidSet.insert(sn.node!.uid)
           }
         }
       }

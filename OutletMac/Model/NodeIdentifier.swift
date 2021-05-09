@@ -25,7 +25,7 @@ class NodeIdentifier: CustomStringConvertible {
   var pathList: [String]
 
   public var description: String {
-    return "∣\(TreeType.display(treeType))-D\(deviceUID)-N\(nodeUID)⩨\(pathList)∣"
+    return "∣\(TreeType.display(treeType))-d\(deviceUID)-n\(nodeUID)⩨\(pathList)∣"
   }
 
   var treeType: TreeType {
@@ -119,7 +119,7 @@ class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
   }
 
   override var guid: GUID {
-    return "\(self.deviceUID):\(self.nodeUID):\(self._pathUID):E"
+    return EPHEMERAL_GUID
   }
 
   override public var description: String {
@@ -262,7 +262,17 @@ class ChangeTreeSPID: SinglePathNodeIdentifier {
 
   init(pathUID: UID, deviceUID: UID, _ singlePath: String, _ opType: UserOpType?) {
     self.opType = opType
-    super.init(pathUID, deviceUID: deviceUID, singlePath)
+    self._path_uid = pathUID
+    super.init(NULL_UID, deviceUID: deviceUID, singlePath)
+  }
+
+  let _path_uid: UID
+
+  override var pathUID: UID {
+    get {
+      // default to nodeUID for LocalDisk, etc, where paths and nodes are 1-to-1
+      return self._path_uid
+    }
   }
 
   let opType: UserOpType?

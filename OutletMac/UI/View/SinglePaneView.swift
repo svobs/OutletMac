@@ -10,7 +10,7 @@ import SwiftUI
 /**
  STRUCT SinglePaneView
 
- Note: currently this is just a single-column version of TwoPaneView, with the button & progresss row removed
+ Note: currently this is just a single-column version of TwoPaneView, with the button & progress row removed
  (if it works, why add effort and bugs?)
  */
 struct SinglePaneView: View {

@@ -54,18 +54,21 @@ class NodeIdentifierFactory {
     return LocalNodeIdentifier(LOCAL_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
   }
 
-  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32? = nil) throws -> NodeIdentifier {
-    if let opType = opType {
-      if opType > 0 {
-        // ChangeTreeSPID (we must be coming from gRPC)
-        let opTypeEnum: UserOpType?
-        if opType == GRPC_CHANGE_TREE_NO_OP {
-          opTypeEnum = nil
-        } else {
-          opTypeEnum = UserOpType(rawValue: opType)
-        }
-        return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum)
+  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32) throws -> NodeIdentifier {
+    if deviceUID == NULL_UID {
+      // this can indicate that the entire node doesn't exist or is invalid
+      throw OutletError.invalidState("device_uid cannot be null!")
+    }
+
+    if opType > 0 {
+      // ChangeTreeSPID (we must be coming from gRPC)
+      let opTypeEnum: UserOpType?
+      if opType == GRPC_CHANGE_TREE_NO_OP {
+        opTypeEnum = nil
+      } else {
+        opTypeEnum = UserOpType(rawValue: opType)
       }
+      return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum)
     }
 
     let treeType = try self.getTreeType(for: deviceUID)

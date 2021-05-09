@@ -160,20 +160,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: UInt32 {
-    get {return _storage._uid}
-    set {_uniqueStorage()._uid = newValue}
+  public var nodeIdentifier: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _storage._nodeIdentifier ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
+    set {_uniqueStorage()._nodeIdentifier = newValue}
   }
-
-  public var deviceUid: UInt32 {
-    get {return _storage._deviceUid}
-    set {_uniqueStorage()._deviceUid = newValue}
-  }
-
-  public var pathList: [String] {
-    get {return _storage._pathList}
-    set {_uniqueStorage()._pathList = newValue}
-  }
+  /// Returns true if `nodeIdentifier` has been explicitly set.
+  public var hasNodeIdentifier: Bool {return _storage._nodeIdentifier != nil}
+  /// Clears the value of `nodeIdentifier`. Subsequent reads from it will return its default value.
+  public mutating func clearNodeIdentifier() {_uniqueStorage()._nodeIdentifier = nil}
 
   public var trashed: UInt32 {
     get {return _storage._trashed}
@@ -188,16 +182,6 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
   public var iconID: UInt32 {
     get {return _storage._iconID}
     set {_uniqueStorage()._iconID = newValue}
-  }
-
-  public var decoratorNid: UInt32 {
-    get {return _storage._decoratorNid}
-    set {_uniqueStorage()._decoratorNid = newValue}
-  }
-
-  public var decoratorParentNid: UInt32 {
-    get {return _storage._decoratorParentNid}
-    set {_uniqueStorage()._decoratorParentNid = newValue}
   }
 
   public var nodeType: OneOf_NodeType? {
@@ -804,14 +788,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
 extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".Node"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "uid"),
-    2: .standard(proto: "device_uid"),
-    3: .standard(proto: "path_list"),
-    4: .same(proto: "trashed"),
-    5: .standard(proto: "is_shared"),
-    6: .standard(proto: "icon_id"),
-    7: .standard(proto: "decorator_nid"),
-    8: .standard(proto: "decorator_parent_nid"),
+    1: .standard(proto: "node_identifier"),
+    2: .same(proto: "trashed"),
+    3: .standard(proto: "is_shared"),
+    4: .standard(proto: "icon_id"),
     10: .standard(proto: "container_meta"),
     11: .standard(proto: "category_meta"),
     12: .standard(proto: "root_type_meta"),
@@ -822,14 +802,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
   ]
 
   fileprivate class _StorageClass {
-    var _uid: UInt32 = 0
-    var _deviceUid: UInt32 = 0
-    var _pathList: [String] = []
+    var _nodeIdentifier: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
     var _trashed: UInt32 = 0
     var _isShared: Bool = false
     var _iconID: UInt32 = 0
-    var _decoratorNid: UInt32 = 0
-    var _decoratorParentNid: UInt32 = 0
     var _nodeType: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType?
 
     static let defaultInstance = _StorageClass()
@@ -837,14 +813,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
     private init() {}
 
     init(copying source: _StorageClass) {
-      _uid = source._uid
-      _deviceUid = source._deviceUid
-      _pathList = source._pathList
+      _nodeIdentifier = source._nodeIdentifier
       _trashed = source._trashed
       _isShared = source._isShared
       _iconID = source._iconID
-      _decoratorNid = source._decoratorNid
-      _decoratorParentNid = source._decoratorParentNid
       _nodeType = source._nodeType
     }
   }
@@ -864,14 +836,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
         // allocates stack space for every case branch when no optimizations are
         // enabled. https://github.com/apple/swift-protobuf/issues/1034
         switch fieldNumber {
-        case 1: try { try decoder.decodeSingularUInt32Field(value: &_storage._uid) }()
-        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._deviceUid) }()
-        case 3: try { try decoder.decodeRepeatedStringField(value: &_storage._pathList) }()
-        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._trashed) }()
-        case 5: try { try decoder.decodeSingularBoolField(value: &_storage._isShared) }()
-        case 6: try { try decoder.decodeSingularUInt32Field(value: &_storage._iconID) }()
-        case 7: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorNid) }()
-        case 8: try { try decoder.decodeSingularUInt32Field(value: &_storage._decoratorParentNid) }()
+        case 1: try { try decoder.decodeSingularMessageField(value: &_storage._nodeIdentifier) }()
+        case 2: try { try decoder.decodeSingularUInt32Field(value: &_storage._trashed) }()
+        case 3: try { try decoder.decodeSingularBoolField(value: &_storage._isShared) }()
+        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._iconID) }()
         case 10: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta?
           if let current = _storage._nodeType {
@@ -943,29 +911,17 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if _storage._uid != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._uid, fieldNumber: 1)
-      }
-      if _storage._deviceUid != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._deviceUid, fieldNumber: 2)
-      }
-      if !_storage._pathList.isEmpty {
-        try visitor.visitRepeatedStringField(value: _storage._pathList, fieldNumber: 3)
+      if let v = _storage._nodeIdentifier {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
       }
       if _storage._trashed != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._trashed, fieldNumber: 4)
+        try visitor.visitSingularUInt32Field(value: _storage._trashed, fieldNumber: 2)
       }
       if _storage._isShared != false {
-        try visitor.visitSingularBoolField(value: _storage._isShared, fieldNumber: 5)
+        try visitor.visitSingularBoolField(value: _storage._isShared, fieldNumber: 3)
       }
       if _storage._iconID != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._iconID, fieldNumber: 6)
-      }
-      if _storage._decoratorNid != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._decoratorNid, fieldNumber: 7)
-      }
-      if _storage._decoratorParentNid != 0 {
-        try visitor.visitSingularUInt32Field(value: _storage._decoratorParentNid, fieldNumber: 8)
+        try visitor.visitSingularUInt32Field(value: _storage._iconID, fieldNumber: 4)
       }
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
@@ -1010,14 +966,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
         let rhs_storage = _args.1
-        if _storage._uid != rhs_storage._uid {return false}
-        if _storage._deviceUid != rhs_storage._deviceUid {return false}
-        if _storage._pathList != rhs_storage._pathList {return false}
+        if _storage._nodeIdentifier != rhs_storage._nodeIdentifier {return false}
         if _storage._trashed != rhs_storage._trashed {return false}
         if _storage._isShared != rhs_storage._isShared {return false}
         if _storage._iconID != rhs_storage._iconID {return false}
-        if _storage._decoratorNid != rhs_storage._decoratorNid {return false}
-        if _storage._decoratorParentNid != rhs_storage._decoratorParentNid {return false}
         if _storage._nodeType != rhs_storage._nodeType {return false}
         return true
       }
