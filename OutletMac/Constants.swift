@@ -283,7 +283,7 @@ enum TreeType: UID {
       case .NA:
         return "None"
       case .MIXED:
-        return "Mixed"
+        return "Super Root"
       case .LOCAL_DISK:
         return "Local Disk"
       case .GDRIVE:
@@ -311,6 +311,8 @@ let SUPER_ROOT_UID = TreeType.MIXED.rawValue
 let LOCAL_ROOT_UID = TreeType.LOCAL_DISK.rawValue
 let GDRIVE_ROOT_UID = TreeType.GDRIVE.rawValue
 let ROOT_PATH_UID = LOCAL_ROOT_UID
+
+let SUPER_ROOT_DEVICE_UID = SUPER_ROOT_UID
 
 let MIN_FREE_UID: UID = 100
 

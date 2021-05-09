@@ -31,8 +31,9 @@ protocol TreePanelControllable: HasLifecycle {
 
   var dispatchListener: DispatchListener { get }
 
-  func changeTree(to newTree: DisplayTree) throws
+  func updateDisplayTree(to newTree: DisplayTree) throws
   func requestTreeLoad() throws
+  func generateCheckedRowList() throws -> [SPIDNodePair]
 
   func connectTreeView(_ treeView: TreeViewController)
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
@@ -112,7 +113,11 @@ class MockTreePanelController: TreePanelControllable {
   func shutdown() throws {
   }
 
-  public func changeTree(to newTree: DisplayTree) throws {
+  func updateDisplayTree(to newTree: DisplayTree) throws {
+  }
+
+  func generateCheckedRowList() throws -> [SPIDNodePair] {
+    return []
   }
 
   func requestTreeLoad() throws {
@@ -203,7 +208,7 @@ class TreePanelController: TreePanelControllable {
     try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
   }
 
-  public func changeTree(to newTree: DisplayTree) throws {
+  public func updateDisplayTree(to newTree: DisplayTree) throws {
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
     self.app.execSync {
       if newTree.treeID != self.tree.treeID {
@@ -402,6 +407,62 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
+  func generateCheckedRowList() throws -> [SPIDNodePair] {
+    let (checkedNodeSet, mixedNodeSet) = self.displayStore.getCheckedAndMixedRows()
+
+    var checkedRowList: [SPIDNodePair] = []
+
+    var whitelist = LinkedList<SPIDNodePair>()
+    var secondaryScreening = LinkedList<SPIDNodePair>()
+
+    assert(self.tree.hasCheckboxes, "Tree does not have checkboxes. Is this a ChangeTree? \(self.tree.state)")
+
+    // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
+    for topLevelSN in try self.tree.getChildListForRoot() {
+      if checkedNodeSet.contains(topLevelSN.node!.uid) {
+        whitelist.append(topLevelSN)
+      } else if mixedNodeSet.contains(topLevelSN.node!.uid) {
+        secondaryScreening.append(topLevelSN)
+      }
+    }
+
+    while !secondaryScreening.isEmpty {
+      let mixedDirSN = secondaryScreening.popFirst()!
+      assert(mixedDirSN.node!.isDir, "Expected a dir-type node: \(mixedDirSN.node!)")  // only dir nodes can be mixed
+
+      if !(mixedDirSN.node!.isDisplayOnly || mixedDirSN.node!.isLive) {
+        // Even an inconsistent MKDIR node must be included as a checked item:
+        checkedRowList.append(mixedDirSN)
+      }
+
+      // Check each child of a mixed dir for checked or mixed status
+      for childSN in try self.tree.getChildList(mixedDirSN.spid) {
+        if checkedNodeSet.contains(childSN.node!.uid) {
+          whitelist.append(childSN)
+        } else if mixedNodeSet.contains(childSN.node!.uid) {
+          secondaryScreening.append(childSN)
+        }
+      }
+
+      // Whitelist contains nothing but trees full of checked items
+      while !whitelist.isEmpty {
+        let chosenSN = whitelist.popFirst()!
+        if !(chosenSN.node!.isDisplayOnly || chosenSN.node!.isLive) {
+          checkedRowList.append(chosenSN)
+        }
+
+        // Drill down into all descendants of nodes in the whitelist.
+        if chosenSN.node!.isDir {
+          for childSN in try self.tree.getChildList(chosenSN.spid) {
+            whitelist.append(childSN)
+          }
+        }
+      }
+    }
+
+    return checkedRowList
+  }
+
   // Util: error reporting
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -453,7 +514,7 @@ class TreePanelController: TreePanelControllable {
 
   private func onDisplayTreeChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
     let newTree = try propDict.get("tree") as! DisplayTree
-    try self.changeTree(to: newTree)
+    try self.updateDisplayTree(to: newTree)
   }
 
   private func onEditingRootCancelled(_ senderID: SenderID, _ propDict: PropDict) throws {

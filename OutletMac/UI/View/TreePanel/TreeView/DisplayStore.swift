@@ -132,6 +132,10 @@ class DisplayStore {
   // "Get" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  func getCheckedAndMixedRows() -> (Set<UID>, Set<UID>) {
+    return (self.checkedNodeSet, self.mixedNodeSet)
+  }
+
   private func getSN_NoLock(_ guid: GUID) -> SPIDNodePair? {
     return self.primaryDict[guid] ?? nil
   }

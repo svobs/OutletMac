@@ -110,6 +110,13 @@ class OutletGRPCClient: OutletBackend {
 
     dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
   }
+
+  private func reportError(_ msg: String, _ secondaryMsg: String) {
+    var argDict: [String: Any] = [:]
+    argDict["msg"] = msg
+    argDict["secondary_msg"] = secondaryMsg
+    dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: ID_BACKEND_CLIENT, argDict)
+  }
   
   func receiveServerSignals() throws {
     NSLog("DEBUG Subscribing to server signals...")
@@ -122,6 +129,7 @@ class OutletGRPCClient: OutletBackend {
       } catch {
         let signal = Signal(rawValue: signalGRPC.sigInt)!
         NSLog("ERROR While relaying received signal \(signal): \(error)")
+        self.reportError("While relaying received signal \(signal)", "\(error)")
       }
     }
     

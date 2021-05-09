@@ -23,6 +23,8 @@ protocol OutletApp: HasLifecycle {
 
   func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
   func getTreePanelController(_ treeID: String) -> TreePanelControllable?
+
+  func sendEnableUISignal(enable: Bool)
 }
 
 class MockApp: OutletApp {
@@ -54,6 +56,9 @@ class MockApp: OutletApp {
   }
   func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
     return nil
+  }
+
+  public func sendEnableUISignal(enable: Bool) {
   }
 }
 
@@ -302,7 +307,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.taskRunner.execSync(workItem)
   }
 
-  private func sendEnableUISingal(enable: Bool) {
+  public func sendEnableUISignal(enable: Bool) {
     self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": enable])
   }
 
@@ -318,7 +323,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   private func reloadTree(_ con: TreePanelControllable) throws {
     let newTree = try self.backend.createExistingDisplayTree(treeID: con.treeID, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
-    try con.changeTree(to: newTree!)
+    try con.updateDisplayTree(to: newTree!)
   }
 
   // SignalDispatcher callbacks
@@ -357,13 +362,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func afterDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
     // This will change the button bar:
     self.changeWindowMode(.DIFF)
-    self.sendEnableUISingal(enable: true)
+    self.sendEnableUISignal(enable: true)
   }
 
   private func afterDiffTreesFailed(senderID: SenderID, propDict: PropDict) throws {
     // Change button bar back:
     self.changeWindowMode(.BROWSING)
-    self.sendEnableUISingal(enable: true)
+    self.sendEnableUISignal(enable: true)
   }
 
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
@@ -371,7 +376,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.changeWindowMode(.BROWSING)
     try self.reloadTree(self.conLeft!)
     try self.reloadTree(self.conRight!)
-    self.sendEnableUISingal(enable: true)
+    self.sendEnableUISignal(enable: true)
   }
 
   private func afterMergeTreeGenerated(senderID: SenderID, propDict: PropDict) throws {

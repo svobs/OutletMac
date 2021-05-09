@@ -21,6 +21,11 @@ class NodeIdentifierFactory {
       throw OutletError.invalidState("getTreeType(): deviceUID is null!")
     }
 
+    if deviceUID == SUPER_ROOT_DEVICE_UID {
+      // super-root
+      return .MIXED
+    }
+
     if deviceList.count == 0 {
       // lazy load device list from server.
       // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body
@@ -35,7 +40,7 @@ class NodeIdentifierFactory {
       }
     }
     throw OutletError.invalidState("Could not find device with UID: \(deviceUID)")
-  }  
+  }
 
   func getRootConstantGDriveIdentifier(_ deviceUID: UID) -> GDriveIdentifier {
     return GDriveIdentifier(GDRIVE_ROOT_UID, deviceUID: deviceUID, [ROOT_PATH])
@@ -76,6 +81,17 @@ class NodeIdentifierFactory {
         return GDriveSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0])
       }
       return GDriveIdentifier(uid, deviceUID: deviceUID, pathList)
+    } else if treeType == .MIXED {
+      if pathList.count > 1 {
+        throw OutletError.invalidState("Too many paths for tree_type MIXED: \(pathList)")
+      }
+      if deviceUID != SUPER_ROOT_DEVICE_UID {
+        throw OutletError.invalidState("Expected deviceUID of \(SUPER_ROOT_DEVICE_UID) but found \(deviceUID)")
+      }
+      if pathUID == NULL_UID {
+        throw OutletError.invalidState("PathUID is null!")
+      }
+      return MixedTreeSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0])
     }
     
     throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), deviceUID=\(deviceUID), treeType=\(treeType), pathList=\(pathList), pathUID=\(pathUID)")

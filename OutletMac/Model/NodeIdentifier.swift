@@ -153,7 +153,7 @@ class GDriveSPID: SinglePathNodeIdentifier {
   }
 
   override public var description: String {
-    return "∣\(TreeType.display(treeType))-\(guid)∣"
+    return "∣\(TreeType.display(treeType))-\(guid)⩨\(self.getSinglePath())∣"
   }
 
   override var treeType: TreeType {
@@ -169,11 +169,32 @@ class GDriveSPID: SinglePathNodeIdentifier {
 }
 
 /**
- CLASS MixedSPID
+ CLASS MixedTreeSPID
 
  A SPID for Mixed tree types
  */
-class MixedSPID: SinglePathNodeIdentifier {
+class MixedTreeSPID: SinglePathNodeIdentifier {
+  init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String) {
+    self._pathUID = pathUID
+    super.init(nodeUID, deviceUID: deviceUID, singlePath)
+  }
+
+  let _pathUID: UID
+
+  override var pathUID: UID {
+    get {
+      return self._pathUID
+    }
+  }
+
+  override var guid: GUID {
+    // This MUST match the BE's behavior exactly, or bugs will result!
+    return "\(self.deviceUID):\(self.nodeUID):\(self._pathUID)"
+  }
+
+  override public var description: String {
+    return "∣\(TreeType.display(treeType))-\(guid)⩨\(self.getSinglePath())∣"
+  }
 
   override var treeType: TreeType {
     get {
@@ -181,13 +202,10 @@ class MixedSPID: SinglePathNodeIdentifier {
     }
   }
 
-  override func copy(with uid: UID? = nil) -> MixedSPID {
+  // TODO: delete this method. Remove all DecoNode code
+  override func copy(with uid: UID? = nil) -> MixedTreeSPID {
     let uidToCopy: UID = uid ?? self.nodeUID
-    return MixedSPID(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath())
-  }
-
-  static func from(_ nodeIdentifier: NodeIdentifier, _ singlePath: String) -> MixedSPID {
-    return MixedSPID(nodeIdentifier.nodeUID, deviceUID: nodeIdentifier.deviceUID, singlePath)
+    return MixedTreeSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self.pathUID, self.getSinglePath())
   }
 }
 

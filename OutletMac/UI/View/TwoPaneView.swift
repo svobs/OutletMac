@@ -59,10 +59,10 @@ fileprivate struct ButtonBar: View {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func onDiffButtonClicked() {
-    NSLog("Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
+    NSLog("DEBUG Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
-    self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": false])
+    self.app.sendEnableUISignal(enable: false)
 
     // Now ask BE to start the diff
     do {
@@ -70,18 +70,32 @@ fileprivate struct ButtonBar: View {
       //  We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
     } catch {
       NSLog("ERROR Failed to start tree diff: \(error)")
-      self.conLeft.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
+      self.app.sendEnableUISignal(enable: true)
     }
   }
 
   func onDownloadFromGDriveButtonClicked() {
-    NSLog("DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
+    NSLog("DEBUG DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
     self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_MAIN_WINDOW)
   }
 
   func onMergeButtonClicked() {
+    do {
+      let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
+      let selectedChangeListRight = try self.conRight.generateCheckedRowList()
 
-    
+      NSLog("DEBUG Selected changes (Left): \(selectedChangeListLeft.map({"\($0.spid)"}).joined(separator: ","))")
+      NSLog("DEBUG Selected changes (Right): \(selectedChangeListRight.map({"\($0.spid)"}).joined(separator: ","))")
+
+      self.app.sendEnableUISignal(enable: false)
+
+      try self.app.backend.generateMergeTree(treeIDLeft: self.conLeft.treeID, treeIDRight: self.conRight.treeID,
+                                         selectedChangeListLeft: selectedChangeListLeft, selectedChangeListRight: selectedChangeListRight)
+
+    } catch {
+      self.conLeft.reportException("Failed to generate merge preview", error)
+      self.app.sendEnableUISignal(enable: true)
+    }
   }
 
   func onCancelDiffButtonClicked() {
