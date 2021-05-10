@@ -33,13 +33,10 @@ class DisplayStore {
     - At the same time as an item is checked, the checked & mixed state of its all ancestors must be recorded.
     - The 'mixedNodeSet' set is needed for display purposes.
 
-   These are sets of node UIDs, not GUIDs, because checking a node in the GUI must check all instances of that node,
-   not just the instance denoted by the GUID.
-
    Not used if the TreeView does not contain checkboxes.
   */
-  private var checkedNodeSet = Set<UID>()
-  private var mixedNodeSet = Set<UID>()
+  private var checkedNodeSet = Set<GUID>()
+  private var mixedNodeSet = Set<GUID>()
 
   init(_ controllable: TreePanelControllable) {
     self.con = controllable
@@ -99,7 +96,7 @@ class DisplayStore {
     con.app.execSync {
       // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
       let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
-      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.node!.uid)
+      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.spid.guid)
 
       for childSN in childSNList {
         let childGUID = childSN.spid.guid
@@ -108,7 +105,7 @@ class DisplayStore {
 
         if parentChecked {
           // all children are implicitly checked:
-          self.checkedNodeSet.insert(childSN.node!.uid)
+          self.checkedNodeSet.insert(childSN.spid.guid)
         }
       }
       self.parentChildListDict[parentGUID] = childSNList
@@ -201,7 +198,7 @@ class DisplayStore {
   // Checkbox State
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func getCheckedAndMixedRows() -> (Set<UID>, Set<UID>) {
+  func getCheckedAndMixedRows() -> (Set<GUID>, Set<GUID>) {
     return (self.checkedNodeSet, self.mixedNodeSet)
   }
 
@@ -212,7 +209,7 @@ class DisplayStore {
       }
     }
 
-    if self.checkedNodeSet.contains(sn.node!.uid) {
+    if self.checkedNodeSet.contains(sn.spid.guid) {
       return true
     }
 
@@ -255,7 +252,7 @@ class DisplayStore {
   private func getCheckboxState_NoLock(_ sn: SPIDNodePair) -> NSControl.StateValue {
     if self.isCheckboxChecked_NoLock(sn) {
       return .on
-    } else if self.mixedNodeSet.contains(sn.node!.uid) {
+    } else if self.mixedNodeSet.contains(sn.spid.guid) {
       return .mixed
     } else {
       return .off
@@ -282,26 +279,26 @@ class DisplayStore {
   func isCheckboxMixed(_ sn: SPIDNodePair) -> Bool {
     var isMixed: Bool = false
     con.app.execSync {
-      isMixed = self.mixedNodeSet.contains(sn.node!.uid)
+      isMixed = self.mixedNodeSet.contains(sn.spid.guid)
     }
     return isMixed
   }
 
   private func updateCheckedStateTracking_NoLock(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let nodeUID: UID = sn.node!.uid
+    let guid: GUID = sn.spid.guid
 
-    NSLog("DEBUG Setting node \(nodeUID): checked=\(isChecked) mixed=\(isMixed)")
+    NSLog("DEBUG Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
 
     if isChecked {
-      self.checkedNodeSet.insert(nodeUID)
+      self.checkedNodeSet.insert(guid)
     } else {
-      self.checkedNodeSet.remove(nodeUID)
+      self.checkedNodeSet.remove(guid)
     }
 
     if isMixed {
-      self.mixedNodeSet.insert(nodeUID)
+      self.mixedNodeSet.insert(guid)
     } else {
-      self.mixedNodeSet.remove(nodeUID)
+      self.mixedNodeSet.remove(guid)
     }
 
   }
@@ -317,19 +314,16 @@ class DisplayStore {
 
   func removeSN(_ guid: GUID) -> Bool {
     var removed: Bool = false
-    if let sn: SPIDNodePair = self.getSN(guid) {
-      let nodeUID = sn.node!.uid
-      con.app.execSync {
-        self.checkedNodeSet.remove(nodeUID)
-        self.mixedNodeSet.remove(nodeUID)
-        self.parentChildListDict.removeValue(forKey: guid)
+    con.app.execSync {
+      self.checkedNodeSet.remove(guid)
+      self.mixedNodeSet.remove(guid)
+      self.parentChildListDict.removeValue(forKey: guid)
 
-        if self.primaryDict.removeValue(forKey: guid) == nil {
-          NSLog("WARN  Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
-        } else {
-          NSLog("DEBUG GUID removed from DisplayStore: \(guid)")
-          removed = true
-        }
+      if self.primaryDict.removeValue(forKey: guid) == nil {
+        NSLog("WARN  Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
+      } else {
+        NSLog("DEBUG GUID removed from DisplayStore: \(guid)")
+        removed = true
       }
     }
     return removed

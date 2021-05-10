@@ -176,7 +176,8 @@ class Node: CustomStringConvertible {
       return self.nodeIdentifier.pathList[0]
     }
   }
-  
+
+  /** Use isDir to check if node has DirStats */
   func setDirStats(_ dirStats: DirectoryStats?) {
     preconditionFailure("setDirStats(): class does not implement setDirStats(): \(type(of: self))!")
   }
@@ -214,7 +215,7 @@ typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node?)
  CLASS DirectoryStats
  Encapsulates stats for a directory node
  */
-class DirectoryStats {
+class DirectoryStats : CustomStringConvertible {
   var fileCount: UInt32 = 0
   var trashedFileCount: UInt32 = 0
   var dirCount: UInt32 = 0
@@ -257,7 +258,12 @@ class DirectoryStats {
     let size: String = String(sizeBytes)  // TODO: formatting!
     return "\(size) in \(self.fileCount) files and \(self.dirCount) dirs"  // TODO: formatting with commas, similar to Python's :n
   }
-  
+
+  var description: String {
+    get {
+      "DirStats(reg=[\(fileCount)f \(dirCount)d \(sizeBytes)b] trash=[\(trashedFileCount)f \(trashedDirCount)d \(trashedBytes)b])"
+    }
+  }
 }
 
 /**

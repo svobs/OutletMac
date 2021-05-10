@@ -484,9 +484,9 @@ class TreePanelController: TreePanelControllable {
 
     // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
     for topLevelSN in try self.tree.getChildListForRoot() {
-      if checkedNodeSet.contains(topLevelSN.node!.uid) {
+      if checkedNodeSet.contains(topLevelSN.spid.guid) {
         whitelist.append(topLevelSN)
-      } else if mixedNodeSet.contains(topLevelSN.node!.uid) {
+      } else if mixedNodeSet.contains(topLevelSN.spid.guid) {
         secondaryScreening.append(topLevelSN)
       }
     }
@@ -506,11 +506,11 @@ class TreePanelController: TreePanelControllable {
 
       // Check each child of a mixed dir for checked or mixed status
       for childSN in try self.tree.getChildList(mixedDirSN.spid) {
-        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid) nodeUID=\(childSN.node!.uid)")
-        if checkedNodeSet.contains(childSN.node!.uid) {
+        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid) GUID=\(childSN.spid.guid)")
+        if checkedNodeSet.contains(childSN.spid.guid) {
           NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to whitelist: \(childSN.spid)")
           whitelist.append(childSN)
-        } else if mixedNodeSet.contains(childSN.node!.uid) {
+        } else if mixedNodeSet.contains(childSN.spid.guid) {
           NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to mixed list: \(childSN.spid)")
           secondaryScreening.append(childSN)
         }

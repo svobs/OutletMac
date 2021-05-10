@@ -192,6 +192,11 @@ class GRPCConverter {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
 
+    if SUPER_DEBUG && node.isDir {
+      let dirStatsStr = node.getDirStats() == nil ? "nil" : "\(node.getDirStats()!)"
+      NSLog("DEBUG Node \(node.nodeIdentifier) has DirStats: \(dirStatsStr)")
+    }
+
     node.customIcon = IconID(rawValue: nodeGRPC.iconID)!
 
     return node
