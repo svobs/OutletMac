@@ -25,6 +25,7 @@ func fromBoolOrNil(_ b: Bool?) -> String {
 
 class StringUtil {
   private static let byteCountFormatter: ByteCountFormatter = makeByteCountFormatter()
+  private static let largeNumberFormatter: NumberFormatter = makeLargeNumberFormatter()
 
   private static func makeByteCountFormatter() -> ByteCountFormatter {
     let formatter = ByteCountFormatter()
@@ -33,6 +34,16 @@ class StringUtil {
     formatter.includesUnit = true
     formatter.isAdaptive = true
     return formatter
+  }
+
+  private static func makeLargeNumberFormatter() -> NumberFormatter {
+    let numberFormatter = NumberFormatter()
+    numberFormatter.numberStyle = .decimal
+    return numberFormatter
+  }
+
+  static func formatNumberWithCommas(_ largeNumber: UInt32) -> String {
+    return largeNumberFormatter.string(from: NSNumber(value:largeNumber))!
   }
 
   static func formatByteCount(_ byteCount: UInt64?) -> String {

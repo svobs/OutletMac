@@ -471,8 +471,6 @@ class TreePanelController: TreePanelControllable {
   func generateCheckedRowList() throws -> [SPIDNodePair] {
     let (checkedNodeSet, mixedNodeSet) = self.displayStore.getCheckedAndMixedRows()
 
-    // FIXME FIXME FIXME: Need to use GUIDs instead!
-
     NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Checked nodes: \(checkedNodeSet). Mixed nodes: \(mixedNodeSet)")
 
     var checkedRowList: [SPIDNodePair] = []

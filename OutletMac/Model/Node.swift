@@ -239,12 +239,12 @@ class DirectoryStats : CustomStringConvertible {
       
       var filesString: String = ""
       let multi = files == 1 ? "" : "s"
-      filesString = "\(files) file\(multi)"
+      filesString = "\(StringUtil.formatNumberWithCommas(files)) file\(multi)"
       
       var dirsString: String = ""
       if dirs > 0 {
         let multi = dirs == 1 ? "" : "s"
-        dirsString = ", \(dirs) dir\(multi)"
+        dirsString = ", \(StringUtil.formatNumberWithCommas(dirs)) dir\(multi)"
       }
       
       return "\(filesString)\(dirsString)"
@@ -255,8 +255,8 @@ class DirectoryStats : CustomStringConvertible {
     if self.sizeBytes == 0 && self.fileCount == 0 {
       return ""
     }
-    let size: String = String(sizeBytes)  // TODO: formatting!
-    return "\(size) in \(self.fileCount) files and \(self.dirCount) dirs"  // TODO: formatting with commas, similar to Python's :n
+    let size: String = StringUtil.formatByteCount(sizeBytes)
+    return "\(size) in \(StringUtil.formatNumberWithCommas(self.fileCount)) files and \(StringUtil.formatNumberWithCommas(self.dirCount)) dirs"
   }
 
   var description: String {
