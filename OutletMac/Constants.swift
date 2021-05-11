@@ -10,7 +10,7 @@ import SwiftUI
 typealias MD5 = String
 typealias SHA256 = String
 
-let SUPER_DEBUG: Bool = false
+let SUPER_DEBUG: Bool = true
 
 let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
 
@@ -339,4 +339,3 @@ enum TreeDisplayMode: UInt32 {
 let CFG_KEY_TREE_ICON_SIZE = "display.image.tree_icon_size"
 let CFG_KEY_TOOLBAR_ICON_SIZE = "display.image.toolbar_icon_size"
 let CFG_KEY_USE_NATIVE_TOOLBAR_ICONS = "display.image.use_native_toolbar_icons"
-

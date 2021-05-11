@@ -1,5 +1,5 @@
 //
-//  self.swift
+//  GRPCConverter.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-01-15.
@@ -186,11 +186,13 @@ class GRPCConverter {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
 
-    NSLog("DEBUG Converted from gRPC: \(node)")
+    if SUPER_DEBUG {
+      NSLog("DEBUG Converted from gRPC: \(node)")
 
-    if SUPER_DEBUG && node.isDir {
-      let dirStatsStr = node.getDirStats() == nil ? "nil" : "\(node.getDirStats()!)"
-      NSLog("DEBUG Node \(node.nodeIdentifier) has DirStats: \(dirStatsStr)")
+      if node.isDir {
+        let dirStatsStr = node.getDirStats() == nil ? "nil" : "\(node.getDirStats()!)"
+        NSLog("DEBUG DirNode \(node.nodeIdentifier) has DirStats: \(dirStatsStr)")
+      }
     }
 
     node.customIcon = IconID(rawValue: nodeGRPC.iconID)!
@@ -252,8 +254,8 @@ class GRPCConverter {
   // NodeIdentifier
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func nodeIdentifierFromGRPC(_ nidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    return try self.backend.nodeIdentifierFactory.forValues(nidGRPC.uid, deviceUID: nidGRPC.deviceUid, nidGRPC.pathList, pathUID: nidGRPC.pathUid, opType: nidGRPC.opType)
+  func nodeIdentifierFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
+    try self.backend.nodeIdentifierFactory.forValues(grpc.uid, deviceUID: grpc.deviceUid, grpc.pathList, pathUID: grpc.pathUid, opType: grpc.opType)
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
@@ -334,11 +336,12 @@ class GRPCConverter {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
 
-  func displayTreeUiStateFromGRPC(_ stateGRPC: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
-    let rootSn: SPIDNodePair = try self.snFromGRPC(stateGRPC.rootSn)
-    let treeDisplayMode = TreeDisplayMode(rawValue: stateGRPC.treeDisplayMode)!
-    NSLog("DEBUG [\(stateGRPC.treeID)] Got rootSN: \(rootSn)")
+  func displayTreeUiStateFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState) throws -> DisplayTreeUiState {
+    let rootSn: SPIDNodePair = try self.snFromGRPC(grpc.rootSn)
+    let treeDisplayMode = TreeDisplayMode(rawValue: grpc.treeDisplayMode)!
+    NSLog("DEBUG [\(grpc.treeID)] Got rootSN: \(rootSn)")
     // note: I have absolutely no clue why gRPC renames "hasCheckboxes" to "hasCheckboxes_p"
-    return DisplayTreeUiState(treeID: stateGRPC.treeID, rootSN: rootSn, rootExists: stateGRPC.rootExists, offendingPath: stateGRPC.offendingPath, needsManualLoad: stateGRPC.needsManualLoad, treeDisplayMode: treeDisplayMode, hasCheckboxes: stateGRPC.hasCheckboxes_p)
+    return DisplayTreeUiState(treeID: grpc.treeID, rootSN: rootSn, rootExists: grpc.rootExists, offendingPath: grpc.offendingPath,
+            needsManualLoad: grpc.needsManualLoad, treeDisplayMode: treeDisplayMode, hasCheckboxes: grpc.hasCheckboxes_p)
   }
 }

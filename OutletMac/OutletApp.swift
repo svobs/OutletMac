@@ -148,7 +148,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       try dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
       try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
       try dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
-      try dispatchListener.subscribe(signal: .EXIT_DIFF_MODE, afterDiffExited)
+      try dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
       try dispatchListener.subscribe(signal: .COMPLETE_MERGE, afterDiffExited)
       try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
       try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
@@ -363,6 +363,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func afterDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
+    let leftTree = try propDict.get("tree_left") as! DisplayTree
+    let rightTree = try propDict.get("tree_right") as! DisplayTree
+    try self.conLeft!.updateDisplayTree(to: leftTree)
+    try self.conRight!.updateDisplayTree(to: rightTree)
     // This will change the button bar:
     self.changeWindowMode(.DIFF)
     self.sendEnableUISignal(enable: true)
@@ -375,10 +379,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
+    let leftTree = try propDict.get("tree_left") as! DisplayTree
+    let rightTree = try propDict.get("tree_right") as! DisplayTree
+    try self.conLeft!.updateDisplayTree(to: leftTree)
+    try self.conRight!.updateDisplayTree(to: rightTree)
+
     // This will change the button bar:
     self.changeWindowMode(.BROWSING)
-    try self.reloadTree(self.conLeft!)
-    try self.reloadTree(self.conRight!)
     self.sendEnableUISignal(enable: true)
   }
 
@@ -402,6 +409,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func afterDisplayTreeChanged_TwoPane(senderID: SenderID, propDict: PropDict) throws {
+    // FIXME: put this logic into the backend. Track if diff is still happening, and send DIFF_CANCELLED signal with both trees
+
     let newTree = try propDict.get("tree") as! DisplayTree
 
     if newTree.state.treeDisplayMode != .ONE_TREE_ALL_ITEMS {

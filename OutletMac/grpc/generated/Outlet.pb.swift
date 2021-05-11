@@ -740,6 +740,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .device(newValue)}
   }
 
+  public var dualDisplayTree: Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree {
+    get {
+      if case .dualDisplayTree(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree()
+    }
+    set {signalData = .dualDisplayTree(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -754,6 +762,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
     case device(Outlet_Backend_Agent_Grpc_Generated_Device)
+    case dualDisplayTree(Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -801,6 +810,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
         guard case .device(let l) = lhs, case .device(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
+      case (.dualDisplayTree, .dualDisplayTree): return {
+        guard case .dualDisplayTree(let l) = lhs, case .dualDisplayTree(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
       default: return false
       }
     }
@@ -808,6 +821,36 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   }
 
   public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var leftTree: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
+    get {return _storage._leftTree ?? Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState()}
+    set {_uniqueStorage()._leftTree = newValue}
+  }
+  /// Returns true if `leftTree` has been explicitly set.
+  public var hasLeftTree: Bool {return _storage._leftTree != nil}
+  /// Clears the value of `leftTree`. Subsequent reads from it will return its default value.
+  public mutating func clearLeftTree() {_uniqueStorage()._leftTree = nil}
+
+  public var rightTree: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
+    get {return _storage._rightTree ?? Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState()}
+    set {_uniqueStorage()._rightTree = newValue}
+  }
+  /// Returns true if `rightTree` has been explicitly set.
+  public var hasRightTree: Bool {return _storage._rightTree != nil}
+  /// Clears the value of `rightTree`. Subsequent reads from it will return its default value.
+  public mutating func clearRightTree() {_uniqueStorage()._rightTree = nil}
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_DownloadMsg {
@@ -2515,6 +2558,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     18: .standard(proto: "download_msg"),
     19: .standard(proto: "stats_update"),
     20: .same(proto: "device"),
+    21: .standard(proto: "dual_display_tree"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2616,6 +2660,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .device(v)}
       }()
+      case 21: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .dualDisplayTree(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .dualDisplayTree(v)}
+      }()
       default: break
       }
     }
@@ -2675,6 +2728,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       guard case .device(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
     }()
+    case .dualDisplayTree?: try {
+      guard case .dualDisplayTree(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 21)
+    }()
     case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
@@ -2685,6 +2742,78 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     if lhs.sender != rhs.sender {return false}
     if lhs.parentGuid != rhs.parentGuid {return false}
     if lhs.signalData != rhs.signalData {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".DualDisplayTree"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "left_tree"),
+    2: .standard(proto: "right_tree"),
+  ]
+
+  fileprivate class _StorageClass {
+    var _leftTree: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState? = nil
+    var _rightTree: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState? = nil
+
+    static let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _leftTree = source._leftTree
+      _rightTree = source._rightTree
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularMessageField(value: &_storage._leftTree) }()
+        case 2: try { try decoder.decodeSingularMessageField(value: &_storage._rightTree) }()
+        default: break
+        }
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      if let v = _storage._leftTree {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+      }
+      if let v = _storage._rightTree {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+      }
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree, rhs: Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree) -> Bool {
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._leftTree != rhs_storage._leftTree {return false}
+        if _storage._rightTree != rhs_storage._rightTree {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

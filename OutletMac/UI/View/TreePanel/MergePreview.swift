@@ -21,6 +21,8 @@ struct MergePreviewContent: View {
     }
 
     func doMerge() {
+        NSLog("DEBUG OK btn clicked! Sending signal: '\(Signal.COMPLETE_MERGE)'")
+        self.con.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
         self.parentWindow.close()
     }
 
@@ -32,7 +34,7 @@ struct MergePreviewContent: View {
                         .contentShape(Rectangle()) // taps should be detected in the whole window
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
                         .onPreferenceChange(ContentAreaPrefKey.self) { key in
-                            //        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
+//                            NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
                             self.heightTracking.mainWindowHeight = key.height
                         }
             }
@@ -44,7 +46,7 @@ struct MergePreviewContent: View {
                         .keyboardShortcut(.defaultAction)  // this will also color the button
             }
                     .padding(.bottom).padding(.horizontal)  // we have enough padding above already
-        }.frame(minWidth: 400, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 400, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)  // set minimum window dimensions
+        }.frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)  // set minimum window dimensions
     }
 
 }

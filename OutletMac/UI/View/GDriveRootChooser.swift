@@ -89,7 +89,7 @@ struct GDriveRootChooserContent: View {
           .disabled(!self.chooserState.selectionIsValid)
       }
       .padding(.bottom).padding(.horizontal)  // we have enough padding above already
-    }.frame(minWidth: 400, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 400, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)  // set minimum window dimensions
+    }.frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)  // set minimum window dimensions
   }
 
 }
@@ -122,7 +122,7 @@ class GDriveRootChooser: PopUpTreePanel {
     DispatchQueue.main.async {
       let selectionValid = (snList.count == 1 && snList[0].node!.isDir)
       self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.con.treeID)] Selection changed: selectionValid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node!.isDir))")
+      NSLog("DEBUG [\(self.con.treeID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node!.isDir))")
     }
   }
 

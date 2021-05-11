@@ -14,7 +14,7 @@ enum Signal: UInt32 {
   case START_CACHEMAN_DONE = 5
   case DIFF_TREES_DONE = 7
   case DIFF_TREES_FAILED = 8
-  case DIFF_ONE_SIDE_RESULT = 9
+  case DIFF_TREES_CANCELLED = 9
   case SYNC_GDRIVE_CHANGES = 10
   case DOWNLOAD_ALL_GDRIVE_META = 11
   case COMMAND_COMPLETE = 12
@@ -53,6 +53,7 @@ enum Signal: UInt32 {
   case GDRIVE_RELOADED = 45
   case NODE_UPSERTED = 46
   case NODE_REMOVED = 47
+  /** Sent by FE and received by the BE */
   case EXIT_DIFF_MODE = 49
   case ERROR_OCCURRED = 50
   case REFRESH_SUBTREE_STATS_DONE = 51

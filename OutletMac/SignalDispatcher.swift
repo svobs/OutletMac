@@ -182,7 +182,8 @@ class SignalDispatcher {
   }
 
   fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
-    if self.signalListenerDict[signal]?.removeValue(forKey: listenerID) != nil {
+    if var listenerDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
+      listenerDict.removeValue(forKey: listenerID)
       NSLog("DEBUG SignalDispatcher: Removed subscriber '\(listenerID)' from signal '\(signal)'")
       return
     }

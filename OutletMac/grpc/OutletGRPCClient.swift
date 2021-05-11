@@ -70,6 +70,13 @@ class OutletGRPCClient: OutletBackend {
         let displayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
         let tree: DisplayTree = displayTreeUiState.toDisplayTree(backend: self)
         argDict["tree"] = tree
+      case .DIFF_TREES_DONE, .DIFF_TREES_CANCELLED:
+        let displayTreeUiStateL = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.dualDisplayTree.leftTree)
+        let treeL: DisplayTree = displayTreeUiStateL.toDisplayTree(backend: self)
+        argDict["tree_left"] = treeL
+        let displayTreeUiStateR = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.dualDisplayTree.rightTree)
+        let treeR: DisplayTree = displayTreeUiStateR.toDisplayTree(backend: self)
+        argDict["tree_right"] = treeR
       case .OP_EXECUTION_PLAY_STATE_CHANGED:
         argDict["is_enabled"] = signalGRPC.playState.isEnabled
       case .TOGGLE_UI_ENABLEMENT:

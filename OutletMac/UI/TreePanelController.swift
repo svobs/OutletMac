@@ -216,8 +216,9 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
     self.app.execSync {
       if newTree.treeID != self.tree.treeID {
-        NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")
+        NSLog("INFO  [\(self.treeID)] Changing treeID to \(newTree.treeID)")
         do {
+          self.treeView = nil
           self.app.deregisterTreePanelController(self.tree.treeID)
           self.app.registerTreePanelController(newTree.treeID, self)
           try self.reattachListeners(newTree.treeID)
@@ -256,6 +257,7 @@ class TreePanelController: TreePanelControllable {
 
   // Should be called by TreeViewController
   func connectTreeView(_ treeView: TreeViewController) {
+    NSLog("INFO  Connecting TreeView to TreePanelController")
     self.treeView = treeView
 
     if self.readyToPopulate {
@@ -562,10 +564,6 @@ class TreePanelController: TreePanelControllable {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   private func onEnableUIToggled(_ senderID: SenderID, _ propDict: PropDict) throws {
-    if !self.canChangeRoot {
-      assert(!self.swiftTreeState.isUIEnabled)
-      return
-    }
     let isEnabled = try propDict.getBool("enable")
     DispatchQueue.main.async {
       self.swiftTreeState.isUIEnabled = isEnabled

@@ -63,7 +63,8 @@ class SwiftTreeState: ObservableObject {
   @Published var treeType: TreeType = TreeType.NA
   @Published var hasCheckboxes: Bool
 
-  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?, rootPath: String, rootPathNonEdit: String, rootDeviceUID: UID, treeType: TreeType, hasCheckboxes: Bool) {
+  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?,
+       rootPath: String, rootPathNonEdit: String, rootDeviceUID: UID, treeType: TreeType, hasCheckboxes: Bool) {
     self.isUIEnabled = isUIEnabled
     self.isRootExists = isRootExists
     self.isEditingRoot = isEditingRoot
