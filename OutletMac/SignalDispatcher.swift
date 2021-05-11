@@ -158,7 +158,7 @@ fileprivate class Subscription {
 /**
  CLASS SignalDispatcher
 
- Mimics the functionality of PyDispatcher, with some simplifications/improvments. It's simple enough that I just wrote my own code.
+ Mimics the functionality of PyDispatcher, with some simplifications/improvements. It's simple enough that I just wrote my own code.
  */
 class SignalDispatcher {
   fileprivate var signalListenerDict = [Signal: [ListenerID: Subscription]]()
@@ -196,7 +196,7 @@ class SignalDispatcher {
    Specifically, gRPC will crash if a callback from a gRPC response makes another gRPC request in the same thread.
    */
   func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
-    NSLog("DEBUG SignalDispatcher: Sending signal \(signal)")
+    NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
       var countNotified = 0
