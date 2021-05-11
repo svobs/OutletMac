@@ -14,7 +14,7 @@ class MergePreview: PopUpTreePanel {
         super.init(app, con, initialSelection: initialSelection)
         assert(con.treeID == ID_MERGE_TREE)
         self.window.center()
-        self.window.title = "Google Drive Root Chooser"
+        self.window.title = "Confirm Merge"
 
 //        window.contentView = NSHostingView(rootView: content)
 //    window.setDefaultButtonCell(

@@ -189,6 +189,12 @@ class SignalDispatcher {
     NSLog("WARN  Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
   }
 
+  /**
+   Sends the given Signal to configured listeners asynchronously.
+
+   Each subscriber is notified via a separate DispatchQueue WorkItem. Doing this defends against potential problems in gRPC when run loops are reused.
+   Specifically, gRPC will crash if a callback from a gRPC response makes another gRPC request in the same thread.
+   */
   func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
     NSLog("DEBUG Dispatcher: Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
@@ -200,10 +206,12 @@ class SignalDispatcher {
         if subscriber.matches(senderID) {
           countNotified += 1
           NSLog("DEBUG Dispatcher: Calling listener \(subID) for signal '\(signal)'")
-          do {
-            try subscriber.callback(senderID, propertyList)
-          } catch {
-            NSLog("ERROR While calling listener \(subID) for signal '\(signal)': \(error)")
+          DispatchQueue.global(qos: .background).async {
+            do {
+              try subscriber.callback(senderID, propertyList)
+            } catch {
+              NSLog("ERROR While calling listener \(subID) for signal '\(signal)': \(error)")
+            }
           }
         } else if SUPER_DEBUG {
           NSLog("DEBUG Listener \(subID) does not match signal '\(signal)'")
