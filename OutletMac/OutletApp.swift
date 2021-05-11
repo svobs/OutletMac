@@ -22,6 +22,7 @@ protocol OutletApp: HasLifecycle {
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 
   func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
+  func deregisterTreePanelController(_ treeID: TreeID)
   func getTreePanelController(_ treeID: String) -> TreePanelControllable?
 
   func sendEnableUISignal(enable: Bool)
@@ -54,6 +55,10 @@ class MockApp: OutletApp {
 
   func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable) {
   }
+
+  func deregisterTreePanelController(_ treeID: TreeID) {
+  }
+
   func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
     return nil
   }
@@ -176,7 +181,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   /**
-   Creates and starts a tree controller for the given tree, but does not load it
+   Creates and starts a tree controller for the given tree, but does not load it.
+
+   NOTE:
   */
   func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
@@ -348,12 +355,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func onTreePanelControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
-    }
-    NSLog("DEBUG [\(senderID)] Deregistering tree controller in frontend")
-    self.treeControllerDict.removeValue(forKey: senderID)
+    self.deregisterTreePanelController(senderID)
   }
 
   private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
@@ -381,9 +383,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func afterMergeTreeGenerated(senderID: SenderID, propDict: PropDict) throws {
-    // TODO: show Merge Tree dialog
-
-
+    let newTree = try propDict.get("tree") as! DisplayTree
+    // This will put the controller in the registry as a side effect
+    let _ = try self.buildController(newTree, canChangeRoot: false, allowMultipleSelection: false)
+    // note: we can't send a controller directly to this method (cuz of @objc), so instead we put it in our controller registry and later look it up.
+    NSApp.sendAction(#selector(OutletMacApp.openMergePreview), to: nil, from:newTree.treeID)
   }
 
   private func afterGenMergeTreeFailed(senderID: SenderID, propDict: PropDict) throws {
@@ -416,37 +420,65 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.changeWindowMode(.BROWSING)
   }
 
+  // TreePanelController registry
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  func registerTreePanelController(_ treeID: TreeID, _ controller: TreePanelControllable) {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    self.treeControllerDict[treeID] = controller
+  }
+
+  func deregisterTreePanelController(_ treeID: TreeID) {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
+    self.treeControllerDict.removeValue(forKey: treeID)
+  }
+
+  func getTreePanelController(_ treeID: TreeID) -> TreePanelControllable? {
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
+    return self.treeControllerDict[treeID]
+  }
+
   // Etc
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  /**
+   Display error msg in dialog
+   */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       DispatchQueue.main.async {
         self.settings.showAlert(title: msg, msg: secondaryMsg)
       }
   }
 
-  // TODO: this is TEMPORARY
-  func getDefaultGDriveDeviceUID() throws -> UID {
-    var deviceUID: UID? = nil
-    for device in try self.backend.getDeviceList() {
-      if device.treeType == .GDRIVE {
-        if deviceUID != nil {
-          throw OutletError.invalidState("Multiple Google Drive accounts found but this is not supported!")
-        } else {
-          deviceUID = device.uid
-        }
-      }
-    }
-    if deviceUID == nil {
-      throw OutletError.invalidState("No Google Drive accounts found!")
-    } else {
-      return deviceUID!
-    }
+  /**
+   Display dialog to confirm with user. Return TRUE if user says OK; FALSE if user cancels
+   */
+  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
+    let alert = NSAlert()
+    alert.messageText = messageText
+    alert.informativeText = informativeText
+    alert.addButton(withTitle: okButtonText)
+    alert.addButton(withTitle: cancelButtonText)
+    alert.alertStyle = .warning
+    return alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
   }
 
+  /**
+   Display GDrive root selection dialog
+   */
   @objc func openGDriveRootChooser(_ treeID: String) {
     guard let sourceCon = self.getTreePanelController(treeID) else {
-      NSLog("ERROR [\(treeID)] Cannot open GDrive chooser: could not find controller with this treeID!")
+      NSLog("ERROR [\(treeID)] Cannot open GDrive Chooser: could not find controller with this treeID!")
       return
     }
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
@@ -468,29 +500,44 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
-    let alert = NSAlert()
-    alert.messageText = messageText
-    alert.informativeText = informativeText
-    alert.addButton(withTitle: okButtonText)
-    alert.addButton(withTitle: cancelButtonText)
-    alert.alertStyle = .warning
-    return alert.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn
+  @objc func openMergePreview(_ treeID: TreeID) {
+//    if self.mergePreviewView != nil && self.mergePreviewView.isOpen {
+//      self.mergePreviewView.moveToFront()
+//    } else {
+//      self.execAsync {
+//        do {
+//          // note: we can't send a controller directly to this method (cuz of @objc), so instead we look it up in our controller registry.
+//          guard let con = self.getTreePanelController(treeID) else {
+//            NSLog("ERROR [\(treeID)] Cannot open Merge Preview: could not find controller with this treeID!")
+//            return
+//          }
+//
+//          self.mergePreviewView = MergePreview(self, con)
+//          try self.mergePreviewView.start()
+//        } catch {
+//          self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
+//        }
+//      }
+//    }
   }
 
-  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable) {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
+  // TODO: this is TEMPORARY
+  func getDefaultGDriveDeviceUID() throws -> UID {
+    var deviceUID: UID? = nil
+    for device in try self.backend.getDeviceList() {
+      if device.treeType == .GDRIVE {
+        if deviceUID != nil {
+          throw OutletError.invalidState("Multiple Google Drive accounts found but this is not supported!")
+        } else {
+          deviceUID = device.uid
+        }
+      }
     }
-    self.treeControllerDict[treeID] = controller
+    if deviceUID == nil {
+      throw OutletError.invalidState("No Google Drive accounts found!")
+    } else {
+      return deviceUID!
+    }
   }
 
-  func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
-    }
-    return self.treeControllerDict[treeID]
-  }
 }

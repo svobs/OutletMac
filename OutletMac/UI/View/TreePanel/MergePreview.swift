@@ -10,7 +10,7 @@ import SwiftUI
  */
 class MergePreview: PopUpTreePanel {
 
-    override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
+    override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
         super.init(app, con, initialSelection: initialSelection)
         assert(con.treeID == ID_MERGE_TREE)
         self.window.center()

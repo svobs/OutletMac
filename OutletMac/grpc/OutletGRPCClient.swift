@@ -590,6 +590,7 @@ class OutletGRPCClient: OutletBackend {
 
   func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
     do {
+      NSLog("INFO  Calling gRPC: \(rpcName)")
       return try call.response.wait()
     } catch is NIOConnectionError {
       self.grpcConnectionDown()

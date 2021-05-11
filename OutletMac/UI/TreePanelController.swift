@@ -218,6 +218,8 @@ class TreePanelController: TreePanelControllable {
       if newTree.treeID != self.tree.treeID {
         NSLog("DEBUG [\(self.treeID)] Changing treeID to \(newTree.treeID)")
         do {
+          self.app.deregisterTreePanelController(self.tree.treeID)
+          self.app.registerTreePanelController(newTree.treeID, self)
           try self.reattachListeners(newTree.treeID)
         } catch {
           self.reportException("Failed to reattach listeners", error)
