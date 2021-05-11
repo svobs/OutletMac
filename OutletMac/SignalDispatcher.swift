@@ -175,18 +175,18 @@ class SignalDispatcher {
     }
 
     if self.signalListenerDict[signal]!.updateValue(subscription, forKey: listenerID) != nil {
-      NSLog("WARN  Overwriting subscriber '\(listenerID)' for signal '\(signal)'")
+      NSLog("WARN  SignalDispatcher: Overwriting subscriber '\(listenerID)' for signal '\(signal)'")
     } else {
-      NSLog("DEBUG Added subscriber '\(listenerID)' for signal '\(signal)'")
+      NSLog("DEBUG SignalDispatcher: Added subscriber '\(listenerID)' for signal '\(signal)'")
     }
   }
 
   fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
     if self.signalListenerDict[signal]?.removeValue(forKey: listenerID) != nil {
-      NSLog("DEBUG Removed subscriber '\(listenerID)' from signal '\(signal)'")
+      NSLog("DEBUG SignalDispatcher: Removed subscriber '\(listenerID)' from signal '\(signal)'")
       return
     }
-    NSLog("WARN  Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
+    NSLog("WARN  SignalDispatcher: Could not remove subscriber '\(listenerID)' from signal '\(signal)': not found")
   }
 
   /**
@@ -196,7 +196,7 @@ class SignalDispatcher {
    Specifically, gRPC will crash if a callback from a gRPC response makes another gRPC request in the same thread.
    */
   func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
-    NSLog("DEBUG Dispatcher: Sending signal \(signal)")
+    NSLog("DEBUG SignalDispatcher: Sending signal \(signal)")
     if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
       let propertyList = PropDict(params)
       var countNotified = 0
@@ -205,22 +205,22 @@ class SignalDispatcher {
         countTotal += 1
         if subscriber.matches(senderID) {
           countNotified += 1
-          NSLog("DEBUG Dispatcher: Calling listener \(subID) for signal '\(signal)'")
           DispatchQueue.global(qos: .background).async {
             do {
+              NSLog("DEBUG SignalDispatcher: Calling listener \(subID) for signal '\(signal)'")
               try subscriber.callback(senderID, propertyList)
             } catch {
-              NSLog("ERROR While calling listener \(subID) for signal '\(signal)': \(error)")
+              NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")
             }
           }
         } else if SUPER_DEBUG {
-          NSLog("DEBUG Listener \(subID) does not match signal '\(signal)'")
+          NSLog("DEBUG SignalDispatcher: Listener \(subID) does not match signal '\(signal)'")
         }
       }
 
-      NSLog("DEBUG Dispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
+      NSLog("DEBUG SignalDispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
     } else {
-      NSLog("DEBUG No subscribers found for signal \(signal)")
+      NSLog("DEBUG SignalDispatcher: No subscribers found for signal \(signal)")
     }
   }
 }
