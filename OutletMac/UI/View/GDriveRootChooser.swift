@@ -7,23 +7,6 @@
 
 import SwiftUI
 
-class GDriveRootChooserDelegate: NSObject, NSWindowDelegate {
-  var windowIsOpen = true
-  var parentMeta: GDriveRootChooser? = nil
-
-  func windowWillClose(_ notification: Notification) {
-    windowIsOpen = false
-
-    if let parent = parentMeta {
-      do {
-        try parent.shutdown()
-      } catch {
-        NSLog("ERROR Failure during GDrive root chooser shutdown; \(error)")
-      }
-    }
-  }
-}
-
 /**
  Wrap the selection in an ObservableObject so objects outside of the view can alter the view...
  What a headache.
@@ -111,111 +94,28 @@ struct GDriveRootChooserContent: View {
 
 }
 
-class GDriveRootChooserWindow: NSWindow {
-  override func keyDown(with event: NSEvent) {
-    // Pass all key events to the project model
-    NSLog("KEY EVENT: \(event)")
-    // Enable key events
-    interpretKeyEvents([event])
-    if event.keyCode == 13 {
-      NSLog("ENTER KEY PRESSED!")
-    } else {
-      NSLog("User pressed key: \(event.keyCode)")
-    }
-  }
-}
-
 /**
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
-class GDriveRootChooser: HasLifecycle, ObservableObject {
-  var window: NSWindow!
-  @State var windowDelegate = GDriveRootChooserDelegate()
+class GDriveRootChooser: PopUpTreePanel {
   var chooserState: ChooserState = ChooserState()
-  let initialSelection: SPIDNodePair
 
-  let app: OutletApp
-  let con: TreePanelControllable
-  let dispatchListener: DispatchListener
-  private var loadComplete: Bool = false
-
-  var isOpen: Bool {
-    get {
-      return windowDelegate.windowIsOpen
-    }
-  }
-
-  init(_ app: OutletApp, _ con: TreePanelControllable, targetTreeID: String, initialSelection: SPIDNodePair) {
-    self.app = app
-    self.con = con
-    self.initialSelection = initialSelection
-    self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID))-dialog")
+  init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair, targetTreeID: TreeID) {
+    super.init(app, con, initialSelection: initialSelection)
     assert(con.treeID == ID_GDRIVE_DIR_SELECT)
-    // TODO: save content rect in config
-    // note: x & y are from lower-left corner
-    let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
-    window = GDriveRootChooserWindow(
-      contentRect: contentRect,
-      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-      backing: .buffered, defer: false)
-    // this will override x & y from content rect
-    window.center()
-    window.title = "Google Drive Root Chooser"
+    self.window.center()
+    self.window.title = "Google Drive Root Chooser"
     // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
 //    window.setFrameAutosaveName(window.title)
     let content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self.window, self.chooserState)
-    window.delegate = self.windowDelegate
     window.contentView = NSHostingView(rootView: content)
 //    window.setDefaultButtonCell(
-  }
-
-  func start() throws {
-    self.windowDelegate.parentMeta = self
-
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onBackendReady, whitelistSenderID: self.con.treeID)
-    try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateComplete, whitelistSenderID: self.con.treeID)
-    try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
-
-    // TODO: create & populate progress bar to show user that something is being done here
-
-    try self.con.requestTreeLoad()
-  }
-
-  func shutdown() throws {
-    try self.dispatchListener.unsubscribeAll()
-  }
-
-  func moveToFront() {
-    if loadComplete {
-      DispatchQueue.main.async {
-        self.window.makeKeyAndOrderFront(nil)
-      }
-    }
-  }
-
-  func selectSPID(_ spid: SPID) {
-    // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
-    // being hit
-    self.con.treeView!.selectSingleSPID(spid)
   }
 
   // DispatchListener callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func onBackendReady(_ senderID: SenderID, _ props: PropDict) throws {
-    NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
-    self.loadComplete = true
-    self.moveToFront()
-  }
-
-  private func onPopulateComplete(_ senderID: SenderID, _ props: PropDict) throws {
-    NSLog("DEBUG [\(self.con.treeID)] Populate complete! Selecting SPID: \(self.initialSelection.spid)")
-    DispatchQueue.main.async {
-      self.selectSPID(self.initialSelection.spid)
-    }
-  }
-
-  private func onSelectionChanged(_ senderID: SenderID, _ props: PropDict) throws {
+  override func onSelectionChanged(_ senderID: SenderID, _ props: PropDict) throws {
     let snList: [SPIDNodePair] = try props.getArray("sn_list") as! [SPIDNodePair]
     assert(snList.count <= 1)
 

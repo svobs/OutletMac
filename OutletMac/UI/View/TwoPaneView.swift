@@ -84,8 +84,10 @@ fileprivate struct ButtonBar: View {
       let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
       let selectedChangeListRight = try self.conRight.generateCheckedRowList()
 
-      NSLog("INFO  Selected changes (Left): \(selectedChangeListLeft.map({"\($0.spid)"}).joined(separator: ","))")
-      NSLog("INFO  Selected changes (Right): \(selectedChangeListRight.map({"\($0.spid)"}).joined(separator: ","))")
+      if SUPER_DEBUG {
+        NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
+        NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
+      }
 
       self.app.sendEnableUISignal(enable: false)
 

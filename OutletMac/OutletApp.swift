@@ -95,6 +95,7 @@ class AppMenu: NSMenu {
 
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   var rootChooserView: GDriveRootChooser!
+  var mergePreviewView: MergePreview!
   var window: NSWindow!
 
   let winID = ID_MAIN_WINDOW
@@ -459,7 +460,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 
-        rootChooserView = GDriveRootChooser(self, con, targetTreeID: treeID, initialSelection: currentSN)
+        rootChooserView = GDriveRootChooser(self, con, initialSelection: currentSN, targetTreeID: treeID)
         try rootChooserView.start()
       } catch {
         self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
