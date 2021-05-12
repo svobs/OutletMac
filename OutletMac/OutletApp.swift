@@ -149,7 +149,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
       try dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
       try dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
-      try dispatchListener.subscribe(signal: .COMPLETE_MERGE, afterDiffExited)
       try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
       try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
 

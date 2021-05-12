@@ -17,6 +17,12 @@ class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
   private var con: TreePanelControllable
 
+  private var treeID: TreeID {
+    get {
+      return self.con.treeID
+    }
+  }
+
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
   private var childParentDict: [GUID: GUID] = [:]
@@ -162,7 +168,7 @@ class DisplayStore {
     con.app.execSync {
       let childList = self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
       if childIndex >= childList.count {
-        NSLog("ERROR Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
+        NSLog("ERROR \(self.treeID) Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
         sn = nil
       } else {
         sn = childList[childIndex]
@@ -183,7 +189,7 @@ class DisplayStore {
     if let parentGUID = self.childParentDict[childGUID] {
       return self.primaryDict[parentGUID]
     }
-    NSLog("ERROR Could not find parent of GUID \(childGUID) in childParentDict!")
+    NSLog("[\(treeID)] ERROR Could not find parent of GUID \(childGUID) in childParentDict!")
     return nil
   }
 
@@ -242,7 +248,7 @@ class DisplayStore {
       if parentGUID != TOPMOST_GUID {
         for siblingSN in self.getChildList_NoLock(parentGUID) {
           let state = self.getCheckboxState_NoLock(siblingSN)
-          NSLog("DEBUG Sibling \(siblingSN.spid.guid) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
+          NSLog("DEBUG [\(treeID)] Sibling \(siblingSN.spid.guid) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
           self.updateCheckedStateTracking_NoLock(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
         }
       }
@@ -287,7 +293,7 @@ class DisplayStore {
   private func updateCheckedStateTracking_NoLock(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
     let guid: GUID = sn.spid.guid
 
-    NSLog("DEBUG Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
+    NSLog("DEBUG [\(treeID)] Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
 
     if isChecked {
       self.checkedNodeSet.insert(guid)
@@ -320,9 +326,9 @@ class DisplayStore {
       self.parentChildListDict.removeValue(forKey: guid)
 
       if self.primaryDict.removeValue(forKey: guid) == nil {
-        NSLog("WARN  Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
+        NSLog("WARN  [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
       } else {
-        NSLog("DEBUG GUID removed from DisplayStore: \(guid)")
+        NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
         removed = true
       }
     }
@@ -339,12 +345,12 @@ class DisplayStore {
     var searchQueue = LinkedList<SPIDNodePair>()
 
     if var sn = self.getSN_NoLock(guid) {
-      NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
       searchQueue.append(sn)
 
       while !searchQueue.isEmpty {
         sn = searchQueue.popFirst()!
-        NSLog("DEBUG [\(self.con.treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
         applyFunc(sn)
 
         for childSN in self.getChildList_NoLock(sn.spid.guid) {

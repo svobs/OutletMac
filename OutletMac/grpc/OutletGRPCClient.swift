@@ -40,6 +40,7 @@ class OutletGRPCClient: OutletBackend {
     try connectAndForwardSignal(.COMPLETE_MERGE)
     try connectAndForwardSignal(.DOWNLOAD_ALL_GDRIVE_META)
     try connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
+    try connectAndForwardSignal(.EXIT_DIFF_MODE)
   }
   
   func shutdown() throws {

@@ -45,7 +45,7 @@ enum Signal: UInt32 {
   // --- Tree actions: notifications ---
   /** Fired by the backend when it has begun to load a subtree from cache */
   case LOAD_SUBTREE_STARTED = 40
-  /** Fired by the backend when it has finsished loading a subtree from cache */
+  /** Fired by the backend when it has finished loading a subtree from cache */
   case LOAD_SUBTREE_DONE = 41
   case NODE_EXPANSION_TOGGLED = 42
   case NODE_EXPANSION_DONE = 43
