@@ -413,15 +413,15 @@ class OutletGRPCClient: OutletBackend {
     return treeIDs
   }
   
-  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws {
+  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request()
     request.treeIDLeft = treeIDLeft
     request.treeIDRight = treeIDRight
-    for sn in selectedChangeListLeft {
-      request.changeListLeft.append(try self.grpcConverter.snToGRPC(sn))
+    for guid in selectedChangeListLeft {
+      request.changeListLeft.append(guid)
     }
-    for sn in selectedChangeListRight {
-      request.changeListRight.append(try self.grpcConverter.snToGRPC(sn))
+    for guid in selectedChangeListRight {
+      request.changeListRight.append(guid)
     }
 
     let _ = try self.callAndTranslateErrors(self.stub.generate_merge_tree(request), "generateMergeTree")

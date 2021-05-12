@@ -55,6 +55,7 @@ struct TreeViewRepresentable: NSViewControllerRepresentable {
   }
 
   func makeNSViewController(context: Context) -> TreeViewController {
+    NSLog("DEBUG [\(self.con.treeID)] Creating TreeViewController")
     let treeViewController = TreeViewController()
     treeViewController.con = self.con
     return treeViewController

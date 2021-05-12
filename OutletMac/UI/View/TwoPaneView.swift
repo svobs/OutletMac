@@ -84,6 +84,8 @@ fileprivate struct ButtonBar: View {
       let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
       let selectedChangeListRight = try self.conRight.generateCheckedRowList()
 
+      let guidListLeft: [GUID] = selectedChangeListLeft.map({ $0.spid.guid })
+      let guidListRight: [GUID] = selectedChangeListRight.map({ $0.spid.guid })
       if SUPER_DEBUG {
         NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
         NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
@@ -92,7 +94,7 @@ fileprivate struct ButtonBar: View {
       self.app.sendEnableUISignal(enable: false)
 
       try self.app.backend.generateMergeTree(treeIDLeft: self.conLeft.treeID, treeIDRight: self.conRight.treeID,
-                                         selectedChangeListLeft: selectedChangeListLeft, selectedChangeListRight: selectedChangeListRight)
+                                             selectedChangeListLeft: guidListLeft, selectedChangeListRight: guidListRight)
 
     } catch {
       self.conLeft.reportException("Failed to generate merge preview", error)

@@ -40,7 +40,7 @@ protocol OutletBackend: HasLifecycle {
   
   func dropDraggedNodes(srcTreeID: TreeID, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: TreeID, dstSN: SPIDNodePair) throws
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
-  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws
+  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
   func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws
   func getLastPendingOp(nodeUID: UID) throws -> UserOp?
@@ -193,7 +193,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [SPIDNodePair], selectedChangeListRight: [SPIDNodePair]) throws {
+  func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

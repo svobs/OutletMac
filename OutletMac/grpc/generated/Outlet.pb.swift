@@ -413,9 +413,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request {
 
   public var treeIDRight: String = String()
 
-  public var changeListLeft: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
+  public var changeListLeft: [String] = []
 
-  public var changeListRight: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
+  public var changeListRight: [String] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -2081,8 +2081,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request: SwiftPr
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.treeIDLeft) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeIDRight) }()
-      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.changeListLeft) }()
-      case 4: try { try decoder.decodeRepeatedMessageField(value: &self.changeListRight) }()
+      case 3: try { try decoder.decodeRepeatedStringField(value: &self.changeListLeft) }()
+      case 4: try { try decoder.decodeRepeatedStringField(value: &self.changeListRight) }()
       default: break
       }
     }
@@ -2096,10 +2096,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request: SwiftPr
       try visitor.visitSingularStringField(value: self.treeIDRight, fieldNumber: 2)
     }
     if !self.changeListLeft.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.changeListLeft, fieldNumber: 3)
+      try visitor.visitRepeatedStringField(value: self.changeListLeft, fieldNumber: 3)
     }
     if !self.changeListRight.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.changeListRight, fieldNumber: 4)
+      try visitor.visitRepeatedStringField(value: self.changeListRight, fieldNumber: 4)
     }
     try unknownFields.traverse(visitor: &visitor)
   }

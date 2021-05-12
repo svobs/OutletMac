@@ -257,7 +257,7 @@ class TreePanelController: TreePanelControllable {
 
   // Should be called by TreeViewController
   func connectTreeView(_ treeView: TreeViewController) {
-    NSLog("INFO  Connecting TreeView to TreePanelController")
+    NSLog("INFO  [\(self.treeID)] Connecting TreeView to TreePanelController")
     self.treeView = treeView
 
     if self.readyToPopulate {
@@ -268,6 +268,8 @@ class TreePanelController: TreePanelControllable {
           self.reportException("Failed to populate tree", error)
         }
       }
+    } else {
+      NSLog("DEBUG [\(self.treeID)] readyToPopulate is false")
     }
   }
 
