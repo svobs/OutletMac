@@ -30,12 +30,13 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
     let initialSelection: SPIDNodePair?
 
     func windowWillClose(_ notification: Notification) {
+        NSLog("DEBUG [\(self.con.treeID)] windowWillClose() entered")
         windowIsOpen = false
 
         do {
             try self.shutdown()
         } catch {
-            NSLog("ERROR Failure during GDrive root chooser shutdown; \(error)")
+            NSLog("ERROR Failure during window close; \(error)")
         }
     }
 
@@ -59,9 +60,13 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered, defer: false)
         // this will override x & y from content rect
+
     }
 
     func start() throws {
+        // Enables windowWillClose() callback
+        window.delegate = self
+
         try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
         try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
         try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
@@ -71,7 +76,10 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         try self.con.requestTreeLoad()
     }
 
+    // This is called by windowWillClose()
     func shutdown() throws {
+        NSLog("DEBUG [\(self.con.treeID)] Window shutdown() called")
+        try self.con.shutdown()
         try self.dispatchListener.unsubscribeAll()
     }
 

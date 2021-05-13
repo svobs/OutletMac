@@ -40,7 +40,10 @@ struct MergePreviewContent: View {
             }
             HStack {
                 Spacer()
-                Button("Cancel", action: {self.parentWindow.close()})
+                Button("Cancel", action: {
+                    NSLog("DEBUG [\(self.con.treeID)] Cancel button was clicked")
+                    self.parentWindow.close()
+                })
                         .keyboardShortcut(.cancelAction)
                 Button("Proceed", action: self.doMerge)
                         .keyboardShortcut(.defaultAction)  // this will also color the button

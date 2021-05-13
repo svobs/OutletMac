@@ -190,6 +190,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   func shutdown() throws {
+    NSLog("DEBUG [\(self.treeID)] Controller shutdown() called")
     try self.dispatchListener.unsubscribeAll()
 
     self.dispatcher.sendSignal(signal: .DEREGISTER_DISPLAY_TREE, senderID: self.treeID)

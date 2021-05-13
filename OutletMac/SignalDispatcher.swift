@@ -88,7 +88,7 @@ class PropDict {
 class DispatchListener {
   private let _id: ListenerID
   private let _dispatcher: SignalDispatcher
-  private var _subscribedSignals = [Signal]()
+  private var _subscribedSignals = Set<Signal>()
 
   init(_ id: ListenerID, _ dispatcher: SignalDispatcher) {
     self._id = id
@@ -99,16 +99,22 @@ class DispatchListener {
     let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
     try self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
+    self._subscribedSignals.insert(signal)
   }
 
   /**
    TODO: put in destructor? Does Swift have those?
   */
   func unsubscribeAll() throws {
+    NSLog("DEBUG Unsubscribing from all signals for listenerID \(_id)")
     for signal in self._subscribedSignals {
       try self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
+      self._subscribedSignals.remove(signal)
     }
-    self._subscribedSignals.removeAll()
+    if !self._subscribedSignals.isEmpty {
+      NSLog("ERROR Expected set of subscribed signals to be empty after unsubscribeAll() for listenerID \(_id) but \(self._subscribedSignals.count) remain. Will remove remaining signals anyway")
+      self._subscribedSignals.removeAll()
+    }
   }
 }
 
@@ -182,8 +188,7 @@ class SignalDispatcher {
   }
 
   fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
-    if var listenerDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
-      listenerDict.removeValue(forKey: listenerID)
+    if (self.signalListenerDict[signal]?.removeValue(forKey: listenerID)) != nil {
       NSLog("DEBUG SignalDispatcher: Removed subscriber '\(listenerID)' from signal '\(signal)'")
       return
     }

@@ -157,7 +157,7 @@ class TreeActions {
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {
     self.con.app.execAsync {
-      // FIXME: this silently fails
+      // FIXME: need permissions
       let url = URL(fileURLWithPath: fullPath)
       NSWorkspace.shared.open(url)
     }
