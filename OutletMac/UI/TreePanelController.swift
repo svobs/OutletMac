@@ -290,6 +290,10 @@ class TreePanelController: TreePanelControllable {
     }
     readyToPopulate = false
 
+    self.clearModelAndTreeView()
+    // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
+    self.appendEphemeralNode(nil, "Loading...")
+
     let rows: RowsOfInterest
     do {
       rows = try self.app.backend.getRowsOfInterest(treeID: self.treeID)
@@ -298,10 +302,6 @@ class TreePanelController: TreePanelControllable {
       reportException("Failed to fetch expanded node list", error)
       rows = RowsOfInterest() // non-fatal error
     }
-
-    self.clearModelAndTreeView()
-    // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
-    self.appendEphemeralNode(nil, "Loading...")
 
     var queue = LinkedList<SPIDNodePair>()
 
@@ -312,8 +312,8 @@ class TreePanelController: TreePanelControllable {
       self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
-      // When both calls below have separate DispatchQueue workitems, sometimes nothing shows up.
-      // Is it possible the workitems can arrive out of order? Need to research this.
+      // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
+      // Is it possible the WorkItems can arrive out of order? Need to research this.
       DispatchQueue.main.async {
         self.clearModelAndTreeView()
         self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
@@ -474,6 +474,21 @@ class TreePanelController: TreePanelControllable {
     self.treeView!.reloadItem(guid, reloadChildren: false)
   }
 
+  /** Returns a list which contains the nodes of the items which are currently checked by the user
+  (including any rows which may not be visible in the UI due to being collapsed). This will be a subset of the ChangeDisplayTree currently
+  being displayed. Includes file nodes only, with the exception of MKDIR nodes.
+
+  This method assumes that we are a ChangeTree and thus returns instances of GUID. We don't try to do any fancy logic to filter out
+  CategoryNodes, existing directories, or other non-change nodes; we'll let the backend handle that. We simply return each of the GUIDs which
+  have check boxes in the GUI (1-to-1 in count)
+
+  Algorithm:
+      Iterate over display nodes. Start with top-level nodes.
+    - If row is checked, add it to checked_queue.
+      Each node added to checked_queue will be added to the returned list along with all its descendants.
+    - If row is unchecked, ignore it.
+    - If row is inconsistent, add it to mixed_queue. Each of its descendants will be examined and have these rules applied recursively.
+  */
   func generateCheckedRowList() throws -> [SPIDNodePair] {
     let (checkedNodeSet, mixedNodeSet) = self.displayStore.getCheckedAndMixedRows()
 
@@ -481,65 +496,60 @@ class TreePanelController: TreePanelControllable {
 
     var checkedRowList: [SPIDNodePair] = []
 
-    var whitelist = LinkedList<SPIDNodePair>()
-    var secondaryScreening = LinkedList<SPIDNodePair>()
+    var checkedQueue = LinkedList<SPIDNodePair>()
+    var mixedQueue = LinkedList<SPIDNodePair>()
 
     assert(self.tree.hasCheckboxes, "Tree does not have checkboxes. Is this a ChangeTree? \(self.tree.state)")
 
-    // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
-    for topLevelSN in try self.tree.getChildListForRoot() {
-      if checkedNodeSet.contains(topLevelSN.spid.guid) {
-        whitelist.append(topLevelSN)
-      } else if mixedNodeSet.contains(topLevelSN.spid.guid) {
-        secondaryScreening.append(topLevelSN)
-      }
-    }
+    mixedQueue.append(self.tree.rootSN)
 
     NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining mixed-state node list...")
 
-    while !secondaryScreening.isEmpty {
-      let mixedDirSN = secondaryScreening.popFirst()!
-      NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next mixed-state dir: \(mixedDirSN.spid)")
+    while !mixedQueue.isEmpty {
+      let mixedDirSN = mixedQueue.popFirst()!
+      if SUPER_DEBUG {
+        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next mixed-state dir: \(mixedDirSN.spid)")
+      }
       assert(mixedDirSN.node!.isDir, "Expected a dir-type node: \(mixedDirSN.node!)")  // only dir nodes can be mixed
 
-//      if !(mixedDirSN.node!.isDisplayOnly || mixedDirSN.node!.isLive) {
-//        // Even an inconsistent MKDIR node must be included as a checked item:
-//        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): adding mixed-state MKDIR to CHECKED list: \(mixedDirSN.spid.guid)")
-//        checkedRowList.append(mixedDirSN)
-//      }
-
-      // Check each child of a mixed dir for checked or mixed status
+      // Check each child of a mixed dir for checked or mixed status.
+      // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
       for childSN in try self.tree.getChildList(mixedDirSN.spid) {
-        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid) GUID=\(childSN.spid.guid)")
+        if SUPER_DEBUG {
+          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid)")
+        }
         if checkedNodeSet.contains(childSN.spid.guid) {
-          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to whitelist: \(childSN.spid)")
-          whitelist.append(childSN)
+          if SUPER_DEBUG {
+            NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to checkedQueue: \(childSN.spid)")
+          }
+          checkedQueue.append(childSN)
         } else if mixedNodeSet.contains(childSN.spid.guid) {
-          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to mixed list: \(childSN.spid)")
-          secondaryScreening.append(childSN)
+          if SUPER_DEBUG {
+            NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to mixed list: \(childSN.spid)")
+          }
+          mixedQueue.append(childSN)
         }
       }
+    }
 
-      NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining whitelist...")
+    NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining checkedQueue...")
 
-      // Whitelist contains nothing but trees full of checked items
-      while !whitelist.isEmpty {
-        let chosenSN = whitelist.popFirst()!
-        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next node in whitelist: \(chosenSN.spid) isDisplayOnly=\(chosenSN.node!.isDisplayOnly) isLive=\(chosenSN.node!.isLive)")
-//        if !(chosenSN.node!.isDisplayOnly || chosenSN.node!.isLive) {
-//          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to CHECKED list: \(chosenSN.spid.guid)")
-//          checkedRowList.append(chosenSN)
-//        }
+    // Whitelist contains nothing but trees full of checked items
+    while !checkedQueue.isEmpty {
+      let chosenSN = checkedQueue.popFirst()!
+      if SUPER_DEBUG {
+        NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Popped next in checkedQueue. Adding to CHECKED list: \(chosenSN.spid.guid) \(chosenSN.spid)")
+      }
 
-        // Drill down into all descendants of nodes in the whitelist.
-        if chosenSN.node!.isDir {
-          for childSN in try self.tree.getChildList(chosenSN.spid) {
-            NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to whitelist: \(chosenSN.spid.guid)")
-            whitelist.append(childSN)
+      checkedRowList.append(chosenSN)
+
+      // Drill down into all descendants of nodes in the checkedQueue.
+      if chosenSN.node!.isDir {
+        for childSN in try self.tree.getChildList(chosenSN.spid) {
+          if SUPER_DEBUG {
+            NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to checkedQueue: \(chosenSN.spid.guid)")
           }
-        } else { // not a dir
-          NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to CHECKED list: \(chosenSN.spid.guid)")
-          checkedRowList.append(chosenSN)
+          checkedQueue.append(childSN)
         }
       }
     }
