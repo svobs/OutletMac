@@ -340,10 +340,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
+    NSLog("ERROR Received signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
-    DispatchQueue.main.async {
-      self.settings.showAlert(title: msg, msg: secondaryMsg)
-    }
   }
 
   private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {

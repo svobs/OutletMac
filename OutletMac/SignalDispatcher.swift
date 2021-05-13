@@ -215,7 +215,7 @@ class SignalDispatcher {
             }
           }
         } else if SUPER_DEBUG {
-          NSLog("DEBUG SignalDispatcher: Listener \(subID) does not match signal '\(signal)'")
+          NSLog("DEBUG SignalDispatcher: Listener \(subID) does not match signal '\(signal)' (looking for \(senderID)")
         }
       }
 
