@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
+		CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */; };
 		CDF2FC51828D5D39AF021168 /* PopUpTreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */; };
 		CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AB9766F071E5450156 /* MergePreview.swift */; };
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
@@ -70,6 +71,7 @@
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopUpTreePanel.swift; sourceTree = "<group>"; };
 		CDF2F8AB9766F071E5450156 /* MergePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreview.swift; sourceTree = "<group>"; };
+		CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
 		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
 		D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		D12C2CB02601FEB600E91EC9 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				D1C20DFD264489410068C3FC /* CellFactory.swift */,
 				D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */,
 				D1C20E012644912A0068C3FC /* OutlineViewFactory.swift */,
+				CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */,
 			);
 			path = TreeView;
 			sourceTree = "<group>";
@@ -472,6 +475,7 @@
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,
 				CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */,
 				CDF2FC51828D5D39AF021168 /* PopUpTreePanel.swift in Sources */,
+				CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
