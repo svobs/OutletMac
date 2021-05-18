@@ -19,13 +19,7 @@ class ContainerNode: Node {
       true
     }
   }
-  
-  override var isDisplayOnly: Bool {
-    get {
-      true
-    }
-  }
-  
+
   override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }
@@ -57,6 +51,12 @@ class CategoryNode: ContainerNode {
       return .ICON_GENERIC_DIR
     }
   }
+
+  override var isDisplayOnly: Bool {
+    get {
+      true
+    }
+  }
 }
 
 /**
@@ -84,6 +84,12 @@ class RootTypeNode: ContainerNode {
         return .ICON_GDRIVE
       }
       return .ICON_GENERIC_DIR
+    }
+  }
+
+  override var isDisplayOnly: Bool {
+    get {
+      true
     }
   }
 }

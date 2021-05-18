@@ -106,6 +106,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         outlineView.delegate = self
         outlineView.dataSource = self
         outlineView.menu = self.initContextMenu()
+
+        // Set default mask to "copy"
+        outlineView.setDraggingSourceOperationMask(.copy, forLocal: false)
     }
 
     // DataSource methods
@@ -127,14 +130,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-    // Tell Apple how many children each row has.
+     Tell Apple how many children each row has.
     */
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         return displayStore.getChildList(itemToGUID(item)).count
     }
 
     /**
-     Tell whether the row is expandable
+     Tell AppKit whether the row is expandable
      */
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
         // TODO: in the future, we'll want to download the contents of each child directory so that we
@@ -249,6 +252,82 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
     }
 
+    // Drag & Drop
+    // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+    /**
+     Drag source. Implement this method to allow the table to be an NSDraggingSource that supports multiple item dragging. Return a custom object
+     that implements NSPasteboardWriting (or simply use NSPasteboardItem). Return nil to prevent a particular item from being dragged.
+     */
+    func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
+        // TODO: return nil for items which should not be dragged, such as CategoryNodes.
+        let guid: GUID = self.itemToGUID(item)
+        if let sn = self.displayStore.getSN(guid) {
+            if let node = sn.node {
+                if node.isDisplayOnly {
+                    NSLog("DEBUG [\(treeID)] Denying drag for node (\(guid)) - it is display only")
+                    return nil
+                } else {
+                    // NSString implements NSPasteboardWriting.
+                    return item as! NSString
+                }
+            }
+        }
+
+        return nil
+    }
+
+
+    /**
+     Implement this method know when the dragging session is about to begin and to potentially modify the dragging session.
+
+     In our case, we want to filter out any child nodes which are redundant, because the parent has already been included
+     */
+    func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItems draggedItems: [Any]) {
+
+    }
+
+//    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
+//
+//    }
+
+    /**
+     Drop (from drag)
+     */
+    func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int)
+                    -> NSDragOperation {
+        NSLog("DEBUG [\(treeID)] Drag")
+
+        var targetGUID: GUID? = nil
+
+        if index == NSOutlineViewDropOnItemIndex {
+            targetGUID = self.itemToGUID(item)
+        } else {
+            // if the drop is between two rows then find the row under the cursor
+            if let mouseLocation = NSApp.currentEvent?.locationInWindow {
+                let point = outlineView.convert(mouseLocation, from: nil)
+                let rowIndex = outlineView.row(at: point)
+                if rowIndex >= 0 {
+                    if let item = outlineView.item(atRow: rowIndex) {
+                        if let guid = item as? GUID {
+                            NSLog("DEBUG [\(treeID)] Dropped onto GUID: \(guid)")
+                            targetGUID = guid
+                        }
+                    }
+                }
+            }
+        }
+        // change the drop item
+        if targetGUID != nil {
+            outlineView.setDropItem(targetGUID, dropChildIndex: NSOutlineViewDropOnItemIndex)
+            return .move
+        }
+        else {
+            return []
+        }
+    }
+
+
     // Utility methods
     // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -262,8 +341,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     func getSelectedUIDs() -> Set<UID> {
         var uidSet = Set<UID>()
-        for selectedRow in outlineView.selectedRowIndexes {
-            if let item = outlineView.item(atRow: selectedRow) {
+        for rowIndex in outlineView.selectedRowIndexes {
+            if let item = outlineView.item(atRow: rowIndex) {
                 if let guid = item as? GUID {
                     if let sn = displayStore.getSN(guid) {
                         uidSet.insert(sn.node!.uid)
