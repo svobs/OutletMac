@@ -46,8 +46,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             outlineView.endUpdates()
         }
 
-        let selectedUIDList = Array(self.getSelectedUIDs())
-        self.con.treeActions.confirmAndDeleteSubtrees(selectedUIDList)
+        let selectedGUIDList = Array(self.getSelectedGUIDs())
+        let selectedSNList = displayStore.getSNList(selectedGUIDList)
+        self.con.treeActions.confirmAndDeleteSubtrees(selectedSNList)
     }
 
 
@@ -285,12 +286,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     /**
      Implement this method know when the dragging session is about to begin and to potentially modify the dragging session.
-
-     In our case, we want to filter out any child nodes which are redundant, because the parent has already been included
      */
-    func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItems draggedItems: [Any]) {
+//    func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItems draggedItems: [Any]) {
+//    }
 
-    }
+    /* Dragging Destination Support - Required for multi-image dragging. Implement this method to allow the table to update dragging items as they are dragged over the view. Typically this will involve calling [draggingInfo enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:] and setting the draggingItem's imageComponentsProvider to a proper image based on the content. For View Based TableViews, one can use NSTableCellView's -draggingImageComponents and -draggingImageFrame.
+     */
+//    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
+//    }
 
     /**
      This is implemented to support dropping items onto the Trash icon in the Dock
@@ -305,12 +308,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         NSLog("INFO  [\(treeID)] User dragged to Trash: \(guidList)")
-        // TODO: implement delete
-    }
-
-    /* Dragging Destination Support - Required for multi-image dragging. Implement this method to allow the table to update dragging items as they are dragged over the view. Typically this will involve calling [draggingInfo enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:] and setting the draggingItem's imageComponentsProvider to a proper image based on the content. For View Based TableViews, one can use NSTableCellView's -draggingImageComponents and -draggingImageFrame.
-     */
-    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
+        let snList = displayStore.getSNList(guidList)
+        self.con.treeActions.confirmAndDeleteSubtrees(snList)
     }
 
     /**
@@ -372,7 +371,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-     Accept Drop: does the actual drop
+     Accept Drop: executes the drop
 
      This method is called when the mouse is released over an outline view that previously decided to allow a drop via the validateDrop method.
      The data source should incorporate the data from the dragging pasteboard at this time. 'index' is the location to insert the data as a child of
@@ -392,6 +391,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             NSLog("DEBUG [\(treeID)] No target found for \(parentGUID)")
             return false
         }
+
 
     }
 
@@ -482,30 +482,36 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
     }
 
+    private func reloadItem_NoLock(_ guid: GUID, reloadChildren: Bool) {
+        // remember, GUID at root of tree is nil
+        let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
+        NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
+        self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
+    }
+
     /**
      Reloads the row with the given GUID in the NSOutlineView. Convenience function for use by external classes
      */
     func reloadItem(_ guid: GUID, reloadChildren: Bool) {
-        // remember, GUID at root of tree is nil
-        let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
-
         DispatchQueue.main.async {
-            NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
-            self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
+            self.reloadItem_NoLock(guid, reloadChildren: reloadChildren)
         }
     }
 
-    // GAH. Not needed.
-    private func removeItem(_ guid: GUID, parentGUID: GUID) {
+    func removeItem(_ guid: GUID, parentGUID: GUID) {
         // remember, GUID at root of tree is nil
         let effectiveParent = (parentGUID == self.con.tree.rootSPID.guid) ? nil : parentGUID
 
         DispatchQueue.main.async {
-            let indexSet = self.getIndexSetFor(guid)
-            if !indexSet.isEmpty {
+            let indexInParent = self.outlineView.childIndex(forItem: guid)
+            if indexInParent >= 0 {
+                var indexSet = IndexSet()
+                indexSet.insert(indexInParent)
                 NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? TOPMOST_GUID)")
-                self.outlineView.removeItems(at: indexSet, inParent: parentGUID, withAnimation: .effectFade)
+                self.outlineView.removeItems(at: indexSet, inParent: effectiveParent, withAnimation: .effectFade)
             }
+            // It seems that the only bug-free way to remove the node is to reload its parent:
+//            self.reloadItem_NoLock(parentGUID, reloadChildren: true)
         }
     }
 

@@ -147,6 +147,20 @@ class DisplayStore {
     return sn
   }
 
+  func getSNList(_ guidList: [GUID]) -> [SPIDNodePair] {
+    var snList: [SPIDNodePair] = []
+    con.app.execSync {
+      for guid in guidList {
+        if let sn = self.getSN_NoLock(guid) {
+          snList.append(sn)
+        } else {
+          NSLog("[\(self.treeID)] WARN  Could not find SN for GUID; ommitting: \(guid)")
+        }
+      }
+    }
+    return snList
+  }
+
   func getChildListForRoot() -> [SPIDNodePair] {
     return self.getChildList(TOPMOST_GUID)
   }

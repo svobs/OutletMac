@@ -656,9 +656,9 @@ class TreePanelController: TreePanelControllable {
     let parentGUID = try propDict.get("parent_guid") as! String
     NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
 
-    let _ = self.displayStore.removeSN(sn.spid.guid)
-    // It seems that the only bug-free way to remove the node is to reload its parent:
-    self.treeView!.reloadItem(parentGUID, reloadChildren: true)
+    if self.displayStore.removeSN(sn.spid.guid) {
+      self.treeView!.removeItem(sn.spid.guid, parentGUID: parentGUID)
+    }
   }
 
   // Other callbacks

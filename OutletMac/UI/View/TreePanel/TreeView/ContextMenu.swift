@@ -93,15 +93,15 @@ class TreeContextMenu {
     }
 
     if nodeLocalList.count > 0 {
-      let item = MenuItemWithNodeList(title: "Delete \(nodeLocalList.count) Items from Local Disk", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.nodeList = nodeLocalList
+      let item = MenuItemWithSNList(title: "Delete \(nodeLocalList.count) Items from Local Disk", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.snList = snList
       item.target = self.con.treeActions
       menu.addItem(item)
     }
 
     if nodeGDriveList.count > 0 {
-      let item = MenuItemWithNodeList(title: "Delete \(nodeGDriveList.count) Items from Google Drive", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.nodeList = nodeGDriveList
+      let item = MenuItemWithSNList(title: "Delete \(nodeGDriveList.count) Items from Google Drive", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.snList = snList
       item.target = self.con.treeActions
       menu.addItem(item)
     }
@@ -254,8 +254,8 @@ class TreeContextMenu {
       if node.treeType == .GDRIVE {
         title += " from Google Drive"
       }
-      let item = MenuItemWithNodeList(title: title, action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.nodeList = [node]
+      let item = MenuItemWithSNList(title: title, action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.snList = [sn]
       item.target = self.con.treeActions
       menu.addItem(item)
     }

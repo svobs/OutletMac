@@ -147,12 +147,8 @@ class TreeActions {
     self.setChecked(snList, false)
   }
 
-  @objc func deleteSubtree(_ sender: MenuItemWithNodeList) {
-    var nodeUIDList: [UID] = []
-    for node in sender.nodeList {
-      nodeUIDList.append(node.uid)
-    }
-    self.confirmAndDeleteSubtrees(nodeUIDList)
+  @objc func deleteSubtree(_ sender: MenuItemWithSNList) {
+    self.confirmAndDeleteSubtrees(sender.snList)
   }
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {
@@ -163,15 +159,14 @@ class TreeActions {
     }
   }
 
-  public func confirmAndDeleteSubtrees(_ uidList: [UID]) {
-    var msg = "Are you sure you want to delete"
+  public func confirmAndDeleteSubtrees(_ snList: [SPIDNodePair]) {
+    var msg = "Are you sure you want to delete "
     var okText = "Delete"
-    if uidList.count == 1 {
-      // TODO: ideally I would like to print the name of the item, but it's really hard to get from here
-      msg += " this item?"
+    if snList.count == 1 {
+      msg += "\"\(snList[0].node!.name)\"?"
     } else {
-      msg += " these \(uidList.count) items?"
-      okText = "Delete \(uidList.count) items"
+      msg += "these \(snList.count) items?"
+      okText = "Delete \(snList.count) items"
     }
 
     guard self.con.app.confirmWithUserDialog("Confirm Delete", msg, okButtonText: okText, cancelButtonText: "Cancel") else {
@@ -179,10 +174,15 @@ class TreeActions {
       return
     }
 
-    NSLog("DEBUG [\(treeID)] User confirmed delete of \(uidList.count) items")
+    NSLog("DEBUG [\(treeID)] User confirmed delete of \(snList.count) items")
+
+    var nodeUIDList: [UID] = []
+    for sn in snList {
+      nodeUIDList.append(sn.node!.uid)
+    }
 
     do {
-      try self.con.backend.deleteSubtree(nodeUIDList: uidList)
+      try self.con.backend.deleteSubtree(nodeUIDList: nodeUIDList)
     } catch {
       self.con.reportException("Failed to delete subtree", error)
     }
