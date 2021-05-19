@@ -155,6 +155,14 @@ class DisplayStore {
     return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
   }
 
+  func getChildCount(_ parentGUID: GUID?) -> Int? {
+    var count: Int? = 0
+    con.app.execSync {
+      count = self.parentChildListDict[parentGUID ?? TOPMOST_GUID]?.count
+    }
+    return count
+  }
+
   func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     con.app.execSync {
@@ -214,10 +222,8 @@ class DisplayStore {
   }
 
   private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
-    if let node = sn.node {
-      if node.isEphemeral {
-        return false
-      }
+    if let node = sn.node, node.isEphemeral {
+      return false
     }
 
     if self.checkedNodeSet.contains(sn.spid.guid) {

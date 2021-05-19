@@ -423,10 +423,8 @@ class TreePanelController: TreePanelControllable {
       self.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
       return
     }
-    if let isEphemeral = sn.node?.isEphemeral {
-      if isEphemeral {
-        return
-      }
+    if let isEphemeral = sn.node?.isEphemeral, isEphemeral {
+      return
     }
 
     // What a mouthful. At least we are handling the bulk of the work in one batch:
