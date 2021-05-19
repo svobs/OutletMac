@@ -109,6 +109,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         // Set default mask to "copy"
         outlineView.setDraggingSourceOperationMask(.copy, forLocal: false)
+        // Allowed pasteboard type
+        // TODO: implement custom type, not string
+        outlineView.registerForDraggedTypes([.string])
     }
 
     // DataSource methods
@@ -243,7 +246,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
 
         do {
-            // Tell BE to remove the GUID from its peresisted state of expanded rows. (No need to make a
+            // Tell BE to remove the GUID from its persisted state of expanded rows. (No need to make a
             // similar call when the row is expanded; the BE does this automatically when getChildList() called)
             NSLog("DEBUG [\(treeID)] Reporting collapsed node to BE: \(parentGUID)")
             try self.con.backend.removeExpandedRow(parentGUID, self.treeID)
@@ -258,6 +261,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     /**
      Drag source. Implement this method to allow the table to be an NSDraggingSource that supports multiple item dragging. Return a custom object
      that implements NSPasteboardWriting (or simply use NSPasteboardItem). Return nil to prevent a particular item from being dragged.
+     In our case, that means filtering out display-only nodes such as CategoryNodes.
      */
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
         // TODO: return nil for items which should not be dragged, such as CategoryNodes.
@@ -287,21 +291,22 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     }
 
-//    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
-//
-//    }
+
+    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
+    }
 
     /**
-     Drop (from drag)
+     Validate Drop
+
+       This method is used by NSOutlineView to determine a valid drop target. Based on the mouse position, the outline view will suggest a proposed child 'index' for the drop to happen as a child of 'item'. This method must return a value that indicates which NSDragOperation the data source will perform. The data source may "re-target" a drop, if desired, by calling setDropItem:dropChildIndex: and returning something other than NSDragOperationNone. One may choose to re-target for various reasons (eg. for better visual feedback when inserting into a sorted position). On Leopard linked applications, this method is called only when the drag position changes or the dragOperation changes (ie: a modifier key is pressed). Prior to Leopard, it would be called constantly in a timer, regardless of attribute changes.
      */
     func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int)
                     -> NSDragOperation {
-        NSLog("DEBUG [\(treeID)] Drag")
-
         var targetGUID: GUID? = nil
 
         if index == NSOutlineViewDropOnItemIndex {
             targetGUID = self.itemToGUID(item)
+            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering directly on GUID: \(targetGUID!)")
         } else {
             // if the drop is between two rows then find the row under the cursor
             if let mouseLocation = NSApp.currentEvent?.locationInWindow {
@@ -310,7 +315,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 if rowIndex >= 0 {
                     if let item = outlineView.item(atRow: rowIndex) {
                         if let guid = item as? GUID {
-                            NSLog("DEBUG [\(treeID)] Dropped onto GUID: \(guid)")
+                            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(guid)")
                             targetGUID = guid
                         }
                     }
@@ -319,6 +324,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
         // change the drop item
         if targetGUID != nil {
+            // FIXME: figure out how to support 'index' param for dropping between nodes
             outlineView.setDropItem(targetGUID, dropChildIndex: NSOutlineViewDropOnItemIndex)
             return .move
         }
@@ -326,6 +332,33 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return []
         }
     }
+
+    /**
+     Accept Drop: does the actual drop
+
+     This method is called when the mouse is released over an outline view that previously decided to allow a drop via the validateDrop method.
+     The data source should incorporate the data from the dragging pasteboard at this time. 'index' is the location to insert the data as a child of
+     'item', and are the values previously set in the validateDrop: method.
+     */
+    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
+        guard let pasteboardItems = info.draggingPasteboard.pasteboardItems else {
+            return false
+        }
+
+        let guidMap = pasteboardItems.compactMap{ $0.string(forType: .string) }
+        NSLog("DEBUG [\(treeID)] DROPPING \(guidMap)")
+
+        let parentGUID = itemToGUID(item)
+        if let dragTargetSN  = displayStore.getChild(parentGUID, index) {
+            NSLog("DEBUG [\(treeID)] DROP onto \(dragTargetSN.spid.guid)")
+            return true
+        } else {
+            NSLog("DEBUG [\(treeID)] No target found for \(parentGUID)")
+            return false
+        }
+
+    }
+
 
 
     // Utility methods

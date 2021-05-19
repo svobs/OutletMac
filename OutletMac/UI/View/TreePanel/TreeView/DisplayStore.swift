@@ -166,12 +166,17 @@ class DisplayStore {
   func getChild(_ parentGUID: GUID?, _ childIndex: Int) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     con.app.execSync {
-      let childList = self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
-      if childIndex >= childList.count {
-        NSLog("ERROR \(self.treeID) Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
-        sn = nil
+      if childIndex < 0 {
+        // Return parent instead
+        sn = self.getSN_NoLock(parentGUID ?? TOPMOST_GUID)
       } else {
-        sn = childList[childIndex]
+        let childList = self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
+        if childIndex >= childList.count {
+          NSLog("ERROR \(self.treeID) Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
+          sn = nil
+        } else {
+          sn = childList[childIndex]
+        }
       }
     }
     return sn
