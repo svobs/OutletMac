@@ -370,6 +370,19 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return self.dragOperation
     }
 
+    private func getSrcTreeID(from dragInfo: NSDraggingInfo) -> TreeID? {
+        if let dragSource = dragInfo.draggingSource {
+            if let srcOutlineView = dragSource as? NSOutlineView {
+                if let srcDelegate = srcOutlineView.delegate {
+                    if let srcTreeController = srcDelegate as? TreeViewController {
+                        return srcTreeController.treeID
+                    }
+                }
+            }
+        }
+        return nil
+    }
+
     /**
      Accept Drop: executes the drop
 
@@ -381,18 +394,31 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         guard let guidList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
             return false
         }
-        NSLog("DEBUG [\(treeID)] DROPPING \(guidList)")
+
+        guard let srcTreeID = self.getSrcTreeID(from: info) else {
+            // In the future, we should rework this to support drops from outside the application
+            NSLog("ERROR [\(treeID)] Could not get source tree ID from drag source! Aborting drop")
+            self.con.reportError("Unexpected Error", "Could not get source tree ID from drag source! Aborting drop")
+            return false
+        }
+        NSLog("DEBUG [\(treeID)] DROPPING \(guidList) from \(srcTreeID)")
 
         let parentGUID = itemToGUID(item)
-        if let dragTargetSN  = displayStore.getChild(parentGUID, index) {
-            NSLog("DEBUG [\(treeID)] DROP onto \(dragTargetSN.spid.guid)")
-            return true
-        } else {
+        guard let dragTargetSN  = displayStore.getChild(parentGUID, index) else {
             NSLog("DEBUG [\(treeID)] No target found for \(parentGUID)")
             return false
         }
 
+        let dstGUID = dragTargetSN.spid.guid
+        NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID)")
 
+        do {
+//            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: guidList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
+            return true
+        } catch {
+            self.con.reportException("Drop failed!", error)
+            return false
+        }
     }
 
     private static func extractGUIDs(_ pasteboard: NSPasteboard) -> [GUID]? {
