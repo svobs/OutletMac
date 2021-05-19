@@ -110,9 +110,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         // Set allowable drag operations:
         outlineView.setDraggingSourceOperationMask([.move, .copy, .delete], forLocal: false)
-        // Set allowed pasteboard (drag) types:
-        // TODO: implement custom type, not string
-        outlineView.registerForDraggedTypes([.string])
+        // Set allowed pasteboard (drag) types (see NodePasteboardWriter class)
+        outlineView.registerForDraggedTypes([.guid])
         outlineView.draggingDestinationFeedbackStyle = .regular
     }
 
@@ -275,7 +274,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                     return nil
                 } else {
                     // NSString implements NSPasteboardWriting.
-                    return item as! NSString
+                    return NodePasteboardWriter(guid: guid)
                 }
             }
         }
@@ -401,7 +400,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return nil
         }
 
-        return pasteboardItems.compactMap{ $0.string(forType: .string) }
+        // note: type .guid is defined in extension NSPasteboard.PasteboardType
+        return pasteboardItems.compactMap{ $0.string(forType: .guid) }
     }
 
     // Utility methods
