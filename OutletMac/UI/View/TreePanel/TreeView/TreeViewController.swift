@@ -312,6 +312,22 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         self.con.treeActions.confirmAndDeleteSubtrees(snList)
     }
 
+    private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
+        for srcSN in self.displayStore.getSNList(srcGUIDList) {
+            // TODO: equals
+//            if dropTargetSN.node!.nodeIdentifier == srcSN.node!.nodeIdentifier {
+//                NSLog("[\(self.treeID)] DEBUG Target (\(dropTargetSN.spid)) is being dropped on itself")
+//                return true
+//            }
+            if dropTargetSN.node!.isParentOf(srcSN.node!) {
+                NSLog("[\(self.treeID)] DEBUG Target dir (\(dropTargetSN.spid)) is parent of dragged node (\(srcSN.spid))")
+                return true
+            }
+        }
+
+        return false
+    }
+
     /**
      Validate Drop
 
@@ -328,14 +344,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return self.dragOperation
         }
 
-        var targetGUID: GUID = self.itemToGUID(item)
+        var dstGUID: GUID = self.itemToGUID(item)
 
         if index == NSOutlineViewDropOnItemIndex {
             // Possibility I: Dropping ON
-            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(targetGUID)")
+            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(dstGUID)")
         } else {
             // Possibility II: Dropping BETWEEN
-            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(targetGUID) child index \(index)")
+            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(dstGUID) child index \(index)")
 
             // if the drop is between two rows then find the row under the cursor
             if let mouseLocation = NSApp.currentEvent?.locationInWindow {
@@ -345,28 +361,38 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                     if let item = outlineView.item(atRow: rowIndex) {
                         if let guid = item as? GUID {
                             NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(guid)")
-                            targetGUID = guid
+                            dstGUID = guid
                         }
                     }
                 }
             }
         }
 
-        if let sn = displayStore.getSN(targetGUID) {
-            if sn.node!.isDisplayOnly {
+        if var dstSN = displayStore.getSN(dstGUID) {
+            if dstSN.node!.isDisplayOnly {
                 // cannot drop on non-real nodes such as CategoryNodes. Deny drop
                 return []
             }
 
-            if !sn.node!.isDir {
+            if !dstSN.node!.isDir {
                 // cannot drop on file. Re-target the drop so that we are dropping on its parent dir
-                targetGUID = displayStore.getParentGUID(targetGUID)!
+                dstGUID = displayStore.getParentGUID(dstGUID)!
+                dstSN = displayStore.getSN(dstGUID)!
             }
+
+            guard let srcGUIDList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
+                return []
+            }
+            if isDroppingOnSelf(srcGUIDList, dstSN) {
+                // Deny drop. Use nice animation to spring back
+                return []
+            }
+
             // fall through
         }
 
         // change the drop item. Always drop onto nodes directly,
-        outlineView.setDropItem(targetGUID, dropChildIndex: NSOutlineViewDropOnItemIndex)
+        outlineView.setDropItem(dstGUID, dropChildIndex: NSOutlineViewDropOnItemIndex)
         return self.dragOperation
     }
 
@@ -391,7 +417,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      'item', and are the values previously set in the validateDrop: method.
      */
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        guard let guidList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
+        guard let srcGUIDList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
             return false
         }
 
@@ -402,21 +428,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return false
         }
         let parentGUID = itemToGUID(item)
-        NSLog("DEBUG [\(treeID)] DROPPING \(guidList) onto parent \(parentGUID) index \(index) from \(srcTreeID)")
+        NSLog("DEBUG [\(treeID)] DROPPING \(srcGUIDList) onto parent \(parentGUID) index \(index) from \(srcTreeID)")
 
         guard let dragTargetSN  = displayStore.getChild(parentGUID, index, useParentIfIndexInvalid: true) else {
             NSLog("DEBUG [\(treeID)] No target found for \(parentGUID)")
             return false
         }
-
         let dstGUID = dragTargetSN.spid.guid
         NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID)")
 
         do {
-            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: guidList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
+            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
             return true
         } catch {
-            self.con.reportException("Drop failed!", error)
+            self.con.reportException("Error: Drop Failed!", error)
             return false
         }
     }

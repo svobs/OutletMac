@@ -197,7 +197,11 @@ class GDriveFolder: GDriveNode {
       "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUID ?? 0) syncTS=\(syncTS ?? 0) " +
       "allChildrenFetched=\(isAllChildrenFetched))"
   }
-  
+
+  override func isParentOf(_ potentialChildNode: Node) -> Bool {
+    return potentialChildNode.deviceUID == self.deviceUID && potentialChildNode.parentList.contains(self.uid)
+  }
+
   // TODO: override equals
   
 }
@@ -291,5 +295,9 @@ class GDriveFile: GDriveNode {
       "mimeTypeUID=\(mimeTypeUID) size=\(sizeStr) trashed=\(trashed) createTS=\(createTSStr) modifyTS=\(modifyTSStr) " +
       "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUIDStr) syncTS=\(syncTSStr))"
   }
-  
+
+  override func isParentOf(_ otherNode: Node) -> Bool {
+    // A file can never be parent of anything (awww...)
+    return false
+  }
 }

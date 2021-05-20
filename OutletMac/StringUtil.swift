@@ -57,3 +57,10 @@ class StringUtil {
     return URL(fileURLWithPath: parentPath).appendingPathComponent(childPath).path
   }
 }
+
+extension String {
+  func replaceFirstOccurrence(of target: String, with replacement: String) -> String {
+    guard let range = self.range(of: target) else { return self }
+    return self.replacingCharacters(in: range, with: replacement)
+  }
+}

@@ -104,10 +104,21 @@ class LocalDirNode: LocalNode {
   override func getDirStats() -> DirectoryStats? {
     return self._dirStats
   }
+
+  override func isParentOf(_ potentialChildNode: Node) -> Bool {
+    if potentialChildNode.deviceUID == self.deviceUID {
+      let potentialChildNodeURL: URL = URL(fileURLWithPath: potentialChildNode.firstPath)
+      if potentialChildNodeURL.deletingLastPathComponent() == URL(fileURLWithPath: self.firstPath) {
+        return true
+      }
+    }
+    // A file can never be the parent of anything
+    return false
+  }
 }
 
 /**
- CLASS LocaFileNode
+ CLASS LocalFileNode
  */
 class LocaFileNode: LocalNode {
   var _md5: MD5?
@@ -190,5 +201,9 @@ class LocaFileNode: LocalNode {
     self._changeTS = changeTS
     super.init(nodeIdentifer, parentUID, trashed, isLive: isLive)
   }
-}
 
+  override func isParentOf(_ otherNode: Node) -> Bool {
+    // A file can never be the parent of anything
+    return false
+  }
+}

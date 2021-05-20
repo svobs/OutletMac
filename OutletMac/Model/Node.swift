@@ -177,6 +177,10 @@ class Node: CustomStringConvertible {
     }
   }
 
+  func isParentOf(_ otherNode: Node) -> Bool {
+    fatalError("Cannot call isParentOf for Node base class!")
+  }
+
   /** Use isDir to check if node has DirStats */
   func setDirStats(_ dirStats: DirectoryStats?) {
     preconditionFailure("setDirStats(): class does not implement setDirStats(): \(type(of: self))!")
@@ -287,5 +291,9 @@ class EphemeralNode: Node {
     get {
       return true
     }
+  }
+
+  override func isParentOf(_ otherNode: Node) -> Bool {
+    return false
   }
 }
