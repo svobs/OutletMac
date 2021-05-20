@@ -431,24 +431,15 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request {
 
   public var dstTreeID: String = String()
 
-  public var srcSnList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
+  public var srcGuidList: [String] = []
 
-  public var dstSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
-    get {return _dstSn ?? Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()}
-    set {_dstSn = newValue}
-  }
-  /// Returns true if `dstSn` has been explicitly set.
-  public var hasDstSn: Bool {return self._dstSn != nil}
-  /// Clears the value of `dstSn`. Subsequent reads from it will return its default value.
-  public mutating func clearDstSn() {self._dstSn = nil}
+  public var dstGuid: String = String()
 
   public var isInto: Bool = false
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
-
-  fileprivate var _dstSn: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request {
@@ -2119,8 +2110,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "src_tree_id"),
     2: .standard(proto: "dst_tree_id"),
-    3: .standard(proto: "src_sn_list"),
-    4: .standard(proto: "dst_sn"),
+    3: .standard(proto: "src_guid_list"),
+    4: .standard(proto: "dst_guid"),
     5: .standard(proto: "is_into"),
   ]
 
@@ -2132,8 +2123,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.srcTreeID) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.dstTreeID) }()
-      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.srcSnList) }()
-      case 4: try { try decoder.decodeSingularMessageField(value: &self._dstSn) }()
+      case 3: try { try decoder.decodeRepeatedStringField(value: &self.srcGuidList) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.dstGuid) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isInto) }()
       default: break
       }
@@ -2147,11 +2138,11 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     if !self.dstTreeID.isEmpty {
       try visitor.visitSingularStringField(value: self.dstTreeID, fieldNumber: 2)
     }
-    if !self.srcSnList.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.srcSnList, fieldNumber: 3)
+    if !self.srcGuidList.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.srcGuidList, fieldNumber: 3)
     }
-    if let v = self._dstSn {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    if !self.dstGuid.isEmpty {
+      try visitor.visitSingularStringField(value: self.dstGuid, fieldNumber: 4)
     }
     if self.isInto != false {
       try visitor.visitSingularBoolField(value: self.isInto, fieldNumber: 5)
@@ -2162,8 +2153,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request) -> Bool {
     if lhs.srcTreeID != rhs.srcTreeID {return false}
     if lhs.dstTreeID != rhs.dstTreeID {return false}
-    if lhs.srcSnList != rhs.srcSnList {return false}
-    if lhs._dstSn != rhs._dstSn {return false}
+    if lhs.srcGuidList != rhs.srcGuidList {return false}
+    if lhs.dstGuid != rhs.dstGuid {return false}
     if lhs.isInto != rhs.isInto {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

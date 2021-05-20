@@ -135,8 +135,8 @@ class DisplayStore {
   // "Get" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func getSN_NoLock(_ guid: GUID) -> SPIDNodePair? {
-    return self.primaryDict[guid] ?? nil
+  private func getSN_NoLock(_ guid: GUID?) -> SPIDNodePair? {
+    return self.primaryDict[guid ?? TOPMOST_GUID] ?? nil
   }
 
   func getSN(_ guid: GUID) -> SPIDNodePair? {
@@ -185,17 +185,26 @@ class DisplayStore {
     return snList
   }
 
-  func getChild(_ parentGUID: GUID?, _ childIndex: Int) -> SPIDNodePair? {
+  func getChild(_ parentGUID: GUID?, _ childIndex: Int, useParentIfIndexInvalid: Bool = false) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     con.app.execSync {
       if childIndex < 0 {
-        // Return parent instead
-        sn = self.getSN_NoLock(parentGUID ?? TOPMOST_GUID)
+        if useParentIfIndexInvalid {
+          // Return parent instead
+          sn = self.getSN_NoLock(parentGUID)
+        } else {
+          NSLog("ERROR [\(self.treeID)] getChild(): childIndex (\(childIndex)) is negative! (parentGUID=\(parentGUID ?? TOPMOST_GUID)")
+          sn = nil
+        }
       } else {
         let childList = self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
         if childIndex >= childList.count {
-          NSLog("ERROR \(self.treeID) Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
-          sn = nil
+          if useParentIfIndexInvalid {
+            sn = self.getSN_NoLock(parentGUID)
+          } else {
+            NSLog("ERROR [\(self.treeID)] getChild(): Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
+            sn = nil
+          }
         } else {
           sn = childList[childIndex]
         }

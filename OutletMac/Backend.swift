@@ -38,7 +38,7 @@ protocol OutletBackend: HasLifecycle {
   func createExistingDisplayTree(treeID: TreeID, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree?
   
-  func dropDraggedNodes(srcTreeID: TreeID, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: TreeID, dstSN: SPIDNodePair) throws
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID) throws
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
@@ -185,7 +185,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func dropDraggedNodes(srcTreeID: TreeID, srcSNList: [SPIDNodePair], isInto: Bool, dstTreeID: TreeID, dstSN: SPIDNodePair) throws {
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

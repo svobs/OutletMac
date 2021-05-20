@@ -401,10 +401,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             self.con.reportError("Unexpected Error", "Could not get source tree ID from drag source! Aborting drop")
             return false
         }
-        NSLog("DEBUG [\(treeID)] DROPPING \(guidList) from \(srcTreeID)")
-
         let parentGUID = itemToGUID(item)
-        guard let dragTargetSN  = displayStore.getChild(parentGUID, index) else {
+        NSLog("DEBUG [\(treeID)] DROPPING \(guidList) onto parent \(parentGUID) index \(index) from \(srcTreeID)")
+
+        guard let dragTargetSN  = displayStore.getChild(parentGUID, index, useParentIfIndexInvalid: true) else {
             NSLog("DEBUG [\(treeID)] No target found for \(parentGUID)")
             return false
         }
@@ -413,7 +413,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID)")
 
         do {
-//            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: guidList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
+            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: guidList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
             return true
         } catch {
             self.con.reportException("Drop failed!", error)
