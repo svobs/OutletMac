@@ -137,34 +137,31 @@ struct BoolToggleButton: View {
  CLASS PlayPauseToggleButton
  */
 struct PlayPauseToggleButton: View {
-  @Binding var isPlaying: Bool
+  @EnvironmentObject var settings: GlobalSettings
   let iconStore: IconStore
   let dispatcher: SignalDispatcher
-  private var onClickAction: NoArgVoidFunc? = nil
 
-  init(_ iconStore: IconStore, _ isPlaying: Binding<Bool>, _ dispatcher: SignalDispatcher) {
+  init(_ iconStore: IconStore, _ dispatcher: SignalDispatcher) {
     self.iconStore = iconStore
-    self._isPlaying = isPlaying
     self.dispatcher = dispatcher
-    self.onClickAction = onClickAction == nil ? self.toggleValue : onClickAction!
   }
 
   private func toggleValue() {
-    if self.isPlaying {
-      NSLog("Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
+    if self.settings.isPlaying {
+      NSLog("INFO  Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
       dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
     } else {
-      NSLog("Play/Pause btn clicked! Sending signal \(Signal.RESUME_OP_EXECUTION)")
+      NSLog("INFO  Play/Pause btn clicked! Sending signal \(Signal.RESUME_OP_EXECUTION)")
       dispatcher.sendSignal(signal: .RESUME_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
     }
   }
 
   var body: some View {
-    Button(action: onClickAction!) {
-      if isPlaying {
+    Button(action: toggleValue) {
+      if settings.isPlaying {
         UnselectedToolbarIcon(iconStore.getIcon(for: .ICON_PAUSE))
       } else {
-        SelectedToolbarIcon(iconStore.getIcon(for: .ICON_PLAY))
+        UnselectedToolbarIcon(iconStore.getIcon(for: .ICON_PLAY))
       }
     }
     .buttonStyle(PlainButtonStyle())

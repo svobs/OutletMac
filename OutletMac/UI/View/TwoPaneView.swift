@@ -48,7 +48,7 @@ fileprivate struct ButtonBar: View {
         Button("Merge...", action: self.onMergeButtonClicked)
         Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
       }
-      PlayPauseToggleButton(app.iconStore, $settings.isPlaying, conLeft.dispatcher)
+      PlayPauseToggleButton(app.iconStore, conLeft.dispatcher)
       Spacer()
     }
     .padding(.leading, H_PAD)
@@ -187,6 +187,7 @@ struct TwoPaneView: View {
 
       // Row4: Button bar & progress bar
       ButtonBar(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
+        .environmentObject(settings)
         .frame(alignment: .bottomLeading)
         .background(GeometryReader { geo in
           Color.clear
