@@ -115,7 +115,7 @@ enum IconNames: String {
 /**
  ENUM IconID
  
- Used for identifying icons in a compact way. Each IconID has an associated image which can be retreived from the backend,
+ Used for identifying icons in a compact way. Each IconID has an associated image which can be retrieved from the backend,
  but may alternatively be represented by a MacOS system image.
  */
 enum IconID: UInt32 {

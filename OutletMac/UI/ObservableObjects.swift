@@ -7,7 +7,7 @@
 import SwiftUI
 
 /**
- The EnivornmentObject containing shared state for all UI components in the app
+ The EnvironmentObject containing shared state for all UI components in the app
  */
 class GlobalSettings: ObservableObject {
   @Published var isPlaying = false
