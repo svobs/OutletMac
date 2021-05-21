@@ -314,11 +314,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
-            // TODO: equals
-//            if dropTargetSN.node!.nodeIdentifier == srcSN.node!.nodeIdentifier {
-//                NSLog("[\(self.treeID)] DEBUG Target (\(dropTargetSN.spid)) is being dropped on itself")
-//                return true
-//            }
             if dropTargetSN.node!.isParentOf(srcSN.node!) {
                 NSLog("[\(self.treeID)] DEBUG Target dir (\(dropTargetSN.spid)) is parent of dragged node (\(srcSN.spid))")
                 return true

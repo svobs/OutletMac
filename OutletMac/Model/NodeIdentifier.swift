@@ -11,7 +11,7 @@ import Foundation
  CLASS NodeIdentifier
  "Abstract" base class. Should not be instantiated.
  */
-class NodeIdentifier: CustomStringConvertible {
+class NodeIdentifier: CustomStringConvertible, Equatable {
 
   init(_ nodeUID: UID, deviceUID: UID, _ pathList: [String]) {
     self.nodeUID = nodeUID
@@ -50,8 +50,16 @@ class NodeIdentifier: CustomStringConvertible {
     false
   }
   
-  func getSinglePath() throws -> String {
-    throw OutletError.invalidOperation("Cannot call getSinglePath() for NodeIdentifier base class!")
+  func getSinglePath() -> String {
+    fatalError("Cannot call getSinglePath() for NodeIdentifier base class!")
+  }
+
+  func equals(_ rhs: NodeIdentifier) -> Bool {
+    return self.deviceUID == rhs.deviceUID && self.nodeUID == rhs.nodeUID
+  }
+
+  static func ==(lhs: NodeIdentifier, rhs: NodeIdentifier) -> Bool {
+    return lhs.equals(rhs)
   }
 }
 
@@ -83,6 +91,15 @@ class SinglePathNodeIdentifier: NodeIdentifier {
 
   override public var description: String {
     return "∣\(guid)⩨\"\(getSinglePath())\"∣"
+  }
+
+  func equals(_ rhs: SinglePathNodeIdentifier) -> Bool {
+    return super.equals(_: rhs) && self.getSinglePath() == rhs.getSinglePath()
+  }
+
+  static func ==(lhs: SinglePathNodeIdentifier, rhs: SinglePathNodeIdentifier) -> Bool {
+    // call into instance func so that it can properly inherit behavior from superclass
+    return lhs.equals(rhs)
   }
 }
 
@@ -166,6 +183,14 @@ class GDriveSPID: SinglePathNodeIdentifier {
     let uidToCopy: UID = nodeUID ?? self.nodeUID
     return GDriveSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self._pathUID, self.getSinglePath())
   }
+
+  func equals(_ rhs: GDriveSPID) -> Bool {
+    return super.equals(_: rhs) && self.pathUID == rhs.pathUID
+  }
+
+  static func ==(lhs: GDriveSPID, rhs: GDriveSPID) -> Bool {
+    return lhs.equals(rhs)
+  }
 }
 
 /**
@@ -207,6 +232,14 @@ class MixedTreeSPID: SinglePathNodeIdentifier {
     let uidToCopy: UID = uid ?? self.nodeUID
     return MixedTreeSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self.pathUID, self.getSinglePath())
   }
+
+  func equals(_ rhs: MixedTreeSPID) -> Bool {
+    return super.equals(_: rhs) && self.pathUID == rhs.pathUID
+  }
+
+  static func ==(lhs: MixedTreeSPID, rhs: MixedTreeSPID) -> Bool {
+    return lhs.equals(rhs)
+  }
 }
 
 
@@ -219,13 +252,6 @@ class GDriveIdentifier: NodeIdentifier {
   override var treeType: TreeType {
     get {
       return .GDRIVE
-    }
-  }
-
-  var pathUID: UID {
-    get {
-      // don't ever do this
-      fatalError("Cannot get pathUID for GDriveIdentifier!")
     }
   }
 
@@ -293,4 +319,11 @@ class ChangeTreeSPID: SinglePathNodeIdentifier {
     }
   }
 
+  func equals(_ rhs: ChangeTreeSPID) -> Bool {
+    return super.equals(_: rhs) && self.pathUID == rhs.pathUID && ((self.opType == nil && rhs.opType == nil) || (self.opType == rhs.opType))
+  }
+
+  static func ==(lhs: ChangeTreeSPID, rhs: ChangeTreeSPID) -> Bool {
+    return lhs.equals(rhs)
+  }
 }
