@@ -275,7 +275,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func clearModelAndTreeView() {
-    // Clear display store & treeview (which draws from display store)
+    // Clear display store & TreeView (which draws from display store)
     self.displayStore.putRootChildList(self.tree.rootSN, [])
     DispatchQueue.main.async {
       self.treeView!.outlineView.reloadData()

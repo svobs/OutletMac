@@ -895,6 +895,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request {
 
   public var treeID: String = String()
 
+  public var isExpandingParent: Bool = false
+
   /// 0=unlimited
   public var maxResults: UInt32 = 0
 
@@ -2898,7 +2900,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "parent_spid"),
     2: .standard(proto: "tree_id"),
-    3: .standard(proto: "max_results"),
+    3: .standard(proto: "is_expanding_parent"),
+    4: .standard(proto: "max_results"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2909,7 +2912,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._parentSpid) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
-      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.maxResults) }()
+      case 3: try { try decoder.decodeSingularBoolField(value: &self.isExpandingParent) }()
+      case 4: try { try decoder.decodeSingularUInt32Field(value: &self.maxResults) }()
       default: break
       }
     }
@@ -2922,8 +2926,11 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
     }
+    if self.isExpandingParent != false {
+      try visitor.visitSingularBoolField(value: self.isExpandingParent, fieldNumber: 3)
+    }
     if self.maxResults != 0 {
-      try visitor.visitSingularUInt32Field(value: self.maxResults, fieldNumber: 3)
+      try visitor.visitSingularUInt32Field(value: self.maxResults, fieldNumber: 4)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2931,6 +2938,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request) -> Bool {
     if lhs._parentSpid != rhs._parentSpid {return false}
     if lhs.treeID != rhs.treeID {return false}
+    if lhs.isExpandingParent != rhs.isExpandingParent {return false}
     if lhs.maxResults != rhs.maxResults {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

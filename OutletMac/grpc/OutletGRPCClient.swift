@@ -267,12 +267,13 @@ class OutletGRPCClient: OutletBackend {
     return deviceList
   }
   
-  func getChildList(parentSPID: SPID, treeID: TreeID?, maxResults: UInt32?) throws -> [SPIDNodePair] {
+  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool = false, maxResults: UInt32?) throws -> [SPIDNodePair] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request()
     if treeID != nil {
       request.treeID = treeID!
     }
     request.parentSpid = try self.grpcConverter.nodeIdentifierToGRPC(parentSPID)
+    request.isExpandingParent = isExpandingParent
     request.maxResults = maxResults ?? 0
 
     let response = try self.callAndTranslateErrors(self.stub.get_child_list_for_spid(request), "getChildList")
@@ -284,7 +285,7 @@ class OutletGRPCClient: OutletBackend {
 
     return try self.grpcConverter.snListFromGRPC(response.childList)
   }
-  
+
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request()
     request.stopAtPath = stopAtPath ?? ""

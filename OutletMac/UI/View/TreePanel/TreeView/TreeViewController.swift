@@ -222,7 +222,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
 
         do {
-            let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+            let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, isExpandingParent: true,
+                    maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
 
             outlineView.beginUpdates()
             defer {

@@ -25,7 +25,7 @@ protocol OutletBackend: HasLifecycle {
   func startSubtreeLoad(treeID: TreeID) throws
   func getOpExecutionPlayState() throws -> Bool
   func getDeviceList() throws -> [Device]
-  func getChildList(parentSPID: SPID, treeID: TreeID?, maxResults: UInt32?) throws -> [SPIDNodePair]
+  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair]
   func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair]
   func getRowsOfInterest(treeID: TreeID) throws -> RowsOfInterest
   func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws
@@ -141,7 +141,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getChildList(parentSPID: SPID, treeID: TreeID?, maxResults: UInt32?) throws -> [SPIDNodePair] {
+  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
