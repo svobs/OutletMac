@@ -352,45 +352,100 @@ class DisplayStore {
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  private func removeSN_NoLock(_ guid: GUID) -> Bool {
+    self.checkedNodeSet.remove(guid)
+    self.mixedNodeSet.remove(guid)
+    self.parentChildListDict.removeValue(forKey: guid)
+
+    if self.primaryDict.removeValue(forKey: guid) == nil {
+      NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
+    } else {
+      NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
+      return true
+    }
+    return false
+  }
+
   func removeSN(_ guid: GUID) -> Bool {
     var removed: Bool = false
     con.app.execSync {
-      self.checkedNodeSet.remove(guid)
-      self.mixedNodeSet.remove(guid)
-      self.parentChildListDict.removeValue(forKey: guid)
-
-      if self.primaryDict.removeValue(forKey: guid) == nil {
-        NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
-      } else {
-        NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
-        removed = true
-      }
+      removed = self.removeSN_NoLock(guid)
     }
     return removed
+  }
+
+  func removeSubtree(_ guid: GUID) {
+    let applyFunc: ApplyToSNFunc = { sn in
+      _ = self.removeSN_NoLock(sn.spid.guid)
+    }
+
+    con.app.execSync {
+      self.doForDescendants(guid, applyFunc)
+    }
   }
 
   func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node!.isDir ?? false
   }
 
+  /**
+   Applies the given applyFunc to the given item's descendants in breadth-first order.
+
+   Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
+   */
+  func doForDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
+    // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
+    // (likely?) that 'applyFunc' also contains a dispatch queue work item.
+    var searchQueue = LinkedList<SPIDNodePair>()
+
+    if let sn = self.getSN_NoLock(guid) {
+
+      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      for childSN in self.getChildList_NoLock(sn.spid.guid) {
+        searchQueue.append(childSN)
+      }
+
+      applyBreadthFirst(&searchQueue, applyFunc)
+    }
+  }
+
+  /**
+   Applies the given applyFunc to the given item and its descendants in breadth-first order.
+
+   Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
+   */
   func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
     var searchQueue = LinkedList<SPIDNodePair>()
 
-    if var sn = self.getSN_NoLock(guid) {
+    if let sn = self.getSN_NoLock(guid) {
       NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
       searchQueue.append(sn)
 
-      while !searchQueue.isEmpty {
-        sn = searchQueue.popFirst()!
-        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
-        applyFunc(sn)
+      applyBreadthFirst(&searchQueue, applyFunc)
+    }
+  }
 
-        for childSN in self.getChildList_NoLock(sn.spid.guid) {
-            searchQueue.append(childSN)
-        }
+  /**
+   Applies the given applyFunc to each item in the given searchQueue and its descendants in the queue in breadth-first order.
+   The queue is assumed to contain an initial set of SPIDNodePairs, and will be depleted at the end.
+
+   Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
+   */
+  private func applyBreadthFirst(_ searchQueue: inout LinkedList<SPIDNodePair>, _ applyFunc: ApplyToSNFunc) {
+    // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
+    // (likely?) that 'applyFunc' also contains a dispatch queue work item.
+    while !searchQueue.isEmpty {
+      let sn = searchQueue.popFirst()!
+
+      for childSN in self.getChildList_NoLock(sn.spid.guid) {
+        searchQueue.append(childSN)
       }
+
+      // Apply this AFTER adding its children
+      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+      applyFunc(sn)
     }
   }
 }

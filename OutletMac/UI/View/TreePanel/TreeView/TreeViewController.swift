@@ -219,7 +219,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
-        NSLog("DEBUG [\(treeID)] User expanded node \(parentGUID)")
+        NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
 
         do {
             let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, isExpandingParent: true,
@@ -234,27 +234,36 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         } catch OutletError.maxResultsExceeded(let actualCount) {
             self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
         } catch {
-            self.con.reportException("Failed to expand node", error)
+            self.con.reportException("Failed to expand row", error)
         }
     }
 
     /**
      Pre Row Collapse
      From NSOutlineViewDelegate
+
+     IMPORTANT NOTE: MacOS has its own quirk when collapsing a node which has expanded descendants. By default, collapsing it will "secretly" keep
+     the state of its expanded descendants, so that expanding it again right away will restore their expanded states as well. The user can override
+     this behavior by holding down the Option key when collapsing the node, which in effect will collapse all the descendants.
+
+     Currently the BE will honor this behavior while the app is open (because the descendant states are remembered by the NSOutlineView), but if the
+     app is closed, on the next run any descendants which were collapsed at the end of the last run will stay that way.
      */
     func outlineViewItemWillCollapse(_ notification: Notification) {
         guard let parentGUID: GUID = getKey(notification) else {
             return
         }
-        NSLog("DEBUG [\(treeID)] User collapsed node \(parentGUID)")
+        NSLog("DEBUG [\(treeID)] Row is collapsing: \(parentGUID)")
+
+        displayStore.removeSubtree(parentGUID)
 
         do {
             // Tell BE to remove the GUID from its persisted state of expanded rows. (No need to make a
             // similar call when the row is expanded; the BE does this automatically when getChildList() called)
-            NSLog("DEBUG [\(treeID)] Reporting collapsed node to BE: \(parentGUID)")
+            NSLog("DEBUG [\(treeID)] Reporting collapsed row to BE: \(parentGUID)")
             try self.con.backend.removeExpandedRow(parentGUID, self.treeID)
         } catch {
-            NSLog("ERROR [\(treeID)] Failed to report collapsed node to BE: \(error)")
+            NSLog("ERROR [\(treeID)] Failed to report collapsed row to BE: \(error)")
         }
     }
 
