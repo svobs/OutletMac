@@ -22,7 +22,12 @@ class SignalReceiverThread: Thread {
       self.grpcClient.receiveServerSignals()
 
       while !grpcClient.isConnected && !self.isCancelled {
-        // TODO: send ping to indicate recovery from connection failure
+
+        // It seems that once the channel fails to connect, it will never succeed.
+        self.grpcClient.replaceStub()
+
+        self.grpcClient.receiveServerSignals()
+
         NSLog("INFO  Will retry signal stream in \(SLEEP_PERIOD_SEC) sec...")
         Thread.sleep(forTimeInterval: SLEEP_PERIOD_SEC)
         NSLog("DEBUG SignalReceiverThread looping (count: \(grpcClient.conecutiveStreamFailCount))")

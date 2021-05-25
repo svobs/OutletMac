@@ -88,9 +88,12 @@ enum Signal: UInt32 {
   // --- Status bar ---
   case SET_STATUS = 105
 
+  // gRPC, sent from server to client when connect successful
+  case WELCOME = 200
+
   // --- Only used by SwiftUI ---
-  case CANCEL_ALL_EDIT_ROOT = 200
-  case CANCEL_OTHER_EDIT_ROOT = 201
+  case CANCEL_ALL_EDIT_ROOT = 1000
+  case CANCEL_OTHER_EDIT_ROOT = 1001
 }
 
 // --- Sender identifiers ---

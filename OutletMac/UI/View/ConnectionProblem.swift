@@ -50,8 +50,11 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
                 contentRect: contentRect,
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered, defer: false)
-        // this will override x & y from content rect
+        self.window.center()
+        self.window.title = "Cannot connect to agent"
 
+        let content = ConnectionProblemContent(self.app, self.window)
+        window.contentView = NSHostingView(rootView: content)
     }
 
     func start() throws {
@@ -69,4 +72,38 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
             self.window.makeKeyAndOrderFront(nil)
         }
     }
+}
+
+struct ConnectionProblemContent: View {
+    @StateObject var heightTracking: HeightTracking = HeightTracking()
+    var parentWindow: NSWindow
+    let app: OutletApp
+
+    init(_ app: OutletApp, _ parentWindow: NSWindow) {
+        self.parentWindow = parentWindow
+        self.app = app
+    }
+
+    func okClicked() {
+        // TODO
+        NSLog("DEBUG OK btn clicked!'")
+        self.parentWindow.close()
+    }
+
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Button("Cancel", action: {
+                    NSLog("DEBUG ConnectionProblemContent: Cancel button was clicked")
+                    self.parentWindow.close()
+                })
+                        .keyboardShortcut(.cancelAction)
+                Button("Proceed", action: self.okClicked)
+                        .keyboardShortcut(.defaultAction)  // this will also color the button
+            }
+                    .padding(.bottom).padding(.horizontal)  // we have enough padding above already
+        }.frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)  // set minimum window dimensions
+    }
+
 }

@@ -16,6 +16,9 @@ protocol OutletApp: HasLifecycle {
   var backend: OutletBackend { get }
   var iconStore: IconStore { get }
 
+  func grpcDidGoDown()
+  func grpcDidGoUp()
+
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
 
@@ -42,6 +45,12 @@ class MockApp: OutletApp {
   func start() throws {
   }
   func shutdown() throws {
+  }
+
+  func grpcDidGoDown() {
+  }
+
+  func grpcDidGoUp() {
   }
 
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
@@ -102,7 +111,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   var rootChooserView: GDriveRootChooser!
   var mergePreviewView: MergePreview!
   var connectionProblemView: ConnectionProblemView!
-  var mainWindow: NSWindow!
+  var mainWindow: NSWindow? = nil
 
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
@@ -134,7 +143,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   func start() {
     NSLog("DEBUG OutletMacApp start begin")
 
-    self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+    self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, app: self)
     self._iconStore = IconStore(self.backend)
 
     if signalReceiverThread != nil {
@@ -158,6 +167,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
     dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
+
+    try! self.backend.start()  // should not throw errors
+    NSLog("INFO  Backend started")
   }
 
   func shutdown() throws {
@@ -172,11 +184,34 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.signalReceiverThread?.cancel()
   }
 
+  func grpcDidGoDown() {
+    mainWindow?.close()
+
+    NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
+  }
+
+  func grpcDidGoUp() {
+    self.execAsync {
+      do {
+        try self.launchFrontend()
+      } catch {
+        if let grpcClient = self._backend, !grpcClient.isConnected {
+          // we can handle a disconnect
+          NSLog("ERROR While creating main window: \(error)")
+
+        } else { // unknown error: bad
+          NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
+          NSLog("DEBUG Sleeping 1s to let things settle...")
+          sleep(1)
+          exit(1)
+        }
+      }
+    }
+  }
+
   private func launchFrontend() throws {
     // These make gRPC calls and will be the first thing to fail if the BE is not online
     // (note: they will fail separately, since OutletGRPCClient operates on a separate thread)
-    try self.backend.start()
-    NSLog("INFO  Backend started")
     try self.iconStore.start()
 
     settings.isPlaying = try self.backend.getOpExecutionPlayState()
@@ -189,11 +224,15 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
 
-    let screenSize = NSScreen.main?.frame.size ?? .zero
-    NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
+    DispatchQueue.main.async {
+      self.connectionProblemView.window.close()
 
-    NSLog("DEBUG OutletMacApp start done")
-    self.createMainWindow()
+      let screenSize = NSScreen.main?.frame.size ?? .zero
+      NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
+
+      NSLog("DEBUG OutletMacApp start done")
+      self.createMainWindow()
+    }
   }
 
   /**
@@ -237,13 +276,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       contentRect: self.contentRect,
       styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered, defer: false)
-    mainWindow.delegate = self
-    mainWindow.title = "OutletMac"
-//    mainWindow.setFrameAutosaveName("OutletMac")
-//    mainWindow.center()
-    mainWindow.makeKeyAndOrderFront(nil)
+    mainWindow!.delegate = self
+    mainWindow!.title = "OutletMac"
+    mainWindow!.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
-    mainWindow.contentView = NSHostingView(rootView: contentView)
+    mainWindow!.contentView = NSHostingView(rootView: contentView)
   }
 
   private func reportWinCoords() {
@@ -270,24 +307,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.start()
 
-    self.execAsync {
-      do {
-        try self.launchFrontend()
-      } catch {
-        if let grpcClient = self._backend, !grpcClient.isConnected {
-          // we can handle a disconnect
-          NSLog("ERROR While creating main window: \(error)")
-
-          NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
-
-        } else { // unknown error
-          NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
-          NSLog("DEBUG Sleeping 1s to let things settle...")
-          sleep(1)
-          exit(1)
-        }
-      }
-    }
+    self.grpcDidGoUp()
   }
 
   // NSWindowDelegate methods

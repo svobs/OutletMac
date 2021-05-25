@@ -16,24 +16,43 @@ import NIO
  Thin gRPC client to the backend service
  */
 class OutletGRPCClient: OutletBackend {
-  let stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
-  let dispatcher: SignalDispatcher
+  let host: String
+  let port: Int
+  var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
+  let app: OutletApp
   let dispatchListener: DispatchListener
   var isConnected: Bool = true // set to true initially just for logging purposes: we care more to note if it's initially down than up
   var conecutiveStreamFailCount: Int = 0
   lazy var grpcConverter = GRPCConverter(self)
   lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
 
-  init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ dispatcher: SignalDispatcher) {
-    self.dispatcher = dispatcher
+  init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ app: OutletApp,
+       host: String, port: Int) {
+    self.app = app
     self.stub = client
-    self.dispatchListener = dispatcher.createListener(ID_BACKEND_CLIENT)
+    self.dispatchListener = app.dispatcher.createListener(ID_BACKEND_CLIENT)
+    self.host = host
+    self.port = port
+  }
+
+  func replaceStub() {
+    do {
+      try self.stub.channel.close().wait()
+    } catch {
+      NSLog("ERROR While closing client stub: \(error)")
+    }
+
+    self.stub = OutletGRPCClient.makeClientStub(self.host, self.port)
   }
 
   /**
    Factory method: makes a `Outlet_Backend_Agent_Grpc_Generated_OutletClient` client for a service hosted on {host} and listening on {port}.
    */
-  static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
+  static func makeClient(host: String, port: Int, app: OutletApp) -> OutletGRPCClient {
+    return OutletGRPCClient(OutletGRPCClient.makeClientStub(host, port), app, host: host, port: port)
+  }
+
+  private static func makeClientStub(_ host: String, _ port: Int) -> Outlet_Backend_Agent_Grpc_Generated_OutletClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
     let channel = ClientConnection.insecure(group: group)
@@ -41,19 +60,19 @@ class OutletGRPCClient: OutletBackend {
             .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
             .connect(host: host, port: port)
 
-    return OutletGRPCClient(Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel), dispatcher)
+    return Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel)
   }
 
   func start() throws {
     NSLog("DEBUG Starting OutletGRPCClient...")
 
     // Forward the following Dispatcher signals across gRPC:
-    try connectAndForwardSignal(.PAUSE_OP_EXECUTION)
-    try connectAndForwardSignal(.RESUME_OP_EXECUTION)
-    try connectAndForwardSignal(.COMPLETE_MERGE)
-    try connectAndForwardSignal(.DOWNLOAD_ALL_GDRIVE_META)
-    try connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
-    try connectAndForwardSignal(.EXIT_DIFF_MODE)
+    connectAndForwardSignal(.PAUSE_OP_EXECUTION)
+    connectAndForwardSignal(.RESUME_OP_EXECUTION)
+    connectAndForwardSignal(.COMPLETE_MERGE)
+    connectAndForwardSignal(.DOWNLOAD_ALL_GDRIVE_META)
+    connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
+    connectAndForwardSignal(.EXIT_DIFF_MODE)
   }
   
   func shutdown() throws {
@@ -63,7 +82,7 @@ class OutletGRPCClient: OutletBackend {
   // Signals
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func connectAndForwardSignal(_ signal: Signal) throws {
+  private func connectAndForwardSignal(_ signal: Signal) {
     self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
       self.sendSignalToServer(signal, senderID)
     }
@@ -128,6 +147,9 @@ class OutletGRPCClient: OutletBackend {
     var argDict: [String: Any] = [:]
 
     switch signal {
+    case .WELCOME:
+        // Do not forward to clients. Welcome msg is used just for its ping functionality
+        return
       case .DISPLAY_TREE_CHANGED, .GENERATE_MERGE_TREE_DONE:
         let displayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
         let tree: DisplayTree = displayTreeUiState.toDisplayTree(backend: self)
@@ -177,7 +199,7 @@ class OutletGRPCClient: OutletBackend {
     }
     argDict["signal"] = signal
 
-    dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
+    app.dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
   }
 
   /**
@@ -187,7 +209,7 @@ class OutletGRPCClient: OutletBackend {
     var argDict: [String: Any] = [:]
     argDict["msg"] = msg
     argDict["secondary_msg"] = secondaryMsg
-    dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: ID_BACKEND_CLIENT, argDict)
+    app.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: ID_BACKEND_CLIENT, argDict)
   }
 
   // Remaining RPCs
@@ -635,6 +657,7 @@ class OutletGRPCClient: OutletBackend {
     if self.isConnected {
       self.isConnected = false
       NSLog("INFO  gRPC connection is DOWN!")
+      self.app.grpcDidGoDown()
     }
   }
 
@@ -642,7 +665,8 @@ class OutletGRPCClient: OutletBackend {
     if !self.isConnected {
       self.isConnected = true
       NSLog("INFO  gRPC connection is UP!")
-      self.conecutiveStreamFailCount = 0
+      self.conecutiveStreamFailCount = 0  // reset failure count
+      self.app.grpcDidGoUp()
     }
   }
 
