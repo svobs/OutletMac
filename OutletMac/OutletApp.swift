@@ -113,6 +113,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   var connectionProblemView: ConnectionProblemView!
   var mainWindow: NSWindow? = nil
 
+  private var enableWindowCloseListener: Bool = true
+
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
@@ -185,7 +187,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func grpcDidGoDown() {
-    mainWindow?.close()
+    DispatchQueue.main.sync {
+      self.enableWindowCloseListener = false
+      mainWindow?.close()
+      self.enableWindowCloseListener = true
+    }
 
     NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
   }
@@ -225,7 +231,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.conRight!.requestTreeLoad()
 
     DispatchQueue.main.async {
-      self.connectionProblemView.window.close()
+      self.connectionProblemView?.window.close()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
       NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
@@ -272,12 +278,19 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // recoverable error: just use defaults
       NSLog("ERROR Failed to load contentRect from config: \(error)")
     }
-    mainWindow = NSWindow(
-      contentRect: self.contentRect,
-      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-      backing: .buffered, defer: false)
-    mainWindow!.delegate = self
-    mainWindow!.title = "OutletMac"
+
+    if mainWindow == nil {
+      NSLog("DEBUG Creating mainWindow")
+      mainWindow = NSWindow(
+              contentRect: self.contentRect,
+              styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+              backing: .buffered, defer: false)
+      mainWindow!.isReleasedWhenClosed = false  // i.e., don't crash when re-opening
+      mainWindow!.delegate = self
+      mainWindow!.title = "OutletMac"
+    }
+
+    NSLog("DEBUG Showing mainWindow")
     mainWindow!.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
     mainWindow!.contentView = NSHostingView(rootView: contentView)
@@ -334,7 +347,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 //  }
 
   @objc func windowWillClose(_ notification: Notification) {
-    NSLog("DEBUG User closed main mainWindow: closing app")
+    if !self.enableWindowCloseListener {
+      NSLog("DEBUG Closing mainWindow")
+      return
+    }
+
+    NSLog("DEBUG User closed mainWindow: closing app")
     do {
       try self.shutdown()
     } catch {
@@ -576,6 +594,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   @objc func openConnectionProblemWindow() {
     if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+      NSLog("INFO  Showing ConnectionProblemView")
       self.connectionProblemView.moveToFront()
     } else {
       NSLog("INFO  Opening ConnectionProblemView")
