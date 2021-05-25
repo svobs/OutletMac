@@ -16,23 +16,24 @@ import NIO
  Thin gRPC client to the backend service
  */
 class OutletGRPCClient: OutletBackend {
-  let host: String
-  let port: Int
   var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
   let app: OutletApp
+  let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
-  var isConnected: Bool = true // set to true initially just for logging purposes: we care more to note if it's initially down than up
-  var conecutiveStreamFailCount: Int = 0
   lazy var grpcConverter = GRPCConverter(self)
   lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
 
-  init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ app: OutletApp,
-       host: String, port: Int) {
+  var isConnected: Bool {
+    get {
+      return self.backendConnectionState.isConnected
+    }
+  }
+
+  init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
     self.app = app
     self.stub = client
     self.dispatchListener = app.dispatcher.createListener(ID_BACKEND_CLIENT)
-    self.host = host
-    self.port = port
+    self.backendConnectionState = backendConnectionState
   }
 
   func replaceStub() {
@@ -42,14 +43,15 @@ class OutletGRPCClient: OutletBackend {
       NSLog("ERROR While closing client stub: \(error)")
     }
 
-    self.stub = OutletGRPCClient.makeClientStub(self.host, self.port)
+    self.stub = OutletGRPCClient.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
   }
 
   /**
    Factory method: makes a `Outlet_Backend_Agent_Grpc_Generated_OutletClient` client for a service hosted on {host} and listening on {port}.
    */
-  static func makeClient(host: String, port: Int, app: OutletApp) -> OutletGRPCClient {
-    return OutletGRPCClient(OutletGRPCClient.makeClientStub(host, port), app, host: host, port: port)
+  static func makeClient(app: OutletApp, _ conn: BackendConnectionState) ->
+          OutletGRPCClient {
+    return OutletGRPCClient(OutletGRPCClient.makeClientStub(conn.host, conn.port), app, conn)
   }
 
   private static func makeClientStub(_ host: String, _ port: Int) -> Outlet_Backend_Agent_Grpc_Generated_OutletClient {
@@ -119,7 +121,7 @@ class OutletGRPCClient: OutletBackend {
 
     call.status.whenSuccess { status in
       // Yes, it says "whenSuccess" above, but this is actually always a failure of some kind.
-      self.conecutiveStreamFailCount += 1
+      self.backendConnectionState.conecutiveStreamFailCount += 1
 
       if status.code == .ok {
         // this should never happen if the server was properly written
@@ -655,7 +657,7 @@ class OutletGRPCClient: OutletBackend {
 
   private func grpcConnectionDown() {
     if self.isConnected {
-      self.isConnected = false
+      self.backendConnectionState.isConnected = false
       NSLog("INFO  gRPC connection is DOWN!")
       self.app.grpcDidGoDown()
     }
@@ -663,9 +665,9 @@ class OutletGRPCClient: OutletBackend {
 
   private func grpcConnectionRestored() {
     if !self.isConnected {
-      self.isConnected = true
+      self.backendConnectionState.isConnected = true
       NSLog("INFO  gRPC connection is UP!")
-      self.conecutiveStreamFailCount = 0  // reset failure count
+      self.backendConnectionState.conecutiveStreamFailCount = 0  // reset failure count
       self.app.grpcDidGoUp()
     }
   }

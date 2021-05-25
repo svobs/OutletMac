@@ -112,6 +112,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   var mergePreviewView: MergePreview!
   var connectionProblemView: ConnectionProblemView!
   var mainWindow: NSWindow? = nil
+  let backendConnectionState: BackendConnectionState = BackendConnectionState(host: "localhost", port: 50051)
 
   private var enableWindowCloseListener: Bool = true
 
@@ -145,7 +146,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   func start() {
     NSLog("DEBUG OutletMacApp start begin")
 
-    self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, app: self)
+    self._backend = OutletGRPCClient.makeClient(app: self, backendConnectionState)
     self._iconStore = IconStore(self.backend)
 
     if signalReceiverThread != nil {
@@ -184,12 +185,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
 
     self.signalReceiverThread?.cancel()
+
+    // Close the app when mainWindow is closed, Windoze-style
+    NSApplication.shared.terminate(0)
   }
 
   func grpcDidGoDown() {
     DispatchQueue.main.sync {
       self.enableWindowCloseListener = false
+      // Close all other windows beside the Connection Problem window, if they exist
       mainWindow?.close()
+      rootChooserView?.window.close()
+      mergePreviewView?.window.close()
       self.enableWindowCloseListener = true
     }
 
@@ -358,8 +365,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     } catch {
       NSLog("ERROR During application shutdown: \(error)")
     }
-    // Close the app when mainWindow is closed, Windoze-style
-    NSApplication.shared.terminate(0)
   }
 
   // Convenience methods
@@ -600,7 +605,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("INFO  Opening ConnectionProblemView")
       DispatchQueue.main.async {
         do {
-          self.connectionProblemView = ConnectionProblemView(self)
+          self.connectionProblemView = ConnectionProblemView(self, self.backendConnectionState)
           try self.connectionProblemView.start()
           self.connectionProblemView.moveToFront()
         } catch {

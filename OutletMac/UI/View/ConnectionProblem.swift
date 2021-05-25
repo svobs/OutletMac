@@ -5,6 +5,21 @@
 
 import SwiftUI
 
+class BackendConnectionState: ObservableObject {
+    @Published var host: String
+    @Published var port: Int
+
+    @Published var conecutiveStreamFailCount: Int = 0
+    // set to true initially just for logging purposes: we care more to note if it's initially down than up:
+    @Published var isConnected: Bool = true
+    @Published var isRelaunching: Bool = false
+
+    init(host: String, port: Int) {
+        self.host = host
+        self.port = port
+    }
+}
+
 class ConnectionProblemWindow: NSWindow {
     override func keyDown(with event: NSEvent) {
         // Pass all key events to the project model
@@ -40,20 +55,20 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
         }
     }
 
-    init(_ app: OutletApp) {
+    init(_ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
         self.app = app
 
         // TODO: save content rect in config
         // note: x & y are from lower-left corner
-        let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
+        let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
         window = ConnectionProblemWindow(
                 contentRect: contentRect,
-                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+                styleMask: [.titled, .closable, .fullSizeContentView],
                 backing: .buffered, defer: false)
         self.window.center()
         self.window.title = "Cannot connect to agent"
 
-        let content = ConnectionProblemContent(self.app, self.window)
+        let content = ConnectionProblemContent(self.app, self.window, backendConnectionState)
         window.contentView = NSHostingView(rootView: content)
     }
 
@@ -75,35 +90,50 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
 }
 
 struct ConnectionProblemContent: View {
-    @StateObject var heightTracking: HeightTracking = HeightTracking()
+    @ObservedObject var backendConnectionState: BackendConnectionState
     var parentWindow: NSWindow
     let app: OutletApp
 
-    init(_ app: OutletApp, _ parentWindow: NSWindow) {
+    init(_ app: OutletApp, _ parentWindow: NSWindow, _ backendConnectionState: BackendConnectionState) {
         self.parentWindow = parentWindow
         self.app = app
+        self.backendConnectionState = backendConnectionState
     }
 
-    func okClicked() {
-        // TODO
-        NSLog("DEBUG OK btn clicked!'")
+    func quitButtonClicked() {
+        NSLog("DEBUG ConnectionProblemContent: Quit btn clicked!'")
         self.parentWindow.close()
+        do {
+            try self.app.shutdown()
+        } catch {
+            // this shouldn't happen in principle
+            NSLog("ERROR Failure during shutdown: \(error)")
+        }
+    }
+
+    func relaunchButtonClicked() {
+        NSLog("DEBUG ConnectionProblemContent: Relaunch btn clicked!'")
+        self.backendConnectionState.isRelaunching = true
+
+        // TODO
     }
 
     var body: some View {
         VStack {
+            Text("Trying to connect to \(backendConnectionState.host), port \(String(backendConnectionState.port))")
+
+            Text("Attempting retry #\(backendConnectionState.conecutiveStreamFailCount)...")
+
             HStack {
-                Spacer()
-                Button("Cancel", action: {
-                    NSLog("DEBUG ConnectionProblemContent: Cancel button was clicked")
-                    self.parentWindow.close()
-                })
-                        .keyboardShortcut(.cancelAction)
-                Button("Proceed", action: self.okClicked)
+                Button("Kill & relaunch agent", action: self.relaunchButtonClicked)
                         .keyboardShortcut(.defaultAction)  // this will also color the button
-            }
+                        .disabled(self.backendConnectionState.isRelaunching)
+
+                Button("Quit", action: self.quitButtonClicked)
+                        .keyboardShortcut(.cancelAction)
+            }.frame(alignment: .center)
                     .padding(.bottom).padding(.horizontal)  // we have enough padding above already
-        }.frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)  // set minimum window dimensions
+        }.frame(width: 300, height: 150)  // set minimum window dimensions
     }
 
 }

@@ -30,7 +30,7 @@ class SignalReceiverThread: Thread {
 
         NSLog("INFO  Will retry signal stream in \(SLEEP_PERIOD_SEC) sec...")
         Thread.sleep(forTimeInterval: SLEEP_PERIOD_SEC)
-        NSLog("DEBUG SignalReceiverThread looping (count: \(grpcClient.conecutiveStreamFailCount))")
+        NSLog("DEBUG SignalReceiverThread looping (count: \(grpcClient.backendConnectionState.conecutiveStreamFailCount))")
       }
     }
   }

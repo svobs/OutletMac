@@ -109,7 +109,6 @@ class GDriveRootChooser: PopUpTreePanel {
 //    window.setFrameAutosaveName(window.title)
     let content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self.window, self.chooserState)
     window.contentView = NSHostingView(rootView: content)
-//    window.setDefaultButtonCell(
   }
 
   // DispatchListener callbacks
