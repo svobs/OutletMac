@@ -101,13 +101,15 @@ class AppMenu: NSMenu {
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   var rootChooserView: GDriveRootChooser!
   var mergePreviewView: MergePreview!
-  var window: NSWindow!
+  var connectionProblemView: ConnectionProblemView!
+  var mainWindow: NSWindow!
 
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
   lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
-  var _backend: OutletBackend? = nil
+  var signalReceiverThread: SignalReceiverThread?
+  var _backend: OutletGRPCClient? = nil
   var _iconStore: IconStore? = nil
   var conLeft: TreePanelController? = nil
   var conRight: TreePanelController? = nil
@@ -129,67 +131,33 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  func start() throws {
+  func start() {
     NSLog("DEBUG OutletMacApp start begin")
 
-    do {
-      self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
-      self._iconStore = IconStore(self.backend)
+    self._backend = OutletGRPCClient.makeClient(host: "localhost", port: 50051, dispatcher: self.dispatcher)
+    self._iconStore = IconStore(self.backend)
 
-      NSLog("INFO  gRPC client connecting")
-      try self.backend.start()
-      NSLog("INFO  Backend started")
-
-      try self.iconStore.start()
-
-      // Subscribe to app-wide signals here
-      try dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
-      try dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
-      try dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
-      try dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
-      try dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
-      try dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
-      try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
-      try dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
-
-      try dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
-
-      try dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
-
-
-      settings.isPlaying = try self.backend.getOpExecutionPlayState()
-
-      // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
-      let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-      let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowMultipleSelection: true)
-      self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
-      try self.conLeft!.requestTreeLoad()
-      try self.conRight!.requestTreeLoad()
-
-      let screenSize = NSScreen.main?.frame.size ?? .zero
-      NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
-
-      NSLog("DEBUG OutletMacApp start done")
-    } catch {
-      NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
-      NSLog("DEBUG Sleeping 1s to let things settle...")
-      sleep(1)
-      exit(1)
+    if signalReceiverThread != nil {
+      NSLog("WARN  Looks like a SignalReceiverThread already exists. Telling it to cancel.")
+      self.signalReceiverThread!.cancel()
     }
-  }
 
-  /**
-   Creates and starts a tree controller for the given tree, but does not load it.
+    self.signalReceiverThread = SignalReceiverThread(self._backend!)
+    self.signalReceiverThread!.start()
 
-   NOTE:
-  */
-  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
-    let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
+    // Subscribe to app-wide signals here
+    dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
+    dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
+    dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
+    dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
+    dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
+    dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
+    dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
+    dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
 
-    try con.start()
-    return con
+    dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+
+    dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
   }
 
   func shutdown() throws {
@@ -200,6 +168,45 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         NSLog("ERROR [\(treeID)] Failed to shut down controller")
       }
     }
+
+    self.signalReceiverThread?.cancel()
+  }
+
+  private func launchFrontend() throws {
+    // These make gRPC calls and will be the first thing to fail if the BE is not online
+    // (note: they will fail separately, since OutletGRPCClient operates on a separate thread)
+    try self.backend.start()
+    NSLog("INFO  Backend started")
+    try self.iconStore.start()
+
+    settings.isPlaying = try self.backend.getOpExecutionPlayState()
+
+    // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
+    let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
+    let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+    self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowMultipleSelection: true)
+    self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
+    try self.conLeft!.requestTreeLoad()
+    try self.conRight!.requestTreeLoad()
+
+    let screenSize = NSScreen.main?.frame.size ?? .zero
+    NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
+
+    NSLog("DEBUG OutletMacApp start done")
+    self.createMainWindow()
+  }
+
+  /**
+   Creates and starts a tree controller for the given tree, but does not load it.
+
+   NOTE:
+  */
+  private func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
+    let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
+    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
+
+    try con.start()
+    return con
   }
 
   private func loadWindowContentRectFromConfig() throws -> NSRect {
@@ -218,7 +225,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     return NSRect(x: winX, y: winY, width: winWidth, height: winHeight)
   }
 
-  private func createWindow() {
+  private func createMainWindow() {
     // FIXME: actually get the app to use these values
     do {
       self.contentRect = try self.loadWindowContentRectFromConfig()
@@ -226,22 +233,22 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // recoverable error: just use defaults
       NSLog("ERROR Failed to load contentRect from config: \(error)")
     }
-    window = NSWindow(
+    mainWindow = NSWindow(
       contentRect: self.contentRect,
       styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered, defer: false)
-    window.delegate = self
-    window.title = "OutletMac"
-//    window.setFrameAutosaveName("OutletMac")
-//    window.center()
-    window.makeKeyAndOrderFront(nil)
+    mainWindow.delegate = self
+    mainWindow.title = "OutletMac"
+//    mainWindow.setFrameAutosaveName("OutletMac")
+//    mainWindow.center()
+    mainWindow.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
-    window.contentView = NSHostingView(rootView: contentView)
+    mainWindow.contentView = NSHostingView(rootView: contentView)
   }
 
   private func reportWinCoords() {
     let rect = self.contentRect
-    NSLog("DEBUG [\(self.winID)] Firing timer to report window size: \(rect)")
+    NSLog("DEBUG [\(self.winID)] Firing timer to report mainWindow size: \(rect)")
 
     var configDict = [String: String]()
     configDict["ui_state.\(winID).x"] = String(Int(rect.minX))
@@ -252,7 +259,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     do {
       try self.backend.putConfigList(configDict)
     } catch {
-      NSLog("ERROR [\(self.winID)] Failed to report window size: \(error)")
+      NSLog("ERROR [\(self.winID)] Failed to report mainWindow size: \(error)")
       return
     }
   }
@@ -261,11 +268,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    do {
-      try self.start()
-      self.createWindow()
-    } catch {
-      NSLog("ERROR should not have gotten here: \(error)")
+    self.start()
+
+    self.execAsync {
+      do {
+        try self.launchFrontend()
+      } catch {
+        if let grpcClient = self._backend, !grpcClient.isConnected {
+          // we can handle a disconnect
+          NSLog("ERROR While creating main window: \(error)")
+
+          NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
+
+        } else { // unknown error
+          NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
+          NSLog("DEBUG Sleeping 1s to let things settle...")
+          sleep(1)
+          exit(1)
+        }
+      }
     }
   }
 
@@ -273,16 +294,16 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   @objc func windowDidResize(_ notification: Notification) {
-//    NSLog("DEBUG Main win resized! \(self.window?.frame.size as Any)")
-    if let winFrame: CGRect = self.window?.frame {
+//    NSLog("DEBUG Main win resized! \(self.mainWindow?.frame.size as Any)")
+    if let winFrame: CGRect = self.mainWindow?.frame {
       self.contentRect = winFrame
       self.winCoordsTimer.reschedule()
     }
   }
 
   @objc func windowDidMove(_ notification: Notification) {
-//    NSLog("DEBUG Main win moved! \(self.window?.frame.origin as Any)")
-    if let winFrame: CGRect = self.window?.frame {
+//    NSLog("DEBUG Main win moved! \(self.mainWindow?.frame.origin as Any)")
+    if let winFrame: CGRect = self.mainWindow?.frame {
       self.contentRect = winFrame
       self.winCoordsTimer.reschedule()
     }
@@ -293,13 +314,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 //  }
 
   @objc func windowWillClose(_ notification: Notification) {
-    NSLog("DEBUG User closed main window: closing app")
+    NSLog("DEBUG User closed main mainWindow: closing app")
     do {
       try self.shutdown()
     } catch {
       NSLog("ERROR During application shutdown: \(error)")
     }
-    // Close the app when window is closed, Windoze-style
+    // Close the app when mainWindow is closed, Windoze-style
     NSApplication.shared.terminate(0)
   }
 
@@ -528,6 +549,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
           try self.mergePreviewView.start()
         } catch {
           self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
+        }
+      }
+    }
+  }
+
+  @objc func openConnectionProblemWindow() {
+    if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+      self.connectionProblemView.moveToFront()
+    } else {
+      NSLog("INFO  Opening ConnectionProblemView")
+      DispatchQueue.main.async {
+        do {
+          self.connectionProblemView = ConnectionProblemView(self)
+          try self.connectionProblemView.start()
+          self.connectionProblemView.moveToFront()
+        } catch {
+          self.displayError("Failed to open Connecting dialog!", "An unexpected error occurred: \(error)")
+          sleep(1)
+          exit(1)
         }
       }
     }

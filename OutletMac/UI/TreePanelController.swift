@@ -184,33 +184,33 @@ class TreePanelController: TreePanelControllable {
   func start() throws {
     self.app.registerTreePanelController(self.treeID, self)
 
-    try self.reattachListeners(self.treeID)
+    self.reattachListeners(self.treeID)
 
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
 
   func shutdown() throws {
     NSLog("DEBUG [\(self.treeID)] Controller shutdown() called")
-    try self.dispatchListener.unsubscribeAll()
+    self.dispatchListener.unsubscribeAll()
 
     self.dispatcher.sendSignal(signal: .DEREGISTER_DISPLAY_TREE, senderID: self.treeID)
   }
 
-  func reattachListeners(_ newTreeID: TreeID) throws {
-    try self.dispatchListener.unsubscribeAll()
+  func reattachListeners(_ newTreeID: TreeID) {
+    self.dispatchListener.unsubscribeAll()
 
     self.dispatchListener = self.app.dispatcher.createListener(newTreeID)
-    try self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
-    try self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
+    self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: newTreeID)
 
-    try self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: newTreeID)
-    try self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: newTreeID)
+    self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
   }
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {
@@ -218,14 +218,10 @@ class TreePanelController: TreePanelControllable {
     self.app.execSync {
       if newTree.treeID != self.tree.treeID {
         NSLog("INFO  [\(self.treeID)] Changing treeID to \(newTree.treeID)")
-        do {
-          self.treeView = nil
-          self.app.deregisterTreePanelController(self.tree.treeID)
-          self.app.registerTreePanelController(newTree.treeID, self)
-          try self.reattachListeners(newTree.treeID)
-        } catch {
-          self.reportException("Failed to reattach listeners", error)
-        }
+        self.treeView = nil
+        self.app.deregisterTreePanelController(self.tree.treeID)
+        self.app.registerTreePanelController(newTree.treeID, self)
+        self.reattachListeners(newTree.treeID)
       }
       self.tree = newTree
     }

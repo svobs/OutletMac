@@ -245,6 +245,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      IMPORTANT NOTE: MacOS has its own quirk when collapsing a node which has expanded descendants. By default, collapsing it will "secretly" keep
      the state of its expanded descendants, so that expanding it again right away will restore their expanded states as well. The user can override
      this behavior by holding down the Option key when collapsing the node, which in effect will collapse all the descendants.
+     Reference: https://developer.apple.com/documentation/appkit/nsoutlineview/1531436-collapseitem
 
      Currently the BE will honor this behavior while the app is open (because the descendant states are remembered by the NSOutlineView), but if the
      app is closed, on the next run any descendants which were collapsed at the end of the last run will stay that way.

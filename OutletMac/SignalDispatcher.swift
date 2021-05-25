@@ -95,20 +95,20 @@ class DispatchListener {
     self._dispatcher = dispatcher
   }
 
-  func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) throws {
+  func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) {
     let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
-    try self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
+    self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
     self._subscribedSignals.insert(signal)
   }
 
   /**
    TODO: put in destructor? Does Swift have those?
   */
-  func unsubscribeAll() throws {
+  func unsubscribeAll() {
     NSLog("DEBUG Unsubscribing from all signals for listenerID \(_id)")
     for signal in self._subscribedSignals {
-      try self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
+      self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
       self._subscribedSignals.remove(signal)
     }
     if !self._subscribedSignals.isEmpty {
@@ -175,7 +175,7 @@ class SignalDispatcher {
   }
 
 
-  fileprivate func subscribe(signal: Signal, listenerID: ListenerID, _ subscription: Subscription) throws {
+  fileprivate func subscribe(signal: Signal, listenerID: ListenerID, _ subscription: Subscription) {
     if self.signalListenerDict[signal] == nil {
       self.signalListenerDict[signal] = [:]
     }
@@ -187,7 +187,7 @@ class SignalDispatcher {
     }
   }
 
-  fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) throws {
+  fileprivate func unsubscribe(signal: Signal, listenerID: ListenerID) {
     if (self.signalListenerDict[signal]?.removeValue(forKey: listenerID)) != nil {
       NSLog("DEBUG SignalDispatcher: Removed subscriber '\(listenerID)' from signal '\(signal)'")
       return

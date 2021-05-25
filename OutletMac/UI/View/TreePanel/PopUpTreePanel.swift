@@ -67,9 +67,9 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         // Enables windowWillClose() callback
         window.delegate = self
 
-        try self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
-        try self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
-        try self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
 
         // TODO: create & populate progress bar to show user that something is being done here
 
@@ -80,7 +80,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
     func shutdown() throws {
         NSLog("DEBUG [\(self.con.treeID)] Window shutdown() called")
         try self.con.shutdown()
-        try self.dispatchListener.unsubscribeAll()
+        self.dispatchListener.unsubscribeAll()
     }
 
     func selectSPID(_ spid: SPID) {

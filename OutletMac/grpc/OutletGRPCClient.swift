@@ -17,10 +17,10 @@ import NIO
  */
 class OutletGRPCClient: OutletBackend {
   let stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
-  var signalReceiverThread: SignalReceiverThread?
   let dispatcher: SignalDispatcher
   let dispatchListener: DispatchListener
   var isConnected: Bool = true // set to true initially just for logging purposes: we care more to note if it's initially down than up
+  var conecutiveStreamFailCount: Int = 0
   lazy var grpcConverter = GRPCConverter(self)
   lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
 
@@ -30,9 +30,22 @@ class OutletGRPCClient: OutletBackend {
     self.dispatchListener = dispatcher.createListener(ID_BACKEND_CLIENT)
   }
 
+  /**
+   Factory method: makes a `Outlet_Backend_Agent_Grpc_Generated_OutletClient` client for a service hosted on {host} and listening on {port}.
+   */
+  static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
+    let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+
+    let channel = ClientConnection.insecure(group: group)
+            .withConnectionTimeout(minimum: TimeAmount.seconds(3))
+            .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
+            .connect(host: host, port: port)
+
+    return OutletGRPCClient(Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel), dispatcher)
+  }
+
   func start() throws {
-    self.signalReceiverThread = SignalReceiverThread(self)
-    self.signalReceiverThread!.start()
+    NSLog("DEBUG Starting OutletGRPCClient...")
 
     // Forward the following Dispatcher signals across gRPC:
     try connectAndForwardSignal(.PAUSE_OP_EXECUTION)
@@ -45,11 +58,13 @@ class OutletGRPCClient: OutletBackend {
   
   func shutdown() throws {
     try self.stub.channel.close().wait()
-    self.signalReceiverThread?.cancel()
   }
 
+  // Signals
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
   private func connectAndForwardSignal(_ signal: Signal) throws {
-    try self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
+    self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
       self.sendSignalToServer(signal, senderID)
     }
   }
@@ -59,6 +74,52 @@ class OutletGRPCClient: OutletBackend {
     signalMsg.sigInt = signal.rawValue
     signalMsg.sender = senderID
     _ = self.stub.send_signal(signalMsg)
+  }
+
+  /**
+   Receives signals from the gRPC server and forwards them throughout the app via the app's Dispatcher.
+   */
+  func receiveServerSignals() {
+    NSLog("DEBUG Subscribing to server signals...")
+    let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
+    let call = self.stub.subscribe_to_signals(request) { signalGRPC in
+      // Got new signal (implicitly this means the connection is back up)
+
+      if SUPER_DEBUG {
+        NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
+      }
+      self.grpcConnectionRestored()
+      do {
+        try self.relaySignalLocally(signalGRPC)
+      } catch {
+        let signal = Signal(rawValue: signalGRPC.sigInt)!
+        NSLog("ERROR While relaying received signal \(signal): \(error)")
+        self.reportError("While relaying received signal \(signal)", "\(error)")
+      }
+    }
+
+    call.status.whenSuccess { status in
+      // Yes, it says "whenSuccess" above, but this is actually always a failure of some kind.
+      self.conecutiveStreamFailCount += 1
+
+      if status.code == .ok {
+        // this should never happen if the server was properly written
+        NSLog("INFO  Server closed signal subscription")
+      } else if status.code == .unavailable {
+        if SUPER_DEBUG {
+          NSLog("ERROR ReceiveSignals(): Server unavailable: \(status)")
+        }
+      } else {
+        NSLog("ERROR ReceiveSignals(): received error: \(status)")
+      }
+      self.grpcConnectionDown()
+    }
+
+    // Wait for the call to end. It will only end if an error occurred (see call.status.whenSuccess above)
+    _ = try! call.status.wait()
+    if SUPER_DEBUG {
+      NSLog("DEBUG receiveServerSignals() returning")
+    }
   }
 
   private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) throws {
@@ -119,59 +180,19 @@ class OutletGRPCClient: OutletBackend {
     dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
   }
 
+  /**
+   Convenience function. Sends a given error to the Dispatcher for reporting elsewhere.
+   */
   private func reportError(_ msg: String, _ secondaryMsg: String) {
     var argDict: [String: Any] = [:]
     argDict["msg"] = msg
     argDict["secondary_msg"] = secondaryMsg
     dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: ID_BACKEND_CLIENT, argDict)
   }
-  
-  func receiveServerSignals() throws {
-    NSLog("DEBUG Subscribing to server signals...")
-    let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
-    let call = self.stub.subscribe_to_signals(request) { signalGRPC in
-//      NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
-      self.grpcConnectionRestored()
-      do {
-        try self.relaySignalLocally(signalGRPC)
-      } catch {
-        let signal = Signal(rawValue: signalGRPC.sigInt)!
-        NSLog("ERROR While relaying received signal \(signal): \(error)")
-        self.reportError("While relaying received signal \(signal)", "\(error)")
-      }
-    }
-    
-    call.status.whenSuccess { status in
-      if status.code == .ok {
-        // this should never happen
-        NSLog("INFO  Server closed signal subscription")
-      } else if status.code == .unavailable {
-        if SUPER_DEBUG {
-          NSLog("ERROR ReceiveSignals(): Server unavailable: \(status)")
-        }
-        self.grpcConnectionDown()
-      } else {
-        NSLog("ERROR ReceiveSignals(): received error: \(status)")
-      }
-    }
 
-    // Wait for the call to end.
-    _ = try! call.status.wait()
-    NSLog("DEBUG receiveServerSignals() returning")
-  }
+  // Remaining RPCs
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  /// Makes a `RouteGuide` client for a service hosted on "localhost" and listening on the given port.
-  static func makeClient(host: String, port: Int, dispatcher: SignalDispatcher) -> OutletGRPCClient {
-    let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-    
-    let channel = ClientConnection.insecure(group: group)
-      .withConnectionTimeout(minimum: TimeAmount.seconds(3))
-      .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
-      .connect(host: host, port: port)
-    
-    return OutletGRPCClient(Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel), dispatcher)
-  }
-  
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
     NSLog("DEBUG [\(request.treeID)] Requesting DisplayTree for params: \(request)")
     var grpcRequest = Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request()
@@ -597,7 +618,7 @@ class OutletGRPCClient: OutletBackend {
     }
   }
 
-  func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
+  private func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
     do {
       NSLog("INFO  Calling gRPC: \(rpcName)")
       return try call.response.wait()
@@ -610,19 +631,19 @@ class OutletGRPCClient: OutletBackend {
     }
   }
 
-  func grpcConnectionDown() {
+  private func grpcConnectionDown() {
     if self.isConnected {
       self.isConnected = false
       NSLog("INFO  gRPC connection is DOWN!")
     }
   }
 
-  func grpcConnectionRestored() {
+  private func grpcConnectionRestored() {
     if !self.isConnected {
       self.isConnected = true
       NSLog("INFO  gRPC connection is UP!")
+      self.conecutiveStreamFailCount = 0
     }
-    self.signalReceiverThread?.loopCount = 0
   }
 
 }
