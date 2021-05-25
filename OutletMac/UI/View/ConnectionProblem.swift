@@ -5,21 +5,6 @@
 
 import SwiftUI
 
-class BackendConnectionState: ObservableObject {
-    @Published var host: String
-    @Published var port: Int
-
-    @Published var conecutiveStreamFailCount: Int = 0
-    // set to true initially just for logging purposes: we care more to note if it's initially down than up:
-    @Published var isConnected: Bool = true
-    @Published var isRelaunching: Bool = false
-
-    init(host: String, port: Int) {
-        self.host = host
-        self.port = port
-    }
-}
-
 class ConnectionProblemWindow: NSWindow {
     override func keyDown(with event: NSEvent) {
         // Pass all key events to the project model
@@ -66,7 +51,7 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
                 styleMask: [.titled, .closable, .fullSizeContentView],
                 backing: .buffered, defer: false)
         self.window.center()
-        self.window.title = "Cannot connect to agent"
+        self.window.title = "Connection to Agent Failed"
 
         let content = ConnectionProblemContent(self.app, self.window, backendConnectionState)
         window.contentView = NSHostingView(rootView: content)
@@ -133,7 +118,7 @@ struct ConnectionProblemContent: View {
                         .keyboardShortcut(.cancelAction)
             }.frame(alignment: .center)
                     .padding(.bottom).padding(.horizontal)  // we have enough padding above already
-        }.frame(width: 300, height: 150)  // set minimum window dimensions
+        }.frame(width: 300, height: 100)  // set minimum window dimensions
     }
 
 }

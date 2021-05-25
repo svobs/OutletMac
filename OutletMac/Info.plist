@@ -26,6 +26,8 @@
 	<string>Copyright © 2021 Matt Svoboda</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<true/>
+	<key>NSSystemAdministrationUsageDescription</key>
+	<string>Full disk access is needed in order to access your files in the app.</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 </dict>
