@@ -13,9 +13,9 @@ typealias NoArgVoidFunc = () -> Void
 
 // TODO: add glow on hover
 fileprivate struct SelectedToolbarIcon: View {
-  let img: ImageProvider
+  let img: ImageContainer
 
-  init(_ img: ImageProvider) {
+  init(_ img: ImageContainer) {
     self.img = img
   }
 
@@ -34,9 +34,9 @@ fileprivate struct SelectedToolbarIcon: View {
 }
 
 fileprivate struct UnselectedToolbarIcon: View {
-  let img: ImageProvider
+  let img: ImageContainer
 
-  init(_ img: ImageProvider) {
+  init(_ img: ImageContainer) {
     self.img = img
   }
 
@@ -86,11 +86,11 @@ struct TernaryToggleButton: View {
 
       switch isEnabled {
         case .TRUE:
-          SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconTrue))
+          SelectedToolbarIcon(self.iconStore.getToolbarIcon(for: self.iconTrue))
         case .FALSE:
-          SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconFalse))
+          SelectedToolbarIcon(self.iconStore.getToolbarIcon(for: self.iconFalse))
         case .NOT_SPECIFIED:
-          UnselectedToolbarIcon(self.iconStore.getIcon(for: self.iconNotSpecified))
+          UnselectedToolbarIcon(self.iconStore.getToolbarIcon(for: self.iconNotSpecified))
       }
     }
     .buttonStyle(PlainButtonStyle())
@@ -124,9 +124,9 @@ struct BoolToggleButton: View {
   var body: some View {
     Button(action: onClickAction!) {
       if isEnabled {
-        SelectedToolbarIcon(self.iconStore.getIcon(for: self.iconTrue))
+        SelectedToolbarIcon(self.iconStore.getToolbarIcon(for: self.iconTrue))
       } else {
-        UnselectedToolbarIcon(self.iconStore.getIcon(for: self.iconFalse))
+        UnselectedToolbarIcon(self.iconStore.getToolbarIcon(for: self.iconFalse))
       }
     }
     .buttonStyle(PlainButtonStyle())
@@ -159,9 +159,9 @@ struct PlayPauseToggleButton: View {
   var body: some View {
     Button(action: toggleValue) {
       if settings.isPlaying {
-        UnselectedToolbarIcon(iconStore.getIcon(for: .ICON_PAUSE))
+        UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PAUSE))
       } else {
-        UnselectedToolbarIcon(iconStore.getIcon(for: .ICON_PLAY))
+        UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PLAY))
       }
     }
     .buttonStyle(PlainButtonStyle())

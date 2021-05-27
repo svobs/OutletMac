@@ -166,7 +166,7 @@ enum IconID: UInt32 {
   case BTN_GDRIVE = 44
 
   case BADGE_RM = 100
-  case BADGE_MY_SRC = 101
+  case BADGE_MV_SRC = 101
   case BADGE_MV_DST = 102
   case BADGE_CP_SRC = 103
   case BADGE_CP_DST = 104
@@ -174,11 +174,13 @@ enum IconID: UInt32 {
   case BADGE_UP_DST = 106
   case BADGE_MKDIR = 107
 
-  case BADGE_CANCEL = 108
+  case BADGE_TRASHED = 108
+  case BADGE_CANCEL = 109
+  case BADGE_REFRESH = 110
 
-  case BADGE_LINUX = 110
-  case BADGE_MACOS = 111
-  case BADGE_WINDOWS = 112
+  case BADGE_LINUX = 120
+  case BADGE_MACOS = 121
+  case BADGE_WINDOWS = 122
 
 
   func isToolbarIcon() -> Bool {
@@ -227,6 +229,7 @@ enum IconID: UInt32 {
         preconditionFailure("No system image has been defined for: \(self)")
     }
   }
+
 }
 
 let ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME = "multiply.circle.fill"
@@ -355,3 +358,4 @@ enum TreeDisplayMode: UInt32 {
 let CFG_KEY_TREE_ICON_SIZE = "display.image.tree_icon_size"
 let CFG_KEY_TOOLBAR_ICON_SIZE = "display.image.toolbar_icon_size"
 let CFG_KEY_USE_NATIVE_TOOLBAR_ICONS = "display.image.use_native_toolbar_icons"
+let CFG_KEY_USE_NATIVE_TREE_ICONS = "display.image.use_native_tree_icons"

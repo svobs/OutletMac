@@ -131,7 +131,11 @@ class Node: CustomStringConvertible {
   
   var icon: IconID {
     get {
-      return self._icon ?? self.defaultIcon
+      if self._icon == nil || self._icon == IconID.NONE {
+        return self.defaultIcon
+      } else {
+        return self._icon!
+      }
     }
   }
   
@@ -295,5 +299,9 @@ class EphemeralNode: Node {
 
   override func isParentOf(_ otherNode: Node) -> Bool {
     return false
+  }
+
+  override var defaultIcon: IconID {
+    return .ICON_ALERT
   }
 }

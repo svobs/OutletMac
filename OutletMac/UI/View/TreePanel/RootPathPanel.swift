@@ -45,7 +45,7 @@ struct RootPathPanel: View {
       case .MIXED, .NA:
         iconId = .BTN_FOLDER_TREE
     }
-    return con.app.iconStore.getIcon(for: iconId).getImage()
+    return con.app.iconStore.getToolbarIcon(for: iconId).getImage()
   }
 
   // TODO: this is TEMPORARY until we support multiple drives
@@ -125,7 +125,7 @@ struct RootPathPanel: View {
       .buttonStyle(PlainButtonStyle())
 
       if !self.swiftTreeState.isRootExists {
-        con.app.iconStore.getIcon(for: .ICON_ALERT).getImage()
+        con.app.iconStore.getToolbarIcon(for: .ICON_ALERT).getImage()
           .foregroundColor(.yellow)  // in case we are using system image (font)
       }
 
@@ -198,4 +198,3 @@ struct RootPathPanel_Previews: PreviewProvider {
     RootPathPanel(try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
-

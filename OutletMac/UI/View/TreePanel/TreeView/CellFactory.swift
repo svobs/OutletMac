@@ -123,53 +123,7 @@ class CellFactory {
       return nil
     }
 
-    var icon: NSImage
-    if node.isDir {
-
-      // TODO: move this all into the IconStore
-
-      icon = NSWorkspace.shared.icon(for: .folder)
-
-      let newImage = NSImage(size: icon.size)
-      newImage.lockFocus()
-
-      var newImageRect: CGRect = .zero
-      newImageRect.size = newImage.size
-
-      let overlay = try! tvc.con.backend.getIcon(.BADGE_CP_DST)!
-
-      icon.draw(in: newImageRect)
-      let overlayOffset = NSPoint(x: 0, y: icon.size.height / 2.0)
-      overlay.draw(at: overlayOffset, from: newImageRect, operation: .copy, fraction: 1.0)
-
-      newImage.unlockFocus()
-
-//      icon = newImage // TODO
-
-    } else if node.isEphemeral {
-      // TODO: warning icon
-      icon = NSWorkspace.shared.icon(for: .application)
-    } else {
-      let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
-
-      // TODO: move this all into the IconStore
-
-      if suffix == "" {
-        icon = NSWorkspace.shared.icon(for: .data)
-      } else {
-        icon = NSWorkspace.shared.icon(forFileType: suffix)
-      }
-    }
-
-    // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
-    if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: cellHeight, height: cellHeight), context: nil, hints: nil) {
-      icon = NSImage(size: imageRep.size)
-      icon.addRepresentation(imageRep)
-    }
-
-    icon.size = NSSize(width: cellHeight, height: cellHeight)
-
-    return icon
+    return tvc.con.app.iconStore.getTreeIcon(node, height: cellHeight)
   }
 
   private static func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier, _ tvc: TreeViewController) -> NameCellView {

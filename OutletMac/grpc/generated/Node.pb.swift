@@ -61,7 +61,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_UserOp {
   public mutating func clearDstNode() {self._dstNode = nil}
 
   /// no support for result yet
-  public var syncTs: UInt64 = 0
+  public var createTs: UInt64 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -599,7 +599,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
     3: .standard(proto: "op_type"),
     4: .standard(proto: "src_node"),
     5: .standard(proto: "dst_node"),
-    6: .standard(proto: "sync_ts"),
+    6: .standard(proto: "create_ts"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -613,7 +613,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
       case 3: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
       case 4: try { try decoder.decodeSingularMessageField(value: &self._srcNode) }()
       case 5: try { try decoder.decodeSingularMessageField(value: &self._dstNode) }()
-      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
+      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
       default: break
       }
     }
@@ -635,8 +635,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
     if let v = self._dstNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
     }
-    if self.syncTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 6)
+    if self.createTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 6)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -647,7 +647,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
     if lhs.opType != rhs.opType {return false}
     if lhs._srcNode != rhs._srcNode {return false}
     if lhs._dstNode != rhs._dstNode {return false}
-    if lhs.syncTs != rhs.syncTs {return false}
+    if lhs.createTs != rhs.createTs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
