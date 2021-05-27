@@ -122,7 +122,7 @@ fileprivate class ImageProviderWrapper {
 /**
  CLASS IconStore
 
- The in-memory repository for all icons in the app. Configured at start. May use either MacOS system icons, or icons retreived
+ The in-memory repository for all icons in the app. Configured at start. May use either MacOS system icons, or icons retrieved
  from the backend server.
  */
 class IconStore: HasLifecycle {

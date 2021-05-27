@@ -165,6 +165,22 @@ enum IconID: UInt32 {
   case BTN_LOCAL_DISK_WINDOWS = 43
   case BTN_GDRIVE = 44
 
+  case BADGE_RM = 100
+  case BADGE_MY_SRC = 101
+  case BADGE_MV_DST = 102
+  case BADGE_CP_SRC = 103
+  case BADGE_CP_DST = 104
+  case BADGE_UP_SRC = 105
+  case BADGE_UP_DST = 106
+  case BADGE_MKDIR = 107
+
+  case BADGE_CANCEL = 108
+
+  case BADGE_LINUX = 110
+  case BADGE_MACOS = 111
+  case BADGE_WINDOWS = 112
+
+
   func isToolbarIcon() -> Bool {
     // TODO: implement IconID.isToolbarIcon and IconID.isTreeIcon
     return true

@@ -23,7 +23,6 @@ class OutlineViewFactory {
     outlineView.cell?.truncatesLastVisibleLine = true
     outlineView.autoresizesOutlineColumn = true
     outlineView.indentationPerLevel = 16
-//    outlineView.backgroundColor = .clear
     outlineView.appearance = NSAppearance(named: NSAppearance.Name.vibrantDark)
 
     outlineView.headerView = NSTableHeaderView()

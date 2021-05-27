@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSSystemAdministrationUsageDescription</key>
 	<string>Full disk access is needed in order to access your files in the app.</string>
+	<key>LSMultipleInstancesProhibited</key>
+	<string>Multiple instances of this app cannot run on the same device at the same time.</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
 </dict>

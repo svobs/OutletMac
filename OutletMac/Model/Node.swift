@@ -140,7 +140,7 @@ class Node: CustomStringConvertible {
       return self._icon
     }
     set (customIcon) {
-      self._icon = icon
+      self._icon = customIcon
     }
   }
   

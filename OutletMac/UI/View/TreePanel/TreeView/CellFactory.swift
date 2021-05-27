@@ -75,8 +75,9 @@ class CellFactory {
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier, tvc)
         }
+        // update everything:
         cell!.checkbox?.updateState(sn)  // checkbox is optional
-        cell!.imageView!.image = self.makeIcon(sn, cell!, TREE_VIEW_CELL_HEIGHT)
+        cell!.imageView!.image = self.makeIcon(sn, cell!, TREE_VIEW_CELL_HEIGHT, tvc)
         cell!.textField!.stringValue = node.name
         cell!.needsLayout = true
 
@@ -116,19 +117,43 @@ class CellFactory {
   }
 
   // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
-  private static func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat) -> NSImage? {
+  private static func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat,
+                               _ tvc: TreeViewController) -> NSImage? {
     guard let node = sn.node else {
       return nil
     }
 
     var icon: NSImage
     if node.isDir {
+
+      // TODO: move this all into the IconStore
+
       icon = NSWorkspace.shared.icon(for: .folder)
+
+      let newImage = NSImage(size: icon.size)
+      newImage.lockFocus()
+
+      var newImageRect: CGRect = .zero
+      newImageRect.size = newImage.size
+
+      let overlay = try! tvc.con.backend.getIcon(.BADGE_CP_DST)!
+
+      icon.draw(in: newImageRect)
+      let overlayOffset = NSPoint(x: 0, y: icon.size.height / 2.0)
+      overlay.draw(at: overlayOffset, from: newImageRect, operation: .copy, fraction: 1.0)
+
+      newImage.unlockFocus()
+
+//      icon = newImage // TODO
+
     } else if node.isEphemeral {
       // TODO: warning icon
       icon = NSWorkspace.shared.icon(for: .application)
     } else {
       let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
+
+      // TODO: move this all into the IconStore
+
       if suffix == "" {
         icon = NSWorkspace.shared.icon(for: .data)
       } else {
@@ -160,9 +185,10 @@ class CellFactory {
     }
 
     // 2. Icon
-    guard let icon = self.makeIcon(sn, cell, TREE_VIEW_CELL_HEIGHT) else {
+    guard let icon = self.makeIcon(sn, cell, TREE_VIEW_CELL_HEIGHT, tvc) else {
       return cell
     }
+    // make all the image components:
     let imageView = NSImageView(image: icon)
     imageView.imageFrameStyle = .none
     imageView.imageScaling = .scaleProportionallyDown
