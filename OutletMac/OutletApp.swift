@@ -213,6 +213,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
           NSLog("ERROR While creating main window: \(error)")
 
         } else { // unknown error: bad
+          // TODO: display error to user before quitting
           NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
           NSLog("DEBUG Sleeping 1s to let things settle...")
           sleep(1)
@@ -404,7 +405,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
-    NSLog("ERROR Received signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    NSLog("ERROR Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
   }
 

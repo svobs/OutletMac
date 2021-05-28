@@ -25,7 +25,7 @@ class NodeIdentifier: CustomStringConvertible, Equatable {
   var pathList: [String]
 
   public var description: String {
-    return "∣\(TreeType.display(treeType))-d\(deviceUID)-n\(nodeUID)⩨\(pathList)∣"
+    return "∣\(TreeType.display(treeType))-\(deviceUID):\(nodeUID)⩨\(pathList)∣"
   }
 
   var treeType: TreeType {
@@ -259,6 +259,11 @@ class GDriveIdentifier: NodeIdentifier {
     let uidToCopy: UID = nodeUID ?? self.nodeUID
     return GDriveIdentifier(uidToCopy, deviceUID: self.deviceUID, self.pathList)
   }
+
+  public override var description: String {
+    return "∣\(TreeType.display(treeType))-\(deviceUID):\(nodeUID):x⩨\(pathList)∣"
+  }
+
 }
 
 /**

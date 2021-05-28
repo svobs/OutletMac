@@ -155,11 +155,20 @@ class IconStore: HasLifecycle {
     toolbarIconCache.removeAllObjects()
   }
 
+  private func makeGenericCacheKey(_ iconId: IconID) -> String {
+    "\(iconId)"
+  }
+
+  private func makeFileCacheKey(_ iconId: IconID, _ node: Node) -> String {
+    let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
+    return "\(iconId):\(suffix)"
+  }
+
   func getTreeIcon(_ node: Node, height: CGFloat) -> NSImage? {
     var icon: NSImage
 
     let iconId = node.icon
-    NSLog("WARN  Getting treeIcon for: \(iconId): \(node.firstPath)")
+    NSLog("WARN  Getting treeIcon for: \(iconId): \(node.nodeIdentifier)")
     let key: String
 
     var badge: IconID? = nil
@@ -169,37 +178,39 @@ class IconStore: HasLifecycle {
       switch iconId {
       case .ICON_DIR_MK:
         badge = .BADGE_MKDIR
-        fallthrough
+        break
       case .ICON_DIR_RM:
         badge = .BADGE_RM
-        fallthrough
+        break
       case .ICON_DIR_MV_SRC:
         badge = .BADGE_MV_SRC
-        fallthrough
+        break
       case .ICON_DIR_UP_SRC:
         badge = .BADGE_UP_SRC
-        fallthrough
+        break
       case .ICON_DIR_CP_SRC:
         badge = .BADGE_CP_SRC
-        fallthrough
+        break
       case .ICON_DIR_MV_DST:
         badge = .BADGE_MV_DST
-        fallthrough
+        break
       case .ICON_DIR_UP_DST:
         badge = .BADGE_UP_DST
-        fallthrough
+        break
       case .ICON_DIR_CP_DST:
         badge = .BADGE_CP_DST
-        fallthrough
+        break
       case .ICON_DIR_TRASHED:
         badge = .BADGE_TRASHED
-        fallthrough
+        break
       case .ICON_GENERIC_DIR:
-        // DIR:
-        fallthrough
+        // No badge
+        break
       default:
-        key = "\(iconId)"
+        break
       }
+
+      key = makeGenericCacheKey(iconId)
 
       // Used cached icon if available
       if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
@@ -208,44 +219,58 @@ class IconStore: HasLifecycle {
 
       icon = NSWorkspace.shared.icon(for: .folder)
 
-//      badge = .BADGE_CP_DST // TODO
       icon = self.addBadgeOverlay(src: icon, badge: badge)
 
     } else {
+      let isFile: Bool
       // If file, determine appropriate badge, if any
       switch iconId {
       case .ICON_FILE_RM:
         badge = .BADGE_RM
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_MV_SRC:
         badge = .BADGE_MV_SRC
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_UP_SRC:
         badge = .BADGE_UP_SRC
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_CP_SRC:
         badge = .BADGE_CP_SRC
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_MV_DST:
         badge = .BADGE_MV_DST
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_UP_DST:
         badge = .BADGE_UP_DST
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_CP_DST:
         badge = .BADGE_CP_DST
-        fallthrough
+        isFile = true
+        break
       case .ICON_FILE_TRASHED:
         badge = .BADGE_TRASHED
-        fallthrough
+        isFile = true
+        break
       case .ICON_GENERIC_FILE:
-        // FILE
-        let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
-        key = "\(iconId):\(suffix)"
+        // No badge
+        isFile = true
         break
 
       default:
-        key = "\(iconId)"
+        isFile = false
+        break
+      }
+
+      if isFile {
+        key = makeFileCacheKey(iconId, node)
+      } else {
+        key = makeGenericCacheKey(iconId)
       }
 
       // Now that we have derived the key for the file type, use cached value if available
