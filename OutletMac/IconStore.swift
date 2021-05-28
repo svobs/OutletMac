@@ -168,7 +168,9 @@ class IconStore: HasLifecycle {
     var icon: NSImage
 
     let iconId = node.icon
-    NSLog("WARN  Getting treeIcon for: \(iconId): \(node.nodeIdentifier)")
+    if SUPER_DEBUG {
+      NSLog("DEBUG Getting treeIcon for: \(iconId): \(node.nodeIdentifier)")
+    }
     let key: String
 
     var badge: IconID? = nil
@@ -214,6 +216,9 @@ class IconStore: HasLifecycle {
 
       // Used cached icon if available
       if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+        if SUPER_DEBUG {
+          NSLog("DEBUG Returning cached icon for (dir) key '\(key)'")
+        }
         return cachedIcon
       }
 
@@ -275,6 +280,9 @@ class IconStore: HasLifecycle {
 
       // Now that we have derived the key for the file type, use cached value if available
       if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+        if SUPER_DEBUG {
+          NSLog("DEBUG Returning cached icon for (file) key '\(key)'")
+        }
         return cachedIcon
       }
 
@@ -286,7 +294,6 @@ class IconStore: HasLifecycle {
         icon = NSWorkspace.shared.icon(forFileType: suffix)
       }
 
-//      badge = .BADGE_CP_DST // TODO
       icon = self.addBadgeOverlay(src: icon, badge: badge)
     }
 
@@ -298,6 +305,9 @@ class IconStore: HasLifecycle {
 
     icon.size = NSSize(width: height, height: height)
 
+    if SUPER_DEBUG {
+      NSLog("DEBUG Storing icon=\(iconId) with badge=\(badge ?? IconID.NONE) for key: '\(key)'")
+    }
     treeIconCache.setObject(icon, forKey: key as NSString)
     return icon
   }
