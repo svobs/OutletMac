@@ -90,7 +90,6 @@ class OutletGRPCClient: OutletBackend {
     connectAndForwardSignal(.PAUSE_OP_EXECUTION)
     connectAndForwardSignal(.RESUME_OP_EXECUTION)
     connectAndForwardSignal(.COMPLETE_MERGE)
-    connectAndForwardSignal(.DOWNLOAD_ALL_GDRIVE_META)
     connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
     connectAndForwardSignal(.EXIT_DIFF_MODE)
   }

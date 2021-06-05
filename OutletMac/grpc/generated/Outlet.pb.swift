@@ -340,6 +340,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var deviceUid: UInt32 = 0
+
   public var nodeUid: UInt32 = 0
 
   public var requestorID: String = String()
@@ -1920,8 +1922,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request: SwiftPro
 extension Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DownloadFromGDrive_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_uid"),
-    2: .standard(proto: "requestor_id"),
+    1: .standard(proto: "device_uid"),
+    2: .standard(proto: "node_uid"),
+    3: .standard(proto: "requestor_id"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1930,24 +1933,29 @@ extension Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request: SwiftP
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.requestorID) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.requestorID) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 1)
+    }
     if self.nodeUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 2)
     }
     if !self.requestorID.isEmpty {
-      try visitor.visitSingularStringField(value: self.requestorID, fieldNumber: 2)
+      try visitor.visitSingularStringField(value: self.requestorID, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request) -> Bool {
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.nodeUid != rhs.nodeUid {return false}
     if lhs.requestorID != rhs.requestorID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

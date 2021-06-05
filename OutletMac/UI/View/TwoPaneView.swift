@@ -43,7 +43,6 @@ fileprivate struct ButtonBar: View {
     HStack {
       if settings.mode == .BROWSING {
         Button("Diff (content-first)", action: self.onDiffButtonClicked)
-        Button("Download Google Drive meta", action: self.onDownloadFromGDriveButtonClicked)
       } else if settings.mode == .DIFF {
         Button("Merge...", action: self.onMergeButtonClicked)
         Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
@@ -72,11 +71,6 @@ fileprivate struct ButtonBar: View {
       NSLog("ERROR Failed to start tree diff: \(error)")
       self.app.sendEnableUISignal(enable: true)
     }
-  }
-
-  func onDownloadFromGDriveButtonClicked() {
-    NSLog("DEBUG DownloadGDrive btn clicked! Sending signal: '\(Signal.DOWNLOAD_ALL_GDRIVE_META)'")
-    self.conLeft.dispatcher.sendSignal(signal: .DOWNLOAD_ALL_GDRIVE_META, senderID: ID_MAIN_WINDOW)
   }
 
   func onMergeButtonClicked() {
