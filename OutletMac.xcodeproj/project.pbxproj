@@ -360,7 +360,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */,
+				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -612,10 +612,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = OutletMac/OutletMac.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = PG2MG2559L;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/OutletMac/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -638,10 +638,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = OutletMac/OutletMac.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = PG2MG2559L;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/OutletMac/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -680,7 +680,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */ = {
+		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Wildchild9/LinkedList.git";
 			requirement = {
@@ -693,7 +693,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D194BEFA25E8F83000B4827F /* LinkedList */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */;
+			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */;
 			productName = LinkedList;
 		};
 /* End XCSwiftPackageProductDependency section */
