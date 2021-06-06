@@ -44,7 +44,7 @@ protocol OutletBackend: HasLifecycle {
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
   func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws
   func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp?
-  func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
+  func downloadFileFromGDrive(deviceUID: UID, nodeUID: UID, requestorID: String) throws
   func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws
   func getFilterCriteria(treeID: TreeID) throws -> FilterCriteria
   func updateFilterCriteria(treeID: TreeID, filterCriteria: FilterCriteria) throws
@@ -209,7 +209,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws {
+  func downloadFileFromGDrive(deviceUID: UID, nodeUID: UID, requestorID: String) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

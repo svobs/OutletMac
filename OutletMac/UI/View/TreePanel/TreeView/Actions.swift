@@ -94,7 +94,7 @@ class TreeActions {
 
     self.con.app.execAsync {
       do {
-        try self.con.backend.downloadFileFromGDrive(nodeUID: node.uid, requestorID: self.treeID)
+        try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
       } catch {
         self.con.reportException("Failed to download file from Google Drive", error)
       }

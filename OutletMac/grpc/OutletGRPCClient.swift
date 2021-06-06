@@ -526,8 +526,9 @@ class OutletGRPCClient: OutletBackend {
     return UserOp(opUID: response.userOp.opUid, batchUID: response.userOp.batchUid, opType: opType, srcNode: srcNode, dstNode: dstNode)
   }
   
-  func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws {
+  func downloadFileFromGDrive(deviceUID: UID, nodeUID: UID, requestorID: String) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request()
+    request.deviceUid = deviceUID
     request.nodeUid = nodeUID
     request.requestorID = requestorID
     let _ = try self.callAndTranslateErrors(self.stub.download_file_from_gdrive(request), "downloadFileFromGDrive")
