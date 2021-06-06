@@ -121,15 +121,11 @@ struct TwoPaneView: View {
   let app: OutletApp
   let conLeft: TreePanelControllable
   let conRight: TreePanelControllable
-  let leftPanel: TreePanel
-  let rightPanel: TreePanel
 
   init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    self.leftPanel = TreePanel(app, conLeft, heightTracking)
-    self.rightPanel = TreePanel(app, conRight, heightTracking)
     self.heightTracking = heightTracking
   }
 
@@ -140,40 +136,42 @@ struct TwoPaneView: View {
       spacing: 0  // no vertical spacing between cells
     ) {
       // Row0: Root Path
-      self.leftPanel.rootPathPanel
+      RootPathPanel(self.conLeft)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 0, height: geo.size.height))
         })
-      self.rightPanel.rootPathPanel
+      RootPathPanel(self.conRight)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 1, height: geo.size.height))
         })
 
       // Row1: filter panel
-      self.leftPanel.filterPanel
+      FilterPanel(self.conLeft)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
         })
-      self.rightPanel.filterPanel
+      FilterPanel(self.conRight)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 1, height: geo.size.height))
         })
 
       // Row2: Tree view
-      self.leftPanel.treeView
-      self.rightPanel.treeView
+      TreeView(controller: self.conLeft, heightTracking)
+      TreeView(controller: self.conRight, heightTracking)
 
       // Row3: Status msg
-      self.leftPanel.status_panel
+      StatusPanel(self.conLeft)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Status", col: 0, height: geo.size.height))
         })
-      self.rightPanel.status_panel
+      StatusPanel(self.conRight)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Status", col: 1, height: geo.size.height))

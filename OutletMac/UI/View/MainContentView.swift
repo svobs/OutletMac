@@ -32,6 +32,7 @@ struct MainContentView: View {
     // Here, I use GeometryReader to get the full canvas size (sans window decoration)
     GeometryReader { geo in
       TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight, heightTracking)
+        .environmentObject(settings)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(Rectangle()) // taps should be detected in the whole window
         .gesture(tapCancelEdit)
@@ -53,4 +54,3 @@ struct MainContentView_Previews: PreviewProvider {
       .environmentObject(GlobalSettings())
   }
 }
-

@@ -10,11 +10,9 @@ import SwiftUI
  STRUCT RootPathPanel
  */
 struct RootPathPanel: View {
+  @EnvironmentObject var settings: GlobalSettings
   @ObservedObject var swiftTreeState: SwiftTreeState
   let con: TreePanelControllable
-
-  private let colors: [Color] = [.gray, .red, .orange, .yellow, .green, .blue, .purple, .pink]
-  @State private var fgColor: Color = .gray
 
   init(_ controller: TreePanelControllable) {
     self.con = controller
@@ -65,6 +63,20 @@ struct RootPathPanel: View {
     } else {
       return deviceUID!
     }
+  }
+
+  func openRootSelectionDialog(_ device: Device) -> () -> () {
+    if device.treeType == .LOCAL_DISK {
+      return { doOpenFileDialog() }
+    }
+
+    if device.treeType == .GDRIVE {
+      return {
+        self.con.app.openGDriveRootChooser(device.uid, self.con.treeID)
+      }
+    }
+
+    return {}
   }
 
   func doOpenFileDialog() {
@@ -118,9 +130,9 @@ struct RootPathPanel: View {
           .padding(.leading, H_PAD)
       }
       .contextMenu {
-        Button("Local filesystem subtree...", action: self.doOpenFileDialog)
-        Button("Google Drive subtree...", action: {
-                NSApp.sendAction(#selector(OutletMacApp.openGDriveRootChooser), to: nil, from:self.con.treeID)})
+        ForEach(self.settings.deviceList, id: \.self) { device in
+          Button(device.friendlyName, action: self.openRootSelectionDialog(device))
+        }
       }
       .buttonStyle(PlainButtonStyle())
 

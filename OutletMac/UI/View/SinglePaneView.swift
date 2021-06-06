@@ -26,13 +26,10 @@ struct SinglePaneView: View {
   let app: OutletApp
   let con: TreePanelControllable
 
-  var treePanel: TreePanel! = nil
-
   init(_ app: OutletApp, _ con: TreePanelControllable, _ heightTracking: HeightTracking) {
     self.app = app
     self.con = con
     self.heightTracking = heightTracking
-    self.treePanel = TreePanel(app, con, self.heightTracking)
   }
 
   var body: some View {
@@ -42,24 +39,25 @@ struct SinglePaneView: View {
       spacing: 0  // no vertical spacing between cells
     ) {
       // Row0: Root Path
-      self.treePanel.rootPathPanel
+      RootPathPanel(self.con)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 0, height: geo.size.height))
         })
 
       // Row1: filter panel
-      self.treePanel.filterPanel
+      FilterPanel(self.con)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
         })
 
       // Row2: Tree view
-      self.treePanel.treeView
+      TreeView(controller: self.con, heightTracking)
 
       // Row3: Status msg
-      self.treePanel.status_panel
+      StatusPanel(self.con)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Status", col: 0, height: geo.size.height))

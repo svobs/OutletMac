@@ -6,7 +6,7 @@
 //  Copyright © 2021 Matt Svoboda. All rights reserved.
 //
 
-class Device {
+class Device: Hashable {
   let uid: UID
   let long_device_id: String
   let treeType: TreeType
@@ -17,5 +17,13 @@ class Device {
     self.long_device_id = long_device_id
     self.treeType = treeType
     self.friendlyName = friendlyName
+  }
+
+  static func ==(lhs: Device, rhs: Device) -> Bool {
+    return lhs.uid == rhs.uid
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(uid)
   }
 }

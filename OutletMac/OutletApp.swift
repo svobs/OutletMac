@@ -16,6 +16,8 @@ protocol OutletApp: HasLifecycle {
   var backend: OutletBackend { get }
   var iconStore: IconStore { get }
 
+  var settings: GlobalSettings { get }
+
   func grpcDidGoDown()
   func grpcDidGoUp()
 
@@ -29,12 +31,15 @@ protocol OutletApp: HasLifecycle {
   func getTreePanelController(_ treeID: String) -> TreePanelControllable?
 
   func sendEnableUISignal(enable: Bool)
+
+  func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String)
 }
 
 class MockApp: OutletApp {
   var dispatcher: SignalDispatcher
   var backend: OutletBackend
   var iconStore: IconStore
+  var settings = GlobalSettings()
 
   init() {
     self.dispatcher = SignalDispatcher()
@@ -73,6 +78,8 @@ class MockApp: OutletApp {
   }
 
   public func sendEnableUISignal(enable: Bool) {
+  }
+  func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String) {
   }
 }
 
@@ -237,6 +244,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
+
+    settings.deviceList = try self.backend.getDeviceList()
 
     DispatchQueue.main.async {
       self.connectionProblemView?.window.close()
@@ -553,7 +562,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   /**
    Display GDrive root selection dialog
    */
-  @objc func openGDriveRootChooser(_ treeID: String) {
+  func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String) {
     guard let sourceCon = self.getTreePanelController(treeID) else {
       NSLog("ERROR [\(treeID)] Cannot open GDrive Chooser: could not find controller with this treeID!")
       return
@@ -565,7 +574,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       rootChooserView.selectSPID(currentSN.spid)
     } else {
       do {
-        let deviceUID: UID = try self.getDefaultGDriveDeviceUID()
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 

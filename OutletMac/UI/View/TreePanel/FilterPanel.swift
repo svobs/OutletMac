@@ -6,16 +6,6 @@
 //
 import SwiftUI
 
-/*
-extension NSTextField {
-  // Workaround to get rid of focus ring in all text fields
-  open override var focusRingType: NSFocusRingType {
-    get { .none }
-    set { }
-  }
-}
- */
-
 /**
  MacOS's default text field is just a wrapper for NSTextField, which is archaic and minimally ocnfigurable. This is an attempt to clean it up
  and give it a slightly better look.
@@ -100,4 +90,3 @@ struct FilterPanel_Previews: PreviewProvider {
     FilterPanel(try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
   }
 }
-

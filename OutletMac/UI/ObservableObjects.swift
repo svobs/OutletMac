@@ -12,6 +12,8 @@ import SwiftUI
 class GlobalSettings: ObservableObject {
   @Published var isPlaying = false
 
+  @Published var deviceList: [Device] = []
+
   @Published var mode: WindowMode = .BROWSING
 
   // Alert stuff:
