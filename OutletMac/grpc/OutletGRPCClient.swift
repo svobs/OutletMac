@@ -504,8 +504,9 @@ class OutletGRPCClient: OutletBackend {
     let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree_stats(request), "enqueueRefreshSubtreeStatsTask")
   }
   
-  func getLastPendingOp(nodeUID: UID) throws -> UserOp? {
+  func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request()
+    request.deviceUid = deviceUID
     request.nodeUid = nodeUID
 
     let response = try self.callAndTranslateErrors(self.stub.get_last_pending_op_for_node(request), "getLastPendingOp")
@@ -532,8 +533,9 @@ class OutletGRPCClient: OutletBackend {
     let _ = try self.callAndTranslateErrors(self.stub.download_file_from_gdrive(request), "downloadFileFromGDrive")
   }
   
-  func deleteSubtree(nodeUIDList: [UID]) throws {
+  func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws {
     var request = Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request()
+    request.deviceUid = deviceUID
     request.nodeUidList = nodeUIDList
     let _ = try self.callAndTranslateErrors(self.stub.delete_subtree(request), "deleteSubtree")
   }

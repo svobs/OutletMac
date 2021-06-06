@@ -43,9 +43,9 @@ protocol OutletBackend: HasLifecycle {
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
   func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws
-  func getLastPendingOp(nodeUID: UID) throws -> UserOp?
+  func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp?
   func downloadFileFromGDrive(nodeUID: UID, requestorID: String) throws
-  func deleteSubtree(nodeUIDList: [UID]) throws
+  func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws
   func getFilterCriteria(treeID: TreeID) throws -> FilterCriteria
   func updateFilterCriteria(treeID: TreeID, filterCriteria: FilterCriteria) throws
 }
@@ -205,7 +205,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getLastPendingOp(nodeUID: UID) throws -> UserOp? {
+  func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -213,7 +213,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func deleteSubtree(nodeUIDList: [UID]) throws {
+  func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

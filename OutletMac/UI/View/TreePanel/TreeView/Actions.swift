@@ -160,6 +160,11 @@ class TreeActions {
   }
 
   public func confirmAndDeleteSubtrees(_ snList: [SPIDNodePair]) {
+    if snList.count == 0 {
+      self.con.reportError("Cannot Delete", "No items are selected!")
+      return
+    }
+
     var msg = "Are you sure you want to delete "
     var okText = "Delete"
     if snList.count == 1 {
@@ -182,7 +187,8 @@ class TreeActions {
     }
 
     do {
-      try self.con.backend.deleteSubtree(nodeUIDList: nodeUIDList)
+      let deviceUID = snList[0].spid.deviceUID
+      try self.con.backend.deleteSubtree(deviceUID: deviceUID, nodeUIDList: nodeUIDList)
     } catch {
       self.con.reportException("Failed to delete subtree", error)
     }

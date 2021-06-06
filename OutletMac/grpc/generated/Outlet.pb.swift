@@ -328,6 +328,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var deviceUid: UInt32 = 0
+
   public var nodeUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
@@ -485,6 +487,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
+
+  public var deviceUid: UInt32 = 0
 
   public var nodeUidList: [UInt32] = []
 
@@ -1890,7 +1894,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response: SwiftP
 extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".GetLastPendingOp_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_uid"),
+    1: .standard(proto: "device_uid"),
+    2: .standard(proto: "node_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1899,20 +1904,25 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request: SwiftPro
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 1)
+    }
     if self.nodeUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 1)
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request) -> Bool {
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.nodeUid != rhs.nodeUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
@@ -2250,7 +2260,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request: Swift
 extension Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DeleteSubtree_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "node_uid_list"),
+    1: .standard(proto: "device_uid"),
+    2: .standard(proto: "node_uid_list"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2259,20 +2270,25 @@ extension Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request: SwiftProtob
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeRepeatedUInt32Field(value: &self.nodeUidList) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 2: try { try decoder.decodeRepeatedUInt32Field(value: &self.nodeUidList) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.deviceUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 1)
+    }
     if !self.nodeUidList.isEmpty {
-      try visitor.visitPackedUInt32Field(value: self.nodeUidList, fieldNumber: 1)
+      try visitor.visitPackedUInt32Field(value: self.nodeUidList, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request) -> Bool {
+    if lhs.deviceUid != rhs.deviceUid {return false}
     if lhs.nodeUidList != rhs.nodeUidList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
