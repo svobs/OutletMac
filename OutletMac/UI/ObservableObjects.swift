@@ -79,17 +79,10 @@ class SwiftTreeState: ObservableObject {
     self.hasCheckboxes = hasCheckboxes
   }
 
-  private static func toHumanEditableRootPath(_ spid: SPID, _ treeType: TreeType) throws -> String {
-    if treeType == .GDRIVE {
-      return GDRIVE_PATH_PREFIX + spid.getSinglePath()
-    }
-    return spid.getSinglePath()
-  }
-
   func updateFrom(_ tree: DisplayTree) throws {
     self.rootPathNonEdit = tree.rootPath
     self.treeType = try tree.backend.nodeIdentifierFactory.getTreeType(for: tree.rootSPID.deviceUID)
-    self.rootPath = try SwiftTreeState.toHumanEditableRootPath(tree.rootSPID, self.treeType)
+    self.rootPath = tree.rootSPID.getSinglePath()
     self.offendingPath = tree.state.offendingPath
     self.isRootExists = tree.rootExists
     self.isEditingRoot = false
@@ -101,7 +94,7 @@ class SwiftTreeState: ObservableObject {
   static func from(_ tree: DisplayTree) throws -> SwiftTreeState {
     let treeType = try tree.backend.nodeIdentifierFactory.getTreeType(for: tree.rootSPID.deviceUID)
     return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
-                          offendingPath: tree.state.offendingPath, rootPath: try SwiftTreeState.toHumanEditableRootPath(tree.rootSPID, treeType),
+                          offendingPath: tree.state.offendingPath, rootPath: tree.rootSPID.getSinglePath(),
                           rootPathNonEdit: tree.rootPath, rootDeviceUID: tree.rootDeviceUID, treeType: treeType, hasCheckboxes: tree.hasCheckboxes)
   }
 }

@@ -236,7 +236,6 @@ let ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME = "multiply.circle.fill"
 
 
 let ROOT_PATH = "/"
-let GDRIVE_PATH_PREFIX = "gdrive:/"
 
 let LOOPBACK_ADDRESS = "127.0.0.1"
 

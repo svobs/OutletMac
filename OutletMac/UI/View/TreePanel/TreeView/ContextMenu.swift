@@ -193,11 +193,7 @@ class TreeContextMenu {
 
   private func buildFullPathDisplayItem(preamble: String = "", _ node: Node, singlePath: String) -> NSMenuItem {
     let displayPath: String
-    if node.treeType == .GDRIVE {
-      displayPath = "\(preamble)\(GDRIVE_PATH_PREFIX)\(singlePath)"
-    } else {
-      displayPath = "\(preamble)\(singlePath)"
-    }
+    displayPath = "\(preamble)\(singlePath)"
     let item = NSMenuItem(title: displayPath, action: nil, keyEquivalent: "")
     item.toolTip = "The path of the selected item"
     return item
