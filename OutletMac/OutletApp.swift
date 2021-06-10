@@ -198,16 +198,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func grpcDidGoDown() {
-    DispatchQueue.main.sync {
-      self.enableWindowCloseListener = false
-      // Close all other windows beside the Connection Problem window, if they exist
-      mainWindow?.close()
-      rootChooserView?.window.close()
-      mergePreviewView?.window.close()
-      self.enableWindowCloseListener = true
-    }
+    self.execAsync {
+      DispatchQueue.main.async {
+        self.enableWindowCloseListener = false
+        // Close all other windows beside the Connection Problem window, if they exist
+        self.mainWindow?.close()
+        self.rootChooserView?.window.close()
+        self.mergePreviewView?.window.close()
+        self.enableWindowCloseListener = true
 
-    NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
+        NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
+      }
+    }
   }
 
   func grpcDidGoUp() {
