@@ -312,6 +312,8 @@ class EphemeralNode: Node {
  */
 class NonexistentDirNode: Node {
   let _name: String
+  // need to include this for all nodes where isDir==true
+  var _dirStats: DirectoryStats? = nil
 
   init(_ nodeIdentifer: NodeIdentifier, _ name: String) {
     self._name = name
@@ -336,5 +338,13 @@ class NonexistentDirNode: Node {
 
   override func isParentOf(_ otherNode: Node) -> Bool {
     return false
+  }
+
+  override func setDirStats(_ dirStats: DirectoryStats?) {
+    self._dirStats = dirStats
+  }
+
+  override func getDirStats() -> DirectoryStats? {
+    return self._dirStats
   }
 }
