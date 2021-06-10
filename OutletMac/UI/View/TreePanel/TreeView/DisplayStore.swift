@@ -245,7 +245,7 @@ class DisplayStore {
   }
 
   private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
-    if let node = sn.node, node.isEphemeral {
+    if sn.node.isEphemeral {
       return false
     }
 
@@ -385,7 +385,7 @@ class DisplayStore {
   }
 
   func isDir(_ guid: GUID) -> Bool {
-    return self.getSN(guid)?.node!.isDir ?? false
+    return self.getSN(guid)?.node.isDir ?? false
   }
 
   /**

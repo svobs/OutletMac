@@ -36,7 +36,10 @@ class GRPCConverter {
       grpc.iconID = icon.rawValue
     }
 
-    if let containerNode = node as? ContainerNode {
+    if let nonexistentDirNode = node as? NonexistentDirNode {
+      grpc.nonexistentDirMeta = Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta()
+      grpc.nonexistentDirMeta.name = nonexistentDirNode.name
+    } else if let containerNode = node as? ContainerNode {
       // ContainerNode or subclass
       if let catNode = containerNode as? CategoryNode {
         grpc.categoryMeta = Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta()
@@ -181,6 +184,8 @@ class GRPCConverter {
           node = RootTypeNode(nodeIdentifier)
           let dirStats = try self.dirMetaFromGRPC(metaGRPC.dirMeta)
           node.setDirStats(dirStats)
+      case .nonexistentDirMeta(let metaGRPC):
+        node = NonexistentDirNode(nodeIdentifier, metaGRPC.name)
       }
     } else {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
@@ -289,19 +294,14 @@ class GRPCConverter {
     var grpc = Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()
     grpc.spid = try self.nodeIdentifierToGRPC(sn.spid)
     if sn.node != nil {
-      grpc.node = try self.nodeToGRPC(sn.node!)
+      grpc.node = try self.nodeToGRPC(sn.node)
     }
     return grpc
   }
 
   func snFromGRPC(_ snGRPC: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair) throws -> SPIDNodePair {
     let spid: SinglePathNodeIdentifier = try self.spidFromGRPC(spidGRPC: snGRPC.spid)
-    let node: Node?
-    if snGRPC.hasNode {
-      node = try self.nodeFromGRPC(snGRPC.node)
-    } else {
-      node = nil
-    }
+    let node = try self.nodeFromGRPC(snGRPC.node)
     return SPIDNodePair(spid: spid, node: node)
   }
 

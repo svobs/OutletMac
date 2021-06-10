@@ -323,8 +323,7 @@ class TreePanelController: TreePanelControllable {
     while !queue.isEmpty {
 
       let sn = queue.popFirst()!
-      let node = sn.node!
-      if node.isDir && rows.expanded.contains(sn.spid.guid) {
+      if sn.node.isDir && rows.expanded.contains(sn.spid.guid) {
         // only expand rows which are actually present:
         NSLog("DEBUG [\(treeID)] populateTreeView(): Will expand row: \(sn.spid.guid)")
         toExpandInOrder.append(sn.spid.guid)
@@ -419,7 +418,7 @@ class TreePanelController: TreePanelControllable {
       self.reportError("Internal Error", "Could not toggle checkbox: could not find SN in DisplayStore for GUID \(guid)")
       return
     }
-    if let isEphemeral = sn.node?.isEphemeral, isEphemeral {
+    if sn.node.isEphemeral {
       return
     }
 
@@ -505,7 +504,7 @@ class TreePanelController: TreePanelControllable {
       if SUPER_DEBUG {
         NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next mixed-state dir: \(mixedDirSN.spid)")
       }
-      assert(mixedDirSN.node!.isDir, "Expected a dir-type node: \(mixedDirSN.node!)")  // only dir nodes can be mixed
+      assert(mixedDirSN.node.isDir, "Expected a dir-type node: \(mixedDirSN.node)")  // only dir nodes can be mixed
 
       // Check each child of a mixed dir for checked or mixed status.
       // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
@@ -539,7 +538,7 @@ class TreePanelController: TreePanelControllable {
       checkedRowList.append(chosenSN)
 
       // Drill down into all descendants of nodes in the checkedQueue.
-      if chosenSN.node!.isDir {
+      if chosenSN.node.isDir {
         for childSN in try self.tree.getChildList(chosenSN.spid) {
           if SUPER_DEBUG {
             NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to checkedQueue: \(chosenSN.spid.guid)")

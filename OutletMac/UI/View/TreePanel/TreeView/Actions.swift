@@ -34,7 +34,7 @@ class TreeActions {
     var queue = LinkedList<SPIDNodePair>()
 
     func process(_ sn: SPIDNodePair) {
-      if sn.node!.isDir {
+      if sn.node.isDir {
         let guid = sn.spid.guid
         if !outlineView.isItemExpanded(guid) {
           outlineView.animator().expandItem(guid)
@@ -168,7 +168,7 @@ class TreeActions {
     var msg = "Are you sure you want to delete "
     var okText = "Delete"
     if snList.count == 1 {
-      msg += "\"\(snList[0].node!.name)\"?"
+      msg += "\"\(snList[0].node.name)\"?"
     } else {
       msg += "these \(snList.count) items?"
       okText = "Delete \(snList.count) items"
@@ -183,7 +183,7 @@ class TreeActions {
 
     var nodeUIDList: [UID] = []
     for sn in snList {
-      nodeUIDList.append(sn.node!.uid)
+      nodeUIDList.append(sn.node.uid)
     }
 
     do {

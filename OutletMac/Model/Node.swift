@@ -216,7 +216,7 @@ class Node: CustomStringConvertible {
 }
 
 // the only time node is nil is if the tree's root does not exist
-typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node?)
+typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
 
 
 /**
@@ -279,7 +279,7 @@ class DirectoryStats : CustomStringConvertible {
  Is an empty node (not much content)
  */
 class EphemeralNode: Node {
-  let _name: String
+  private let _name: String
   init(_ name: String, parent: SPID?) {
     self._name = name
     super.init(EphemeralNodeIdentifier(parent: parent), [], .NOT_TRASHED)
@@ -303,5 +303,38 @@ class EphemeralNode: Node {
 
   override var defaultIcon: IconID {
     return .ICON_ALERT
+  }
+}
+
+/**
+  Represents a directory which does not exist. Use this in SPIDNodePair objects when the SPID points to something which doesn't exist.
+  It's much safer to use this class rather than remembering to deal with null/nil/None.
+ */
+class NonexistentDirNode: Node {
+  let _name: String
+
+  init(_ nodeIdentifer: NodeIdentifier, _ name: String) {
+    self._name = name
+    super.init(nodeIdentifer)
+  }
+
+  override var name: String {
+    get {
+      return self._name
+    }
+  }
+
+  override var isDir: Bool {
+    return true
+  }
+
+  override func updateFrom(_ otherNode: Node) {
+    self.parentList = otherNode.parentList
+    self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
+    self.trashed = otherNode.trashed
+  }
+
+  override func isParentOf(_ otherNode: Node) -> Bool {
+    return false
   }
 }

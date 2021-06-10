@@ -48,11 +48,7 @@ struct GDriveRootChooserContent: View {
       return
     }
 
-    guard let node = selectedSN.node else {
-      return
-    }
-
-    guard node.isDir else {
+    guard selectedSN.node.isDir else {
       // Should not happen. But just to be careful
       NSLog("ERROR [\(self.con.treeID)] Not a directory: \(selectedSN.spid)")
       return
@@ -120,9 +116,9 @@ class GDriveRootChooser: PopUpTreePanel {
     assert(snList.count <= 1)
 
     DispatchQueue.main.async {
-      let selectionValid = (snList.count == 1 && snList[0].node!.isDir)
+      let selectionValid = (snList.count == 1 && snList[0].node.isDir)
       self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.con.treeID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node!.isDir))")
+      NSLog("DEBUG [\(self.con.treeID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
     }
   }
 

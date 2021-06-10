@@ -245,6 +245,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
     set {_uniqueStorage()._nodeType = .gdriveFolderMeta(newValue)}
   }
 
+  public var nonexistentDirMeta: Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta {
+    get {
+      if case .nonexistentDirMeta(let v)? = _storage._nodeType {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta()
+    }
+    set {_uniqueStorage()._nodeType = .nonexistentDirMeta(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_NodeType: Equatable {
@@ -255,6 +263,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
     case localFileMeta(Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta)
     case gdriveFileMeta(Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta)
     case gdriveFolderMeta(Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta)
+    case nonexistentDirMeta(Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType, rhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType) -> Bool {
@@ -288,6 +297,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
       }()
       case (.gdriveFolderMeta, .gdriveFolderMeta): return {
         guard case .gdriveFolderMeta(let l) = lhs, case .gdriveFolderMeta(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.nonexistentDirMeta, .nonexistentDirMeta): return {
+        guard case .nonexistentDirMeta(let l) = lhs, case .nonexistentDirMeta(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -568,6 +581,18 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var name: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "outlet.backend.agent.grpc.generated"
@@ -799,6 +824,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
     21: .standard(proto: "local_file_meta"),
     22: .standard(proto: "gdrive_file_meta"),
     23: .standard(proto: "gdrive_folder_meta"),
+    24: .standard(proto: "nonexistent_dir_meta"),
   ]
 
   fileprivate class _StorageClass {
@@ -903,6 +929,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
           try decoder.decodeSingularMessageField(value: &v)
           if let v = v {_storage._nodeType = .gdriveFolderMeta(v)}
         }()
+        case 24: try {
+          var v: Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta?
+          if let current = _storage._nodeType {
+            try decoder.handleConflictingOneOf()
+            if case .nonexistentDirMeta(let m) = current {v = m}
+          }
+          try decoder.decodeSingularMessageField(value: &v)
+          if let v = v {_storage._nodeType = .nonexistentDirMeta(v)}
+        }()
         default: break
         }
       }
@@ -954,6 +989,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
       case .gdriveFolderMeta?: try {
         guard case .gdriveFolderMeta(let v)? = _storage._nodeType else { preconditionFailure() }
         try visitor.visitSingularMessageField(value: v, fieldNumber: 23)
+      }()
+      case .nonexistentDirMeta?: try {
+        guard case .nonexistentDirMeta(let v)? = _storage._nodeType else { preconditionFailure() }
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 24)
       }()
       case nil: break
       }
@@ -1567,6 +1606,38 @@ extension Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.Me
       }
       if !storagesAreEqual {return false}
     }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".NonexistentDirMeta"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .same(proto: "name"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.name.isEmpty {
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta) -> Bool {
+    if lhs.name != rhs.name {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

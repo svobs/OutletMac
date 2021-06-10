@@ -83,11 +83,11 @@ class TreeContextMenu {
     var nodeGDriveList: [Node] = []
 
     for sn in snList {
-      if sn.node!.isLive {
+      if sn.node.isLive {
         if sn.spid.treeType == .LOCAL_DISK {
-          nodeLocalList.append(sn.node!)
+          nodeLocalList.append(sn.node)
         } else if sn.spid.treeType == .GDRIVE {
-          nodeGDriveList.append(sn.node!)
+          nodeGDriveList.append(sn.node)
         }
       }
     }
@@ -116,7 +116,7 @@ class TreeContextMenu {
       return
     }
 
-    let op: UserOp? = try self.con.backend.getLastPendingOp(deviceUID: sn.node!.deviceUID, nodeUID: sn.node!.uid)
+    let op: UserOp? = try self.con.backend.getLastPendingOp(deviceUID: sn.node.deviceUID, nodeUID: sn.node.uid)
 
     let singlePath = sn.spid.getSinglePath()
 
@@ -127,7 +127,7 @@ class TreeContextMenu {
 
       // (1/2) Source node:
       let srcPath: String
-      if op!.srcNode.uid == sn.node!.uid {
+      if op!.srcNode.uid == sn.node.uid {
         srcPath = singlePath
       } else {
         srcPath = op!.srcNode.firstPath
@@ -147,7 +147,7 @@ class TreeContextMenu {
 
       // (1/2) Destination node:
       let dstPath: String
-      if op!.dstNode!.uid == sn.node!.uid {
+      if op!.dstNode!.uid == sn.node.uid {
         dstPath = singlePath
       } else {
         dstPath = op!.dstNode!.firstPath
@@ -166,23 +166,23 @@ class TreeContextMenu {
       menu.addItem(NSMenuItem.separator())
 
     } else {
-      let item = self.buildFullPathDisplayItem(sn.node!, singlePath: sn.spid.getSinglePath())
+      let item = self.buildFullPathDisplayItem(sn.node, singlePath: sn.spid.getSinglePath())
       item.isEnabled = false
       menu.addItem(item)
 
       menu.addItem(NSMenuItem.separator())
 
-      try self.buildMenuItemsForSingleNode(menu, sn.node!, singlePath)
+      try self.buildMenuItemsForSingleNode(menu, sn.node, singlePath)
     }
 
-    if sn.node!.isDir {
+    if sn.node.isDir {
       let item = MenuItemWithSNList(title: "Expand All", action: #selector(self.con.treeActions.expandAll(_:)), keyEquivalent: "")
       item.snList = [sn]
       item.target = self.con.treeActions
       menu.addItem(item)
     }
 
-    if sn.node!.isLive {
+    if sn.node.isLive {
       menu.addItem(NSMenuItem.separator())
       let item = MenuItemWithSNList(title: "Refresh", action: #selector(self.con.treeActions.refreshSubtree(_:)), keyEquivalent: "")
       item.snList = [sn]

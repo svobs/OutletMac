@@ -68,7 +68,7 @@ class CellFactory {
       return nil
     }
 
-    let node = sn.node!
+    let node = sn.node
     switch identifier.rawValue {
       case "name":
         var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NameCellView
@@ -119,11 +119,7 @@ class CellFactory {
   // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
   private static func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat,
                                _ tvc: TreeViewController) -> NSImage? {
-    guard let node = sn.node else {
-      return nil
-    }
-
-    return tvc.con.app.iconStore.getTreeIcon(node, height: cellHeight)
+    return tvc.con.app.iconStore.getTreeIcon(sn.node, height: cellHeight)
   }
 
   private static func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier, _ tvc: TreeViewController) -> NameCellView {

@@ -60,7 +60,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
-        if sn.node!.isDir {
+        if sn.node.isDir {
             // Is dir -> toggle expand/collapse
 
             if outlineView.isItemExpanded(guid) {
@@ -280,14 +280,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
         let guid: GUID = self.itemToGUID(item)
         if let sn = self.displayStore.getSN(guid) {
-            if let node = sn.node {
-                if node.isDisplayOnly {
-                    NSLog("DEBUG [\(treeID)] Denying drag for node (\(guid)) - it is display only")
-                    return nil
-                } else {
-                    // NSString implements NSPasteboardWriting.
-                    return NodePasteboardWriter(guid: guid)
-                }
+            if sn.node.isDisplayOnly {
+                NSLog("DEBUG [\(treeID)] Denying drag for node (\(guid)) - it is display only")
+                return nil
+            } else {
+                // NSString implements NSPasteboardWriting.
+                return NodePasteboardWriter(guid: guid)
             }
         }
 
@@ -325,7 +323,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
-            if dropTargetSN.node!.isParentOf(srcSN.node!) {
+            if dropTargetSN.node.isParentOf(srcSN.node) {
                 NSLog("[\(self.treeID)] DEBUG Target dir (\(dropTargetSN.spid)) is parent of dragged node (\(srcSN.spid))")
                 return true
             }
@@ -375,12 +373,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         if var dstSN = displayStore.getSN(dstGUID) {
-            if dstSN.node!.isDisplayOnly {
+            if dstSN.node.isDisplayOnly {
                 // cannot drop on non-real nodes such as CategoryNodes. Deny drop
                 return []
             }
 
-            if !dstSN.node!.isDir {
+            if !dstSN.node.isDir {
                 // cannot drop on file. Re-target the drop so that we are dropping on its parent dir
                 dstGUID = displayStore.getParentGUID(dstGUID)!
                 dstSN = displayStore.getSN(dstGUID)!
@@ -478,7 +476,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             if let item = outlineView.item(atRow: rowIndex) {
                 if let guid = item as? GUID {
                     if let sn = displayStore.getSN(guid) {
-                        uidSet.insert(sn.node!.uid)
+                        uidSet.insert(sn.node.uid)
                     }
                 }
             }

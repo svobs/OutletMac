@@ -8,6 +8,7 @@ Podfile.lock
 Pods
 
 .idea
+.build
 
 ## User settings
 xcuserdata

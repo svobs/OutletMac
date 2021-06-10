@@ -12,7 +12,7 @@ typealias GoogID = String
 /**
  CLASS GDriveNode
  
- "Abstact" base class: do not instantiate directly
+ "Abstract" base class: do not instantiate directly
  */
 class GDriveNode: Node {
   var googID: GoogID?
