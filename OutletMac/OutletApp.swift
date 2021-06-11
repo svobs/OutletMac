@@ -368,6 +368,15 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   @objc func windowWillClose(_ notification: Notification) {
     if !self.enableWindowCloseListener {
       NSLog("DEBUG Closing mainWindow")
+
+      self.execAsync {
+        do {
+          try self.conLeft?.shutdown()
+          try self.conRight?.shutdown()
+        } catch {
+          NSLog("ERROR Failed to shut down tree controllers in mainWindow: \(error)")
+        }
+      }
       return
     }
 

@@ -182,9 +182,10 @@ class TreePanelController: TreePanelControllable {
   }
 
   func start() throws {
+    NSLog("DEBUG [\(self.treeID)] Controller start() called")
     self.app.registerTreePanelController(self.treeID, self)
 
-    self.reattachListeners(self.treeID)
+    self.subscribeToSignals(treeID)
 
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
@@ -200,17 +201,21 @@ class TreePanelController: TreePanelControllable {
     self.dispatchListener.unsubscribeAll()
 
     self.dispatchListener = self.app.dispatcher.createListener(newTreeID)
-    self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
-    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
-    self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: newTreeID)
+    self.subscribeToSignals(newTreeID)
+  }
 
-    self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: newTreeID)
-    self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: newTreeID)
+  private func subscribeToSignals(_ treeID: TreeID) {
+    self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
+    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
+    self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: treeID)
+
+    self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: treeID)
   }
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {

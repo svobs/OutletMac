@@ -151,6 +151,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return displayStore.isDir(itemToGUID(item)) && !self.con.swiftFilterState.isFlatList()
     }
 
+    /**
+     Sorting support
+     */
+    func outlineView(_ outlineView: NSOutlineView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
+        NSLog("sortDescriptorsDidChange：\(oldDescriptors)")
+
+        self.outlineView.reloadData()
+    }
+
     // NSOutlineViewDelegate methods
     // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
