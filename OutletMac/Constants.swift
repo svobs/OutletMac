@@ -26,6 +26,20 @@ let USE_SYSTEM_TOOLBAR_ICONS: Bool = true
 let DEFAULT_ICON_SIZE: Int = 24
 let TREE_VIEW_CELL_HEIGHT: CGFloat = 32.0
 
+// For NSOutlineView
+let NAME_COL_KEY = "name"
+let SIZE_COL_KEY = "size"
+let ETC_COL_KEY = "etc"
+let MODIFY_TS_COL_KEY = "mtime"
+let META_CHANGE_TS_COL_KEY = "ctime"
+
+
+enum ColSortOrder: Int {
+  case NAME = 1
+  case SIZE = 2
+  case MODIFY_TS = 3
+  case CHANGE_TS = 4
+}
 
 // Padding in pixels
 let H_PAD: CGFloat = 5

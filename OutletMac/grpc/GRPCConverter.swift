@@ -293,9 +293,6 @@ class GRPCConverter {
   func snToGRPC(_ sn: SPIDNodePair) throws -> Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
     var grpc = Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair()
     grpc.spid = try self.nodeIdentifierToGRPC(sn.spid)
-    if sn.node != nil {
-      grpc.node = try self.nodeToGRPC(sn.node)
-    }
     return grpc
   }
 

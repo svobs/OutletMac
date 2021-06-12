@@ -27,7 +27,7 @@ class LocalNode: Node {
   }
   
   func deriveParentPath() throws -> String {
-    return URL(fileURLWithPath: try self.nodeIdentifier.getSinglePath()).deletingLastPathComponent().absoluteString
+    return URL(fileURLWithPath: self.nodeIdentifier.getSinglePath()).deletingLastPathComponent().absoluteString
   }
   
   override func getSingleParent() -> UID {

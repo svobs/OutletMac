@@ -23,6 +23,10 @@ class DisplayStore {
     }
   }
 
+  private var colSortOrder: ColSortOrder = .NAME
+  private var sortAscending: Bool = true
+
+  // Need to keep each list in here sorted:
   private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
   private var childParentDict: [GUID: GUID] = [:]
@@ -74,6 +78,68 @@ class DisplayStore {
     self.childParentDict[childGUID] = realParentGUID
   }
 
+  func getColSortOrder() -> ColSortOrder {
+    return self.colSortOrder
+  }
+
+  func updateColSortOrder(_ sortKey: String, _ isAscending: Bool) {
+    let colSortOrder: ColSortOrder
+
+    switch sortKey {
+    case NAME_COL_KEY:
+      colSortOrder = .NAME
+      break
+    case SIZE_COL_KEY:
+      colSortOrder = .SIZE
+      break
+    case MODIFY_TS_COL_KEY:
+      colSortOrder = .MODIFY_TS
+      break
+    case META_CHANGE_TS_COL_KEY:
+      colSortOrder = .CHANGE_TS
+      break
+    default:
+      fatalError("Unrecognized sort key: \(sortKey)")
+    }
+
+    con.app.execSync {
+      self.colSortOrder = colSortOrder
+      self.sortAscending = isAscending
+      for (parentGUID, childList) in self.parentChildListDict {
+        self.parentChildListDict[parentGUID] = self.sortDirContents(childList)
+      }
+    }
+  }
+
+  private func sortDirContents(_ childList: [SPIDNodePair]) -> [SPIDNodePair] {
+    switch self.colSortOrder {
+    case .NAME:
+      let desiredOrder: ComparisonResult = (self.sortAscending ? .orderedAscending : .orderedDescending)
+      return childList.sorted { $0.node.name.localizedCaseInsensitiveCompare($1.node.name) == desiredOrder }
+    case .SIZE:
+      if self.sortAscending {
+        // put nodes with missing size at the end
+        return childList.sorted { ($0.node.sizeBytes ?? UInt64.max) < ($1.node.sizeBytes ?? UInt64.max) }
+      } else {
+        return childList.sorted { ($0.node.sizeBytes ?? UInt64.max) > ($1.node.sizeBytes ?? UInt64.max) }
+      }
+    case .MODIFY_TS:
+      if self.sortAscending {
+        // put nodes with missing TS at the end
+        return childList.sorted { ($0.node.modifyTS ?? UInt64.max) < ($1.node.modifyTS ?? UInt64.max) }
+      } else {
+        return childList.sorted { ($0.node.modifyTS ?? UInt64.max) > ($1.node.modifyTS ?? UInt64.max) }
+      }
+    case .CHANGE_TS:
+      if self.sortAscending {
+        // put nodes with missing TS at the end
+        return childList.sorted { ($0.node.changeTS ?? UInt64.max) < ($1.node.changeTS ?? UInt64.max) }
+      } else {
+        return childList.sorted { ($0.node.changeTS ?? UInt64.max) > ($1.node.changeTS ?? UInt64.max) }
+      }
+    }
+  }
+
   // "Put" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -89,8 +155,10 @@ class DisplayStore {
       self.mixedNodeSet.removeAll()
 
       self.primaryDict[TOPMOST_GUID] = rootSN // needed for determining implicitly checked checkboxes
-      self.parentChildListDict[TOPMOST_GUID] = topLevelSNList
-      for childSN in topLevelSNList {
+
+      let sortedList = self.sortDirContents(topLevelSNList)
+      self.parentChildListDict[TOPMOST_GUID] = sortedList
+      for childSN in sortedList {
         let childGUID = childSN.spid.guid
         self.primaryDict[childGUID] = childSN
         self.childParentDict[childGUID] = TOPMOST_GUID
@@ -114,7 +182,8 @@ class DisplayStore {
           self.checkedNodeSet.insert(childSN.spid.guid)
         }
       }
-      self.parentChildListDict[parentGUID] = childSNList
+      let sortedList = self.sortDirContents(childSNList)
+      self.parentChildListDict[parentGUID] = sortedList
     }
   }
 
@@ -139,6 +208,9 @@ class DisplayStore {
     return self.primaryDict[guid ?? TOPMOST_GUID] ?? nil
   }
 
+  /**
+   Lookup func. Given a GUID, return its corresponding SPIDNodePair.
+   */
   func getSN(_ guid: GUID) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     con.app.execSync {
@@ -147,6 +219,9 @@ class DisplayStore {
     return sn
   }
 
+  /**
+   Lookup func. Given a list of GUIDs, return a list of their corresponding SPIDNodePairs in the same order.
+   */
   func getSNList(_ guidList: [GUID]) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     con.app.execSync {
@@ -161,10 +236,6 @@ class DisplayStore {
     return snList
   }
 
-  func getChildListForRoot() -> [SPIDNodePair] {
-    return self.getChildList(TOPMOST_GUID)
-  }
-
   private func getChildList_NoLock(_ parentGUID: GUID?) -> [SPIDNodePair] {
     return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
   }
@@ -177,6 +248,9 @@ class DisplayStore {
     return count
   }
 
+  /**
+   Returns the list of children for a given parent GUID.
+   */
   func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     con.app.execSync {
@@ -185,6 +259,10 @@ class DisplayStore {
     return snList
   }
 
+  /**
+   Called by NSOutlineView: returns a SPIDNodePair for the requested parent's key (GUID) and zero-based index.
+   Sort-order dependent!
+   */
   func getChild(_ parentGUID: GUID?, _ childIndex: Int, useParentIfIndexInvalid: Bool = false) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     con.app.execSync {

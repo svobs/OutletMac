@@ -168,7 +168,7 @@ class IconStore: HasLifecycle {
     var icon: NSImage
 
     let iconId = node.icon
-    if SUPER_DEBUG_ENABLED {
+    if TRACE_ENABLED {
       NSLog("DEBUG Getting treeIcon for: \(iconId): \(node.nodeIdentifier)")
     }
     let key: String
@@ -216,7 +216,7 @@ class IconStore: HasLifecycle {
 
       // Used cached icon if available
       if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
-        if SUPER_DEBUG_ENABLED {
+        if TRACE_ENABLED {
           NSLog("DEBUG Returning cached icon for (dir) key '\(key)'")
         }
         return cachedIcon
@@ -280,7 +280,7 @@ class IconStore: HasLifecycle {
 
       // Now that we have derived the key for the file type, use cached value if available
       if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
-        if SUPER_DEBUG_ENABLED {
+        if TRACE_ENABLED {
           NSLog("DEBUG Returning cached icon for (file) key '\(key)'")
         }
         return cachedIcon

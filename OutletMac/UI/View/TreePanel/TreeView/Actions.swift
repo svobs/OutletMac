@@ -75,13 +75,9 @@ class TreeActions {
     }
 
     self.con.app.execAsync {
-      do {
-        let node = sender.nodeList[0]
-        let url = try URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
-        NSWorkspace.shared.activateFileViewerSelecting([url])
-      } catch {
-        self.con.reportException("Could not show in Finder", error)
-      }
+      let node = sender.nodeList[0]
+      let url = URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
+      NSWorkspace.shared.activateFileViewerSelecting([url])
     }
   }
 

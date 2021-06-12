@@ -29,41 +29,45 @@ class OutlineViewFactory {
 
     // Columns:
 
-    let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "name"))
+    let nodeColumn = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: NAME_COL_KEY))
     nodeColumn.title = "Name"
     nodeColumn.width = 300
     nodeColumn.minWidth = 150
     nodeColumn.isEditable = false
     outlineView.addTableColumn(nodeColumn)
+    nodeColumn.sortDescriptorPrototype = NSSortDescriptor(key: NAME_COL_KEY, ascending: true)
 
-    let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "size"))
+    let sizeBytesCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: SIZE_COL_KEY))
     sizeBytesCol.title = "Size"
     sizeBytesCol.width = 70
     sizeBytesCol.minWidth = 70
     sizeBytesCol.isEditable = false
     outlineView.addTableColumn(sizeBytesCol)
+    sizeBytesCol.sortDescriptorPrototype = NSSortDescriptor(key: SIZE_COL_KEY, ascending: true)
 
-    let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "etc"))
+    let etcCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: ETC_COL_KEY))
     etcCol.title = "Etc"
     etcCol.width = 200
     etcCol.minWidth = 100
     etcCol.isEditable = false
     outlineView.addTableColumn(etcCol)
 
-    let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "mtime"))
+    let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: MODIFY_TS_COL_KEY))
     mtimeCol.title = "Modification Time"
     mtimeCol.width = 200
     mtimeCol.minWidth = 100
     mtimeCol.isEditable = false
     outlineView.addTableColumn(mtimeCol)
+    mtimeCol.sortDescriptorPrototype = NSSortDescriptor(key: MODIFY_TS_COL_KEY, ascending: true)
 
-    let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: "ctime"))
+    let ctimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: META_CHANGE_TS_COL_KEY))
     ctimeCol.title = "Meta Change Time"
     ctimeCol.width = 200
     ctimeCol.minWidth = 100
     ctimeCol.isEditable = false
 //    ctimeCol.isHidden = true
     outlineView.addTableColumn(ctimeCol)
+    ctimeCol.sortDescriptorPrototype = NSSortDescriptor(key: META_CHANGE_TS_COL_KEY, ascending: true)
 
 //    outlineView.backgroundColor = .clear
 //    outlineView.usesAlternatingRowBackgroundColors = true // TODO: the colors are screwed up when this is used

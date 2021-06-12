@@ -114,6 +114,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         // Set allowed pasteboard (drag) types (see NodePasteboardWriter class)
         outlineView.registerForDraggedTypes([.guid])
         outlineView.draggingDestinationFeedbackStyle = .regular
+
+        // Set initial sort: this will trigger sortDescriptorsDidChange()
+        let sortDescriptor = NSSortDescriptor(key: NAME_COL_KEY, ascending: true, selector: "caseInsensitiveCompare:");
+        outlineView.sortDescriptors = [sortDescriptor]
+        assert (displayStore.getColSortOrder() == .NAME)
     }
 
     // DataSource methods
@@ -152,12 +157,25 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-     Sorting support
+     Callback for updating sort order
      */
     func outlineView(_ outlineView: NSOutlineView, sortDescriptorsDidChange oldDescriptors: [NSSortDescriptor]) {
-        NSLog("sortDescriptorsDidChange：\(oldDescriptors)")
+        NSLog("INFO  [\(treeID)] sortDescriptorsDidChange：old=\(oldDescriptors) new=\(self.outlineView.sortDescriptors)")
 
-        self.outlineView.reloadData()
+        let sortDescList = self.outlineView.sortDescriptors
+        if sortDescList.count > 0 {
+            let primarySort = sortDescList[0]
+            if let key = primarySort.key {
+                // Don't hang the main thread for what may be a long operation:
+                DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+                    self.displayStore.updateColSortOrder(key, primarySort.ascending)
+                    DispatchQueue.main.async {
+                        self.outlineView.reloadData()
+                    }
+                }
+            }
+        }
+
     }
 
     // NSOutlineViewDelegate methods

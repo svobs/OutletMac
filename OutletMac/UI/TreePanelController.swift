@@ -292,7 +292,9 @@ class TreePanelController: TreePanelControllable {
     }
     readyToPopulate = false
 
-    self.clearModelAndTreeView()
+    DispatchQueue.main.async {
+      self.clearModelAndTreeView()
+    }
     // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
     self.appendEphemeralNode(nil, "Loading...")
 
@@ -355,6 +357,7 @@ class TreePanelController: TreePanelControllable {
 
       self.restoreRowSelectionState(rows.selected)
 
+      // FIXME: remove this from FE completely and just push out stat updates from BE. Stats lifecycle is currently broken!
       // remember to kick this off inside the main dispatch queue
       NSLog("DEBUG [\(self.treeID)] Rescheduling stats refresh timer")
       self.statsRefreshTimer.reschedule()
@@ -634,7 +637,7 @@ class TreePanelController: TreePanelControllable {
 
     let sn = try propDict.get("sn") as! SPIDNodePair
     let parentGUID = try propDict.get("parent_guid") as! String
-    NSLog("DEBUG [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
+    NSLog("INFO  [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
 
     let alreadyPresent: Bool = self.displayStore.upsertSN(parentGUID, sn)
 
