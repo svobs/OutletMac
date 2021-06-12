@@ -123,7 +123,7 @@ class OutletGRPCClient: OutletBackend {
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
       // Got new signal (implicitly this means the connection is back up)
 
-      if SUPER_DEBUG {
+      if TRACE_ENABLED {
         NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
       }
       self.grpcConnectionRestored()
@@ -144,7 +144,7 @@ class OutletGRPCClient: OutletBackend {
         // this should never happen if the server was properly written
         NSLog("INFO  Server closed signal subscription")
       } else if status.code == .unavailable {
-        if SUPER_DEBUG {
+        if SUPER_DEBUG_ENABLED {
           NSLog("ERROR ReceiveSignals(): Server unavailable: \(status)")
         }
       } else {
@@ -155,7 +155,7 @@ class OutletGRPCClient: OutletBackend {
 
     // Wait for the call to end. It will only end if an error occurred (see call.status.whenSuccess above)
     _ = try! call.status.wait()
-    if SUPER_DEBUG {
+    if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG receiveServerSignals() returning")
     }
   }
@@ -579,7 +579,7 @@ class OutletGRPCClient: OutletBackend {
   }
   
   func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
-    if SUPER_DEBUG {
+    if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG getIntConfig entered")
     }
     let defaultValStr: String?
@@ -599,7 +599,7 @@ class OutletGRPCClient: OutletBackend {
   }
 
   func getBoolConfig(_ configKey: String, defaultVal: Bool? = nil) throws -> Bool {
-    if SUPER_DEBUG {
+    if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG getBoolConfig entered")
     }
     let defaultValStr: String? = (defaultVal == nil) ? nil : String(defaultVal!)

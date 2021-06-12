@@ -220,8 +220,8 @@ class SignalDispatcher {
               NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")
             }
           }
-        } else if SUPER_DEBUG {
-          NSLog("DEBUG SignalDispatcher: Listener \(subID) does not match signal '\(signal)' (looking for \(senderID)")
+        } else if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG SignalDispatcher: Listener '\(subID)' does not match signal '\(signal)' (looking for '\(senderID)')")
         }
       }
 

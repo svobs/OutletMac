@@ -191,7 +191,7 @@ class GRPCConverter {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
 
-    if SUPER_DEBUG {
+    if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG Converted from gRPC: \(node)")
 
       if node.isDir {

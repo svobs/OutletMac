@@ -80,7 +80,7 @@ fileprivate struct ButtonBar: View {
 
       let guidListLeft: [GUID] = selectedChangeListLeft.map({ $0.spid.guid })
       let guidListRight: [GUID] = selectedChangeListRight.map({ $0.spid.guid })
-      if SUPER_DEBUG {
+      if SUPER_DEBUG_ENABLED {
         NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
         NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
       }

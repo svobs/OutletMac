@@ -506,7 +506,7 @@ class TreePanelController: TreePanelControllable {
 
     while !mixedQueue.isEmpty {
       let mixedDirSN = mixedQueue.popFirst()!
-      if SUPER_DEBUG {
+      if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining next mixed-state dir: \(mixedDirSN.spid)")
       }
       assert(mixedDirSN.node.isDir, "Expected a dir-type node: \(mixedDirSN.node)")  // only dir nodes can be mixed
@@ -514,16 +514,16 @@ class TreePanelController: TreePanelControllable {
       // Check each child of a mixed dir for checked or mixed status.
       // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
       for childSN in try self.tree.getChildList(mixedDirSN.spid) {
-        if SUPER_DEBUG {
+        if SUPER_DEBUG_ENABLED {
           NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid)")
         }
         if checkedNodeSet.contains(childSN.spid.guid) {
-          if SUPER_DEBUG {
+          if SUPER_DEBUG_ENABLED {
             NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to checkedQueue: \(childSN.spid)")
           }
           checkedQueue.append(childSN)
         } else if mixedNodeSet.contains(childSN.spid.guid) {
-          if SUPER_DEBUG {
+          if SUPER_DEBUG_ENABLED {
             NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding child to mixed list: \(childSN.spid)")
           }
           mixedQueue.append(childSN)
@@ -536,7 +536,7 @@ class TreePanelController: TreePanelControllable {
     // Whitelist contains nothing but trees full of checked items
     while !checkedQueue.isEmpty {
       let chosenSN = checkedQueue.popFirst()!
-      if SUPER_DEBUG {
+      if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Popped next in checkedQueue. Adding to CHECKED list: \(chosenSN.spid.guid) \(chosenSN.spid)")
       }
 
@@ -545,7 +545,7 @@ class TreePanelController: TreePanelControllable {
       // Drill down into all descendants of nodes in the checkedQueue.
       if chosenSN.node.isDir {
         for childSN in try self.tree.getChildList(chosenSN.spid) {
-          if SUPER_DEBUG {
+          if SUPER_DEBUG_ENABLED {
             NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to checkedQueue: \(chosenSN.spid.guid)")
           }
           checkedQueue.append(childSN)

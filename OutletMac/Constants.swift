@@ -10,7 +10,9 @@ import SwiftUI
 typealias MD5 = String
 typealias SHA256 = String
 
-let SUPER_DEBUG: Bool = true
+// Logging
+let SUPER_DEBUG_ENABLED: Bool = true
+let TRACE_ENABLED: Bool = false
 
 let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
 
