@@ -199,6 +199,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return nil
         }
 
+//        NSLog("DEBUG [\(treeID)] Cell requested for GUID: \(guid)")
         return CellFactory.upsertCellToOutlineView(self, identifier, guid)
     }
 

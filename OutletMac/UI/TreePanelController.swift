@@ -273,18 +273,18 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
+  // MUST RUN INSIDE MAIN DQ
   private func clearModelAndTreeView() {
     // Clear display store & TreeView (which draws from display store)
+    NSLog("DEBUG [\(treeID)] Clearing TreeView")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
-    DispatchQueue.main.async {
-      self.treeView!.outlineView.reloadData()
-    }
+    self.treeView!.outlineView.reloadData()
   }
 
   private func populateTreeView() throws {
     NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
-      NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate = true")
+      NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate to true")
       readyToPopulate = true
       return
     }
@@ -292,9 +292,9 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.main.async {
       self.clearModelAndTreeView()
+      // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
+      self.appendEphemeralNode(nil, "Loading...")
     }
-    // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
-    self.appendEphemeralNode(nil, "Loading...")
 
     let rows: RowsOfInterest
     do {
@@ -311,7 +311,9 @@ class TreePanelController: TreePanelControllable {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
       NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
-      self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+      DispatchQueue.main.async {
+        self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+      }
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
@@ -336,12 +338,16 @@ class TreePanelController: TreePanelControllable {
           let childSNList: [SPIDNodePair] = try self.tree.getChildList(sn.spid)
           NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) child nodes for parent \(sn.spid)")
 
-          self.displayStore.putChildList(sn, childSNList)
+          DispatchQueue.main.async {
+            self.displayStore.putChildList(sn, childSNList)
+          }
           queue.append(contentsOf: childSNList)
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue
-          self.appendEphemeralNode(sn, "ERROR: too many items to display (\(actualCount))")
+          DispatchQueue.main.async {
+            self.appendEphemeralNode(sn, "ERROR: too many items to display (\(actualCount))")
+          }
         }
       }
     }
@@ -365,16 +371,14 @@ class TreePanelController: TreePanelControllable {
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID)
     let ephemeralSN = ephemeralNode.toSN()
 
-    DispatchQueue.main.async {
-      self.displayStore.putChildList(parentSN, [ephemeralSN])  // yeah, make sure we put this inside the main DQ or weird race conditions result
+    self.displayStore.putChildList(parentSN, [ephemeralSN])  // yeah, make sure we put this inside the main DQ or weird race conditions result
 
-      var itemToReload = parentSN?.spid.guid
-      if itemToReload == nil || itemToReload == self.tree.rootSPID.guid {
-        itemToReload  = nil
-      }
-      self.treeView!.outlineView.reloadItem(itemToReload, reloadChildren: true)
-      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' ")
+    var itemToReload = parentSN?.spid.guid
+    if itemToReload == nil || itemToReload == self.tree.rootSPID.guid {
+      itemToReload  = nil
     }
+    self.treeView!.outlineView.reloadItem(itemToReload, reloadChildren: true)
+    NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' ")
   }
 
   private func restoreRowSelectionState(_ selected: Set<GUID>) {

@@ -535,7 +535,7 @@ class OutletGRPCClient: OutletBackend {
     let response = try self.callAndTranslateErrors(self.stub.get_filter(request), "getFilterCriteria")
     if response.hasFilterCriteria {
       let filterCriteria = try self.grpcConverter.filterCriteriaFromGRPC(response.filterCriteria)
-      NSLog("[\(treeID)] DEBUG From gRPC: \(filterCriteria)")
+      NSLog("DEBUG [\(treeID)] FilterCriteria from gRPC: \(filterCriteria)")
       return filterCriteria
     } else {
       throw OutletError.invalidState("No FilterCriteria (probably unknown tree) for tree: \(treeID)")
