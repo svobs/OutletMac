@@ -59,9 +59,6 @@ class CellFactory {
   }
 
   static func upsertCellToOutlineView(_ tvc: TreeViewController, _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
-    guard guid != EPHEMERAL_GUID else {
-      return nil
-    }
 
     guard let sn = tvc.displayStore.getSN(guid) else {
       NSLog("ERROR [\(tvc.treeID)] viewForTableColumn(): node not found with GUID: \(guid)")

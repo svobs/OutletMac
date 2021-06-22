@@ -360,17 +360,20 @@ class TreePanelController: TreePanelControllable {
   }
 
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
-    let ephemeralNode = EphemeralNode(nodeName, parent: parentSN?.spid ?? nil)
-    let ephemeralSN = (ephemeralNode.nodeIdentifier as! SPID, ephemeralNode)
-    self.displayStore.putChildList(parentSN, [ephemeralSN])
+    let parentSPID = (parentSN == nil ? self.tree.rootSPID : parentSN!.spid)
+
+    let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID)
+    let ephemeralSN = ephemeralNode.toSN()
 
     DispatchQueue.main.async {
+      self.displayStore.putChildList(parentSN, [ephemeralSN])  // yeah, make sure we put this inside the main DQ or weird race conditions result
+
       var itemToReload = parentSN?.spid.guid
       if itemToReload == nil || itemToReload == self.tree.rootSPID.guid {
         itemToReload  = nil
       }
       self.treeView!.outlineView.reloadItem(itemToReload, reloadChildren: true)
-      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): '\(nodeName)'")
+      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' ")
     }
   }
 

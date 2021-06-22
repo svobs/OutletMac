@@ -17,6 +17,8 @@ class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
   private var con: TreePanelControllable
 
+  private let dq = DispatchQueue(label: "Serial DisplayStore Queue") // custom dispatch queues are serial by default
+
   private var treeID: TreeID {
     get {
       return self.con.treeID
@@ -102,7 +104,7 @@ class DisplayStore {
       fatalError("Unrecognized sort key: \(sortKey)")
     }
 
-    con.app.execSync {
+    dq.sync {
       self.colSortOrder = colSortOrder
       self.sortAscending = isAscending
       for (parentGUID, childList) in self.parentChildListDict {
@@ -147,7 +149,7 @@ class DisplayStore {
    Clears all data structures. Populates the data structures with the given SNs, then returns them.
   */
   func putRootChildList(_ rootSN: SPIDNodePair, _ topLevelSNList: [SPIDNodePair]) -> Void {
-    con.app.execSync {
+    dq.sync {
       self.primaryDict.removeAll()
       self.childParentDict.removeAll()
       self.parentChildListDict.removeAll()
@@ -167,7 +169,7 @@ class DisplayStore {
   }
 
   func putChildList(_ parentSN: SPIDNodePair?, _ childSNList: [SPIDNodePair]) {
-    con.app.execSync {
+    dq.sync {
       // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
       let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
       let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.spid.guid)
@@ -184,12 +186,14 @@ class DisplayStore {
       }
       let sortedList = self.sortDirContents(childSNList)
       self.parentChildListDict[parentGUID] = sortedList
+
+      NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
     }
   }
 
   func upsertSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
     var wasPresent: Bool = false
-    con.app.execSync {
+    dq.sync {
       let childGUID = childSN.spid.guid
       if self.primaryDict[childGUID] != nil {
         wasPresent = true
@@ -213,7 +217,7 @@ class DisplayStore {
    */
   func getSN(_ guid: GUID) -> SPIDNodePair? {
     var sn: SPIDNodePair?
-    con.app.execSync {
+    dq.sync {
       sn = self.getSN_NoLock(guid)
     }
     return sn
@@ -224,7 +228,7 @@ class DisplayStore {
    */
   func getSNList(_ guidList: [GUID]) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
-    con.app.execSync {
+    dq.sync {
       for guid in guidList {
         if let sn = self.getSN_NoLock(guid) {
           snList.append(sn)
@@ -242,7 +246,7 @@ class DisplayStore {
 
   func getChildCount(_ parentGUID: GUID?) -> Int? {
     var count: Int? = 0
-    con.app.execSync {
+    dq.sync {
       count = self.parentChildListDict[parentGUID ?? TOPMOST_GUID]?.count
     }
     return count
@@ -253,7 +257,7 @@ class DisplayStore {
    */
   func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
-    con.app.execSync {
+    dq.sync {
       snList = self.getChildList_NoLock(parentGUID)
     }
     return snList
@@ -265,7 +269,7 @@ class DisplayStore {
    */
   func getChild(_ parentGUID: GUID?, _ childIndex: Int, useParentIfIndexInvalid: Bool = false) -> SPIDNodePair? {
     var sn: SPIDNodePair?
-    con.app.execSync {
+    dq.sync {
       if childIndex < 0 {
         if useParentIfIndexInvalid {
           // Return parent instead
@@ -293,7 +297,7 @@ class DisplayStore {
 
   func getParentGUID(_ childGUID: GUID) -> GUID? {
     var parentGUID: GUID? = nil
-    con.app.execSync {
+    dq.sync {
       parentGUID = self.childParentDict[childGUID]
     }
     return parentGUID
@@ -309,7 +313,7 @@ class DisplayStore {
 
   func getParentSN(_ childGUID: GUID) -> SPIDNodePair? {
     var parentSN: SPIDNodePair? = nil
-    con.app.execSync {
+    dq.sync {
       parentSN = self.getParentSN_NoLock(childGUID)
     }
     return parentSN
@@ -335,7 +339,7 @@ class DisplayStore {
   }
 
   func updateCheckboxStateForSameLevelAndBelow(_ guid: GUID, _ newIsCheckedValue: Bool, _ treeID: TreeID) {
-    con.app.execSync {
+    dq.sync {
 
       /*
        1. Self and children
@@ -380,7 +384,7 @@ class DisplayStore {
   // includes implicit values based on parent
   func getCheckboxState(_ sn: SPIDNodePair) -> NSControl.StateValue {
     var state: NSControl.StateValue = .off
-    con.app.execSync {
+    dq.sync {
       state = self.getCheckboxState_NoLock(sn)
     }
     return state
@@ -388,7 +392,7 @@ class DisplayStore {
 
   func isCheckboxChecked(_ sn: SPIDNodePair) -> Bool {
     var isChecked: Bool = false
-    con.app.execSync {
+    dq.sync {
       isChecked = self.isCheckboxChecked_NoLock(sn)
     }
     return isChecked
@@ -396,7 +400,7 @@ class DisplayStore {
 
   func isCheckboxMixed(_ sn: SPIDNodePair) -> Bool {
     var isMixed: Bool = false
-    con.app.execSync {
+    dq.sync {
       isMixed = self.mixedNodeSet.contains(sn.spid.guid)
     }
     return isMixed
@@ -422,7 +426,7 @@ class DisplayStore {
   }
 
   func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    con.app.execSync {
+    dq.sync {
       self.updateCheckedStateTracking_NoLock(sn, isChecked: isChecked, isMixed: isMixed)
     }
   }
@@ -446,7 +450,7 @@ class DisplayStore {
 
   func removeSN(_ guid: GUID) -> Bool {
     var removed: Bool = false
-    con.app.execSync {
+    dq.sync {
       removed = self.removeSN_NoLock(guid)
     }
     return removed
@@ -457,7 +461,7 @@ class DisplayStore {
       _ = self.removeSN_NoLock(sn.spid.guid)
     }
 
-    con.app.execSync {
+    dq.sync {
       self.doForDescendants(guid, applyFunc)
     }
   }

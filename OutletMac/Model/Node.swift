@@ -276,11 +276,11 @@ class DirectoryStats : CustomStringConvertible {
 
 /**
  CLASS EphemeralNode
- Is an empty node (not much content)
+ Not a "real" node in the sense that it represents something from central, but needed to display something to the user
  */
 class EphemeralNode: Node {
   private let _name: String
-  init(_ name: String, parent: SPID?) {
+  init(_ name: String, parent: SPID) {
     self._name = name
     super.init(EphemeralNodeIdentifier(parent: parent), [], .NOT_TRASHED)
   }
@@ -303,6 +303,16 @@ class EphemeralNode: Node {
 
   override var defaultIcon: IconID {
     return .ICON_ALERT
+  }
+
+  override var isDisplayOnly: Bool {
+    get {
+      true
+    }
+  }
+
+  func toSN() -> SPIDNodePair {
+    return (self.nodeIdentifier as! SPID, self)
   }
 }
 

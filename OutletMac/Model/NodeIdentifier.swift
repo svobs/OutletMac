@@ -136,7 +136,7 @@ class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
   }
 
   override var guid: GUID {
-    return EPHEMERAL_GUID
+    return "0:0:\(self._pathUID):E"
   }
 
   override public var description: String {
