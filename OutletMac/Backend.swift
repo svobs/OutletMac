@@ -42,7 +42,6 @@ protocol OutletBackend: HasLifecycle {
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws
   func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp?
   func downloadFileFromGDrive(deviceUID: UID, nodeUID: UID, requestorID: String) throws
   func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws
@@ -198,10 +197,6 @@ class MockBackend: OutletBackend {
   }
 
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws {
-    throw OutletError.invalidOperation("Cannot call MockBackend methods")
-  }
-
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

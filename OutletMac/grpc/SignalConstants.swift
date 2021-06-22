@@ -53,11 +53,12 @@ enum Signal: UInt32 {
   case GDRIVE_RELOADED = 45
   case NODE_UPSERTED = 46
   case NODE_REMOVED = 47
+  /** Sent from BE and received by FE: stats were updated for nodes in the DisplayTree, and also possibly the StatusMsg */
+  case STATS_UPDATED = 48
+
   /** Sent by FE and received by the BE */
   case EXIT_DIFF_MODE = 49
   case ERROR_OCCURRED = 50
-  case REFRESH_SUBTREE_STATS_DONE = 51
-  case REFRESH_SUBTREE_STATS_COMPLETELY_DONE = 52
   /** Indicates that the central cache has updated the stats for the subtree, and the subtree should redraw the nodes */
   case DOWNLOAD_FROM_GDRIVE_DONE = 53
   /** This is fired by the UI when it has finished populating the UI tree */

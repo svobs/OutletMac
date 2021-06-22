@@ -194,25 +194,20 @@ class OutletGRPCClient: OutletBackend {
         argDict["status_msg"] = signalGRPC.statusMsg.msg
       case .DOWNLOAD_FROM_GDRIVE_DONE:
         argDict["filename"] = signalGRPC.downloadMsg.filename
-      case .REFRESH_SUBTREE_STATS_DONE:
+      case .STATS_UPDATED:
         argDict["status_msg"] = signalGRPC.statsUpdate.statusMsg
 
-        if signalGRPC.statsUpdate.dirMetaList.count > 0 {
-          // TODO: this API could be improved by adding separate fields for UID-based vs GUID-based entries
-          if signalGRPC.statsUpdate.dirMetaList[0].uid > 0 {
-            var dirStatsDict: [UID:DirectoryStats] = [:]
-            for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaList {
-              dirStatsDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-            }
-            argDict["dir_stats_dict_uid"] = dirStatsDict
-          } else {
-            var dirStatsDict: [GUID:DirectoryStats] = [:]
-            for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaList {
-              dirStatsDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-            }
-            argDict["dir_stats_dict_guid"] = dirStatsDict
-          }
+        var dirStatsByUidDict: [UID:DirectoryStats] = [:]
+        for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaByUidList {
+          dirStatsByUidDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
         }
+        argDict["dir_stats_dict_by_uid"] = dirStatsByUidDict
+
+        var dirStatsByGuidDict: [GUID:DirectoryStats] = [:]
+        for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaByGuidList {
+          dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
+        }
+        argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
       default:
         break
     }
@@ -496,14 +491,7 @@ class OutletGRPCClient: OutletBackend {
     request.treeID = treeID
     let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree(request), "enqueueRefreshSubtreeTask")
   }
-  
-  func enqueueRefreshSubtreeStatsTask(rootUID: UID, treeID: TreeID) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request()
-    request.rootUid = rootUID
-    request.treeID = treeID
-    let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree_stats(request), "enqueueRefreshSubtreeStatsTask")
-  }
-  
+
   func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request()
     request.deviceUid = deviceUID

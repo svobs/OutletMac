@@ -169,7 +169,6 @@ class TreePanelController: TreePanelControllable {
   var allowMultipleSelection: Bool
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
-  private lazy var statsRefreshTimer = HoldOffTimer(STATS_REFRESH_HOLDOFF_TIME_MS, self.fireRequestStatsRefresh)
 
   init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowMultipleSelection: Bool) throws {
     self.app = app
@@ -212,7 +211,6 @@ class TreePanelController: TreePanelControllable {
     self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: treeID)
-    self.dispatchListener.subscribe(signal: .REFRESH_SUBTREE_STATS_DONE, self.onRefreshStatsDone, whitelistSenderID: treeID)
 
     self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: treeID)
@@ -311,7 +309,7 @@ class TreePanelController: TreePanelControllable {
 
     do {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
-      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root")
+      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
       self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
       queue.append(contentsOf: topLevelSNList)
@@ -349,7 +347,7 @@ class TreePanelController: TreePanelControllable {
     }
 
     DispatchQueue.main.async {
-      // Reload entire tree:
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
       self.treeView!.outlineView.reloadItem(nil, reloadChildren: true)
 
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): Expanding rows: \(toExpandInOrder)")
@@ -357,24 +355,22 @@ class TreePanelController: TreePanelControllable {
 
       self.restoreRowSelectionState(rows.selected)
 
-      // FIXME: remove this from FE completely and just push out stat updates from BE. Stats lifecycle is currently broken!
-      // remember to kick this off inside the main dispatch queue
-      NSLog("DEBUG [\(self.treeID)] Rescheduling stats refresh timer")
-      self.statsRefreshTimer.reschedule()
-
       self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
     }
   }
 
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
-    let parentGUID = parentSN?.spid.guid
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSN?.spid ?? nil)
     let ephemeralSN = (ephemeralNode.nodeIdentifier as! SPID, ephemeralNode)
     self.displayStore.putChildList(parentSN, [ephemeralSN])
 
     DispatchQueue.main.async {
-      self.treeView!.outlineView.reloadItem(parentGUID, reloadChildren: true)
-      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node: '\(nodeName)'")
+      var itemToReload = parentSN?.spid.guid
+      if itemToReload == nil || itemToReload == self.tree.rootSPID.guid {
+        itemToReload  = nil
+      }
+      self.treeView!.outlineView.reloadItem(itemToReload, reloadChildren: true)
+      NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): '\(nodeName)'")
     }
   }
 
@@ -624,11 +620,6 @@ class TreePanelController: TreePanelControllable {
     self.updateStatusBarMsg(statusBarMsg)
   }
 
-  private func onRefreshStatsDone(_ senderID: SenderID, _ propDict: PropDict) throws {
-    let statusBarMsg = try propDict.getString("status_msg")
-    self.updateStatusBarMsg(statusBarMsg)
-  }
-
   private func onNodeUpserted(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
       NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
@@ -675,29 +666,20 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func fireFilterTimer() {
-    NSLog("DEBUG [\(self.treeID)] Firing timer to update filter via BE")
+    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
 
-    do {
-      try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: self.swiftFilterState.toFilterCriteria())
-    } catch {
-      NSLog("ERROR [\(self.treeID)] Failed to update filter criteria on the backend: \(error)")
-      return
-    }
-    do {
-      try self.populateTreeView()
-    } catch {
-      reportException("Failed to repopulate TreeView after filter change", error)
-    }
-  }
+      NSLog("DEBUG [\(self.treeID)] Firing timer to update filter via BE")
 
-  private func fireRequestStatsRefresh() {
-    NSLog("DEBUG [\(self.treeID)] Requesting subtree stats refresh")
-
-    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
-        try self.backend.enqueueRefreshSubtreeStatsTask(rootUID: self.tree.rootSPID.nodeUID, treeID: self.treeID)
+        try self.app.backend.updateFilterCriteria(treeID: self.treeID, filterCriteria: self.swiftFilterState.toFilterCriteria())
       } catch {
-        reportException("Request to refresh stats failed", error)
+        NSLog("ERROR [\(self.treeID)] Failed to update filter criteria on the backend: \(error)")
+        return
+      }
+      do {
+        try self.populateTreeView()
+      } catch {
+        reportException("Failed to repopulate TreeView after filter change", error)
       }
     }
   }
