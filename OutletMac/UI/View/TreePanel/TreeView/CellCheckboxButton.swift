@@ -43,7 +43,7 @@ class CellCheckboxButton: NSButton {
 
   func updateState(_ sn: SPIDNodePair) {
     self.guid = sn.spid.guid
-    let state = self.parent.displayStore.getCheckboxState(sn)
+    let state = self.parent.displayStore.getCheckboxState(guid)
     // Need to disable this in most cases, because we cannot preemptively prevent the user from
     // toggling into the Mixed state if it is enabled. Enable only when we want to display the mixed state:
     self.allowsMixedState = state == .mixed

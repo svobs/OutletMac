@@ -208,6 +208,8 @@ class OutletGRPCClient: OutletBackend {
           dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
         }
         argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
+      case .LOAD_SUBTREE_DONE:
+        argDict["status_msg"] = signalGRPC.statusMsg.msg
       default:
         break
     }

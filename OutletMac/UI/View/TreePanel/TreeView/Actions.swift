@@ -50,7 +50,7 @@ class TreeActions {
     while !queue.isEmpty {
       let parentSN = queue.popFirst()!
       let parentGUID = parentSN.spid.guid
-      for sn in self.con.displayStore.getChildList(parentGUID) {
+      for sn in self.con.displayStore.getChildSNList(parentGUID) {
         process(sn)
       }
     }

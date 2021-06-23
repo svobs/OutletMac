@@ -211,6 +211,7 @@ class TreePanelController: TreePanelControllable {
     self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .STATS_UPDATED, self.onDirStatsUpdated, whitelistSenderID: treeID)
 
     self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: treeID)
@@ -452,13 +453,13 @@ class TreePanelController: TreePanelControllable {
       var hasChecked = false
       var hasUnchecked = false
       var hasMixed = false
-      for childSN in self.displayStore.getChildList(ancestorGUID) {
-        if self.displayStore.isCheckboxChecked(childSN) {
+      for childGUID in self.displayStore.getChildGUIDList(ancestorGUID) {
+        if self.displayStore.isCheckboxChecked(childGUID) {
           hasChecked = true
         } else {
           hasUnchecked = true
         }
-        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childSN)
+        hasMixed = hasMixed || self.displayStore.isCheckboxMixed(childGUID)
       }
       let isChecked = hasChecked && !hasUnchecked && !hasMixed
       let isMixed = hasMixed || (hasChecked && hasUnchecked)
@@ -473,7 +474,7 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
 
     // Update model here:
-    self.displayStore.updateCheckedStateTracking(sn, isChecked: isChecked, isMixed: isMixed)
+    self.displayStore.updateCheckedStateTracking(guid, isChecked: isChecked, isMixed: isMixed)
 
     // Now update the node in the UI:
     self.treeView!.reloadItem(guid, reloadChildren: false)
@@ -599,6 +600,10 @@ class TreePanelController: TreePanelControllable {
     DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
       do {
         self.enableNodeUpdateSignals = true
+
+        let statusBarMsg = try propDict.getString("status_msg")
+        self.updateStatusBarMsg(statusBarMsg)
+
         try self.populateTreeView()
       } catch {
         NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
@@ -625,6 +630,25 @@ class TreePanelController: TreePanelControllable {
   private func onSetStatus(_ senderID: SenderID, _ propDict: PropDict) throws {
     let statusBarMsg = try propDict.getString("status_msg")
     self.updateStatusBarMsg(statusBarMsg)
+  }
+
+  private func onDirStatsUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
+    // TODO: do we really want to honor this flag here?
+    if !self.enableNodeUpdateSignals {
+      NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
+      return
+    }
+
+    let statusBarMsg = try propDict.getString("status_msg")
+    self.updateStatusBarMsg(statusBarMsg)
+
+    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
+    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
+
+    DispatchQueue.main.async {
+      self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
+      self.treeView!.outlineView.reloadData()
+    }
   }
 
   private func onNodeUpserted(_ senderID: SenderID, _ propDict: PropDict) throws {
@@ -658,7 +682,7 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
 
     if self.displayStore.removeSN(sn.spid.guid) {
-      self.treeView!.removeItem(sn.spid.guid, parentGUID: parentGUID)
+      self.treeView!.reloadItem(parentGUID, reloadChildren: true)
     }
   }
 

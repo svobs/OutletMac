@@ -143,7 +143,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      Tell Apple how many children each row has.
     */
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-        return displayStore.getChildList(itemToGUID(item)).count
+        return displayStore.getChildGUIDList(itemToGUID(item)).count
     }
 
     /**
@@ -280,6 +280,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      */
     func outlineViewItemWillCollapse(_ notification: Notification) {
         guard let parentGUID: GUID = getKey(notification) else {
+            return
+        }
+        guard parentGUID != TOPMOST_GUID else {
+            NSLog("ERROR [\(treeID)] Trying to collapse topmost GUID (\(parentGUID)); ignoring")
             return
         }
         NSLog("DEBUG [\(treeID)] Row is collapsing: \(parentGUID)")
@@ -578,23 +582,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func reloadItem(_ guid: GUID, reloadChildren: Bool) {
         DispatchQueue.main.async {
             self.reloadItem_NoLock(guid, reloadChildren: reloadChildren)
-        }
-    }
-
-    func removeItem(_ guid: GUID, parentGUID: GUID) {
-        // remember, GUID at root of tree is nil
-        let effectiveParent = (parentGUID == self.con.tree.rootSPID.guid) ? nil : parentGUID
-
-        DispatchQueue.main.async {
-            let indexInParent = self.outlineView.childIndex(forItem: guid)
-            if indexInParent >= 0 {
-                var indexSet = IndexSet()
-                indexSet.insert(indexInParent)
-                NSLog("DEBUG [\(self.treeID)] Removing item: \(guid) with parent: \(effectiveParent ?? TOPMOST_GUID)")
-                self.outlineView.removeItems(at: indexSet, inParent: effectiveParent, withAnimation: .effectFade)
-            }
-            // It seems that the only bug-free way to remove the node is to reload its parent:
-//            self.reloadItem_NoLock(parentGUID, reloadChildren: true)
         }
     }
 

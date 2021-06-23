@@ -28,9 +28,10 @@ class DisplayStore {
   private var colSortOrder: ColSortOrder = .NAME
   private var sortAscending: Bool = true
 
-  // Need to keep each list in here sorted:
-  private var parentChildListDict: [GUID: [SPIDNodePair]] = [:]
+  // Need to keep each list in here sorted according to the current UI setting:
+  private var parentChildListDict: [GUID: [GUID]] = [:]
   private var primaryDict: [GUID: SPIDNodePair] = [:]
+  // Back pointer to each parent (for speed)
   private var childParentDict: [GUID: GUID] = [:]
 
   /*
@@ -68,13 +69,13 @@ class DisplayStore {
     }
     // TODO: this may get slow for very large directories...
     for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
-      if existing.spid.guid == childGUID {
+      if existing == childGUID {
         // found: replace existing
-        self.parentChildListDict[realParentGUID]![index] = childSN
+        self.parentChildListDict[realParentGUID]![index] = childGUID
         return
       }
     }
-    self.parentChildListDict[realParentGUID]!.append(childSN)
+    self.parentChildListDict[realParentGUID]!.append(childGUID)
 
     // Child -> Parent
     self.childParentDict[childGUID] = realParentGUID
@@ -113,33 +114,64 @@ class DisplayStore {
     }
   }
 
-  private func sortDirContents(_ childList: [SPIDNodePair]) -> [SPIDNodePair] {
+  private func toSNList(guidList: [GUID]) throws -> [SPIDNodePair] {
+    var snList: [SPIDNodePair] = []
+
+    for guid in guidList {
+      let sn = primaryDict[guid]
+      if sn == nil {
+        throw OutletError.invalidState("toSNList(): failed to find GUID in primaryDict: \(guid)")
+      }
+      snList.append(sn!)
+    }
+
+    return snList
+  }
+
+  private func sortDirContents(_ childList: [GUID]) -> [GUID] {
+    // convert from [GUID] to [SPIDNodePair]. If error occurs, fail
+    let snList: [SPIDNodePair]
+    do {
+      snList = try toSNList(guidList: childList)
+    } catch {
+      NSLog("[\(self.treeID)] ERROR sortDirContents() failed: \(error)")
+      return childList
+    }
+
+    let snSortedList: [SPIDNodePair] = sortDirContents(snList: snList)
+    return snSortedList.map { $0.spid.guid }  // convert back to [GUID]
+  }
+
+  private func sortDirContents(snList: [SPIDNodePair]) -> [SPIDNodePair] {
+    let snSortedList: [SPIDNodePair]
     switch self.colSortOrder {
     case .NAME:
       let desiredOrder: ComparisonResult = (self.sortAscending ? .orderedAscending : .orderedDescending)
-      return childList.sorted { $0.node.name.localizedCaseInsensitiveCompare($1.node.name) == desiredOrder }
+      snSortedList = snList.sorted { $0.node.name.localizedCaseInsensitiveCompare($1.node.name) == desiredOrder }
     case .SIZE:
       if self.sortAscending {
         // put nodes with missing size at the end
-        return childList.sorted { ($0.node.sizeBytes ?? UInt64.max) < ($1.node.sizeBytes ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.sizeBytes ?? UInt64.max) < ($1.node.sizeBytes ?? UInt64.max) }
       } else {
-        return childList.sorted { ($0.node.sizeBytes ?? UInt64.max) > ($1.node.sizeBytes ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.sizeBytes ?? UInt64.max) > ($1.node.sizeBytes ?? UInt64.max) }
       }
     case .MODIFY_TS:
       if self.sortAscending {
         // put nodes with missing TS at the end
-        return childList.sorted { ($0.node.modifyTS ?? UInt64.max) < ($1.node.modifyTS ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.modifyTS ?? UInt64.max) < ($1.node.modifyTS ?? UInt64.max) }
       } else {
-        return childList.sorted { ($0.node.modifyTS ?? UInt64.max) > ($1.node.modifyTS ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.modifyTS ?? UInt64.max) > ($1.node.modifyTS ?? UInt64.max) }
       }
     case .CHANGE_TS:
       if self.sortAscending {
         // put nodes with missing TS at the end
-        return childList.sorted { ($0.node.changeTS ?? UInt64.max) < ($1.node.changeTS ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.changeTS ?? UInt64.max) < ($1.node.changeTS ?? UInt64.max) }
       } else {
-        return childList.sorted { ($0.node.changeTS ?? UInt64.max) > ($1.node.changeTS ?? UInt64.max) }
+        snSortedList = snList.sorted { ($0.node.changeTS ?? UInt64.max) > ($1.node.changeTS ?? UInt64.max) }
       }
     }
+
+    return snSortedList
   }
 
   // "Put" operations
@@ -158,8 +190,8 @@ class DisplayStore {
 
       self.primaryDict[TOPMOST_GUID] = rootSN // needed for determining implicitly checked checkboxes
 
-      let sortedList = self.sortDirContents(topLevelSNList)
-      self.parentChildListDict[TOPMOST_GUID] = sortedList
+      let sortedList = self.sortDirContents(snList: topLevelSNList)
+      self.parentChildListDict[TOPMOST_GUID] = sortedList.map { $0.spid.guid }
       for childSN in sortedList {
         let childGUID = childSN.spid.guid
         self.primaryDict[childGUID] = childSN
@@ -184,8 +216,8 @@ class DisplayStore {
           self.checkedNodeSet.insert(childSN.spid.guid)
         }
       }
-      let sortedList = self.sortDirContents(childSNList)
-      self.parentChildListDict[parentGUID] = sortedList
+      let sortedGUIDList = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
+      self.parentChildListDict[parentGUID] = sortedGUIDList
 
       NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
     }
@@ -224,9 +256,9 @@ class DisplayStore {
   }
 
   /**
-   Lookup func. Given a list of GUIDs, return a list of their corresponding SPIDNodePairs in the same order.
+   Generic lookup func. Given a list of GUIDs, return a list of their corresponding SPIDNodePairs in the same order.
    */
-  func getSNList(_ guidList: [GUID]) -> [SPIDNodePair] {
+  public func getSNList(_ guidList: [GUID]) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     dq.sync {
       for guid in guidList {
@@ -240,7 +272,7 @@ class DisplayStore {
     return snList
   }
 
-  private func getChildList_NoLock(_ parentGUID: GUID?) -> [SPIDNodePair] {
+  private func getChildGUIDList_NoLock(_ parentGUID: GUID?) -> [GUID] {
     return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
   }
 
@@ -253,15 +285,33 @@ class DisplayStore {
   }
 
   /**
-   Returns the list of children for a given parent GUID.
+   Returns the list of child GUIDs for a given parent GUID.
    */
-  func getChildList(_ parentGUID: GUID?) -> [SPIDNodePair] {
+  func getChildGUIDList(_ parentGUID: GUID?) -> [GUID] {
+    var guidList: [GUID] = []
+    dq.sync {
+      guidList = self.getChildGUIDList_NoLock(parentGUID)
+    }
+    return guidList
+  }
+
+  /**
+   Returns the list of children for a given parent GUID as SPIDNodePairs. This is similar to getChildGUIDList, but is a slightly heavier operation,
+   so getChildGUIDList should be used if possible.
+   */
+  func getChildSNList(_ parentGUID: GUID?) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     dq.sync {
-      snList = self.getChildList_NoLock(parentGUID)
+      let guidList = self.getChildGUIDList_NoLock(parentGUID)
+      do {
+        snList = try self.toSNList(guidList: guidList)
+      } catch {
+        NSLog("ERROR: getChildSNList(): toSNList() failed (no results will be returned!): \(error)")
+      }
     }
     return snList
   }
+
 
   /**
    Called by NSOutlineView: returns a SPIDNodePair for the requested parent's key (GUID) and zero-based index.
@@ -288,7 +338,7 @@ class DisplayStore {
             sn = nil
           }
         } else {
-          sn = childList[childIndex]
+          sn = getSN_NoLock(childList[childIndex])
         }
       }
     }
@@ -326,7 +376,12 @@ class DisplayStore {
     return (self.checkedNodeSet, self.mixedNodeSet)
   }
 
-  private func isCheckboxChecked_NoLock(_ sn: SPIDNodePair) -> Bool {
+  private func isCheckboxChecked_NoLock(_ guid: GUID) -> Bool {
+    guard let sn = getSN_NoLock(guid) else {
+      NSLog("[\(treeID)] ERROR isCheckboxChecked_NoLock(): Could not find GUID \(guid) in primaryDict! Returning false")
+      return false
+    }
+
     if sn.node.isEphemeral {
       return false
     }
@@ -347,7 +402,7 @@ class DisplayStore {
        This will not update it in the UI, however.
        */
       NSLog("DEBUG [\(treeID)] setNodeCheckedState(): setting self and descendants of \(guid): checked => \(newIsCheckedValue)")
-      let applyFunc: ApplyToSNFunc = { sn in self.updateCheckedStateTracking_NoLock(sn, isChecked: newIsCheckedValue, isMixed: false) }
+      let applyFunc: ApplyToSNFunc = { sn in self.updateCheckedStateTracking_NoLock(guid, isChecked: newIsCheckedValue, isMixed: false) }
       self.doForSelfAndAllDescendants(guid, applyFunc)
 
       /*
@@ -362,19 +417,19 @@ class DisplayStore {
       let parentGUID = parentSN.spid.guid
 
       if parentGUID != TOPMOST_GUID {
-        for siblingSN in self.getChildList_NoLock(parentGUID) {
-          let state = self.getCheckboxState_NoLock(siblingSN)
-          NSLog("DEBUG [\(treeID)] Sibling \(siblingSN.spid.guid) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
-          self.updateCheckedStateTracking_NoLock(siblingSN, isChecked: state == .on, isMixed: state == .mixed)
+        for siblingGUID in self.getChildGUIDList_NoLock(parentGUID) {
+          let state = self.getCheckboxState_NoLock(siblingGUID)
+          NSLog("DEBUG [\(treeID)] Sibling \(siblingGUID) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
+          self.updateCheckedStateTracking_NoLock(siblingGUID, isChecked: state == .on, isMixed: state == .mixed)
         }
       }
     }
   }
 
-  private func getCheckboxState_NoLock(_ sn: SPIDNodePair) -> NSControl.StateValue {
-    if self.isCheckboxChecked_NoLock(sn) {
+  private func getCheckboxState_NoLock(_ guid: GUID) -> NSControl.StateValue {
+    if self.isCheckboxChecked_NoLock(guid) {
       return .on
-    } else if self.mixedNodeSet.contains(sn.spid.guid) {
+    } else if self.mixedNodeSet.contains(guid) {
       return .mixed
     } else {
       return .off
@@ -382,33 +437,31 @@ class DisplayStore {
   }
 
   // includes implicit values based on parent
-  func getCheckboxState(_ sn: SPIDNodePair) -> NSControl.StateValue {
+  func getCheckboxState(_ guid: GUID) -> NSControl.StateValue {
     var state: NSControl.StateValue = .off
     dq.sync {
-      state = self.getCheckboxState_NoLock(sn)
+      state = self.getCheckboxState_NoLock(guid)
     }
     return state
   }
 
-  func isCheckboxChecked(_ sn: SPIDNodePair) -> Bool {
+  func isCheckboxChecked(_ guid: GUID) -> Bool {
     var isChecked: Bool = false
     dq.sync {
-      isChecked = self.isCheckboxChecked_NoLock(sn)
+      isChecked = self.isCheckboxChecked_NoLock(guid)
     }
     return isChecked
   }
 
-  func isCheckboxMixed(_ sn: SPIDNodePair) -> Bool {
+  func isCheckboxMixed(_ guid: GUID) -> Bool {
     var isMixed: Bool = false
     dq.sync {
-      isMixed = self.mixedNodeSet.contains(sn.spid.guid)
+      isMixed = self.mixedNodeSet.contains(guid)
     }
     return isMixed
   }
 
-  private func updateCheckedStateTracking_NoLock(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
-    let guid: GUID = sn.spid.guid
-
+  private func updateCheckedStateTracking_NoLock(_ guid: GUID, isChecked: Bool, isMixed: Bool) {
     NSLog("DEBUG [\(treeID)] Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
 
     if isChecked {
@@ -425,9 +478,9 @@ class DisplayStore {
 
   }
 
-  func updateCheckedStateTracking(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
+  func updateCheckedStateTracking(_ guid: GUID, isChecked: Bool, isMixed: Bool) {
     dq.sync {
-      self.updateCheckedStateTracking_NoLock(sn, isChecked: isChecked, isMixed: isMixed)
+      self.updateCheckedStateTracking_NoLock(guid, isChecked: isChecked, isMixed: isMixed)
     }
   }
 
@@ -456,7 +509,7 @@ class DisplayStore {
     return removed
   }
 
-  func removeSubtree(_ guid: GUID) {
+  public func removeSubtree(_ guid: GUID) {
     let applyFunc: ApplyToSNFunc = { sn in
       _ = self.removeSN_NoLock(sn.spid.guid)
     }
@@ -466,8 +519,24 @@ class DisplayStore {
     }
   }
 
-  func isDir(_ guid: GUID) -> Bool {
+  public func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node.isDir ?? false
+  }
+
+  public func updateDirStats(_ byGUID: Dictionary<GUID, DirectoryStats>, _ byUID: Dictionary<UID, DirectoryStats>) {
+    dq.sync {
+      for (guid, sn) in self.primaryDict {
+        if byGUID.count > 0 {
+          if let dirStats = byGUID[guid] {
+            sn.node.setDirStats(dirStats)
+          }
+        } else if byUID.count > 0 {
+          if let dirStats = byUID[sn.node.uid] {
+            sn.node.setDirStats(dirStats)
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -475,16 +544,16 @@ class DisplayStore {
 
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  func doForDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
+  private func doForDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    var searchQueue = LinkedList<SPIDNodePair>()
+    var searchQueue = LinkedList<GUID>()
 
     if let sn = self.getSN_NoLock(guid) {
 
       NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
-      for childSN in self.getChildList_NoLock(sn.spid.guid) {
-        searchQueue.append(childSN)
+      for childGUID in self.getChildGUIDList_NoLock(sn.spid.guid) {
+        searchQueue.append(childGUID)
       }
 
       applyBreadthFirst(&searchQueue, applyFunc)
@@ -496,14 +565,14 @@ class DisplayStore {
 
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
+  private func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    var searchQueue = LinkedList<SPIDNodePair>()
+    var searchQueue = LinkedList<GUID>()
 
     if let sn = self.getSN_NoLock(guid) {
       NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
-      searchQueue.append(sn)
+      searchQueue.append(guid)
 
       applyBreadthFirst(&searchQueue, applyFunc)
     }
@@ -515,19 +584,24 @@ class DisplayStore {
 
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func applyBreadthFirst(_ searchQueue: inout LinkedList<SPIDNodePair>, _ applyFunc: ApplyToSNFunc) {
+  private func applyBreadthFirst(_ searchQueue: inout LinkedList<GUID>, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
     while !searchQueue.isEmpty {
-      let sn = searchQueue.popFirst()!
+      let guid = searchQueue.popFirst()!
 
-      for childSN in self.getChildList_NoLock(sn.spid.guid) {
-        searchQueue.append(childSN)
+      for childGUID in self.getChildGUIDList_NoLock(guid) {
+        searchQueue.append(childGUID)
       }
 
       // Apply this AFTER adding its children
-      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
-      applyFunc(sn)
+      if let sn = getSN_NoLock(guid) {
+        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+        applyFunc(sn)
+      } else {
+        // should never happen but let's log if it does
+        NSLog("ERROR [\(treeID)] applyBreadthFirst(): failed to find SN for GUID, skipping: \(guid)")
+      }
     }
   }
 }
