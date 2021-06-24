@@ -116,9 +116,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         outlineView.draggingDestinationFeedbackStyle = .regular
 
         // Set initial sort: this will trigger sortDescriptorsDidChange()
-      let sortDescriptor = NSSortDescriptor(key: NAME_COL_KEY, ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:)));
+        let sortDescriptor = NSSortDescriptor(key: NAME_COL_KEY, ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:)));
         outlineView.sortDescriptors = [sortDescriptor]
         assert (displayStore.getColSortOrder() == .NAME)
+
+        self.con.clearTreeAndDisplayLoadingMsg()
     }
 
     // DataSource methods

@@ -495,7 +495,9 @@ class DisplayStore {
     if self.primaryDict.removeValue(forKey: guid) == nil {
       NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
     } else {
-      NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
+      }
       return true
     }
     return false
@@ -550,8 +552,9 @@ class DisplayStore {
     var searchQueue = LinkedList<GUID>()
 
     if let sn = self.getSN_NoLock(guid) {
-
-      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      }
       for childGUID in self.getChildGUIDList_NoLock(sn.spid.guid) {
         searchQueue.append(childGUID)
       }
@@ -571,7 +574,9 @@ class DisplayStore {
     var searchQueue = LinkedList<GUID>()
 
     if let sn = self.getSN_NoLock(guid) {
-      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      }
       searchQueue.append(guid)
 
       applyBreadthFirst(&searchQueue, applyFunc)
@@ -596,7 +601,9 @@ class DisplayStore {
 
       // Apply this AFTER adding its children
       if let sn = getSN_NoLock(guid) {
-        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+        }
         applyFunc(sn)
       } else {
         // should never happen but let's log if it does

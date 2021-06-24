@@ -37,6 +37,7 @@ protocol TreePanelControllable: HasLifecycle {
   func setChecked(_ guid: GUID, _ isChecked: Bool) throws
 
   func connectTreeView(_ treeView: TreeViewController)
+  func clearTreeAndDisplayLoadingMsg()
   func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
 
   func reportError(_ title: String, _ errorMsg: String)
@@ -128,6 +129,9 @@ class MockTreePanelController: TreePanelControllable {
   }
 
   func connectTreeView(_ treeView: TreeViewController) {
+  }
+
+  func clearTreeAndDisplayLoadingMsg() {
   }
 
   func reportError(_ title: String, _ errorMsg: String) {
@@ -282,6 +286,13 @@ class TreePanelController: TreePanelControllable {
     self.treeView!.outlineView.reloadData()
   }
 
+  func clearTreeAndDisplayLoadingMsg() {
+    DispatchQueue.main.async {
+      self.clearModelAndTreeView()
+      self.appendEphemeralNode(nil, "Loading...")
+    }
+  }
+
   private func populateTreeView() throws {
     NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
@@ -291,11 +302,7 @@ class TreePanelController: TreePanelControllable {
     }
     readyToPopulate = false
 
-    DispatchQueue.main.async {
-      self.clearModelAndTreeView()
-      // TODO: change this to timer which can be cancelled, so we only display if ~500ms have elapsed
-      self.appendEphemeralNode(nil, "Loading...")
-    }
+    clearTreeAndDisplayLoadingMsg()
 
     let rows: RowsOfInterest
     do {
