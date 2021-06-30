@@ -42,7 +42,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         browser!.includesPeerToPeer = true
         browser!.delegate = self
 //        browser!.searchForRegistrationDomains()
-        browser!.searchForServices(ofType: BONJOUR_SERVICE_TYPE, inDomain: "")
+        browser!.searchForServices(ofType: BONJOUR_SERVICE_TYPE, inDomain: BONJOUR_SERVICE_DOMAIN)
     }
 
     func stopDiscovery() {
@@ -84,7 +84,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         // Resolve the service in 5 seconds
         service = svc
         service!.delegate = self
-        service!.resolve(withTimeout: ZEROCONF_RESOLUTION_TIMEOUT_SEC)
+        service!.resolve(withTimeout: BONJOUR_RESOLUTION_TIMEOUT_SEC)
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {

@@ -105,7 +105,7 @@ class OutletGRPCClient: OutletBackend {
 
   @objc func runSignalReceiverThread() {
     NSLog("DEBUG [SignalReceiverThread] Starting thread")
-    let zeroconf = Bonjour(self)
+    let bonjour = Bonjour(self)
 
     while !self.wasShutdown {
       while !isConnected && !self.wasShutdown {
@@ -114,7 +114,7 @@ class OutletGRPCClient: OutletBackend {
         group.enter()
 
         // Do discovery all over again, in case the address has changed:
-        zeroconf.startDiscovery(onSuccess: { ipPort in
+        bonjour.startDiscovery(onSuccess: { ipPort in
           DispatchQueue.global(qos: .userInitiated).async {
             self.backendConnectionState.host = ipPort.ip
             self.backendConnectionState.port = ipPort.port
@@ -136,16 +136,20 @@ class OutletGRPCClient: OutletBackend {
         })
 
         // wait ...
-        NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery...")
-        group.wait()
+        NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
+        let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
+        if result == .timedOut {
+          NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+        } else {  // some other failure
+          NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+        }
 
-        NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
         Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
         NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
       }
 
       NSLog("DEBUG [SignalReceiverThread] Thread cancelled")
-      zeroconf.stopDiscovery()
+      bonjour.stopDiscovery()
     }
   }
 
