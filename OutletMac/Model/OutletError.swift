@@ -10,6 +10,7 @@ enum OutletError: Error {
   case invalidState(String? = nil)
   case grpcFailure(String? = nil)
   case grpcConnectionDown(String? = nil)
+  case bonjourFailure(String? = nil)
 
   case maxResultsExceeded(actualCount: UInt32)
 }

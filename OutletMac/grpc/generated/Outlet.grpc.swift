@@ -111,11 +111,6 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>
 
-  func refresh_subtree_stats(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request,
-    callOptions: CallOptions?
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>
-
   func get_next_uid(
     _ request: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request,
     callOptions: CallOptions?
@@ -468,24 +463,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     )
   }
 
-  /// Unary call to refresh_subtree_stats
-  ///
-  /// - Parameters:
-  ///   - request: Request to send to refresh_subtree_stats.
-  ///   - callOptions: Call options.
-  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func refresh_subtree_stats(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request,
-    callOptions: CallOptions? = nil
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, Outlet_Backend_Agent_Grpc_Generated_Empty> {
-    return self.makeUnaryCall(
-      path: "/outlet.backend.agent.grpc.generated.Outlet/refresh_subtree_stats",
-      request: request,
-      callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makerefresh_subtree_statsInterceptors() ?? []
-    )
-  }
-
   /// Unary call to get_next_uid
   ///
   /// - Parameters:
@@ -735,9 +712,6 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
   /// - Returns: Interceptors to use when invoking 'refresh_subtree'.
   func makerefresh_subtreeInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>]
 
-  /// - Returns: Interceptors to use when invoking 'refresh_subtree_stats'.
-  func makerefresh_subtree_statsInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>]
-
   /// - Returns: Interceptors to use when invoking 'get_next_uid'.
   func makeget_next_uidInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request, Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response>]
 
@@ -832,8 +806,6 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerP
   func start_subtree_load(request: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response>
 
   func refresh_subtree(request: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_Empty>
-
-  func refresh_subtree_stats(request: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_Empty>
 
   func get_next_uid(request: Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response>
 
@@ -1028,16 +1000,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
         }
       }
 
-    case "refresh_subtree_stats":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makerefresh_subtree_statsInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.refresh_subtree_stats(request: request, context: context)
-        }
-      }
-
     case "get_next_uid":
       return CallHandlerFactory.makeUnary(
         callHandlerContext: callHandlerContext,
@@ -1219,10 +1181,6 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   /// - Returns: Interceptors to use when handling 'refresh_subtree'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makerefresh_subtreeInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>]
-
-  /// - Returns: Interceptors to use when handling 'refresh_subtree_stats'.
-  ///   Defaults to calling `self.makeInterceptors()`.
-  func makerefresh_subtree_statsInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, Outlet_Backend_Agent_Grpc_Generated_Empty>]
 
   /// - Returns: Interceptors to use when handling 'get_next_uid'.
   ///   Defaults to calling `self.makeInterceptors()`.

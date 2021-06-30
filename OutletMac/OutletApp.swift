@@ -119,7 +119,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   var mergePreviewView: MergePreview!
   var connectionProblemView: ConnectionProblemView!
   var mainWindow: NSWindow? = nil
-  let backendConnectionState: BackendConnectionState = BackendConnectionState(host: "localhost", port: 50051)
+  private var wasShutdown: Bool = false
 
   private var enableWindowCloseListener: Bool = true
 
@@ -127,9 +127,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
   lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
-  var signalReceiverThread: SignalReceiverThread?
-  var _backend: OutletGRPCClient? = nil
-  var _iconStore: IconStore? = nil
+  private var _backend: OutletGRPCClient?
+  private var _iconStore: IconStore? = nil
+
   var conLeft: TreePanelController? = nil
   var conRight: TreePanelController? = nil
   let taskRunner: TaskRunner = TaskRunner()
@@ -153,16 +153,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   func start() {
     NSLog("DEBUG OutletMacApp start begin")
 
-    self._backend = OutletGRPCClient.makeClient(app: self, backendConnectionState)
+    self._backend = OutletGRPCClient(self)
     self._iconStore = IconStore(self.backend)
-
-    if signalReceiverThread != nil {
-      NSLog("WARN  Looks like a SignalReceiverThread already exists. Telling it to cancel.")
-      self.signalReceiverThread!.cancel()
-    }
-
-    self.signalReceiverThread = SignalReceiverThread(self._backend!)
-    self.signalReceiverThread!.start()
 
     // Subscribe to app-wide signals here
     dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
@@ -183,6 +175,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func shutdown() throws {
+    if self.wasShutdown {
+      return
+    }
+    self.treeControllerLock.lock()
+    defer {
+      self.treeControllerLock.unlock()
+    }
     for (treeID, controller) in self.treeControllerDict {
       do {
         try controller.shutdown()
@@ -191,10 +190,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       }
     }
 
-    self.signalReceiverThread?.cancel()
-
     // Close the app when mainWindow is closed, Windoze-style
     NSApplication.shared.terminate(0)
+
+    self.wasShutdown = true
   }
 
   func grpcDidGoDown() {
@@ -220,6 +219,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         if let grpcClient = self._backend, !grpcClient.isConnected {
           // we can handle a disconnect
           NSLog("ERROR While creating main window: \(error)")
+
+          self.grpcDidGoDown()
 
         } else { // unknown error: bad
           // TODO: display error to user before quitting
@@ -338,8 +339,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.start()
-
-    self.grpcDidGoUp()
   }
 
   // NSWindowDelegate methods
@@ -625,7 +624,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("INFO  Opening ConnectionProblemView")
       DispatchQueue.main.async {
         do {
-          self.connectionProblemView = ConnectionProblemView(self, self.backendConnectionState)
+          self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
           try self.connectionProblemView.start()
           self.connectionProblemView.moveToFront()
         } catch {
@@ -636,24 +635,4 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       }
     }
   }
-
-  // TODO: this is TEMPORARY
-  func getDefaultGDriveDeviceUID() throws -> UID {
-    var deviceUID: UID? = nil
-    for device in try self.backend.getDeviceList() {
-      if device.treeType == .GDRIVE {
-        if deviceUID != nil {
-          throw OutletError.invalidState("Multiple Google Drive accounts found but this is not supported!")
-        } else {
-          deviceUID = device.uid
-        }
-      }
-    }
-    if deviceUID == nil {
-      throw OutletError.invalidState("No Google Drive accounts found!")
-    } else {
-      return deviceUID!
-    }
-  }
-
 }

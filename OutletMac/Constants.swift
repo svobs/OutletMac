@@ -252,11 +252,19 @@ let ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME = "multiply.circle.fill"
 
 let ROOT_PATH = "/"
 
+let DEFAULT_GRPC_SERVER_ADDRESS = "localhost"
+let DEFAULT_GRPC_SERVER_PORT = 50051
+
+let ZEROCONF_RESOLUTION_TIMEOUT_SEC = 5.0
+
 let LOOPBACK_ADDRESS = "127.0.0.1"
 
 let ZEROCONF_SERVICE_NAME = "OutletService"
 let ZEROCONF_SERVICE_VERSION = "1.0.0"
-let ZEROCONF_SERVICE_TYPE = "_outlet._tcp.local."
+let BONJOUR_SERVICE_TYPE = "_outlet._tcp"
+let BONJOUR_SERVICE_DOMAIN = "local."
+
+let SIGNAL_THREAD_SLEEP_PERIOD_SEC: Double = 3
 
 typealias UID = UInt32
 typealias GUID = String

@@ -469,20 +469,6 @@ public struct Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request {
   fileprivate var _nodeIdentifier: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
-public struct Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var rootUid: UInt32 = 0
-
-  public var treeID: String = String()
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
 public struct Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -690,6 +676,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .sn(newValue)}
   }
 
+  /// for SET_STATUS, LOAD_SUBTREE_DONE
   public var statusMsg: Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
     get {
       if case .statusMsg(let v)? = signalData {return v}
@@ -740,6 +727,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case uiEnablement(Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement)
     /// for NODE_UPSERTED, NODE_REMOVED
     case sn(Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair)
+    /// for SET_STATUS, LOAD_SUBTREE_DONE
     case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
@@ -2198,44 +2186,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request: SwiftProto
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request) -> Bool {
     if lhs._nodeIdentifier != rhs._nodeIdentifier {return false}
-    if lhs.treeID != rhs.treeID {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".RefreshSubtreeStats_Request"
-  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "root_uid"),
-    2: .standard(proto: "tree_id"),
-  ]
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.rootUid) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.rootUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.rootUid, fieldNumber: 1)
-    }
-    if !self.treeID.isEmpty {
-      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_RefreshSubtreeStats_Request) -> Bool {
-    if lhs.rootUid != rhs.rootUid {return false}
     if lhs.treeID != rhs.treeID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

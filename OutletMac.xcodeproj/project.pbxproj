@@ -12,6 +12,7 @@
 		CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */; };
 		CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */; };
 		CDF2FC51828D5D39AF021168 /* PopUpTreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */; };
+		CDF2FE4E8BE4CD5A8D1DDBC0 /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */; };
 		CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AB9766F071E5450156 /* MergePreview.swift */; };
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
 		D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */; };
@@ -57,7 +58,6 @@
 		D1D8711725F1F8D60072CB97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D8711625F1F8D60072CB97 /* main.swift */; };
 		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
 		D1E913BA25AA735C008E958B /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeView.swift */; };
-		D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */; };
 		D1ED5E2725C7D7A400A8E5DB /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */; };
 		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
 		D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */; };
@@ -71,6 +71,7 @@
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
+		CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
 		CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
 		CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblem.swift; sourceTree = "<group>"; };
 		CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopUpTreePanel.swift; sourceTree = "<group>"; };
@@ -121,7 +122,6 @@
 		D1D8711625F1F8D60072CB97 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		D1E913B925AA735C008E958B /* TreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
-		D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalReceiverThread.swift; sourceTree = "<group>"; };
 		D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
@@ -184,6 +184,7 @@
 				D194BF0025E9CFC700B4827F /* TaskRunner.swift */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
 				D15E773226045B9700D63A14 /* IconStore.swift */,
+				CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -226,7 +227,6 @@
 				D16839AD25AD551100D76169 /* generated */,
 				D16839E725AD8D0600D76169 /* SignalConstants.swift */,
 				D1CB04A025B1832E00556B28 /* GRPCConverter.swift */,
-				D1ED5E2125C6A25A00A8E5DB /* SignalReceiverThread.swift */,
 			);
 			path = grpc;
 			sourceTree = "<group>";
@@ -360,7 +360,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */,
+				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -437,7 +437,6 @@
 				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
 				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
 				D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */,
-				D1ED5E2225C6A25A00A8E5DB /* SignalReceiverThread.swift in Sources */,
 				D1FCD9AB25D8EF9E000C8FF3 /* ToolbarButton.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
 				D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */,
@@ -484,6 +483,7 @@
 				CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */,
 				CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */,
 				CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */,
+				CDF2FE4E8BE4CD5A8D1DDBC0 /* Bonjour.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -680,7 +680,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */ = {
+		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Wildchild9/LinkedList.git";
 			requirement = {
@@ -693,7 +693,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D194BEFA25E8F83000B4827F /* LinkedList */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */;
+			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */;
 			productName = LinkedList;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -18,8 +18,7 @@ class BackendConnectionState: ObservableObject {
   @Published var port: Int
 
   @Published var conecutiveStreamFailCount: Int = 0
-  // set to true initially just for logging purposes: we care more to note if it's initially down than up:
-  @Published var isConnected: Bool = true
+  @Published var isConnected: Bool = false
   @Published var isRelaunching: Bool = false
 
   init(host: String, port: Int) {
@@ -40,6 +39,8 @@ class OutletGRPCClient: OutletBackend {
   let dispatchListener: DispatchListener
   lazy var grpcConverter = GRPCConverter(self)
   lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
+  var signalReceiverThread: Thread?
+  var wasShutdown = false
 
   var isConnected: Bool {
     get {
@@ -47,29 +48,38 @@ class OutletGRPCClient: OutletBackend {
     }
   }
 
-  init(_ client: Outlet_Backend_Agent_Grpc_Generated_OutletClient, _ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
+  init(_ app: OutletApp) {
     self.app = app
-    self.stub = client
     self.dispatchListener = app.dispatcher.createListener(ID_BACKEND_CLIENT)
-    self.backendConnectionState = backendConnectionState
+    self.backendConnectionState = BackendConnectionState(host: DEFAULT_GRPC_SERVER_ADDRESS, port: DEFAULT_GRPC_SERVER_PORT)
+    self.stub = OutletGRPCClient.makeClientStub(backendConnectionState.host, backendConnectionState.port)
   }
 
-  func replaceStub() {
-    do {
-      try self.stub.channel.close().wait()
-    } catch {
-      NSLog("ERROR While closing client stub: \(error)")
+  func start() throws {
+    NSLog("DEBUG Starting OutletGRPCClient...")
+
+    // Forward the following Dispatcher signals across gRPC:
+    connectAndForwardSignal(.PAUSE_OP_EXECUTION)
+    connectAndForwardSignal(.RESUME_OP_EXECUTION)
+    connectAndForwardSignal(.COMPLETE_MERGE)
+    connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
+    connectAndForwardSignal(.EXIT_DIFF_MODE)
+
+    // This thread will also handle the discovery:
+    self.signalReceiverThread = Thread(target: self, selector: #selector(self.runSignalReceiverThread), object: nil)
+    self.signalReceiverThread!.start()
+  }
+  
+  func shutdown() throws {
+    if self.wasShutdown {
+      return
     }
-
-    self.stub = OutletGRPCClient.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
-  }
-
-  /**
-   Factory method: makes a `Outlet_Backend_Agent_Grpc_Generated_OutletClient` client for a service hosted on {host} and listening on {port}.
-   */
-  static func makeClient(app: OutletApp, _ conn: BackendConnectionState) ->
-          OutletGRPCClient {
-    return OutletGRPCClient(OutletGRPCClient.makeClientStub(conn.host, conn.port), app, conn)
+    if let thread = self.signalReceiverThread {
+      thread.cancel()
+      self.signalReceiverThread = nil
+    }
+    try self.stub.channel.close().wait()
+    self.wasShutdown = true
   }
 
   private static func makeClientStub(_ host: String, _ port: Int) -> Outlet_Backend_Agent_Grpc_Generated_OutletClient {
@@ -83,19 +93,60 @@ class OutletGRPCClient: OutletBackend {
     return Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel)
   }
 
-  func start() throws {
-    NSLog("DEBUG Starting OutletGRPCClient...")
+  func replaceStub() {
+    do {
+      try self.stub.channel.close().wait()
+    } catch {
+      NSLog("ERROR While closing client stub: \(error)")
+    }
 
-    // Forward the following Dispatcher signals across gRPC:
-    connectAndForwardSignal(.PAUSE_OP_EXECUTION)
-    connectAndForwardSignal(.RESUME_OP_EXECUTION)
-    connectAndForwardSignal(.COMPLETE_MERGE)
-    connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
-    connectAndForwardSignal(.EXIT_DIFF_MODE)
+    self.stub = OutletGRPCClient.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
   }
-  
-  func shutdown() throws {
-    try self.stub.channel.close().wait()
+
+  @objc func runSignalReceiverThread() {
+    NSLog("DEBUG [SignalReceiverThread] Starting thread")
+    let zeroconf = Bonjour(self)
+
+    while !self.wasShutdown {
+      while !isConnected && !self.wasShutdown {
+
+        let group = DispatchGroup()
+        group.enter()
+
+        // Do discovery all over again, in case the address has changed:
+        zeroconf.startDiscovery(onSuccess: { ipPort in
+          DispatchQueue.global(qos: .userInitiated).async {
+            self.backendConnectionState.host = ipPort.ip
+            self.backendConnectionState.port = ipPort.port
+            // It seems that once the channel fails to connect, it will never succeed. Replace the whole object
+            self.replaceStub()
+
+            // This will return only if there's an error (usually connection lost):
+            self.receiveServerSignals()
+
+            group.leave()
+          }
+
+        }, onError: { error in
+          DispatchQueue.global(qos: .userInitiated).async {
+            NSLog("ERROR Failed to find server via Bonjour: \(error)")
+
+            group.leave()
+          }
+        })
+
+        // wait ...
+        NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery...")
+        group.wait()
+
+        NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+        Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
+        NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
+      }
+
+      NSLog("DEBUG [SignalReceiverThread] Thread cancelled")
+      zeroconf.stopDiscovery()
+    }
   }
 
   // Signals
@@ -554,17 +605,13 @@ class OutletGRPCClient: OutletBackend {
   func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request()
     request.configKeyList.append(configKey)
-    let call = self.stub.get_config(request)
-    do {
-      let response = try call.response.wait()
-      if response.configList.count != 1 {
-        throw OutletError.invalidState("RPC 'getFilterCriteria' failed: got more than one value for config list")
-      } else {
-        assert(response.configList[0].key == configKey, "getConfig(): response key (\(response.configList[0].key)) != expected (\(configKey))")
-        return response.configList[0].val
-      }
-    } catch {
-      throw OutletError.grpcFailure("RPC 'getConfig' failed: \(error)")
+
+    let response = try self.callAndTranslateErrors(self.stub.get_config(request), "getConfig")
+    if response.configList.count != 1 {
+      throw OutletError.invalidState("RPC 'getFilterCriteria' failed: got more than one value for config list")
+    } else {
+      assert(response.configList[0].key == configKey, "getConfig(): response key (\(response.configList[0].key)) != expected (\(configKey))")
+      return response.configList[0].val
     }
   }
   
@@ -653,6 +700,10 @@ class OutletGRPCClient: OutletBackend {
   }
 
   private func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
+    if !self.isConnected {
+      throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: client not connected!")
+    }
+
     do {
       NSLog("INFO  Calling gRPC: \(rpcName)")
       return try call.response.wait()
