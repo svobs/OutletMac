@@ -39,7 +39,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         NSLog("DEBUG Bonjour: Starting discovery...")
         // Setup the browser
         browser = NetServiceBrowser()
-        browser!.includesPeerToPeer = true
+//        browser!.includesPeerToPeer = true
         browser!.delegate = self
 //        browser!.searchForRegistrationDomains()
         browser!.searchForServices(ofType: BONJOUR_SERVICE_TYPE, inDomain: BONJOUR_SERVICE_DOMAIN)
@@ -82,7 +82,6 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
     // DidStopSearch
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         NSLog("DEBUG Bonjour: Search stopped")
-        stopDiscovery()
     }
 
     // DidFind

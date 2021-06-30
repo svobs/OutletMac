@@ -86,7 +86,7 @@ struct ConnectionProblemContent: View {
     }
 
     func quitButtonClicked() {
-        NSLog("DEBUG ConnectionProblemContent: Quit btn clicked!'")
+        NSLog("DEBUG ConnectionProblemContent: Quit btn clicked!")
         self.parentWindow.close()
         do {
             try self.app.shutdown()

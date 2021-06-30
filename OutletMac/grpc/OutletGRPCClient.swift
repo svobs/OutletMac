@@ -108,9 +108,12 @@ class OutletGRPCClient: OutletBackend {
     let bonjour = Bonjour(self)
 
     while !self.wasShutdown {
-      while !isConnected && !self.wasShutdown {
 
-        let group = DispatchGroup()
+      let group = DispatchGroup()
+      var discoverySucceeded = false
+
+      // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
+      DispatchQueue.main.sync {
         group.enter()
 
         // Do discovery all over again, in case the address has changed:
@@ -121,9 +124,7 @@ class OutletGRPCClient: OutletBackend {
             // It seems that once the channel fails to connect, it will never succeed. Replace the whole object
             self.replaceStub()
 
-            // This will return only if there's an error (usually connection lost):
-            self.receiveServerSignals()
-
+            discoverySucceeded = true
             group.leave()
           }
 
@@ -134,24 +135,28 @@ class OutletGRPCClient: OutletBackend {
             group.leave()
           }
         })
-
-        // wait ...
-        NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
-        let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
-        if result == .timedOut {
-          NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-        } else {  // some other failure
-          NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-        }
-
-        Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
-        NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
-        self.backendConnectionState.conecutiveStreamFailCount += 1
       }
 
-      NSLog("DEBUG [SignalReceiverThread] Thread cancelled")
-      bonjour.stopDiscovery()
+      // wait ...
+      NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
+      let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
+      if result == .timedOut {
+        NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+      } else {
+        if discoverySucceeded {
+          // This will return only if there's an error (usually connection lost):
+          self.receiveServerSignals()
+        }
+
+        NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+      }
+
+      Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
+      NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
+      self.backendConnectionState.conecutiveStreamFailCount += 1
     }
+    NSLog("DEBUG [SignalReceiverThread] Thread shutting down")
+    bonjour.stopDiscovery()
   }
 
   // Signals
