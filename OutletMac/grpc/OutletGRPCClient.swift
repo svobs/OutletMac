@@ -146,6 +146,7 @@ class OutletGRPCClient: OutletBackend {
 
         Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
         NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
+        self.backendConnectionState.conecutiveStreamFailCount += 1
       }
 
       NSLog("DEBUG [SignalReceiverThread] Thread cancelled")
@@ -193,7 +194,6 @@ class OutletGRPCClient: OutletBackend {
 
     call.status.whenSuccess { status in
       // Yes, it says "whenSuccess" above, but this is actually always a failure of some kind.
-      self.backendConnectionState.conecutiveStreamFailCount += 1
 
       if status.code == .ok {
         // this should never happen if the server was properly written

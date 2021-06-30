@@ -170,6 +170,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
 
+    self.grpcDidGoDown()
     try! self.backend.start()  // should not throw errors
     NSLog("INFO  Backend started")
   }

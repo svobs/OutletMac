@@ -57,19 +57,35 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // MARK: Service discovery
 
+    // WillSearch
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
         NSLog("DEBUG Bonjour: Search beginning")
     }
 
+    // DidNotResolve
     func netService(_ sender: NetService, didNotResolve errorDict: [String : NSNumber]) {
         NSLog("ERROR Bonjour: Resolve error: (sender=\(sender)) errors=\(errorDict)")
+        if let errorHandler = self.errorHandler {
+            errorHandler(OutletError.bonjourFailure(("ERROR Bonjour: Resolve error: (sender=\(sender)) errors=\(errorDict)")))
+        }
+        stopDiscovery()
     }
 
+    // DidNotSearch
+    func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
+        NSLog("ERROR NetServiceBrowser returned DidNotSearch: \(errorDict)")
+        if let errorHandler = self.errorHandler {
+            errorHandler(OutletError.bonjourFailure("NetServiceBrowser returned DidNotSearch: \(errorDict)"))
+        }
+    }
+
+    // DidStopSearch
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         NSLog("DEBUG Bonjour: Search stopped")
         stopDiscovery()
     }
 
+    // DidFind
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind svc: NetService, moreComing: Bool) {
         NSLog("INFO  Bonjour: Discovered service: name='\(svc.name)' type='\(svc.type)' domain='\(svc.domain)'")
 
@@ -87,21 +103,17 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         service!.resolve(withTimeout: BONJOUR_RESOLUTION_TIMEOUT_SEC)
     }
 
-    func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
-        NSLog("ERROR NetServiceBrowser returned DidNotSearch: \(errorDict)")
-        if let errorHandler = self.errorHandler {
-            errorHandler(OutletError.bonjourFailure("NetServiceBrowser returned DidNotSearch: \(errorDict)"))
-        }
-    }
-
+    // DidFindDomain
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domainString: String, moreComing: Bool) {
         NSLog("DEBUG Bonjour: found domain: \(domainString)")
     }
 
+    // DidRemoveDomain
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domainString: String, moreComing: Bool) {
         NSLog("DEBUG Bonjour: Domain removed: '\(domainString)'")
     }
 
+    // DidResolveAddress
     func netServiceDidResolveAddress(_ sender: NetService) {
         NSLog("DEBUG Bonjour: netServiceDidResolveAddress")
 
@@ -111,8 +123,10 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
             let ipPort = IPPort(ip: serviceIp, port: sender.port)
 
-            if let successHandler = self.successHandler {
-                successHandler(ipPort)
+            if let data = sender.txtRecordData() {
+                if let successHandler = self.successHandler {
+                    successHandler(ipPort)
+                }
             }
         } else {
             NSLog("ERROR Bonjour: Did not find IPv4 address")
@@ -123,6 +137,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     }
 
+    // DidNotPublish
     func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
         NSLog("ERROR Bonjour: DidNotPublish: \(errorDict)")
         if let errorHandler = self.errorHandler {
@@ -130,16 +145,20 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         }
     }
 
+    // WillPublish
+    func netServiceWillPublish(_ sender: NetService) {
+        NSLog("DEBUG Bonjour: Service will publish, apparently")
+    }
+
+    // DidPublish
     func netServiceDidPublish(_ sender: NetService) {
         NSLog("DEBUG Bonjour: netService published.")
     }
 
+    // DidStop
     func netServiceDidStop(_ sender: NetService) {
         NSLog("DEBUG Bonjour: netService stopped.")
-    }
-
-    func netServiceWillPublish(_ sender: NetService) {
-        NSLog("DEBUG Bonjour: Service will publish, apparently")
+        stopDiscovery()
     }
 
     // Find an IPv4 address from the service address data
