@@ -104,6 +104,7 @@ struct ConnectionProblemContent: View {
     }
 
     var body: some View {
+        // TODO: show if we are using Bonjour instead: "Looking for service..."
         VStack {
             Text("Trying to connect to \(backendConnectionState.host), port \(String(backendConnectionState.port))")
 

@@ -150,10 +150,45 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  func start() {
+  func start() throws {
     NSLog("DEBUG OutletMacApp start begin")
 
-    self._backend = OutletGRPCClient(self)
+    var useFixedAddress: Bool = false
+    var fixedHost: String? = nil
+    var fixedPort: Int? = nil
+    for (index, argument) in CommandLine.arguments.enumerated() {
+      switch argument {
+      case "--host":
+        if CommandLine.arguments.count > index + 1 {
+          useFixedAddress = true
+          fixedHost = CommandLine.arguments[index + 1]
+        } else {
+          throw OutletError.invalidArgument("Option \"--host\" requires an argument.")
+        }
+      case "--port":
+        if CommandLine.arguments.count > index + 1 {
+          useFixedAddress = true
+          if let port = Int(CommandLine.arguments[index + 1]) {
+            fixedPort = port
+          }
+        } else {
+          throw OutletError.invalidArgument("Option \"--port\" requires an argument.")
+        }
+      default:
+        break
+      }
+    }
+
+    if useFixedAddress {
+      if fixedHost == nil {
+        throw OutletError.invalidArgument("Option \"--host\" is required when \"--port\" is specified.")
+      }
+      if fixedPort == nil {
+        throw OutletError.invalidArgument("Option \"--port\" not required when \"--host\" is specified.")
+      }
+    }
+
+    self._backend = OutletGRPCClient(self, useFixedAddress: useFixedAddress, fixedHost: fixedHost, fixedPort: fixedPort)
     self._iconStore = IconStore(self.backend)
 
     // Subscribe to app-wide signals here
@@ -339,7 +374,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    self.start()
+    do {
+      try self.start()
+    } catch OutletError.invalidArgument(let msg) {
+      fatalError(msg)
+    } catch {
+      fatalError("Start faild with unexpected error: \(error)")
+    }
   }
 
   // NSWindowDelegate methods

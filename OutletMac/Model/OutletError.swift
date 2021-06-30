@@ -6,6 +6,7 @@
 //
 
 enum OutletError: Error {
+  case invalidArgument(String)
   case invalidOperation(String? = nil)
   case invalidState(String? = nil)
   case grpcFailure(String? = nil)
