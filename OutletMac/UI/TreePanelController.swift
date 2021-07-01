@@ -76,14 +76,14 @@ class MockTreePanelController: TreePanelControllable {
   let app: OutletApp
   var tree: DisplayTree
   let dispatchListener: DispatchListener
-  lazy var displayStore: DisplayStore = DisplayStore(self)
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
 
   var treeView: TreeViewController? = nil
-  lazy var treeActions: TreeActions = TreeActions(self)
-  lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
+  let displayStore: DisplayStore = DisplayStore()
+  let treeActions: TreeActions = TreeActions()
+  let contextMenu: TreeContextMenu = TreeContextMenu()
 
   var canChangeRoot: Bool
 
@@ -110,6 +110,9 @@ class MockTreePanelController: TreePanelControllable {
   }
 
   func start() throws {
+    displayStore.con = self
+    treeActions.con = self
+    contextMenu.con = self
   }
 
   func shutdown() throws {
@@ -153,12 +156,12 @@ class MockTreePanelController: TreePanelControllable {
  to be confused with the TreeViewController (which is an AppKit controller for NSOutlineView)
  */
 class TreePanelController: TreePanelControllable {
-  let app: OutletApp
+  var app: OutletApp
   var tree: DisplayTree
   var dispatchListener: DispatchListener
-  lazy var displayStore: DisplayStore = DisplayStore(self)
-  lazy var treeActions: TreeActions = TreeActions(self)
-  lazy var contextMenu: TreeContextMenu = TreeContextMenu(self)
+  let displayStore: DisplayStore = DisplayStore()
+  let treeActions: TreeActions = TreeActions()
+  let contextMenu: TreeContextMenu = TreeContextMenu()
 
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
@@ -186,6 +189,10 @@ class TreePanelController: TreePanelControllable {
 
   func start() throws {
     NSLog("DEBUG [\(self.treeID)] Controller start() called")
+    displayStore.con = self
+    treeActions.con = self
+    contextMenu.con = self
+
     self.app.registerTreePanelController(self.treeID, self)
 
     self.subscribeToSignals(treeID)

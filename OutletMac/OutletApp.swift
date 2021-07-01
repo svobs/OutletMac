@@ -85,8 +85,6 @@ class MockApp: OutletApp {
 
 // This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
 class AppMenu: NSMenu {
-  private lazy var applicationName = ProcessInfo.processInfo.processName
-
   override init(title: String) {
     super.init(title: title)
 
@@ -126,7 +124,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let winID = ID_MAIN_WINDOW
   let settings = GlobalSettings()
   let dispatcher = SignalDispatcher()
-  lazy var dispatchListener: DispatchListener = dispatcher.createListener(winID)
+  let dispatchListener: DispatchListener!
   private var _backend: OutletGRPCClient?
   private var _iconStore: IconStore? = nil
 
@@ -148,6 +146,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     get {
       return self._iconStore!
     }
+  }
+
+  override init() {
+    dispatchListener = dispatcher.createListener(winID)
+    super.init()
   }
 
   func start() throws {

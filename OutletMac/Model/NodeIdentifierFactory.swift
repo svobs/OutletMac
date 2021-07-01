@@ -8,13 +8,9 @@
 import Foundation
 
 class NodeIdentifierFactory {
-  let backend: OutletBackend
+  weak var backend: OutletBackend! = nil
   // cache device list
   var deviceList: [Device] = []
-
-  init(_ backend: OutletBackend) {
-    self.backend = backend
-  }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {
     guard deviceUID != NULL_UID else {

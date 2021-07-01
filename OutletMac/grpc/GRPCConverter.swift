@@ -14,11 +14,7 @@ import Foundation
  Note on ordering of methods: TO comes before FROM
  */
 class GRPCConverter {
-  let backend: OutletBackend
-
-  init(_ backend: OutletBackend) {
-    self.backend = backend
-  }
+  weak var backend: OutletBackend! = nil
 
   // Node
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼

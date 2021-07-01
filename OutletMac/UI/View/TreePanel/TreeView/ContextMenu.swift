@@ -17,11 +17,7 @@ class MenuItemWithNodeList: NSMenuItem {
 
 
 class TreeContextMenu {
-  let con: TreePanelControllable
-
-  init(_ controller: TreePanelControllable) {
-    self.con = controller
-  }
+  weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
 
   var treeID: String {
     return con.treeID

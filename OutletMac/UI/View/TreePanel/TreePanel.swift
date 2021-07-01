@@ -14,7 +14,7 @@ import SwiftUI
  Just a container for all the components for a given tree
  */
 struct TreePanel {
-  let app: OutletApp
+  weak var app: OutletApp!
   let con: TreePanelControllable
   let treeView: TreeView
 

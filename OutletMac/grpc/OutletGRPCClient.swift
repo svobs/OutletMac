@@ -37,8 +37,8 @@ class OutletGRPCClient: OutletBackend {
   let app: OutletApp
   let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
-  lazy var grpcConverter = GRPCConverter(self)
-  lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
+  var grpcConverter = GRPCConverter()
+  var nodeIdentifierFactory = NodeIdentifierFactory()
   var signalReceiverThread: Thread?
   var wasShutdown = false
   var useFixedAddress: Bool = false
@@ -63,6 +63,8 @@ class OutletGRPCClient: OutletBackend {
 
   func start() throws {
     NSLog("DEBUG Starting OutletGRPCClient...")
+    grpcConverter.backend = self
+    nodeIdentifierFactory.backend = self
 
     // Forward the following Dispatcher signals across gRPC:
     connectAndForwardSignal(.PAUSE_OP_EXECUTION)

@@ -11,7 +11,7 @@ import Foundation
  CLASS DisplayTree
  */
 class DisplayTree {
-  let backend: OutletBackend
+  weak var backend: OutletBackend!
   let state: DisplayTreeUiState
   
   init(backend: OutletBackend, state: DisplayTreeUiState) {

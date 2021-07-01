@@ -11,9 +11,9 @@ import SwiftUI
 struct MainContentView: View {
   @EnvironmentObject var settings: GlobalSettings
   @StateObject var heightTracking: HeightTracking = HeightTracking()
-  let app: OutletApp
-  let conLeft: TreePanelControllable
-  let conRight: TreePanelControllable
+  weak var app: OutletApp!
+  weak var conLeft: TreePanelControllable!
+  weak var conRight: TreePanelControllable!
   @State private var window: NSWindow?  // enclosing window(?)
 
   init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable) {

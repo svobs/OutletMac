@@ -20,7 +20,7 @@ class ConnectionProblemWindow: NSWindow {
 }
 
 class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject {
-    let app: OutletApp
+    unowned var app: OutletApp
     var window: ConnectionProblemWindow!
     private var windowIsOpen = true
 
@@ -77,7 +77,7 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
 struct ConnectionProblemContent: View {
     @ObservedObject var backendConnectionState: BackendConnectionState
     var parentWindow: NSWindow
-    let app: OutletApp
+    weak var app: OutletApp!
 
     init(_ app: OutletApp, _ parentWindow: NSWindow, _ backendConnectionState: BackendConnectionState) {
         self.parentWindow = parentWindow

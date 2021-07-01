@@ -5,7 +5,7 @@
 //  Created by Matthew Svoboda on 2021-02-02.
 //
 
-protocol HasLifecycle {
+protocol HasLifecycle: AnyObject {
   func start() throws
   func shutdown() throws
 }

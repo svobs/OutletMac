@@ -74,9 +74,10 @@ extension OutletBackend {
  */
 class MockBackend: OutletBackend {
   let dipatcher: SignalDispatcher
-  lazy var nodeIdentifierFactory = NodeIdentifierFactory(self)
+  let nodeIdentifierFactory = NodeIdentifierFactory()
   init(_ d: SignalDispatcher? = nil) {
     self.dipatcher = d ?? SignalDispatcher()
+    self.nodeIdentifierFactory.backend = self
   }
 
   func start() throws {

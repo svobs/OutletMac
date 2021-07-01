@@ -15,7 +15,7 @@ typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
  */
 class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
-  private var con: TreePanelControllable
+  weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
 
   private let dq = DispatchQueue(label: "Serial DisplayStore Queue") // custom dispatch queues are serial by default
 
@@ -50,10 +50,6 @@ class DisplayStore {
   */
   private var checkedNodeSet = Set<GUID>()
   private var mixedNodeSet = Set<GUID>()
-
-  init(_ controllable: TreePanelControllable) {
-    self.con = controllable
-  }
 
   private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
     let childGUID: GUID = childSN.spid.guid

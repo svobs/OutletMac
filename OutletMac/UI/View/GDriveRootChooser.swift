@@ -21,7 +21,7 @@ class ChooserState: ObservableObject {
 struct GDriveRootChooserContent: View {
   @StateObject var heightTracking: HeightTracking = HeightTracking()
   var parentWindow: NSWindow
-  let app: OutletApp
+  weak var app: OutletApp!
   let con: TreePanelControllable
   let targetTreeID: String
   @ObservedObject var chooserState: ChooserState

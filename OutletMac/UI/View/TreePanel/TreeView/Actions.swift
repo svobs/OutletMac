@@ -11,11 +11,7 @@ import LinkedList
 // Context Menu Actions
 // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 class TreeActions {
-  let con: TreePanelControllable
-
-  init(_ controller: TreePanelControllable) {
-    self.con = controller
-  }
+  weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
 
   var treeID: String {
     return con.treeID
