@@ -268,8 +268,9 @@ class OutletGRPCClient: OutletBackend {
       case .NODE_UPSERTED, .NODE_REMOVED:
         argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
         argDict["parent_guid"] = signalGRPC.parentGuid
-      case .SET_STATUS:
-        argDict["status_msg"] = signalGRPC.statusMsg.msg
+      case .TREE_LOAD_STATE_UPDATED:
+        argDict["tree_load_state"] = TreeLoadState(rawValue: signalGRPC.treeLoadUpdate.loadStateInt)
+        argDict["status_msg"] = signalGRPC.treeLoadUpdate.statusMsg
       case .DOWNLOAD_FROM_GDRIVE_DONE:
         argDict["filename"] = signalGRPC.downloadMsg.filename
       case .STATS_UPDATED:
@@ -286,8 +287,6 @@ class OutletGRPCClient: OutletBackend {
           dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
         }
         argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
-      case .LOAD_SUBTREE_DONE:
-        argDict["status_msg"] = signalGRPC.statusMsg.msg
       default:
         break
     }

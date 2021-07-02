@@ -216,12 +216,10 @@ class TreePanelController: TreePanelControllable {
 
   private func subscribeToSignals(_ treeID: TreeID) {
     self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
-    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_STARTED, self.onLoadStarted, whitelistSenderID: treeID)
-    self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: treeID)
-    self.dispatchListener.subscribe(signal: .SET_STATUS, self.onSetStatus, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .STATS_UPDATED, self.onDirStatsUpdated, whitelistSenderID: treeID)
 
     self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
@@ -602,16 +600,21 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func onLoadStarted(_ senderID: SenderID, _ propDict: PropDict) throws {
-    if self.swiftTreeState.isManualLoadNeeded {
-      DispatchQueue.main.async {
-        self.swiftTreeState.isManualLoadNeeded = false
-      }
-    }
-  }
+  private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
 
-  private func onLoadSubtreeDone(_ senderID: SenderID, _ propDict: PropDict) throws {
-    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+    switch treeLoadState {
+    case .LOAD_STARTED:
+      self.enableNodeUpdateSignals = false
+
+      if self.swiftTreeState.isManualLoadNeeded {
+        DispatchQueue.main.async {
+          self.swiftTreeState.isManualLoadNeeded = false
+        }
+      }
+    case .VISIBLE_FILTERED_NODES_LOADED:
+      fallthrough
+    case .VISIBLE_UNFILTERED_NODES_LOADED:
       do {
         self.enableNodeUpdateSignals = true
 
@@ -624,7 +627,12 @@ class TreePanelController: TreePanelControllable {
         let errorMsg: String = "\(error)" // ew, heh
         self.reportError("Failed to populate tree", errorMsg)
       }
+    default:
+      break
     }
+
+    let statusBarMsg = try propDict.getString("status_msg")
+    self.updateStatusBarMsg(statusBarMsg)
   }
 
   private func onDisplayTreeChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
@@ -639,11 +647,6 @@ class TreePanelController: TreePanelControllable {
       self.swiftTreeState.rootPath = self.tree.rootPath
       self.swiftTreeState.isEditingRoot = false
     }
-  }
-
-  private func onSetStatus(_ senderID: SenderID, _ propDict: PropDict) throws {
-    let statusBarMsg = try propDict.getString("status_msg")
-    self.updateStatusBarMsg(statusBarMsg)
   }
 
   private func onDirStatsUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {

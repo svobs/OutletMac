@@ -42,11 +42,9 @@ enum Signal: UInt32 {
   case SHUTDOWN_APP = 34
   case DEREGISTER_DISPLAY_TREE = 35
 
-  // --- Tree actions: notifications ---
-  /** Fired by the backend when it has begun to load a subtree from cache */
-  case LOAD_SUBTREE_STARTED = 40
-  /** Fired by the backend when it has finished loading a subtree from cache */
-  case LOAD_SUBTREE_DONE = 41
+  // Fired by the backend each time the TreeLoadState changes for a given tree
+  case TREE_LOAD_STATE_UPDATED = 40
+
   case NODE_EXPANSION_TOGGLED = 42
   case NODE_EXPANSION_DONE = 43
   case DISPLAY_TREE_CHANGED = 44
@@ -85,9 +83,6 @@ enum Signal: UInt32 {
   case SET_PROGRESS_TEXT = 102
   case PROGRESS_MADE = 103
   case STOP_PROGRESS = 104
-
-  // --- Status bar ---
-  case SET_STATUS = 105
 
   // gRPC, sent from server to client when connect successful
   case WELCOME = 200

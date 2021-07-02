@@ -67,7 +67,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         // Enables windowWillClose() callback
         window.delegate = self
 
-        self.dispatchListener.subscribe(signal: .LOAD_SUBTREE_DONE, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
         self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
         self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
 
@@ -99,6 +99,23 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
 
     // DispatchListener callbacks
     // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+    private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
+        let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
+
+        switch treeLoadState {
+        case .VISIBLE_FILTERED_NODES_LOADED:
+            fallthrough
+        case .VISIBLE_UNFILTERED_NODES_LOADED:
+            do {
+                NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
+                self.loadComplete = true
+                self.moveToFront()
+            }
+        default:
+            break
+        }
+    }
 
     func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
         NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")

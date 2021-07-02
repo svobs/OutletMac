@@ -364,6 +364,17 @@ let GDRIVE_FOLDER_MIME_TYPE_UID: UID = 1
 
 let GDRIVE_ME_USER_UID: UID = 1
 
+enum TreeLoadState: UInt32 {
+  case UNKNOWN = 0  // should never be sent
+  case NOT_LOADED = 1  // also not sent
+  case LOAD_STARTED = 2
+  case VISIBLE_UNFILTERED_NODES_LOADED = 3  // first thing loaded, if no filter currently applied
+  case VISIBLE_FILTERED_NODES_LOADED = 4  // or, if a filter is currently applied, the currently filtered nodes are loaded first
+  case VISIBLE_UNFILTERED_AND_FILTERED_NODES_LOADED = 5  // combination of the previous 2 states
+  case ADDITIONAL_NODES_LOADED = 6  // this exists to send status updates
+  case ALL_NODES_LOADED_MINUS_SIGNATURES = 7  // once cache is completely loaded & synced (note: GDrive skips this state)
+  case COMPLETELY_LOADED = 10  // final state
+}
 
 /**
  ENUM TreeDisplayMode

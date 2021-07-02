@@ -613,6 +613,20 @@ public struct Outlet_Backend_Agent_Grpc_Generated_StatsUpdate {
   public init() {}
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var loadStateInt: UInt32 = 0
+
+  public var statusMsg: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -676,13 +690,13 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .sn(newValue)}
   }
 
-  /// for SET_STATUS, LOAD_SUBTREE_DONE
-  public var statusMsg: Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
+  /// for TREE_LOAD_STATE_UPDATED
+  public var treeLoadUpdate: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate {
     get {
-      if case .statusMsg(let v)? = signalData {return v}
-      return Outlet_Backend_Agent_Grpc_Generated_StatusMsg()
+      if case .treeLoadUpdate(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate()
     }
-    set {signalData = .statusMsg(newValue)}
+    set {signalData = .treeLoadUpdate(newValue)}
   }
 
   public var downloadMsg: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg {
@@ -727,8 +741,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case uiEnablement(Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement)
     /// for NODE_UPSERTED, NODE_REMOVED
     case sn(Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair)
-    /// for SET_STATUS, LOAD_SUBTREE_DONE
-    case statusMsg(Outlet_Backend_Agent_Grpc_Generated_StatusMsg)
+    /// for TREE_LOAD_STATE_UPDATED
+    case treeLoadUpdate(Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate)
     case downloadMsg(Outlet_Backend_Agent_Grpc_Generated_DownloadMsg)
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
     case device(Outlet_Backend_Agent_Grpc_Generated_Device)
@@ -764,8 +778,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
         guard case .sn(let l) = lhs, case .sn(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
-      case (.statusMsg, .statusMsg): return {
-        guard case .statusMsg(let l) = lhs, case .statusMsg(let r) = rhs else { preconditionFailure() }
+      case (.treeLoadUpdate, .treeLoadUpdate): return {
+        guard case .treeLoadUpdate(let l) = lhs, case .treeLoadUpdate(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       case (.downloadMsg, .downloadMsg): return {
@@ -829,18 +843,6 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DownloadMsg {
   // methods supported on all messages.
 
   public var filename: String = String()
-
-  public var unknownFields = SwiftProtobuf.UnknownStorage()
-
-  public init() {}
-}
-
-public struct Outlet_Backend_Agent_Grpc_Generated_StatusMsg {
-  // SwiftProtobuf.Message conformance is added in an extension below. See the
-  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-  // methods supported on all messages.
-
-  public var msg: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -2515,6 +2517,44 @@ extension Outlet_Backend_Agent_Grpc_Generated_StatsUpdate: SwiftProtobuf.Message
   }
 }
 
+extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".TreeLoadUpdate"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "load_state_int"),
+    2: .standard(proto: "status_msg"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.loadStateInt) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.statusMsg) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.loadStateInt != 0 {
+      try visitor.visitSingularUInt32Field(value: self.loadStateInt, fieldNumber: 1)
+    }
+    if !self.statusMsg.isEmpty {
+      try visitor.visitSingularStringField(value: self.statusMsg, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate) -> Bool {
+    if lhs.loadStateInt != rhs.loadStateInt {return false}
+    if lhs.statusMsg != rhs.statusMsg {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -2527,7 +2567,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     13: .standard(proto: "play_state"),
     14: .standard(proto: "ui_enablement"),
     15: .same(proto: "sn"),
-    17: .standard(proto: "status_msg"),
+    17: .standard(proto: "tree_load_update"),
     18: .standard(proto: "download_msg"),
     19: .standard(proto: "stats_update"),
     20: .same(proto: "device"),
@@ -2598,13 +2638,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         if let v = v {self.signalData = .sn(v)}
       }()
       case 17: try {
-        var v: Outlet_Backend_Agent_Grpc_Generated_StatusMsg?
+        var v: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate?
         if let current = self.signalData {
           try decoder.handleConflictingOneOf()
-          if case .statusMsg(let m) = current {v = m}
+          if case .treeLoadUpdate(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .statusMsg(v)}
+        if let v = v {self.signalData = .treeLoadUpdate(v)}
       }()
       case 18: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg?
@@ -2685,8 +2725,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       guard case .sn(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 15)
     }()
-    case .statusMsg?: try {
-      guard case .statusMsg(let v)? = self.signalData else { preconditionFailure() }
+    case .treeLoadUpdate?: try {
+      guard case .treeLoadUpdate(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 17)
     }()
     case .downloadMsg?: try {
@@ -2819,38 +2859,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_DownloadMsg: SwiftProtobuf.Message
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg) -> Bool {
     if lhs.filename != rhs.filename {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension Outlet_Backend_Agent_Grpc_Generated_StatusMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".StatusMsg"
-  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "msg"),
-  ]
-
-  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.msg) }()
-      default: break
-      }
-    }
-  }
-
-  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.msg.isEmpty {
-      try visitor.visitSingularStringField(value: self.msg, fieldNumber: 1)
-    }
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StatusMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_StatusMsg) -> Bool {
-    if lhs.msg != rhs.msg {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
