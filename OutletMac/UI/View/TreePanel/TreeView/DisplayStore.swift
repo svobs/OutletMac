@@ -17,7 +17,7 @@ class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
   weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
 
-  private let dq = DispatchQueue(label: "Serial DisplayStore Queue") // custom dispatch queues are serial by default
+  private let dq = DispatchQueue(label: "DisplayStore SerialQueue") // custom dispatch queues are serial by default
 
   private var treeID: TreeID {
     get {

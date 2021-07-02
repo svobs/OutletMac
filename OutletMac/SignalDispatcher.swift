@@ -4,6 +4,8 @@
 //
 //  Created by Matthew Svoboda on 2021-02-02.
 //
+// TODO: Migrate to NotificationCenter and delete this file!
+//
 import Foundation
 
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
@@ -95,25 +97,31 @@ class DispatchListener {
     self._dispatcher = dispatcher
   }
 
-  func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) {
-    let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
-    let sub = Subscription(callback, filterBy: filterCriteria)
-    self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
-    self._subscribedSignals.insert(signal)
+  deinit {
+    unsubscribeAll()
   }
 
-  /**
-   TODO: put in destructor? Does Swift have those?
-  */
-  func unsubscribeAll() {
-    NSLog("DEBUG Unsubscribing from all signals for listenerID \(_id)")
-    for signal in self._subscribedSignals {
-      self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
-      self._subscribedSignals.remove(signal)
+  public func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) {
+    let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
+    let sub = Subscription(callback, filterBy: filterCriteria)
+
+    self._dispatcher.dq.sync {
+      self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
+      self._subscribedSignals.insert(signal)
     }
-    if !self._subscribedSignals.isEmpty {
-      NSLog("ERROR Expected set of subscribed signals to be empty after unsubscribeAll() for listenerID \(_id) but \(self._subscribedSignals.count) remain. Will remove remaining signals anyway")
-      self._subscribedSignals.removeAll()
+  }
+
+  public func unsubscribeAll() {
+    self._dispatcher.dq.sync {
+      NSLog("DEBUG Unsubscribing from all signals for listenerID \(_id)")
+      for signal in self._subscribedSignals {
+        self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
+        self._subscribedSignals.remove(signal)
+      }
+      if !self._subscribedSignals.isEmpty {
+        NSLog("ERROR Expected set of subscribed signals to be empty after unsubscribeAll() for listenerID \(_id) but \(self._subscribedSignals.count) remain. Will remove remaining signals anyway")
+        self._subscribedSignals.removeAll()
+      }
     }
   }
 }
@@ -167,9 +175,10 @@ fileprivate class Subscription {
  Mimics the functionality of PyDispatcher, with some simplifications/improvements. It's simple enough that I just wrote my own code.
  */
 class SignalDispatcher {
+  let dq = DispatchQueue(label: "SignalDispatcher SerialQueue") // custom dispatch queues are serial by default
   fileprivate var signalListenerDict = [Signal: [ListenerID: Subscription]]()
 
-  func createListener(_ id: ListenerID) -> DispatchListener {
+  public func createListener(_ id: ListenerID) -> DispatchListener {
     NSLog("DEBUG Creating DispatchListener: \(id)")
     let listener = DispatchListener(id, self)
     return listener
@@ -202,32 +211,34 @@ class SignalDispatcher {
    Each subscriber is notified via a separate DispatchQueue WorkItem. Doing this defends against potential problems in gRPC when run loops are reused.
    Specifically, gRPC will crash if a callback from a gRPC response makes another gRPC request in the same thread.
    */
-  func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
-    NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
-    if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
-      let propertyList = PropDict(params)
-      var countNotified = 0
-      var countTotal = 0
-      for (subID, subscriber) in subscriberDict {
-        countTotal += 1
-        if subscriber.matches(senderID) {
-          countNotified += 1
-          DispatchQueue.global(qos: .background).async {
-            do {
-              NSLog("DEBUG SignalDispatcher: Calling listener \(subID) for signal '\(signal)'")
-              try subscriber.callback(senderID, propertyList)
-            } catch {
-              NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")
+  public func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
+    self.dq.sync {
+      NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
+      if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
+        let propertyList = PropDict(params)
+        var countNotified = 0
+        var countTotal = 0
+        for (subID, subscriber) in subscriberDict {
+          countTotal += 1
+          if subscriber.matches(senderID) {
+            countNotified += 1
+            DispatchQueue.global(qos: .background).async {
+              do {
+                NSLog("DEBUG SignalDispatcher: Calling listener \(subID) for signal '\(signal)'")
+                try subscriber.callback(senderID, propertyList)
+              } catch {
+                NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")
+              }
             }
+          } else if SUPER_DEBUG_ENABLED {
+            NSLog("DEBUG SignalDispatcher: Listener '\(subID)' does not match signal '\(signal)' (looking for '\(senderID)')")
           }
-        } else if SUPER_DEBUG_ENABLED {
-          NSLog("DEBUG SignalDispatcher: Listener '\(subID)' does not match signal '\(signal)' (looking for '\(senderID)')")
         }
-      }
 
-      NSLog("DEBUG SignalDispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
-    } else {
-      NSLog("DEBUG SignalDispatcher: No subscribers found for signal \(signal)")
+        NSLog("DEBUG SignalDispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
+      } else {
+        NSLog("DEBUG SignalDispatcher: No subscribers found for signal \(signal)")
+      }
     }
   }
 }
