@@ -122,10 +122,8 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
             let ipPort = IPPort(ip: serviceIp, port: sender.port)
 
-            if let data = sender.txtRecordData() {
-                if let successHandler = self.successHandler {
-                    successHandler(ipPort)
-                }
+            if let successHandler = self.successHandler {
+                successHandler(ipPort)
             }
         } else {
             NSLog("ERROR Bonjour: Did not find IPv4 address")

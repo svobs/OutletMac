@@ -20,17 +20,19 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>LSMultipleInstancesProhibited</key>
+	<string>Multiple instances of this app cannot run on the same device at the same time.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2021 Matt Svoboda</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<true/>
-	<key>NSSystemAdministrationUsageDescription</key>
-	<string>Full disk access is needed in order to access your files in the app.</string>
-	<key>LSMultipleInstancesProhibited</key>
-	<string>Multiple instances of this app cannot run on the same device at the same time.</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
+	<key>NSSystemAdministrationUsageDescription</key>
+	<string>Full disk access is needed in order to access your files in the app.</string>
 </dict>
 </plist>

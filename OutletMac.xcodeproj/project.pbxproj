@@ -360,7 +360,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */,
+				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -541,13 +541,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -596,12 +597,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -622,7 +624,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.msvoboda.outlet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
@@ -648,7 +650,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.msvoboda.outlet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
@@ -680,7 +682,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */ = {
+		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Wildchild9/LinkedList.git";
 			requirement = {
@@ -693,7 +695,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D194BEFA25E8F83000B4827F /* LinkedList */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */;
+			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */;
 			productName = LinkedList;
 		};
 /* End XCSwiftPackageProductDependency section */
