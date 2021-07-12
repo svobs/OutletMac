@@ -134,6 +134,9 @@ class OutletGRPCClient: OutletBackend {
           // Do discovery all over again, in case the address has changed:
           bonjour.startDiscovery(onSuccess: { ipPort in
             DispatchQueue.global(qos: .userInitiated).async {
+              defer {
+                group.leave()
+              }
               self.backendConnectionState.host = ipPort.ip
               self.backendConnectionState.port = ipPort.port
 
@@ -142,7 +145,6 @@ class OutletGRPCClient: OutletBackend {
               self.replaceStub()
 
               discoverySucceeded = true
-              group.leave()
             }
 
           }, onError: { error in

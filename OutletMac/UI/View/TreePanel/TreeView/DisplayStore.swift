@@ -541,11 +541,19 @@ class DisplayStore {
       for (guid, sn) in self.primaryDict {
         if byGUID.count > 0 {
           if let dirStats = byGUID[guid] {
-            sn.node.setDirStats(dirStats)
+            if sn.node.isDir {
+              sn.node.setDirStats(dirStats)
+            } else {
+              NSLog("ERROR [\(treeID)] Cannot update DirStats: Node is not a dir: \(sn.spid) (matched guid=\(guid))")
+            }
           }
         } else if byUID.count > 0 {
           if let dirStats = byUID[sn.node.uid] {
-            sn.node.setDirStats(dirStats)
+            if sn.node.isDir {
+              sn.node.setDirStats(dirStats)
+            } else {
+              NSLog("ERROR [\(treeID)] Cannot update DirStats: Node is not a dir: \(sn.spid) (matched node_uid=\(sn.node.uid))")
+            }
           }
         }
       }

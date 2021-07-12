@@ -272,11 +272,7 @@ class TreePanelController: TreePanelControllable {
 
     if self.readyToPopulate {
       DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
-        do {
-          try self.populateTreeView()
-        } catch {
-          self.reportException("Failed to populate tree", error)
-        }
+        self.populateTreeView()
       }
     } else {
       NSLog("DEBUG [\(self.treeID)] readyToPopulate is false")
@@ -298,7 +294,20 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  private func populateTreeView() throws {
+  /**
+   Executes async in a DispatchQueue, to ensure serial execution. This will catch and report exceptions.
+   */
+  private func populateTreeView() {
+    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+      do {
+        try self.populateTreeView_NoLock()
+      } catch {
+        self.reportException("Failed to populate tree", error)
+      }
+    }
+  }
+
+  private func populateTreeView_NoLock() throws {
     NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
       NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate to true")
@@ -306,6 +315,11 @@ class TreePanelController: TreePanelControllable {
       return
     }
     readyToPopulate = false
+
+    guard !self.displayStore.isLoaded() else {
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): TreeView is already populated. Returning.")
+      return
+    }
 
     clearTreeAndDisplayLoadingMsg()
 
@@ -617,20 +631,7 @@ class TreePanelController: TreePanelControllable {
     case .COMPLETELY_LOADED:
       self.enableNodeUpdateSignals = true
 
-      let statusBarMsg = try propDict.getString("status_msg")
-      self.updateStatusBarMsg(statusBarMsg)
-
-      do {
-        if self.displayStore.isLoaded() {
-          NSLog("DEBUG [\(self.treeID)] TreeView is already populated")
-        } else {
-          try self.populateTreeView()
-        }
-      } catch {
-        NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
-        let errorMsg: String = "\(error)" // ew, heh
-        self.reportError("Failed to populate tree", errorMsg)
-      }
+      self.populateTreeView()
     default:
       break
     }
@@ -728,11 +729,7 @@ class TreePanelController: TreePanelControllable {
         NSLog("ERROR [\(self.treeID)] Failed to update filter criteria on the backend: \(error)")
         return
       }
-      do {
-        try self.populateTreeView()
-      } catch {
-        reportException("Failed to repopulate TreeView after filter change", error)
-      }
+        self.populateTreeView()
     }
   }
 
