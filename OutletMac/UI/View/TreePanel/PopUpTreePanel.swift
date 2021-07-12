@@ -104,9 +104,9 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
 
         switch treeLoadState {
-        case .VISIBLE_FILTERED_NODES_LOADED:
-            fallthrough
         case .VISIBLE_UNFILTERED_NODES_LOADED:
+            fallthrough
+        case .COMPLETELY_LOADED:
             do {
                 NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
                 self.loadComplete = true

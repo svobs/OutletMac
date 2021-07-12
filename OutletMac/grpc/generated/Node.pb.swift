@@ -441,6 +441,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
 
   public var parentUid: UInt32 = 0
 
+  public var allChildrenFetched: Bool = false
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -1251,6 +1253,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
     1: .standard(proto: "dir_meta"),
     2: .standard(proto: "is_live"),
     3: .standard(proto: "parent_uid"),
+    4: .standard(proto: "all_children_fetched"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1262,6 +1265,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
       case 1: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
       case 3: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 4: try { try decoder.decodeSingularBoolField(value: &self.allChildrenFetched) }()
       default: break
       }
     }
@@ -1277,6 +1281,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
     if self.parentUid != 0 {
       try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 3)
     }
+    if self.allChildrenFetched != false {
+      try visitor.visitSingularBoolField(value: self.allChildrenFetched, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1284,6 +1291,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
     if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.isLive != rhs.isLive {return false}
     if lhs.parentUid != rhs.parentUid {return false}
+    if lhs.allChildrenFetched != rhs.allChildrenFetched {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

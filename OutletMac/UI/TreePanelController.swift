@@ -612,16 +612,20 @@ class TreePanelController: TreePanelControllable {
           self.swiftTreeState.isManualLoadNeeded = false
         }
       }
-    case .VISIBLE_FILTERED_NODES_LOADED:
-      fallthrough
     case .VISIBLE_UNFILTERED_NODES_LOADED:
+      fallthrough
+    case .COMPLETELY_LOADED:
+      self.enableNodeUpdateSignals = true
+
+      let statusBarMsg = try propDict.getString("status_msg")
+      self.updateStatusBarMsg(statusBarMsg)
+
       do {
-        self.enableNodeUpdateSignals = true
-
-        let statusBarMsg = try propDict.getString("status_msg")
-        self.updateStatusBarMsg(statusBarMsg)
-
-        try self.populateTreeView()
+        if self.displayStore.isLoaded() {
+          NSLog("DEBUG [\(self.treeID)] TreeView is already populated")
+        } else {
+          try self.populateTreeView()
+        }
       } catch {
         NSLog("ERROR [\(self.treeID)] Failed to populate tree: \(error)")
         let errorMsg: String = "\(error)" // ew, heh

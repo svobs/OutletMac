@@ -51,6 +51,21 @@ class DisplayStore {
   private var checkedNodeSet = Set<GUID>()
   private var mixedNodeSet = Set<GUID>()
 
+  func isLoaded() -> Bool {
+    var isLoaded = false
+    let topmostGUID = self.con.tree.rootSPID.guid
+    dq.sync {
+      for sn in self.primaryDict.values {
+        if !sn.node.isEphemeral && sn.spid.guid != topmostGUID {
+          NSLog("DEBUG isLoaded(): node is not ephemeral: \(sn.spid)")
+          isLoaded = true
+          break
+        }
+      }
+    }
+    return isLoaded
+  }
+
   private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
     let childGUID: GUID = childSN.spid.guid
     var realParentGUID: GUID = (parentGUID == nil) ? TOPMOST_GUID : parentGUID!
