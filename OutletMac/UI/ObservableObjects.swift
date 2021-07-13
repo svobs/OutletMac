@@ -111,7 +111,7 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
 
   @Published var searchQuery: String {
     didSet {
-      NSLog("Search query changed: \(searchQuery)")
+      NSLog("DEBUG Search query changed: \(searchQuery)")
       if onChangeCallback != nil {
         onChangeCallback!(self)
       }
@@ -119,7 +119,7 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
   }
   @Published var isMatchCase: Bool {
     didSet {
-      NSLog("isMatchCase changed: \(isMatchCase)")
+      NSLog("DEBUG isMatchCase changed: \(isMatchCase)")
       if onChangeCallback != nil {
         onChangeCallback!(self)
       }
@@ -128,7 +128,7 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
 
   @Published var isTrashed: Ternary {
     didSet {
-      NSLog("isTrashed changed: \(isTrashed)")
+      NSLog("DEBUG isTrashed changed: \(isTrashed)")
       if onChangeCallback != nil {
         onChangeCallback!(self)
       }
@@ -136,7 +136,7 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
   }
   @Published var isShared: Ternary {
     didSet {
-      NSLog("isShared changed: \(isShared)")
+      NSLog("DEBUG isShared changed: \(isShared)")
       if onChangeCallback != nil {
         onChangeCallback!(self)
       }
@@ -144,7 +144,7 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
   }
   @Published var showAncestors: Bool {
     didSet {
-      NSLog("showAncestors changed: \(showAncestors)")
+      NSLog("DEBUG showAncestors changed: \(showAncestors)")
       if onChangeCallback != nil {
         onChangeCallback!(self)
       }
