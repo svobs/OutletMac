@@ -104,7 +104,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
 
         switch treeLoadState {
-        case .VISIBLE_UNFILTERED_NODES_LOADED:
+        case .LOAD_STARTED:
             fallthrough
         case .COMPLETELY_LOADED:
             do {

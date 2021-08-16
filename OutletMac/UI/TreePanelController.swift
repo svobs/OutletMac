@@ -626,17 +626,13 @@ class TreePanelController: TreePanelControllable {
 
     switch treeLoadState {
     case .LOAD_STARTED:
-      self.enableNodeUpdateSignals = false
+      self.enableNodeUpdateSignals = true
 
       if self.swiftTreeState.isManualLoadNeeded {
         DispatchQueue.main.async {
           self.swiftTreeState.isManualLoadNeeded = false
         }
       }
-    case .VISIBLE_UNFILTERED_NODES_LOADED:
-      fallthrough
-    case .COMPLETELY_LOADED:
-      self.enableNodeUpdateSignals = true
 
       self.populateTreeView()
     default:
