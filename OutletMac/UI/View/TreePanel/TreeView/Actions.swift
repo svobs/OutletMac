@@ -110,6 +110,8 @@ class TreeActions {
 
     let sn = sender.snList[0]
 
+    self.con.clearTreeAndDisplayLoadingMsg()
+
     self.con.app.execAsync {
       do {
         let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: sn.spid)

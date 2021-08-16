@@ -321,6 +321,8 @@ class TreePanelController: TreePanelControllable {
       return
     }
 
+    let populateStartTimeMS = DispatchTime.now()
+
     clearTreeAndDisplayLoadingMsg()
 
     let rows: RowsOfInterest
@@ -388,6 +390,8 @@ class TreePanelController: TreePanelControllable {
 
       self.restoreRowSelectionState(rows.selected)
 
+      let timeElapsed = populateStartTimeMS.distance(to: DispatchTime.now())
+      NSLog("INFO  [\(self.treeID)] populateTreeView() completed in \(timeElapsed.toString())")
       self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
     }
   }
@@ -594,6 +598,7 @@ class TreePanelController: TreePanelControllable {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func reportError(_ title: String, _ errorMsg: String) {
+    // See listener in OutletApp
     self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
   }
 
@@ -616,6 +621,8 @@ class TreePanelController: TreePanelControllable {
 
   private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
+
+    NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState)")
 
     switch treeLoadState {
     case .LOAD_STARTED:
@@ -681,7 +688,7 @@ class TreePanelController: TreePanelControllable {
 
     let sn = try propDict.get("sn") as! SPIDNodePair
     let parentGUID = try propDict.get("parent_guid") as! String
-    NSLog("INFO  [\(self.treeID)] Received upserted node: \(sn.spid) to parent: \(parentGUID)")
+    NSLog("INFO  [\(self.treeID)] Received upserted node: \(sn.spid) for parent: \(parentGUID)")
 
     let alreadyPresent: Bool = self.displayStore.upsertSN(parentGUID, sn)
 

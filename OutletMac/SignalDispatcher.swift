@@ -213,7 +213,9 @@ class SignalDispatcher {
    */
   public func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
     self.dq.sync {
-      NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
+      }
       if let subscriberDict: [ListenerID: Subscription] = self.signalListenerDict[signal] {
         let propertyList = PropDict(params)
         var countNotified = 0
@@ -230,14 +232,18 @@ class SignalDispatcher {
                 NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")
               }
             }
-          } else if SUPER_DEBUG_ENABLED {
+          } else if TRACE_ENABLED {
             NSLog("DEBUG SignalDispatcher: Listener '\(subID)' does not match signal '\(signal)' (looking for '\(senderID)')")
           }
         }
 
-        NSLog("DEBUG SignalDispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG SignalDispatcher: Routed signal \(signal) to \(countNotified) of \(countTotal) listeners")
+        }
       } else {
-        NSLog("DEBUG SignalDispatcher: No subscribers found for signal \(signal)")
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG SignalDispatcher: No subscribers found for signal \(signal)")
+        }
       }
     }
   }

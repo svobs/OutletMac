@@ -11,8 +11,8 @@ typealias MD5 = String
 typealias SHA256 = String
 
 // Logging
-let SUPER_DEBUG_ENABLED: Bool = true
-let TRACE_ENABLED: Bool = false
+let SUPER_DEBUG_ENABLED: Bool = true  // TODO: externalize this
+let TRACE_ENABLED: Bool = false // TODO: externalize this
 
 let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
 
