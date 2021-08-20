@@ -568,18 +568,7 @@ class DisplayStore {
   private func doForDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    var searchQueue = LinkedList<GUID>()
-
-    if let sn = self.getSN_NoLock(guid) {
-      if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
-      }
-      for childGUID in self.getChildGUIDList_NoLock(sn.spid.guid) {
-        searchQueue.append(childGUID)
-      }
-
-      applyBreadthFirst(&searchQueue, applyFunc)
-    }
+    applyBreadthFirst(guid, includeTopmostGUID: false, applyFunc)
   }
 
   /**
@@ -590,16 +579,7 @@ class DisplayStore {
   private func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    var searchQueue = LinkedList<GUID>()
-
-    if let sn = self.getSN_NoLock(guid) {
-      if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
-      }
-      searchQueue.append(guid)
-
-      applyBreadthFirst(&searchQueue, applyFunc)
-    }
+    applyBreadthFirst(guid, includeTopmostGUID: true, applyFunc)
   }
 
   /**
@@ -608,9 +588,28 @@ class DisplayStore {
 
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func applyBreadthFirst(_ searchQueue: inout LinkedList<GUID>, _ applyFunc: ApplyToSNFunc) {
+  private func applyBreadthFirst(_ topmostGUID: GUID, includeTopmostGUID: Bool, _ applyFunc: ApplyToSNFunc) {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
+
+    guard let sn = self.getSN_NoLock(topmostGUID) else {
+      return
+    }
+
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+    }
+
+    var searchQueue = LinkedList<GUID>()
+    if includeTopmostGUID {
+      searchQueue.append(topmostGUID)
+    } else {
+      for childGUID in self.getChildGUIDList_NoLock(topmostGUID) {
+        searchQueue.append(childGUID)
+      }
+    }
+
+
     while !searchQueue.isEmpty {
       let guid = searchQueue.popFirst()!
 
@@ -621,7 +620,7 @@ class DisplayStore {
       // Apply this AFTER adding its children
       if let sn = getSN_NoLock(guid) {
         if SUPER_DEBUG_ENABLED {
-          NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): applying func for: \(sn.spid)")
+          NSLog("DEBUG [\(treeID)] applyBreadthFirst(): applying func for: \(sn.spid)")
         }
         applyFunc(sn)
       } else {
