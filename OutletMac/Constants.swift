@@ -123,6 +123,8 @@ enum IconNames: String {
 
   case BTN_GDRIVE = "gdrive-btn"
   case BTN_LOCAL_DISK_LINUX = "localdisk-linux-btn"
+
+  case ICON_LOADING = "loading"
 }
 
 // --- FE + BE SHARED ---
@@ -180,6 +182,8 @@ enum IconID: UInt32 {
   case BTN_LOCAL_DISK_WINDOWS = 43
   case BTN_GDRIVE = 44
 
+  case ICON_LOADING = 50
+
   case BADGE_RM = 100
   case BADGE_MV_SRC = 101
   case BADGE_MV_DST = 102
@@ -197,6 +201,14 @@ enum IconID: UInt32 {
   case BADGE_MACOS = 121
   case BADGE_WINDOWS = 122
 
+  func isAnimated() -> Bool {
+    switch self {
+    case .ICON_LOADING:
+      return true
+    default:
+      return false
+    }
+  }
 
   func isToolbarIcon() -> Bool {
     // TODO: implement IconID.isToolbarIcon and IconID.isTreeIcon

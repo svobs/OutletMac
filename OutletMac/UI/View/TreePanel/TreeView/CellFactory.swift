@@ -139,6 +139,11 @@ class CellFactory {
     let imageView = NSImageView(image: icon)
     imageView.imageFrameStyle = .none
     imageView.imageScaling = .scaleProportionallyDown
+
+    if sn.node.icon.isAnimated()  {
+      // FIXME: this doesn't appear to work as advertised
+      imageView.animates = true
+    }
     cell.addSubview(imageView)
     cell.imageView = imageView
 

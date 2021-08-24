@@ -119,7 +119,7 @@ class Node: CustomStringConvertible {
     }
   }
   
-  var defaultIcon: IconID {
+  var `defaultIcon`: IconID {
     get {
       if self.isLive {
         return .ICON_GENERIC_FILE
@@ -302,7 +302,7 @@ class EphemeralNode: Node {
   }
 
   override var defaultIcon: IconID {
-    return .ICON_ALERT
+    return .ICON_LOADING
   }
 
   override var isDisplayOnly: Bool {

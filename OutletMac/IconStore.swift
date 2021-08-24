@@ -175,7 +175,11 @@ class IconStore: HasLifecycle {
 
     var badge: IconID? = nil
 
-    if node.isDir {
+    if node.isEphemeral {
+      let toolIcon = self.getToolbarIcon(for: iconId)
+      icon = (toolIcon as! NetworkImage).nsImage
+      key = makeGenericCacheKey(iconId)
+    } else if node.isDir {
       // If dir, determine appropriate badge, if any
       switch iconId {
       case .ICON_DIR_MK:
