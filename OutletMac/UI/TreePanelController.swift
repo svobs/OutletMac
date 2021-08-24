@@ -297,17 +297,17 @@ class TreePanelController: TreePanelControllable {
   /**
    Executes async in a DispatchQueue, to ensure serial execution. This will catch and report exceptions.
    */
-  private func populateTreeView(repopulate: Bool = false) {
+  private func populateTreeView() {
     DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
       do {
-        try self.populateTreeView_NoLock(repopulate: repopulate)
+        try self.populateTreeView_NoLock()
       } catch {
         self.reportException("Failed to populate tree", error)
       }
     }
   }
 
-  private func populateTreeView_NoLock(repopulate: Bool) throws {
+  private func populateTreeView_NoLock() throws {
     NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
       NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate to true")
@@ -315,11 +315,6 @@ class TreePanelController: TreePanelControllable {
       return
     }
     readyToPopulate = false
-
-    guard repopulate || !self.displayStore.isLoaded() else {
-      NSLog("DEBUG [\(self.treeID)] populateTreeView(): TreeView is already populated. Returning.")
-      return
-    }
 
     let populateStartTimeMS = DispatchTime.now()
 
@@ -732,7 +727,8 @@ class TreePanelController: TreePanelControllable {
         NSLog("ERROR [\(self.treeID)] Failed to update filter criteria on the backend: \(error)")
         return
       }
-        self.populateTreeView(repopulate: true)
+
+      self.populateTreeView()
     }
   }
 

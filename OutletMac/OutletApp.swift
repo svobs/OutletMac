@@ -206,8 +206,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
-    dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, afterDisplayTreeChanged_TwoPane)
-
     self.grpcDidGoDown()
     try! self.backend.start()  // should not throw errors
     NSLog("INFO  Backend started")
@@ -453,15 +451,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
-  /**
-   Reload the given tree in regular mode. This will tell the backend to discard the diff information, and in turn the
-   backend will provide us with our old tree_id
-   */
-  private func reloadTree(_ con: TreePanelControllable) throws {
-    let newTree = try self.backend.createExistingDisplayTree(treeID: con.treeID, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
-    try con.updateDisplayTree(to: newTree!)
-  }
-
   // SignalDispatcher callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -532,33 +521,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func afterGenMergeTreeFailed(senderID: SenderID, propDict: PropDict) throws {
     // Re-enable UI:
     self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": true])
-  }
-
-  private func afterDisplayTreeChanged_TwoPane(senderID: SenderID, propDict: PropDict) throws {
-    // FIXME: put this logic into the backend. Track if diff is still happening, and send DIFF_CANCELLED signal with both trees
-
-    let newTree = try propDict.get("tree") as! DisplayTree
-
-    if newTree.state.treeDisplayMode != .ONE_TREE_ALL_ITEMS {
-      return
-    }
-
-    if senderID == self.conLeft!.treeID && self.conRight!.tree.state.treeDisplayMode == .CHANGES_ONE_TREE_PER_CATEGORY {
-      // If displaying a diff and right root changed, reload left display
-      // (note: right will update its own display)
-      NSLog("DEBUG Detected that \(self.conLeft!.treeID) changed root and changed display mode. Reloading \(self.conRight!.treeID)")
-      try self.reloadTree(self.conRight!)
-    } else if senderID == self.conRight!.treeID && self.conLeft!.tree.state.treeDisplayMode == .CHANGES_ONE_TREE_PER_CATEGORY {
-      // Mirror of above
-      NSLog("DEBUG Detected that \(self.conRight!.treeID) changed root and changed display mode. Reloading \(self.conLeft!.treeID)")
-      try self.reloadTree(self.conLeft!)
-    } else {
-      // Doesn't apply to us
-      return
-    }
-
-    // Change button bar back:
-    self.changeWindowMode(.BROWSING)
   }
 
   // TreePanelController registry
