@@ -76,8 +76,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 NSLog("DEBUG [\(treeID)] User double-clicked: opening local file with default app: \(sn.spid.getSinglePath())")
                 self.con.treeActions.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
             } else if sn.spid.treeType == .GDRIVE {
-                // TODO: download from GDrive and open downloaded file
                 NSLog("DEBUG [\(treeID)] User double-clicked on Google Drive node: \(sn.spid)")
+                let item = MenuItemWithNodeList(title: "Download from Google Drive", action: #selector(self.con.treeActions.downloadFromGDrive(_:)), keyEquivalent: "")
+                item.nodeList = [sn.node]
+                item.target = self.con.treeActions
+                self.con.treeActions.downloadFromGDrive(item)
+                // note: see DOWNLOAD_FROM_GDRIVE_DONE for handling of async response
             } else {
                 NSLog("DEBUG [\(treeID)] User double-clicked on node: \(sn.spid)")
             }

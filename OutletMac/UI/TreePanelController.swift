@@ -224,6 +224,8 @@ class TreePanelController: TreePanelControllable {
 
     self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: treeID)
+
+    self.dispatchListener.subscribe(signal: .DOWNLOAD_FROM_GDRIVE_DONE, self.onGDriveDownloadDone, whitelistSenderID: treeID)
   }
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {
@@ -704,6 +706,13 @@ class TreePanelController: TreePanelControllable {
     if self.displayStore.removeSN(sn.spid.guid) {
       self.treeView!.reloadItem(parentGUID, reloadChildren: true)
     }
+  }
+
+  private func onGDriveDownloadDone(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let filename = try propDict.getString("filename")
+
+    NSLog("DEBUG [\(treeID)] GDrive download complete: opening local file with default app: \(filename)")
+    self.treeActions.openLocalFileWithDefaultApp(filename)
   }
 
   // Other callbacks
