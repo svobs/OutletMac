@@ -103,11 +103,13 @@ class OutletGRPCClient: OutletBackend {
 
   func replaceStub() {
     do {
+      NSLog("DEBUG Closing gRPC channel")
       try self.stub.channel.close().wait()
     } catch {
-      NSLog("ERROR While closing client stub: \(error)")
+      NSLog("ERROR While closing client gRPC channel: \(error)")
     }
 
+    NSLog("DEBUG Making new gRPC client stub...")
     self.stub = OutletGRPCClient.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
   }
 

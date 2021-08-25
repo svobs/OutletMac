@@ -8,10 +8,10 @@
 enum Signal: UInt32 {
   // Tasks
   case ENQUEUE_UI_TASK = 1
-  case START_CACHEMAN = 2
-  case START_OP_EXEC_THREAD = 3
-  case LOAD_REGISTRY_DONE = 4
-  case START_CACHEMAN_DONE = 5
+//  case START_CACHEMAN = 2
+//  case START_OP_EXEC_THREAD = 3
+//  case LOAD_REGISTRY_DONE = 4
+//  case START_CACHEMAN_DONE = 5
   case DIFF_TREES_DONE = 7
   case DIFF_TREES_FAILED = 8
   case DIFF_TREES_CANCELLED = 9
