@@ -123,7 +123,6 @@ class OutletGRPCClient: OutletBackend {
         assert(fixedHost != nil && fixedPort != nil)
         self.backendConnectionState.host = fixedHost!
         self.backendConnectionState.port = fixedPort!
-        self.replaceStub()
         self.receiveServerSignals()
       } else {
         let group = DispatchGroup()
@@ -143,9 +142,6 @@ class OutletGRPCClient: OutletBackend {
               self.backendConnectionState.port = ipPort.port
 
               NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
-              // It seems that once the channel fails to connect, it will never succeed. Replace the whole object
-              self.replaceStub()
-
               discoverySucceeded = true
             }
 
@@ -165,7 +161,6 @@ class OutletGRPCClient: OutletBackend {
           NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
         } else {
           if discoverySucceeded {
-            // This will return only if there's an error (usually connection lost):
             self.receiveServerSignals()
           }
 
@@ -199,8 +194,12 @@ class OutletGRPCClient: OutletBackend {
 
   /**
    Receives signals from the gRPC server and forwards them throughout the app via the app's Dispatcher.
+   This will return only if there's an error (usually connection lost):
    */
   func receiveServerSignals() {
+    // It seems that once the channel fails to connect, it will never succeed. Replace the whole object
+    self.replaceStub()
+
     NSLog("DEBUG Subscribing to server signals...")
     let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
