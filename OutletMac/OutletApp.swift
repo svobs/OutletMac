@@ -559,7 +559,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       DispatchQueue.main.async {
-        self.settings.showAlert(title: msg, msg: secondaryMsg)
+        if !self.connectionProblemView.isOpen {
+          self.settings.showAlert(title: msg, msg: secondaryMsg)
+        }
       }
   }
 
