@@ -126,16 +126,27 @@ class OutletGRPCClient: OutletBackend {
         self.receiveServerSignals()
       } else {
         let group = DispatchGroup()
+        // Occasionally both success & failure handlers will be called in quick succession. In this case, we need to make sure we don't
+        // call group.leave() twice for the same group.enter(), cuz that will crash us:
+        var leftGroup = false
         var discoverySucceeded = false
 
         // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
         DispatchQueue.main.sync {
+          NSLog("DEBUG Entering new DispatchGroup")
           group.enter()
 
           // Do discovery all over again, in case the address has changed:
           bonjour.startDiscovery(onSuccess: { ipPort in
             DispatchQueue.global(qos: .userInitiated).async {
+              if leftGroup {
+                NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
+                return
+              }
+
               defer {
+                NSLog("DEBUG Leaving DispatchGroup")
+                leftGroup = true
                 group.leave()
               }
               self.backendConnectionState.host = ipPort.ip
@@ -147,8 +158,14 @@ class OutletGRPCClient: OutletBackend {
 
           }, onError: { error in
             DispatchQueue.global(qos: .userInitiated).async {
+              if leftGroup {
+                NSLog("DEBUG Already left DispatchGroup; ignoring error handler call")
+                return
+              }
+
               NSLog("ERROR Failed to find server via Bonjour: \(error)")
 
+              leftGroup = true
               group.leave()
             }
           })
@@ -161,6 +178,7 @@ class OutletGRPCClient: OutletBackend {
           NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
         } else {
           if discoverySucceeded {
+            NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
             self.receiveServerSignals()
           }
 
