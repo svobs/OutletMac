@@ -51,7 +51,7 @@ extension DispatchTimeInterval {
     case .never:
       result = nil
     @unknown default:
-      fatalError()
+      fatalError("DispatchTimeInterval.toDouble: unknown default!")
     }
 
     return result

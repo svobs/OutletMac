@@ -25,6 +25,7 @@ protocol TreePanelControllable: HasLifecycle {
   var backend: OutletBackend { get }
   var dispatcher: SignalDispatcher { get }
   var treeID: TreeID { get }
+  var treeLoadState: TreeLoadState { get }
 
   var canChangeRoot: Bool { get }
   var allowMultipleSelection: Bool { get }
@@ -90,6 +91,12 @@ class MockTreePanelController: TreePanelControllable {
   var allowMultipleSelection: Bool {
     get {
       return true
+    }
+  }
+
+  var treeLoadState: TreeLoadState {
+    get {
+      return TreeLoadState.COMPLETELY_LOADED
     }
   }
 
@@ -163,6 +170,7 @@ class TreePanelController: TreePanelControllable {
   let treeActions: TreeActions = TreeActions()
   let contextMenu: TreeContextMenu = TreeContextMenu()
 
+  var treeLoadState: TreeLoadState = .NOT_LOADED
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
 
@@ -239,6 +247,7 @@ class TreePanelController: TreePanelControllable {
         self.reattachListeners(newTree.treeID)
       }
       self.tree = newTree
+      self.treeLoadState = .NOT_LOADED
     }
 
     DispatchQueue.main.async {
@@ -620,6 +629,7 @@ class TreePanelController: TreePanelControllable {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
 
     NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState)")
+    self.treeLoadState = treeLoadState
 
     switch treeLoadState {
     case .LOAD_STARTED:

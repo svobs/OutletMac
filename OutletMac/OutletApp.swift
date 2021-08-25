@@ -378,7 +378,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     do {
       try self.start()
     } catch OutletError.invalidArgument(let msg) {
-      fatalError(msg)
+      fatalError("Start failed: \(msg)")
     } catch {
       fatalError("Start faild with unexpected error: \(error)")
     }

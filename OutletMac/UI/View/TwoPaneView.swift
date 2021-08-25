@@ -58,6 +58,15 @@ fileprivate struct ButtonBar: View {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func onDiffButtonClicked() {
+    if self.conLeft.treeLoadState != .COMPLETELY_LOADED {
+      self.conLeft.reportError("Cannot start diff", "Left tree is not finished loading")
+      return
+    }
+    if self.conRight.treeLoadState != .COMPLETELY_LOADED {
+      self.conRight.reportError("Cannot start diff", "Right tree is not finished loading")
+      return
+    }
+
     NSLog("DEBUG Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
 
     // First disable UI
