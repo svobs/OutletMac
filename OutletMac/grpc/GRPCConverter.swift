@@ -256,7 +256,8 @@ class GRPCConverter {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func nodeIdentifierFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    try self.backend.nodeIdentifierFactory.forValues(grpc.uid, deviceUID: grpc.deviceUid, grpc.pathList, pathUID: grpc.pathUid, opType: grpc.opType)
+    try self.backend.nodeIdentifierFactory.forValues(grpc.uid, deviceUID: grpc.deviceUid, grpc.pathList, pathUID: grpc.pathUid, opType: grpc.opType,
+            parentGUID: grpc.parentGuid)
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
@@ -266,6 +267,9 @@ class GRPCConverter {
     grpc.pathList = nodeIdentifier.pathList
     if let spid = nodeIdentifier as? SPID {
       grpc.pathUid = spid.pathUID
+      if let parentGUID = spid.parentGUID {
+        grpc.parentGuid = parentGUID
+      }
     }
     if nodeIdentifier is ChangeTreeSPID {
       let changeTreeSPID = nodeIdentifier as! ChangeTreeSPID

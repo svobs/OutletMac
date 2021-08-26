@@ -288,7 +288,10 @@ class OutletGRPCClient: OutletBackend {
         argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
       case .NODE_UPSERTED, .NODE_REMOVED:
         argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
-        argDict["parent_guid"] = signalGRPC.parentGuid
+      case .SUBTREE_NODES_CHANGED:
+        argDict["subtree_root_spid"] = try self.grpcConverter.spidFromGRPC(spidGRPC: signalGRPC.subtree.subtreeRootSpid)
+        argDict["upserted_sn_list"] = try self.grpcConverter.snListFromGRPC(signalGRPC.subtree.upsertedSnList)
+        argDict["removed_sn_list"] = try self.grpcConverter.snListFromGRPC(signalGRPC.subtree.removedSnList)
       case .TREE_LOAD_STATE_UPDATED:
         argDict["tree_load_state"] = TreeLoadState(rawValue: signalGRPC.treeLoadUpdate.loadStateInt)
         argDict["status_msg"] = signalGRPC.treeLoadUpdate.statusMsg

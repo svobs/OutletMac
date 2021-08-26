@@ -256,15 +256,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         if let grpcClient = self._backend, !grpcClient.isConnected {
           // we can handle a disconnect
           NSLog("ERROR While creating main window: \(error)")
-
           self.grpcDidGoDown()
 
-        } else { // unknown error: bad
-          // TODO: display error to user before quitting
-          NSLog("FATAL ERROR in OutletMacApp start(): \(error)")
-          NSLog("DEBUG Sleeping 1s to let things settle...")
-          sleep(1)
-          exit(1)
+        } else { // unknown error...try to handle
+          NSLog("ERROR while launching frontend: \(error)")
+          self.grpcDidGoDown()
         }
       }
     }

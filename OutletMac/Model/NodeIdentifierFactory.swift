@@ -10,7 +10,20 @@ import Foundation
 class NodeIdentifierFactory {
   weak var backend: OutletBackend! = nil
   // cache device list
-  var deviceList: [Device] = []
+  private var _deviceList: [Device] = []
+
+  func getDeviceList() throws -> [Device] {
+    if self._deviceList.count == 0 {
+      // lazy load device list from server.
+      // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body
+      // of another gRPC call
+      try DispatchQueue.global(qos: .userInitiated).sync { [unowned self] in
+        NSLog("DEBUG Getting device list from server")
+        self._deviceList = try self.backend.getDeviceList()
+      }
+    }
+    return self._deviceList
+  }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {
     guard deviceUID != NULL_UID else {
@@ -22,15 +35,7 @@ class NodeIdentifierFactory {
       return .MIXED
     }
 
-    if deviceList.count == 0 {
-      // lazy load device list from server.
-      // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body
-      // of another gRPC call
-      try DispatchQueue.global(qos: .userInitiated).sync { [unowned self] in
-        self.deviceList = try self.backend.getDeviceList()
-      }
-    }
-    for device in self.deviceList {
+    for device in try self.getDeviceList() {
       if device.uid == deviceUID {
         return device.treeType
       }
@@ -50,11 +55,13 @@ class NodeIdentifierFactory {
     return LocalNodeIdentifier(LOCAL_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
   }
 
-  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32) throws -> NodeIdentifier {
+  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32, parentGUID: GUID) throws -> NodeIdentifier {
     if deviceUID == NULL_UID {
       // this can indicate that the entire node doesn't exist or is invalid
       throw OutletError.invalidState("device_uid cannot be null!")
     }
+
+    let parentGUID = parentGUID == "" ? nil : parentGUID
 
     if opType > 0 {
       // ChangeTreeSPID (we must be coming from gRPC)
@@ -64,20 +71,20 @@ class NodeIdentifierFactory {
       } else {
         opTypeEnum = UserOpType(rawValue: opType)
       }
-      return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum)
+      return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum, parentGUID: parentGUID)
     }
 
     let treeType = try self.getTreeType(for: deviceUID)
 
     if treeType == .LOCAL_DISK {
       // LocalNodeIdentifier is always a SPID
-      return LocalNodeIdentifier(uid, deviceUID: deviceUID, pathList[0])
+      return LocalNodeIdentifier(uid, deviceUID: deviceUID, pathList[0], parentGUID: parentGUID)
     } else if treeType == .GDRIVE {
       if pathUID > NULL_UID { // non-null value indicates that it must be single path
         if pathList.count > 1 {
             throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): mustBeSinglePath=true but paths count is: \(pathList.count)")
         }
-        return GDriveSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0])
+        return GDriveSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0], parentGUID: parentGUID)
       }
       return GDriveIdentifier(uid, deviceUID: deviceUID, pathList)
     } else if treeType == .MIXED {
@@ -90,7 +97,7 @@ class NodeIdentifierFactory {
       if pathUID == NULL_UID {
         throw OutletError.invalidState("PathUID is null!")
       }
-      return MixedTreeSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0])
+      return MixedTreeSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0], parentGUID: parentGUID)
     }
     
     throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), deviceUID=\(deviceUID), treeType=\(treeType), pathList=\(pathList), pathUID=\(pathUID)")

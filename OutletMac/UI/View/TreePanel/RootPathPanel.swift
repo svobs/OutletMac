@@ -49,7 +49,7 @@ struct RootPathPanel: View {
   // TODO: this is TEMPORARY until we support multiple drives
   func getDefaultLocalDeviceUID() throws -> UID {
     var deviceUID: UID? = nil
-    for device in try self.con.backend.getDeviceList() {
+    for device in try self.con.backend.nodeIdentifierFactory.getDeviceList() {
       if device.treeType == .LOCAL_DISK {
         if deviceUID != nil {
           throw OutletError.invalidState("Multiple local disks found but this is not supported!")

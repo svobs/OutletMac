@@ -70,9 +70,12 @@ class NodeIdentifier: CustomStringConvertible, Equatable {
  */
 class SinglePathNodeIdentifier: NodeIdentifier {
 
-  init(_ nodeUID: UID, deviceUID: UID, _ singlePath: String) {
+  init(_ nodeUID: UID, deviceUID: UID, _ singlePath: String, parentGUID: GUID? = nil) {
     super.init(nodeUID, deviceUID: deviceUID, [singlePath])
+    self.parentGUID = parentGUID
   }
+
+  var parentGUID: GUID?
 
   var pathUID: UID {
     get {
@@ -119,7 +122,7 @@ class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
   init(parent: SinglePathNodeIdentifier?) {
     if parent != nil {
       self._pathUID = parent!.pathUID
-      super.init(parent!.nodeUID, deviceUID: parent!.deviceUID, "")
+      super.init(parent!.nodeUID, deviceUID: parent!.deviceUID, "", parentGUID: parent!.parentGUID)
     } else {
       // root of tree
       self._pathUID = NULL_UID
@@ -151,9 +154,9 @@ class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
  */
 class GDriveSPID: SinglePathNodeIdentifier {
 
-  init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String) {
+  init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String, parentGUID: GUID? = nil) {
     self._pathUID = pathUID
-    super.init(nodeUID, deviceUID: deviceUID, singlePath)
+    super.init(nodeUID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
   }
 
   let _pathUID: UID
@@ -199,9 +202,9 @@ class GDriveSPID: SinglePathNodeIdentifier {
  A SPID for Mixed tree types
  */
 class MixedTreeSPID: SinglePathNodeIdentifier {
-  init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String) {
+  init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String, parentGUID: GUID? = nil) {
     self._pathUID = pathUID
-    super.init(nodeUID, deviceUID: deviceUID, singlePath)
+    super.init(nodeUID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
   }
 
   let _pathUID: UID
@@ -230,7 +233,7 @@ class MixedTreeSPID: SinglePathNodeIdentifier {
   // TODO: delete this method. Remove all DecoNode code
   override func copy(with uid: UID? = nil) -> MixedTreeSPID {
     let uidToCopy: UID = uid ?? self.nodeUID
-    return MixedTreeSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self.pathUID, self.getSinglePath())
+    return MixedTreeSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self.pathUID, self.getSinglePath(), parentGUID: self.parentGUID)
   }
 
   func equals(_ rhs: MixedTreeSPID) -> Bool {
@@ -279,7 +282,7 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
 
   override func copy(with nodeUID: UID? = nil) -> LocalNodeIdentifier {
     let uidToCopy: UID = nodeUID ?? self.nodeUID
-    return LocalNodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath())
+    return LocalNodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath(), parentGUID: parentGUID)
   }
 }
 
@@ -291,10 +294,10 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
  */
 class ChangeTreeSPID: SinglePathNodeIdentifier {
 
-  init(pathUID: UID, deviceUID: UID, _ singlePath: String, _ opType: UserOpType?) {
+  init(pathUID: UID, deviceUID: UID, _ singlePath: String, _ opType: UserOpType?, parentGUID: GUID? = nil) {
     self.opType = opType
     self._path_uid = pathUID
-    super.init(NULL_UID, deviceUID: deviceUID, singlePath)
+    super.init(NULL_UID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
   }
 
   let _path_uid: UID

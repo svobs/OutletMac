@@ -6,12 +6,16 @@
 //
 
 enum Signal: UInt32 {
-  // Tasks
-  case ENQUEUE_UI_TASK = 1
-//  case START_CACHEMAN = 2
-//  case START_OP_EXEC_THREAD = 3
-//  case LOAD_REGISTRY_DONE = 4
-//  case START_CACHEMAN_DONE = 5
+  /** Sent from BE and received by FE: a Node was upserted into the DisplayTree */
+  case NODE_UPSERTED = 1
+  /** Sent from BE and received by FE: a Node was removed from the DisplayTree */
+  case NODE_REMOVED = 2
+  /** Sent from BE and received by FE: stats were updated for nodes in the DisplayTree, and also possibly the StatusMsg */
+  case STATS_UPDATED = 3
+  /** Sent from BE and received by FE: a whole subtree of nodes was upserted and/or removed */
+  case SUBTREE_NODES_CHANGED = 4
+
+  case ENQUEUE_UI_TASK = 6
   case DIFF_TREES_DONE = 7
   case DIFF_TREES_FAILED = 8
   case DIFF_TREES_CANCELLED = 9
@@ -49,11 +53,6 @@ enum Signal: UInt32 {
   case NODE_EXPANSION_DONE = 43
   case DISPLAY_TREE_CHANGED = 44
   case GDRIVE_RELOADED = 45
-  case NODE_UPSERTED = 46
-  case NODE_REMOVED = 47
-  /** Sent from BE and received by FE: stats were updated for nodes in the DisplayTree, and also possibly the StatusMsg */
-  case STATS_UPDATED = 48
-
   /** Sent by FE and received by the BE */
   case EXIT_DIFF_MODE = 49
   case ERROR_OCCURRED = 50

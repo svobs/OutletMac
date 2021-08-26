@@ -150,6 +150,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
   /// If nonzero, is ChangeTreeSPID. 1 to 5 = UserOpType. 9 = no UserOpType.
   public var opType: UInt32 = 0
 
+  /// Optional. For SPIDs only (needed for: NODE_UPSERTED, NODE_REMOVED, SUBTREE_NODES_CHANGED)
+  public var parentGuid: String = String()
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -764,6 +767,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     3: .standard(proto: "path_list"),
     4: .standard(proto: "path_uid"),
     5: .standard(proto: "op_type"),
+    6: .standard(proto: "parent_guid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -777,6 +781,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
       case 4: try { try decoder.decodeSingularUInt32Field(value: &self.pathUid) }()
       case 5: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.parentGuid) }()
       default: break
       }
     }
@@ -798,6 +803,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     if self.opType != 0 {
       try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 5)
     }
+    if !self.parentGuid.isEmpty {
+      try visitor.visitSingularStringField(value: self.parentGuid, fieldNumber: 6)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -807,6 +815,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
     if lhs.pathList != rhs.pathList {return false}
     if lhs.pathUid != rhs.pathUid {return false}
     if lhs.opType != rhs.opType {return false}
+    if lhs.parentGuid != rhs.parentGuid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

@@ -627,6 +627,31 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate {
   public init() {}
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var subtreeRootSpid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+    get {return _subtreeRootSpid ?? Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()}
+    set {_subtreeRootSpid = newValue}
+  }
+  /// Returns true if `subtreeRootSpid` has been explicitly set.
+  public var hasSubtreeRootSpid: Bool {return self._subtreeRootSpid != nil}
+  /// Clears the value of `subtreeRootSpid`. Subsequent reads from it will return its default value.
+  public mutating func clearSubtreeRootSpid() {self._subtreeRootSpid = nil}
+
+  public var upsertedSnList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
+
+  public var removedSnList: [Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+
+  fileprivate var _subtreeRootSpid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -635,9 +660,6 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   public var sigInt: UInt32 = 0
 
   public var sender: String = String()
-
-  /// for NODE_UPSERTED, NODE_REMOVED
-  public var parentGuid: String = String()
 
   public var signalData: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData? = nil
 
@@ -731,6 +753,15 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .dualDisplayTree(newValue)}
   }
 
+  /// for SUBTREE_NODES_CHANGED
+  public var subtree: Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData {
+    get {
+      if case .subtree(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData()
+    }
+    set {signalData = .subtree(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -747,6 +778,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case statsUpdate(Outlet_Backend_Agent_Grpc_Generated_StatsUpdate)
     case device(Outlet_Backend_Agent_Grpc_Generated_Device)
     case dualDisplayTree(Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree)
+    /// for SUBTREE_NODES_CHANGED
+    case subtree(Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -796,6 +829,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
       }()
       case (.dualDisplayTree, .dualDisplayTree): return {
         guard case .dualDisplayTree(let l) = lhs, case .dualDisplayTree(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.subtree, .subtree): return {
+        guard case .subtree(let l) = lhs, case .subtree(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -2555,12 +2592,55 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Mess
   }
 }
 
+extension Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".SubtreeChangeData"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "subtree_root_spid"),
+    2: .standard(proto: "upserted_sn_list"),
+    3: .standard(proto: "removed_sn_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._subtreeRootSpid) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.upsertedSnList) }()
+      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.removedSnList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if let v = self._subtreeRootSpid {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    }
+    if !self.upsertedSnList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.upsertedSnList, fieldNumber: 2)
+    }
+    if !self.removedSnList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.removedSnList, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData, rhs: Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData) -> Bool {
+    if lhs._subtreeRootSpid != rhs._subtreeRootSpid {return false}
+    if lhs.upsertedSnList != rhs.upsertedSnList {return false}
+    if lhs.removedSnList != rhs.removedSnList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "sig_int"),
     2: .same(proto: "sender"),
-    3: .standard(proto: "parent_guid"),
     10: .same(proto: "empty"),
     11: .standard(proto: "error_occurred"),
     12: .standard(proto: "display_tree_ui_state"),
@@ -2572,6 +2652,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     19: .standard(proto: "stats_update"),
     20: .same(proto: "device"),
     21: .standard(proto: "dual_display_tree"),
+    22: .same(proto: "subtree"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2582,7 +2663,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.sigInt) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.sender) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.parentGuid) }()
       case 10: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_Empty?
         if let current = self.signalData {
@@ -2682,6 +2762,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .dualDisplayTree(v)}
       }()
+      case 22: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .subtree(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .subtree(v)}
+      }()
       default: break
       }
     }
@@ -2693,9 +2782,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     }
     if !self.sender.isEmpty {
       try visitor.visitSingularStringField(value: self.sender, fieldNumber: 2)
-    }
-    if !self.parentGuid.isEmpty {
-      try visitor.visitSingularStringField(value: self.parentGuid, fieldNumber: 3)
     }
     // The use of inline closures is to circumvent an issue where the compiler
     // allocates stack space for every case branch when no optimizations are
@@ -2745,6 +2831,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       guard case .dualDisplayTree(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 21)
     }()
+    case .subtree?: try {
+      guard case .subtree(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 22)
+    }()
     case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
@@ -2753,7 +2843,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) -> Bool {
     if lhs.sigInt != rhs.sigInt {return false}
     if lhs.sender != rhs.sender {return false}
-    if lhs.parentGuid != rhs.parentGuid {return false}
     if lhs.signalData != rhs.signalData {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
