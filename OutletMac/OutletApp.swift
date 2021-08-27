@@ -541,7 +541,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         } else if !self.mainWindowIsOpen {
           NSLog("INFO  Will not display error alert ('\(msg)'): the main window is not open to display it")
         } else {
-          NSLog("DEBUG Showing error alert: \(msg)")
           self.settings.showAlert(title: msg, msg: secondaryMsg)
         }
       }

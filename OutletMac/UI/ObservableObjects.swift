@@ -27,10 +27,20 @@ class GlobalSettings: ObservableObject {
    */
   func showAlert(title: String, msg: String, dismissButtonText: String = "Dismiss") {
     NSLog("DEBUG Showing alert with title='\(title)', msg='\(msg)'")
-    self.alertTitle = title
-    self.alertMsg = msg
-    self.dismissButtonText = dismissButtonText
-    self.showingAlert = true
+    if self.showingAlert && self.alertTitle == title && self.alertMsg == msg && self.dismissButtonText == dismissButtonText {
+      NSLog("DEBUG Already showing identical alert; ignoring")
+    } else {
+      self.alertTitle = title
+      self.alertMsg = msg
+      self.dismissButtonText = dismissButtonText
+      self.showingAlert = true
+    }
+  }
+
+  func dismissAlert() {
+    self.showingAlert = false
+    self.alertMsg = ""
+    self.alertTitle = "Alert"
   }
 }
 

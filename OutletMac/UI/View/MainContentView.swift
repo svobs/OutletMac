@@ -22,6 +22,12 @@ struct MainContentView: View {
     self.conRight = conRight
   }
 
+  func dismissAlert() {
+     DispatchQueue.main.async {
+       self.settings.dismissAlert()
+     }
+  }
+
   var body: some View {
     let tapCancelEdit = TapGesture()
       .onEnded { _ in
@@ -37,7 +43,9 @@ struct MainContentView: View {
         .contentShape(Rectangle()) // taps should be detected in the whole window
         .gesture(tapCancelEdit)
         .alert(isPresented: $settings.showingAlert) {
-          Alert(title: Text(settings.alertTitle), message: Text(settings.alertMsg), dismissButton: .default(Text(settings.dismissButtonText)))
+          Alert(title: Text(settings.alertTitle),
+                message: Text(settings.alertMsg),
+                dismissButton: .default(Text(settings.dismissButtonText), action: self.dismissAlert))
         }
         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       .onPreferenceChange(ContentAreaPrefKey.self) { key in
