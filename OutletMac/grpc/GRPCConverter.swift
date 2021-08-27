@@ -284,7 +284,16 @@ class GRPCConverter {
 
   func spidFromGRPC(spidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> SinglePathNodeIdentifier {
     let nodeIdentifier = try self.nodeIdentifierFromGRPC(spidGRPC)
-    return nodeIdentifier as! SinglePathNodeIdentifier
+    if let spid = nodeIdentifier as? SinglePathNodeIdentifier {
+      return spid
+    } else {
+      NSLog("""
+            ERROR Cannot be cast to SPID: \(nodeIdentifier) (values: uid=\(spidGRPC.uid), 
+            deviceUID=\(spidGRPC.deviceUid), pathList=\(spidGRPC.pathList), pathUID: \(spidGRPC.pathUid), opType: \(spidGRPC.opType), 
+            parentGUID: \(spidGRPC.parentGuid))
+            """)
+      throw OutletError.invalidState("Server sent us invalid data: expected a SPID but got a NodeIdentifier: \(nodeIdentifier)")
+    }
   }
 
   // SPIDNodePair

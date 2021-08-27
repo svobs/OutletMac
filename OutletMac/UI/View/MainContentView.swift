@@ -47,10 +47,3 @@ struct MainContentView: View {
     }
   }
 }
-
-struct MainContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    MainContentView(app: MockApp(), conLeft: try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true), conRight: try! MockTreePanelController(ID_RIGHT_TREE, canChangeRoot: true))
-      .environmentObject(GlobalSettings())
-  }
-}

@@ -115,6 +115,7 @@ class OutletGRPCClient: OutletBackend {
 
   @objc func runSignalReceiverThread() {
     NSLog("DEBUG [SignalReceiverThread] Starting thread")
+    NSLog("INFO  SignalReceiverThread: Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
     let bonjour = Bonjour(self)
 
     while !self.wasShutdown {
@@ -750,20 +751,51 @@ class OutletGRPCClient: OutletBackend {
   }
 
   private func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
+    NSLog("DEBUG callAndTranslateErrors(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+
     if !self.isConnected {
       throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: client not connected!")
+    } else {
+
+      do {
+        NSLog("INFO  Calling gRPC: \(rpcName)")
+        return try call.response.wait()
+      } catch is NIOConnectionError {
+        self.grpcConnectionDown()
+        throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
+      } catch {
+        // General failure. Maybe server internal error, or bad data, or something else
+        throw OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+      }
     }
 
-    do {
-      NSLog("INFO  Calling gRPC: \(rpcName)")
-      return try call.response.wait()
-    } catch is NIOConnectionError {
-      self.grpcConnectionDown()
-      throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
-    } catch {
-      // General failure. Maybe server internal error, or bad data, or something else
-      throw OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
-    }
+//    var response: Res? = nil
+//    var err: Error? = nil
+//
+//    self.app.execSync {
+//      NSLog("INFO  callAndTranslateErrors(): Current queue: \(DispatchQueue.currentQueueLabel ?? "nil")")
+//
+//      if !self.isConnected {
+//        err = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: client not connected!")
+//      } else {
+//
+//        do {
+//          NSLog("INFO  Calling gRPC: \(rpcName)")
+//          response = try call.response.wait()
+//        } catch is NIOConnectionError {
+//          self.grpcConnectionDown()
+//          err = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
+//        } catch {
+//          // General failure. Maybe server internal error, or bad data, or something else
+//          err = OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+//        }
+//      }
+//
+//    }
+//    if let error = err {
+//      throw error
+//    }
+//    return response!
   }
 
   private func grpcConnectionDown() {

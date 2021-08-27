@@ -202,11 +202,4 @@ struct RootPathPanel: View {
 
 //    .background(Color.blue)  // TODO
   }
-
-}
-
-struct RootPathPanel_Previews: PreviewProvider {
-  static var previews: some View {
-    RootPathPanel(try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
-  }
 }

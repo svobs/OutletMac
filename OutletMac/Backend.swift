@@ -7,6 +7,7 @@
 import SwiftUI
 
 protocol OutletBackend: HasLifecycle {
+  var app: OutletApp { get }
   var nodeIdentifierFactory: NodeIdentifierFactory { get }
 
   func getConfig(_ configKey: String, defaultVal: String?) throws -> String
@@ -73,10 +74,12 @@ extension OutletBackend {
  Should be used only for testing & previews
  */
 class MockBackend: OutletBackend {
+  let app: OutletApp
   let dipatcher: SignalDispatcher
   let nodeIdentifierFactory = NodeIdentifierFactory()
-  init(_ d: SignalDispatcher? = nil) {
+  init(_ d: SignalDispatcher? = nil, _ app: OutletApp) {
     self.dipatcher = d ?? SignalDispatcher()
+    self.app = app
     self.nodeIdentifierFactory.backend = self
   }
 

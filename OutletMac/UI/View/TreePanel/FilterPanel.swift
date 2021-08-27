@@ -83,10 +83,3 @@ struct FilterPanel: View {
 //    .background(Color.purple)  // TODO
   }
 }
-
-struct FilterPanel_Previews: PreviewProvider {
-  static let app = MockApp()
-  static var previews: some View {
-    FilterPanel(try! MockTreePanelController(ID_LEFT_TREE, canChangeRoot: true))
-  }
-}

@@ -35,54 +35,6 @@ protocol OutletApp: HasLifecycle {
   func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String)
 }
 
-class MockApp: OutletApp {
-  var dispatcher: SignalDispatcher
-  var backend: OutletBackend
-  var iconStore: IconStore
-  var settings = GlobalSettings()
-
-  init() {
-    self.dispatcher = SignalDispatcher()
-    self.backend = MockBackend(self.dispatcher)
-    self.iconStore = IconStore(self.backend)
-  }
-
-  func start() throws {
-  }
-  func shutdown() throws {
-  }
-
-  func grpcDidGoDown() {
-  }
-
-  func grpcDidGoUp() {
-  }
-
-  func execAsync(_ workItem: @escaping NoArgVoidFunc) {
-  }
-  func execSync(_ workItem: @escaping NoArgVoidFunc) {
-  }
-
-  func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool {
-    return false
-  }
-
-  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable) {
-  }
-
-  func deregisterTreePanelController(_ treeID: TreeID) {
-  }
-
-  func getTreePanelController(_ treeID: String) -> TreePanelControllable? {
-    return nil
-  }
-
-  public func sendEnableUISignal(enable: Bool) {
-  }
-  func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String) {
-  }
-}
-
 // This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
 class AppMenu: NSMenu {
   override init(title: String) {
@@ -113,6 +65,8 @@ class AppMenu: NSMenu {
 }
 
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
+  private var mainWindowIsOpen = false
+
   var rootChooserView: GDriveRootChooser!
   var mergePreviewView: MergePreview!
   var connectionProblemView: ConnectionProblemView!
@@ -154,7 +108,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func start() throws {
-    NSLog("DEBUG OutletMacApp start begin")
+    NSLog("DEBUG OutletMacApp start begin: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
 
     var useFixedAddress: Bool = false
     var fixedHost: String? = nil
@@ -206,6 +160,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
+    // show Connection Problem window right away, cuz it might take a while to connect.
+    // TODO: add a delay or something prettier
     self.grpcDidGoDown()
     try! self.backend.start()  // should not throw errors
     NSLog("INFO  Backend started")
@@ -234,33 +190,54 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func grpcDidGoDown() {
-    self.execAsync {
-      DispatchQueue.main.async {
-        self.enableWindowCloseListener = false
-        // Close all other windows beside the Connection Problem window, if they exist
-        self.mainWindow?.close()
-        self.rootChooserView?.window.close()
-        self.mergePreviewView?.window.close()
-        self.enableWindowCloseListener = true
+    DispatchQueue.main.async {
+      self.grpcDidGoDown_internal()
+    }
+  }
 
-        NSApp.sendAction(#selector(OutletMacApp.openConnectionProblemWindow), to: nil, from: self)
+  private func grpcDidGoDown_internal() {
+    NSLog("DEBUG Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
+    self.enableWindowCloseListener = false
+    // Close all other windows beside the Connection Problem window, if they exist
+    self.mainWindow?.close()
+    self.rootChooserView?.window.close()
+    self.mergePreviewView?.window.close()
+    self.enableWindowCloseListener = true
+
+    // Open Connection Problem window
+    if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+      NSLog("INFO  Showing ConnectionProblemView")
+      self.connectionProblemView.moveToFront()
+    } else {
+      NSLog("INFO  Opening ConnectionProblemView")
+      DispatchQueue.main.async {
+        do {
+          self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
+          try self.connectionProblemView.start()
+          self.connectionProblemView.moveToFront()
+        } catch {
+          self.displayError("Failed to open Connecting dialog!", "An unexpected error occurred: \(error)")
+          sleep(1)
+          exit(1)
+        }
       }
     }
   }
 
   func grpcDidGoUp() {
-    self.execAsync {
+    DispatchQueue.main.async {
+      NSLog("INFO  grpcDidGoUp: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
       do {
         try self.launchFrontend()
       } catch {
         if let grpcClient = self._backend, !grpcClient.isConnected {
           // we can handle a disconnect
           NSLog("ERROR While creating main window: \(error)")
-          self.grpcDidGoDown()
+          self.grpcDidGoDown_internal()
 
         } else { // unknown error...try to handle
           NSLog("ERROR while launching frontend: \(error)")
-          self.grpcDidGoDown()
+          self.grpcDidGoDown_internal()
         }
       }
     }
@@ -269,7 +246,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func launchFrontend() throws {
     // These make gRPC calls and will be the first thing to fail if the BE is not online
     // (note: they will fail separately, since OutletGRPCClient operates on a separate thread)
+    NSLog("DEBUG Entered launchFrontend()")
     try self.iconStore.start()
+
+    settings.deviceList = try self.backend.getDeviceList()
 
     settings.isPlaying = try self.backend.getOpExecutionPlayState()
 
@@ -281,9 +261,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
 
-    settings.deviceList = try self.backend.getDeviceList()
-
-    DispatchQueue.main.async {
       self.connectionProblemView?.window.close()
 
       let screenSize = NSScreen.main?.frame.size ?? .zero
@@ -291,7 +268,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
       NSLog("DEBUG OutletMacApp start done")
       self.createMainWindow()
-    }
   }
 
   /**
@@ -308,6 +284,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func loadWindowContentRectFromConfig() throws -> NSRect {
+    NSLog("DEBUG Entered loadWindowContentRectFromConfig()")
     let xLocConfigPath = "ui_state.\(winID).x"
     let yLocConfigPath = "ui_state.\(winID).y"
     let widthConfigPath = "ui_state.\(winID).width"
@@ -344,6 +321,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
 
     NSLog("DEBUG Showing mainWindow")
+    mainWindowIsOpen = true
     mainWindow!.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
     mainWindow!.contentView = NSHostingView(rootView: contentView)
@@ -404,7 +382,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 //  }
 
   @objc func windowWillClose(_ notification: Notification) {
+    self.mainWindowIsOpen = false
+
     if !self.enableWindowCloseListener {
+      // closed by program, not user
       NSLog("DEBUG Closing mainWindow")
 
       self.execAsync {
@@ -555,7 +536,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       DispatchQueue.main.async {
-        if !self.connectionProblemView.isOpen {
+        if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+          NSLog("INFO  Will not display error alert ('\(msg)'): the Connection Problem window is open")
+        } else if !self.mainWindowIsOpen {
+          NSLog("INFO  Will not display error alert ('\(msg)'): the main window is not open to display it")
+        } else {
+          NSLog("DEBUG Showing error alert: \(msg)")
           self.settings.showAlert(title: msg, msg: secondaryMsg)
         }
       }

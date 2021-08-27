@@ -9,20 +9,9 @@ import Foundation
 
 class NodeIdentifierFactory {
   weak var backend: OutletBackend! = nil
-  // cache device list
-  private var _deviceList: [Device] = []
 
   func getDeviceList() throws -> [Device] {
-    if self._deviceList.count == 0 {
-      // lazy load device list from server.
-      // note: it is especially important to use DispatchQueue here, because else we will run risk of crashing if we call a gRPC from the body
-      // of another gRPC call
-      try DispatchQueue.global(qos: .userInitiated).sync { [unowned self] in
-        NSLog("DEBUG Getting device list from server")
-        self._deviceList = try self.backend.getDeviceList()
-      }
-    }
-    return self._deviceList
+    return backend.app.settings.deviceList
   }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {

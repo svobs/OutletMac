@@ -69,92 +69,6 @@ extension TreePanelControllable {
 }
 
 /**
- CLASS MockTreePanelController
-
- Non-functioning implementation of TreePanelControllable. Should only be used for testing & previews
- */
-class MockTreePanelController: TreePanelControllable {
-  let app: OutletApp
-  var tree: DisplayTree
-  let dispatchListener: DispatchListener
-
-  var swiftTreeState: SwiftTreeState
-  var swiftFilterState: SwiftFilterState
-
-  var treeView: TreeViewController? = nil
-  let displayStore: DisplayStore = DisplayStore()
-  let treeActions: TreeActions = TreeActions()
-  let contextMenu: TreeContextMenu = TreeContextMenu()
-
-  var canChangeRoot: Bool
-
-  var allowMultipleSelection: Bool {
-    get {
-      return true
-    }
-  }
-
-  var treeLoadState: TreeLoadState {
-    get {
-      return TreeLoadState.COMPLETELY_LOADED
-    }
-  }
-
-  init(_ treeID: String, canChangeRoot: Bool) throws {
-    self.app = MockApp()
-    self.canChangeRoot = canChangeRoot
-    // dummy data follows
-    let spid = LocalNodeIdentifier(NULL_UID, deviceUID: NULL_UID, ROOT_PATH)
-    let rootSN = (spid, LocalDirNode(spid, NULL_UID, .NOT_TRASHED, isLive: false))
-    self.tree = MockDisplayTree(backend: MockBackend(), state: DisplayTreeUiState(treeID: treeID, rootSN: rootSN, rootExists: false, offendingPath: nil, needsManualLoad: false, treeDisplayMode: .ONE_TREE_ALL_ITEMS, hasCheckboxes: false))
-    self.swiftTreeState = try SwiftTreeState.from(self.tree)
-    let filterCriteria = FilterCriteria()
-    self.swiftFilterState = SwiftFilterState.from(filterCriteria)
-
-    self.dispatchListener = self.app.dispatcher.createListener(self.tree.treeID)
-
-    self.swiftTreeState.statusBarMsg = "Status msg for \(self.treeID)"
-  }
-
-  func start() throws {
-    displayStore.con = self
-    treeActions.con = self
-    contextMenu.con = self
-  }
-
-  func shutdown() throws {
-  }
-
-  func updateDisplayTree(to newTree: DisplayTree) throws {
-  }
-
-  func setChecked(_ guid: GUID, _ isChecked: Bool) throws {
-  }
-
-  func generateCheckedRowList() throws -> [SPIDNodePair] {
-    return []
-  }
-
-  func requestTreeLoad() throws {
-  }
-
-  func connectTreeView(_ treeView: TreeViewController) {
-  }
-
-  func clearTreeAndDisplayLoadingMsg() {
-  }
-
-  func reportError(_ title: String, _ errorMsg: String) {
-  }
-
-  func reportException(_ title: String, _ error: Error) {
-  }
-
-  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
-  }
-}
-
-/**
  CLASS TreePanelController
 
  Serves as the controller for the entire tree panel for a single UI tree.
@@ -604,12 +518,12 @@ class TreePanelController: TreePanelControllable {
 
   func reportError(_ title: String, _ errorMsg: String) {
     // See listener in OutletApp
+    NSLog("ERROR [\(self.treeID)] Reporting local error: title='\(title)' error='\(errorMsg)'")
     self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
   }
 
   func reportException(_ title: String, _ error: Error) {
     let errorMsg: String = "\(error)" // ew, heh
-    NSLog("ERROR [\(self.treeID)] title='\(title)' error'\(errorMsg)'")
     reportError(title, errorMsg)
   }
 

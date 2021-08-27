@@ -69,6 +69,7 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
 
     func moveToFront() {
         DispatchQueue.main.async {
+            self.windowIsOpen = true
             self.window.makeKeyAndOrderFront(nil)
         }
     }

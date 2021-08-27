@@ -144,6 +144,7 @@ class IconStore: HasLifecycle {
   }
 
   func start() throws {
+    NSLog("DEBUG IconStore starting: getting config values from gRPC")
     self.treeIconSize = (CGFloat)(try self.backend.getIntConfig(CFG_KEY_TREE_ICON_SIZE, defaultVal: DEFAULT_ICON_SIZE))
     self.toolbarIconSize = (CGFloat)(try self.backend.getIntConfig(CFG_KEY_TOOLBAR_ICON_SIZE, defaultVal: DEFAULT_ICON_SIZE))
     self.useNativeToolbarIcons = try self.backend.getBoolConfig(CFG_KEY_USE_NATIVE_TOOLBAR_ICONS, defaultVal: useNativeToolbarIcons)

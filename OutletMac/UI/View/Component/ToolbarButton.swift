@@ -167,16 +167,3 @@ struct PlayPauseToggleButton: View {
     .buttonStyle(PlainButtonStyle())
   }
 }
-
-
-struct TernaryToggleButton_Previews: PreviewProvider {
-  static let backend = MockBackend(SignalDispatcher())
-  static let iconStore = IconStore(backend)
-  static var previews: some View {
-    HStack {
-      TernaryToggleButton(iconStore, iconTrue: .ICON_IS_SHARED, iconFalse: .ICON_IS_NOT_SHARED, .constant(Ternary.TRUE))
-      TernaryToggleButton(iconStore, iconTrue: .ICON_IS_TRASHED, iconFalse: .ICON_IS_NOT_TRASHED, .constant(Ternary.TRUE))
-      TernaryToggleButton(iconStore, iconTrue: .ICON_IS_SHARED, iconFalse: .ICON_IS_NOT_TRASHED, .constant(Ternary.TRUE))
-    }
-  }
-}
