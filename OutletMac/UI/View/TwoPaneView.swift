@@ -83,6 +83,10 @@ fileprivate struct ButtonBar: View {
   }
 
   func onMergeButtonClicked() {
+    if self.settings.mode != .DIFF {
+      self.conLeft.reportError("Cannot merge changes", "A diff is not currently in progress")
+      return
+    }
     do {
       let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
       let selectedChangeListRight = try self.conRight.generateCheckedRowList()
@@ -106,6 +110,10 @@ fileprivate struct ButtonBar: View {
   }
 
   func onCancelDiffButtonClicked() {
+    if self.settings.mode != .DIFF {
+      self.conLeft.reportError("Cannot cancel diff", "A diff is not currently in progress")
+      return
+    }
     NSLog("DEBUG CancelDiff btn clicked! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
     self.conLeft.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_MAIN_WINDOW)
   }

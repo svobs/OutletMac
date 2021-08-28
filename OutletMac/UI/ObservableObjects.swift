@@ -37,7 +37,14 @@ class GlobalSettings: ObservableObject {
     }
   }
 
+  func reset() {
+    NSLog("DEBUG Resetting settings")
+    mode = .BROWSING
+    dismissAlert()
+  }
+
   func dismissAlert() {
+    NSLog("DEBUG Dismissing alert")
     self.showingAlert = false
     self.alertMsg = ""
     self.alertTitle = "Alert"

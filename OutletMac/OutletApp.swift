@@ -196,16 +196,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func grpcDidGoDown_internal() {
-    NSLog("DEBUG Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
-    self.enableWindowCloseListener = false
-    // Close all other windows beside the Connection Problem window, if they exist
-    self.mainWindow?.close()
-    self.rootChooserView?.window.close()
-    self.mergePreviewView?.window.close()
-    self.enableWindowCloseListener = true
-
-    // Open Connection Problem window
     DispatchQueue.main.async {
+      NSLog("DEBUG Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
+      self.enableWindowCloseListener = false
+      // Close all other windows beside the Connection Problem window, if they exist
+      self.mainWindow?.close()
+      self.rootChooserView?.window.close()
+      self.mergePreviewView?.window.close()
+      self.enableWindowCloseListener = true
+
+      self.settings.reset()
+
+      // Open Connection Problem window
       if self.connectionProblemView != nil {
         NSLog("INFO  Showing ConnectionProblem window")
         self.connectionProblemView.showWindow()
@@ -423,6 +425,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   private func changeWindowMode(_ newMode: WindowMode) {
     DispatchQueue.main.async {
+      NSLog("DEBUG Setting WindowMode to: \(newMode)")
       self.settings.mode = newMode
     }
   }
