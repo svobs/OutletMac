@@ -41,6 +41,7 @@ class GlobalSettings: ObservableObject {
 
   func reset() {
     NSLog("DEBUG Resetting settings")
+    isUIEnabled = true
     mode = .BROWSING
     dismissAlert()
   }
