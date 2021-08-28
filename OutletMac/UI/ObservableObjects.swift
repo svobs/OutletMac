@@ -22,6 +22,8 @@ class GlobalSettings: ObservableObject {
   @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
   @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
+  @Published var isUIEnabled: Bool = true
+
   /**
    This method will cause an alert to be displayed in the MainContentView.
    */
@@ -51,14 +53,14 @@ class GlobalSettings: ObservableObject {
   }
 }
 
-class HeightTracking: ObservableObject {
+class WindowState: ObservableObject {
   // These two values are calculated and stored so that the proper height of the OutlineView can be derived
-  @Published var mainWindowHeight: CGFloat = 0
+  @Published var windowHeight: CGFloat = 0
   @Published var nonTreeViewHeight: CGFloat = 0
 
   func getTreeViewHeight() -> CGFloat {
-//    NSLog("DEBUG getTreeViewHeight(): \(self.mainWindowHeight) - \(self.nonTreeViewHeight)")
-    return self.mainWindowHeight - self.nonTreeViewHeight
+//    NSLog("DEBUG getTreeViewHeight(): \(self.windowHeight) - \(self.nonTreeViewHeight)")
+    return self.windowHeight - self.nonTreeViewHeight
   }
 
 }
@@ -70,7 +72,6 @@ class HeightTracking: ObservableObject {
  Encapsulates *ONLY* the information required to redraw the SwiftUI views for a given DisplayTree.
  */
 class SwiftTreeState: ObservableObject {
-  @Published var isUIEnabled: Bool
   @Published var isRootExists: Bool
   @Published var isEditingRoot: Bool
   @Published var isManualLoadNeeded: Bool
@@ -82,9 +83,8 @@ class SwiftTreeState: ObservableObject {
   @Published var treeType: TreeType = TreeType.NA
   @Published var hasCheckboxes: Bool
 
-  init(isUIEnabled: Bool, isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?,
+  init(isRootExists: Bool, isEditingRoot: Bool, isManualLoadNeeded: Bool, offendingPath: String?,
        rootPath: String, rootPathNonEdit: String, rootDeviceUID: UID, treeType: TreeType, hasCheckboxes: Bool) {
-    self.isUIEnabled = isUIEnabled
     self.isRootExists = isRootExists
     self.isEditingRoot = isEditingRoot
     self.isManualLoadNeeded = isManualLoadNeeded
@@ -110,7 +110,7 @@ class SwiftTreeState: ObservableObject {
 
   static func from(_ tree: DisplayTree) throws -> SwiftTreeState {
     let treeType = try tree.backend.nodeIdentifierFactory.getTreeType(for: tree.rootSPID.deviceUID)
-    return SwiftTreeState(isUIEnabled: true, isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
+    return SwiftTreeState(isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
                           offendingPath: tree.state.offendingPath, rootPath: tree.rootSPID.getSinglePath(),
                           rootPathNonEdit: tree.rootPath, rootDeviceUID: tree.rootDeviceUID, treeType: treeType, hasCheckboxes: tree.hasCheckboxes)
   }

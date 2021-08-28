@@ -18,7 +18,7 @@ struct TreePanel {
   let con: TreePanelControllable
   let treeView: TreeView
 
-  init(_ app: OutletApp, _ controller: TreePanelControllable, _ heightTracking: HeightTracking) {
+  init(_ app: OutletApp, _ controller: TreePanelControllable, _ heightTracking: WindowState) {
     self.app = app
     self.con = controller
     self.treeView = TreeView(controller: self.con, heightTracking)

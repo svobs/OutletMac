@@ -10,7 +10,7 @@ import SwiftUI
 // Main window content view
 struct MainContentView: View {
   @EnvironmentObject var settings: GlobalSettings
-  @StateObject var heightTracking: HeightTracking = HeightTracking()
+  @StateObject var windowState: WindowState = WindowState()
   weak var app: OutletApp!
   weak var conLeft: TreePanelControllable!
   weak var conRight: TreePanelControllable!
@@ -37,7 +37,7 @@ struct MainContentView: View {
 
     // Here, I use GeometryReader to get the full canvas size (sans window decoration)
     GeometryReader { geo in
-      TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight, heightTracking)
+      TwoPaneView(app: self.app, conLeft: self.conLeft, conRight: self.conRight, windowState)
         .environmentObject(settings)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(Rectangle()) // taps should be detected in the whole window
@@ -50,7 +50,7 @@ struct MainContentView: View {
         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       .onPreferenceChange(ContentAreaPrefKey.self) { key in
 //        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
-        self.heightTracking.mainWindowHeight = key.height
+        self.windowState.windowHeight = key.height
       }
     }
   }

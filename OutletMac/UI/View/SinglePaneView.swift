@@ -15,7 +15,7 @@ import SwiftUI
  */
 struct SinglePaneView: View {
   @EnvironmentObject var settings: GlobalSettings
-  @ObservedObject var heightTracking: HeightTracking
+  @ObservedObject var heightTracking: WindowState
 
   private var columns: [GridItem] = [
     // these specify spacing between columns
@@ -26,7 +26,7 @@ struct SinglePaneView: View {
   let app: OutletApp
   let con: TreePanelControllable
 
-  init(_ app: OutletApp, _ con: TreePanelControllable, _ heightTracking: HeightTracking) {
+  init(_ app: OutletApp, _ con: TreePanelControllable, _ heightTracking: WindowState) {
     self.app = app
     self.con = con
     self.heightTracking = heightTracking
@@ -48,6 +48,7 @@ struct SinglePaneView: View {
 
       // Row1: filter panel
       FilterPanel(self.con)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
@@ -70,7 +71,7 @@ struct SinglePaneView: View {
         totalHeight += height0
       }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.mainWindowHeight))")
+//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.windowHeight))")
       self.heightTracking.nonTreeViewHeight = totalHeight
     }
   }

@@ -9,7 +9,7 @@ import SwiftUI
  The content area of the Merge Preview dialog.
  */
 struct MergePreviewContent: View {
-    @StateObject var heightTracking: HeightTracking = HeightTracking()
+    @StateObject var heightTracking: WindowState = WindowState()
     var parentWindow: NSWindow
     let app: OutletApp
     let con: TreePanelControllable
@@ -35,7 +35,7 @@ struct MergePreviewContent: View {
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
                         .onPreferenceChange(ContentAreaPrefKey.self) { key in
 //                            NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
-                            self.heightTracking.mainWindowHeight = key.height
+                            self.heightTracking.windowHeight = key.height
                         }
             }
             HStack {

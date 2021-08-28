@@ -149,6 +149,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self._iconStore = IconStore(self.backend)
 
     // Subscribe to app-wide signals here
+    dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, onEnableUIToggled)
     dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
     dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
@@ -439,6 +440,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     let secondaryMsg = try propDict.getString("secondary_msg")
     NSLog("ERROR Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
+  }
+
+  private func onEnableUIToggled(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let isEnabled = try propDict.getBool("enable")
+    DispatchQueue.main.async {
+      self.settings.isUIEnabled = isEnabled
+    }
   }
 
   private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {

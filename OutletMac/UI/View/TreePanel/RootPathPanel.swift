@@ -195,6 +195,7 @@ struct RootPathPanel: View {
       } // editing / not editing
 
     }  // HStack
+    .disabled(!settings.isUIEnabled)
     .frame(minWidth: 300,
            maxWidth: .infinity,
            alignment: .topLeading)

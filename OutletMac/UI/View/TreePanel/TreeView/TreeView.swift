@@ -8,12 +8,12 @@ struct TreeView: View {
   let con: TreePanelControllable
   @EnvironmentObject var settings: GlobalSettings
   @ObservedObject var swiftTreeState: SwiftTreeState
-  @ObservedObject var heightTracking: HeightTracking
+  @ObservedObject var windowState: WindowState
 
-  init(controller: TreePanelControllable, _ heightTracking: HeightTracking) {
+  init(controller: TreePanelControllable, _ windowState: WindowState) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
-    self.heightTracking = heightTracking
+    self.windowState = windowState
   }
 
   private func makeTreeView() -> some View {
@@ -22,7 +22,7 @@ struct TreeView: View {
         .frame(minWidth: 200,
                maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                // A redraw of this view should be triggered when either of these values are changed:
-               minHeight: heightTracking.getTreeViewHeight(),
+               minHeight: windowState.getTreeViewHeight(),
                maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
                alignment: .topLeading)
   }

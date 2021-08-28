@@ -43,9 +43,12 @@ fileprivate struct ButtonBar: View {
     HStack {
       if settings.mode == .BROWSING {
         Button("Diff (content-first)", action: self.onDiffButtonClicked)
+                .disabled(!self.settings.isUIEnabled)
       } else if settings.mode == .DIFF {
         Button("Merge...", action: self.onMergeButtonClicked)
+                .disabled(!self.settings.isUIEnabled)
         Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
+                .disabled(!self.settings.isUIEnabled)
       }
       PlayPauseToggleButton(app.iconStore, conLeft.dispatcher)
       Spacer()
@@ -64,6 +67,10 @@ fileprivate struct ButtonBar: View {
     }
     if self.conRight.treeLoadState != .COMPLETELY_LOADED {
       self.conRight.reportError("Cannot start diff", "Right tree is not finished loading")
+      return
+    }
+    if settings.mode != .BROWSING {
+      self.conRight.reportError("Cannot start diff", "A diff is already in process, apparently (this is a bug)")
       return
     }
 
@@ -126,7 +133,7 @@ fileprivate struct ButtonBar: View {
  */
 struct TwoPaneView: View {
   @EnvironmentObject var settings: GlobalSettings
-  @ObservedObject var heightTracking: HeightTracking
+  @ObservedObject var windowState: WindowState
 
   private var columns: [GridItem] = [
     // these specify spacing between columns
@@ -139,11 +146,11 @@ struct TwoPaneView: View {
   let conLeft: TreePanelControllable
   let conRight: TreePanelControllable
 
-  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable, _ heightTracking: HeightTracking) {
+  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable, _ windowState: WindowState) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    self.heightTracking = heightTracking
+    self.windowState = windowState
   }
 
   var body: some View {
@@ -168,19 +175,21 @@ struct TwoPaneView: View {
 
       // Row1: filter panel
       FilterPanel(self.conLeft)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
         })
       FilterPanel(self.conRight)
+        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 1, height: geo.size.height))
         })
 
       // Row2: Tree view
-      TreeView(controller: self.conLeft, heightTracking)
-      TreeView(controller: self.conRight, heightTracking)
+      TreeView(controller: self.conLeft, windowState)
+      TreeView(controller: self.conRight, windowState)
 
       // Row3: Status msg
       StatusPanel(self.conLeft)
@@ -220,8 +229,8 @@ struct TwoPaneView: View {
         totalHeight += max(height0, height1)
       }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.mainWindowHeight))")
-      self.heightTracking.nonTreeViewHeight = totalHeight
+//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.windowHeight))")
+      self.windowState.nonTreeViewHeight = totalHeight
     }
   }
 }

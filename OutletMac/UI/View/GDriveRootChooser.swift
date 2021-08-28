@@ -19,7 +19,7 @@ class ChooserState: ObservableObject {
  The content area of the Google Drive root chooser.
  */
 struct GDriveRootChooserContent: View {
-  @StateObject var heightTracking: HeightTracking = HeightTracking()
+  @StateObject var windowState: WindowState = WindowState()
   var parentWindow: NSWindow
   weak var app: OutletApp!
   let con: TreePanelControllable
@@ -67,14 +67,14 @@ struct GDriveRootChooserContent: View {
   var body: some View {
     VStack {
       GeometryReader { geo in
-        SinglePaneView(self.app, self.con, self.heightTracking)
+        SinglePaneView(self.app, self.con, self.windowState)
           .environmentObject(self.app.settings)
           .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
           .contentShape(Rectangle()) // taps should be detected in the whole window
           .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
         .onPreferenceChange(ContentAreaPrefKey.self) { key in
   //        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
-          self.heightTracking.mainWindowHeight = key.height
+          self.windowState.windowHeight = key.height
         }
       }
       HStack {

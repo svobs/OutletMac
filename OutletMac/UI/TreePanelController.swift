@@ -137,7 +137,6 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func subscribeToSignals(_ treeID: TreeID) {
-    self.dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, self.onEnableUIToggled)
     self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
@@ -530,13 +529,6 @@ class TreePanelController: TreePanelControllable {
 
   // DispatchListener callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  private func onEnableUIToggled(_ senderID: SenderID, _ propDict: PropDict) throws {
-    let isEnabled = try propDict.getBool("enable")
-    DispatchQueue.main.async {
-      self.swiftTreeState.isUIEnabled = isEnabled
-    }
-  }
 
   private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
