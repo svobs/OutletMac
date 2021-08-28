@@ -67,11 +67,9 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
         NSLog("DEBUG ConnectionProblemWindow shutdown() called")
     }
 
-    func moveToFront() {
-        DispatchQueue.main.async {
-            self.windowIsOpen = true
-            self.window.makeKeyAndOrderFront(nil)
-        }
+    func showWindow() {
+        self.windowIsOpen = true
+        self.window.makeKeyAndOrderFront(nil)
     }
 }
 

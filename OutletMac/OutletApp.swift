@@ -205,20 +205,19 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     self.enableWindowCloseListener = true
 
     // Open Connection Problem window
-    if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
-      NSLog("INFO  Showing ConnectionProblemView")
-      self.connectionProblemView.moveToFront()
-    } else {
-      NSLog("INFO  Opening ConnectionProblemView")
-      DispatchQueue.main.async {
+    DispatchQueue.main.async {
+      if self.connectionProblemView != nil {
+        NSLog("INFO  Showing ConnectionProblem window")
+        self.connectionProblemView.showWindow()
+      } else {
+        NSLog("INFO  Creating ConnectionProblem window")
         do {
           self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
           try self.connectionProblemView.start()
-          self.connectionProblemView.moveToFront()
+          self.connectionProblemView.showWindow()
         } catch {
-          self.displayError("Failed to open Connecting dialog!", "An unexpected error occurred: \(error)")
-          sleep(1)
-          exit(1)
+          NSLog("ERROR Failed to open ConnectionProblem window: \(error)")
+          self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
         }
       }
     }
@@ -601,26 +600,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
           try self.mergePreviewView.start()
         } catch {
           self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
-        }
-      }
-    }
-  }
-
-  @objc func openConnectionProblemWindow() {
-    if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
-      NSLog("INFO  Showing ConnectionProblemView")
-      self.connectionProblemView.moveToFront()
-    } else {
-      NSLog("INFO  Opening ConnectionProblemView")
-      DispatchQueue.main.async {
-        do {
-          self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
-          try self.connectionProblemView.start()
-          self.connectionProblemView.moveToFront()
-        } catch {
-          self.displayError("Failed to open Connecting dialog!", "An unexpected error occurred: \(error)")
-          sleep(1)
-          exit(1)
         }
       }
     }
