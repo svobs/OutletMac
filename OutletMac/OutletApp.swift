@@ -209,19 +209,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       self.settings.reset()
 
       // Open Connection Problem window
-      if self.connectionProblemView != nil {
-        NSLog("INFO  Showing ConnectionProblem window")
-        self.connectionProblemView.showWindow()
-      } else {
-        NSLog("INFO  Creating ConnectionProblem window")
-        do {
-          self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
-          try self.connectionProblemView.start()
-          self.connectionProblemView.showWindow()
-        } catch {
-          NSLog("ERROR Failed to open ConnectionProblem window: \(error)")
-          self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
+      NSLog("INFO  Showing ConnectionProblem window")
+      do {
+        if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+          NSLog("DEBUG Closing existing ConnectionProblem window")
+          self.connectionProblemView.window.close()
         }
+        self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
+        try self.connectionProblemView.start()
+        self.connectionProblemView.showWindow()
+      } catch {
+        NSLog("ERROR Failed to open ConnectionProblem window: \(error)")
+        self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
       }
     }
   }

@@ -262,11 +262,10 @@ class TreePanelController: TreePanelControllable {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
       DispatchQueue.main.async {
+        self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
         if topLevelSNList.count == 0 {
           // clear loading node
-          self.clearModelAndTreeView()
-        } else {
-          self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+          self.treeView!.outlineView.reloadData()
         }
       }
       queue.append(contentsOf: topLevelSNList)
