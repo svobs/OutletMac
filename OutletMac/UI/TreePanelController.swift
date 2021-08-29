@@ -371,11 +371,9 @@ class TreePanelController: TreePanelControllable {
     }
   }
   
-  private func updateStatusBarMsg(_ statusMsg: String) {
-    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusMsg)\"")
-    DispatchQueue.main.async {
-      self.swiftTreeState.statusBarMsg = statusMsg
-    }
+  private func updateStatusBarMsg(_ statusBarMsg: String) {
+    NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
+    self.swiftTreeState.statusBarMsg = statusBarMsg
   }
 
   func setChecked(_ guid: GUID, _ isChecked: Bool) throws {
@@ -537,27 +535,28 @@ class TreePanelController: TreePanelControllable {
 
   private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
-
-    NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState)")
-    self.treeLoadState = treeLoadState
-
-    switch treeLoadState {
-    case .LOAD_STARTED:
-      self.enableNodeUpdateSignals = true
-
-      if self.swiftTreeState.isManualLoadNeeded {
-        DispatchQueue.main.async {
-          self.swiftTreeState.isManualLoadNeeded = false
-        }
-      }
-
-      self.populateTreeView()
-    default:
-      break
-    }
-
     let statusBarMsg = try propDict.getString("status_msg")
-    self.updateStatusBarMsg(statusBarMsg)
+
+    DispatchQueue.main.async {
+      NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg=\(statusBarMsg)")
+      self.treeLoadState = treeLoadState
+      self.updateStatusBarMsg(statusBarMsg)
+
+      switch treeLoadState {
+      case .LOAD_STARTED:
+        self.enableNodeUpdateSignals = true
+
+        if self.swiftTreeState.isManualLoadNeeded {
+          DispatchQueue.main.async {
+            self.swiftTreeState.isManualLoadNeeded = false
+          }
+        }
+
+        self.populateTreeView()
+      default:
+        break
+      }
+    }
   }
 
   private func onDisplayTreeChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
@@ -575,19 +574,14 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func onDirStatsUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
-    // TODO: do we really want to honor this flag here?
-    if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
-      return
-    }
-
     let statusBarMsg = try propDict.getString("status_msg")
-    self.updateStatusBarMsg(statusBarMsg)
-
     let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
     let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
 
     DispatchQueue.main.async {
+      NSLog("DEBUG [\(self.treeID)] Updating dir stats with status msg: \"\(statusBarMsg)\"")
+      self.updateStatusBarMsg(statusBarMsg)
+
       self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
       self.treeView!.outlineView.reloadData()
     }

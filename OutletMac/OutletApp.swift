@@ -324,7 +324,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     NSLog("DEBUG Showing mainWindow")
     mainWindowIsOpen = true
     mainWindow!.makeKeyAndOrderFront(nil)
-    let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!).environmentObject(self.settings)
+    let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
+            .environmentObject(self.settings)
     mainWindow!.contentView = NSHostingView(rootView: contentView)
   }
 
@@ -578,39 +579,42 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
-    if rootChooserView != nil && rootChooserView.isOpen {
-      rootChooserView.moveToFront()
-      rootChooserView.selectSPID(currentSN.spid)
-    } else {
-      do {
-        let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
-        let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
+    DispatchQueue.main.async {
+      if self.rootChooserView != nil && self.rootChooserView.isOpen {
+        self.rootChooserView.moveToFront()
+        self.rootChooserView.selectSPID(currentSN.spid)
+      } else {
+        do {
+          let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
+          let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 
-        rootChooserView = GDriveRootChooser(self, con, initialSelection: currentSN, targetTreeID: treeID)
-        try rootChooserView.start()
-      } catch {
-        self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
+          self.rootChooserView = GDriveRootChooser(self, con, initialSelection: currentSN, targetTreeID: treeID)
+          try self.rootChooserView.start()
+        } catch {
+          self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
+        }
       }
     }
   }
 
   @objc func openMergePreview(_ treeID: TreeID) {
-    if self.mergePreviewView != nil && self.mergePreviewView.isOpen {
-      self.mergePreviewView.moveToFront()
-    } else {
-      // note: we can't send a controller directly to this method (cuz of @objc), so instead we look it up in our controller registry.
-      guard let con = self.getTreePanelController(treeID) else {
-        NSLog("ERROR [\(treeID)] Cannot open Merge Preview: could not find controller with this treeID!")
-        return
+    // note: we can't send a controller directly to this method (cuz of @objc), so instead we look it up in our controller registry.
+    guard let con = self.getTreePanelController(treeID) else {
+      NSLog("ERROR [\(treeID)] Cannot open Merge Preview: could not find controller with this treeID!")
+      return
+    }
+
+    DispatchQueue.main.async {
+      if self.mergePreviewView != nil && self.mergePreviewView.isOpen {
+        NSLog("DEBUG Looks like there is an existing Merge Preview window open: closing it")
+        self.mergePreviewView.window.close()
       }
 
-      DispatchQueue.main.async {
-        do {
-          self.mergePreviewView = MergePreview(self, con)
-          try self.mergePreviewView.start()
-        } catch {
-          self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
-        }
+      do {
+        self.mergePreviewView = MergePreview(self, con)
+        try self.mergePreviewView.start()
+      } catch {
+        self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
       }
     }
   }

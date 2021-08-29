@@ -25,7 +25,6 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
     let dispatchListener: DispatchListener
 
     private var windowIsOpen = true
-    private var loadComplete: Bool = false
     var window: NSWindow!
     let initialSelection: SPIDNodePair?
 
@@ -50,7 +49,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         self.app = app
         self.con = con
         self.initialSelection = initialSelection
-        self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID))-dialog")
+        self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID)-dialog")
 
         // TODO: save content rect in config
         // note: x & y are from lower-left corner
@@ -67,7 +66,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         // Enables windowWillClose() callback
         window.delegate = self
 
-        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onLoadSubtreeDone, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.con.treeID)
         self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
         self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
 
@@ -90,11 +89,9 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
     }
 
     func moveToFront() {
-        if loadComplete {
-            DispatchQueue.main.async {
-                self.window.makeKeyAndOrderFront(nil)
-            }
-        }
+        NSLog("DEBUG [\(self.con.treeID)] moveToFront() called")
+        self.window.makeKeyAndOrderFront(nil)
+        self.windowIsOpen = true
     }
 
     // DispatchListener callbacks
@@ -102,14 +99,13 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
 
     private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
         let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
+        NSLog("DEBUG [\(self.con.treeID)] PopUpTreePanel: Got signal \(Signal.TREE_LOAD_STATE_UPDATED) with tree_load_state=\(treeLoadState)")
 
         switch treeLoadState {
-        case .LOAD_STARTED:
-            fallthrough
         case .COMPLETELY_LOADED:
-            do {
+            // note: around exactly the same time, the TreePanelController will receive this and start populating
+            DispatchQueue.main.async {
                 NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
-                self.loadComplete = true
                 self.moveToFront()
             }
         default:
@@ -117,16 +113,13 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         }
     }
 
-    func onLoadSubtreeDone(_ senderID: SenderID, _ props: PropDict) throws {
-        NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
-        self.loadComplete = true
-        self.moveToFront()
-    }
-
+    // This will be triggered by the tree panel controller
     func onPopulateTreeDone(_ senderID: SenderID, _ props: PropDict) throws {
-        if let selectionSPID = self.initialSelection?.spid {
-            NSLog("DEBUG [\(self.con.treeID)] Populate complete! Selecting SPID: \(selectionSPID)")
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            self.moveToFront()
+
+            if let selectionSPID = self.initialSelection?.spid {
+                NSLog("DEBUG [\(self.con.treeID)] Populate complete! Selecting SPID: \(selectionSPID)")
                 self.selectSPID(selectionSPID)
             }
         }

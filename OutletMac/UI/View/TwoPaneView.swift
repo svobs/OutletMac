@@ -161,13 +161,11 @@ struct TwoPaneView: View {
     ) {
       // Row0: Root Path
       RootPathPanel(self.conLeft)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 0, height: geo.size.height))
         })
       RootPathPanel(self.conRight)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 1, height: geo.size.height))
@@ -175,13 +173,11 @@ struct TwoPaneView: View {
 
       // Row1: filter panel
       FilterPanel(self.conLeft)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
         })
       FilterPanel(self.conRight)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 1, height: geo.size.height))
@@ -205,7 +201,6 @@ struct TwoPaneView: View {
 
       // Row4: Button bar & progress bar
       ButtonBar(app: self.app, conLeft: self.conLeft, conRight: self.conRight)
-        .environmentObject(settings)
         .frame(alignment: .bottomLeading)
         .background(GeometryReader { geo in
           Color.clear

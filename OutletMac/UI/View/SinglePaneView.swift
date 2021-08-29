@@ -40,7 +40,6 @@ struct SinglePaneView: View {
     ) {
       // Row0: Root Path
       RootPathPanel(self.con)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Root", col: 0, height: geo.size.height))
@@ -48,7 +47,6 @@ struct SinglePaneView: View {
 
       // Row1: filter panel
       FilterPanel(self.con)
-        .environmentObject(settings)
         .background(GeometryReader { geo in
           Color.clear
             .preference(key: MyHeightPreferenceKey.self, value: MyHeightPreferenceData(name: "Filter", col: 0, height: geo.size.height))
