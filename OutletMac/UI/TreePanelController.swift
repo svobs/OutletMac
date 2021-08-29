@@ -243,6 +243,7 @@ class TreePanelController: TreePanelControllable {
 
     let populateStartTimeMS = DispatchTime.now()
 
+    NSLog("DEBUG populateTreeView_NoLock(): clearing tree and displaying loading msg")
     clearTreeAndDisplayLoadingMsg()
 
     let rows: RowsOfInterest
@@ -258,10 +259,15 @@ class TreePanelController: TreePanelControllable {
 
     do {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
-      NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
       DispatchQueue.main.async {
-        self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+        if topLevelSNList.count == 0 {
+          // clear loading node
+          self.clearModelAndTreeView()
+        } else {
+          self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+        }
       }
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {

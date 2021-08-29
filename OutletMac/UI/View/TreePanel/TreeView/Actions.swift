@@ -110,6 +110,8 @@ class TreeActions {
 
     let sn = sender.snList[0]
 
+    NSLog("DEBUG goIntoDir(): \(sn.spid)")
+
     self.con.clearTreeAndDisplayLoadingMsg()
 
     self.con.app.execAsync {
