@@ -616,10 +616,14 @@ class TreePanelController: TreePanelControllable {
 
     let sn = try propDict.get("sn") as! SPIDNodePair
     let parentGUID = sn.spid.parentGUID!
-    NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid)")
+    NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
 
+    // FIXME: there is a bug here which results in phantom nodes at the topmost level
     if self.displayStore.removeSN(sn.spid.guid) {
       DispatchQueue.main.async {
+        if parentGUID == self.tree.rootSN.spid.guid {
+          NSLog("DEBUG Parent of removed node is root node!")
+        }
         self.treeView!.reloadItem(parentGUID, reloadChildren: true)
       }
     }

@@ -244,10 +244,9 @@ class DirectoryStats : CustomStringConvertible {
     get {
       let files = self.fileCount + self.trashedFileCount
       let dirs = self.dirCount + self.trashedDirCount
-      
-      var filesString: String = ""
+
       let multi = files == 1 ? "" : "s"
-      filesString = "\(StringUtil.formatNumberWithCommas(files)) file\(multi)"
+      let filesString = "\(StringUtil.formatNumberWithCommas(files)) file\(multi)"
       
       var dirsString: String = ""
       if dirs > 0 {
@@ -264,7 +263,8 @@ class DirectoryStats : CustomStringConvertible {
       return ""
     }
     let size: String = StringUtil.formatByteCount(sizeBytes)
-    return "\(size) in \(StringUtil.formatNumberWithCommas(self.fileCount)) files and \(StringUtil.formatNumberWithCommas(self.dirCount)) dirs"
+    let dirsString = self.dirCount == 0 ? "" : " and \(StringUtil.formatNumberWithCommas(self.dirCount)) dirs"
+    return "\(size) in \(StringUtil.formatNumberWithCommas(self.fileCount)) files\(dirsString)"
   }
 
   var description: String {

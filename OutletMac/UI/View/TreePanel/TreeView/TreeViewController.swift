@@ -256,6 +256,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
 
+        guard parentGUID != TOPMOST_GUID else {
+            NSLog("ERROR [\(treeID)] Cannot expand topmost GUID ('\(parentGUID)')! Ignoring request")
+            return
+        }
+
         do {
             let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, isExpandingParent: true,
                     maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
