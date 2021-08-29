@@ -481,6 +481,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
+    // This signal is also emitted after merge is done:
+    DispatchQueue.main.async {
+      self.mergePreviewView.window.close()
+    }
+
     let leftTree = try propDict.get("tree_left") as! DisplayTree
     let rightTree = try propDict.get("tree_right") as! DisplayTree
     try self.conLeft!.updateDisplayTree(to: leftTree)

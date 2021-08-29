@@ -218,7 +218,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let guidSet: Set<GUID> = self.getSelectedGUIDs()
         NSLog("DEBUG [\(treeID)] User selected GUIDs: \(guidSet)")
 
-        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+        self.con.app.execAsync { [unowned self] in
             do {
                 try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
             } catch {

@@ -130,6 +130,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   func reattachListeners(_ newTreeID: TreeID) {
+    NSLog("DEBUG [\(self.treeID)] reattachListeners() called")
     self.dispatchListener.unsubscribeAll()
 
     self.dispatchListener = self.app.dispatcher.createListener(newTreeID)
@@ -176,7 +177,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   func requestTreeLoad() throws {
-    DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+    self.app.execAsync { [unowned self] in
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
         // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
@@ -196,9 +197,7 @@ class TreePanelController: TreePanelControllable {
     self.treeView = treeView
 
     if self.readyToPopulate {
-      DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
-        self.populateTreeView()
-      }
+      self.populateTreeView()
     } else {
       NSLog("DEBUG [\(self.treeID)] readyToPopulate is false")
     }
@@ -223,16 +222,16 @@ class TreePanelController: TreePanelControllable {
    Executes async in a DispatchQueue, to ensure serial execution. This will catch and report exceptions.
    */
   private func populateTreeView() {
-    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+    self.app.execAsync { [unowned self] in
       do {
-        try self.populateTreeView_NoLock()
+        try self.populateTreeView_inner()
       } catch {
         self.reportException("Failed to populate tree", error)
       }
     }
   }
 
-  private func populateTreeView_NoLock() throws {
+  private func populateTreeView_inner() throws {
     NSLog("DEBUG [\(treeID)] Starting populateTreeView()")
     guard self.treeView != nil else {
       NSLog("DEBUG [\(treeID)] populateTreeView(): TreeView is nil. Setting readyToPopulate to true")
@@ -538,7 +537,7 @@ class TreePanelController: TreePanelControllable {
     let statusBarMsg = try propDict.getString("status_msg")
 
     DispatchQueue.main.async {
-      NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg=\(statusBarMsg)")
+      NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg='\(statusBarMsg)'")
       self.treeLoadState = treeLoadState
       self.updateStatusBarMsg(statusBarMsg)
 
@@ -668,7 +667,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func fireFilterTimer() {
-    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+    self.app.execAsync { [unowned self] in
 
       NSLog("DEBUG [\(self.treeID)] Firing timer to update filter via BE")
 

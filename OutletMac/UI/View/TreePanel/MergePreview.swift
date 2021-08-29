@@ -23,7 +23,8 @@ struct MergePreviewContent: View {
     func doMerge() {
         NSLog("DEBUG OK btn clicked! Sending signal: '\(Signal.COMPLETE_MERGE)'")
         self.con.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
-        self.parentWindow.close()
+
+        // BE will notify the app on success or failure, and it will decide whether to close this window.
     }
 
     var body: some View {

@@ -139,7 +139,7 @@ class OutletGRPCClient: OutletBackend {
 
           // Do discovery all over again, in case the address has changed:
           bonjour.startDiscovery(onSuccess: { ipPort in
-            DispatchQueue.global(qos: .userInitiated).async {
+            self.app.execAsync { [unowned self] in
               if leftGroup {
                 NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
                 return
@@ -158,7 +158,7 @@ class OutletGRPCClient: OutletBackend {
             }
 
           }, onError: { error in
-            DispatchQueue.global(qos: .userInitiated).async {
+            self.app.execAsync { [unowned self] in
               if leftGroup {
                 NSLog("DEBUG Already left DispatchGroup; ignoring error handler call")
                 return

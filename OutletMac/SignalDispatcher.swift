@@ -105,21 +105,22 @@ class DispatchListener {
     let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
 
-    self._dispatcher.dq.sync {
+    self._dispatcher.sendQueue.sync {
       self._dispatcher.subscribe(signal: signal, listenerID: self._id, sub)
       self._subscribedSignals.insert(signal)
     }
   }
 
   public func unsubscribeAll() {
-    self._dispatcher.dq.sync {
-      NSLog("DEBUG Unsubscribing from all signals for listenerID \(_id)")
+    // NOTE: this is called by deinit(), so we need to make this a sync call - otherwise we'll end up accessing deallocated vars and crash
+    self._dispatcher.sendQueue.sync {
+      NSLog("DEBUG Unsubscribing from all signals for listenerID \(self._id)")
       for signal in self._subscribedSignals {
-        self._dispatcher.unsubscribe(signal: signal, listenerID: _id)
+        self._dispatcher.unsubscribe(signal: signal, listenerID: self._id)
         self._subscribedSignals.remove(signal)
       }
       if !self._subscribedSignals.isEmpty {
-        NSLog("ERROR Expected set of subscribed signals to be empty after unsubscribeAll() for listenerID \(_id) but \(self._subscribedSignals.count) remain. Will remove remaining signals anyway")
+        NSLog("ERROR Expected set of subscribed signals to be empty after unsubscribeAll() for listenerID \(self._id) but \(self._subscribedSignals.count) remain. Will remove remaining signals anyway")
         self._subscribedSignals.removeAll()
       }
     }
@@ -175,7 +176,8 @@ fileprivate class Subscription {
  Mimics the functionality of PyDispatcher, with some simplifications/improvements. It's simple enough that I just wrote my own code.
  */
 class SignalDispatcher {
-  let dq = DispatchQueue(label: "SignalDispatcher SerialQueue") // custom dispatch queues are serial by default
+  fileprivate let sendQueue = DispatchQueue(label: "SignalDispatcher:SendQueue") // custom dispatch queues are serial by default
+  fileprivate let recvQueue = DispatchQueue(label: "SignalDispatcher:ReceiveQueue")
   fileprivate var signalListenerDict = [Signal: [ListenerID: Subscription]]()
 
   public func createListener(_ id: ListenerID) -> DispatchListener {
@@ -212,7 +214,7 @@ class SignalDispatcher {
    Specifically, gRPC will crash if a callback from a gRPC response makes another gRPC request in the same thread.
    */
   public func sendSignal(signal: Signal, senderID: SenderID, _ params: ParamDict? = nil) {
-    self.dq.sync {
+    self.sendQueue.sync {
       if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG SignalDispatcher: Processing signal \(signal)")
       }
@@ -224,7 +226,7 @@ class SignalDispatcher {
           countTotal += 1
           if subscriber.matches(senderID) {
             countNotified += 1
-            DispatchQueue.global(qos: .background).async {
+            self.recvQueue.async {  // do not block the send queue
               do {
                 NSLog("DEBUG SignalDispatcher: Calling listener \(subID) for signal '\(signal)'")
                 try subscriber.callback(senderID, propertyList)
