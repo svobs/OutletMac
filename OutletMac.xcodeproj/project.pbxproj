@@ -21,7 +21,6 @@
 		D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13544F72605E24800C6DADC /* GDriveRootChooser.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
-		D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */; };
 		D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADFA25BEC35E00E4F9E4 /* Backend.swift */; };
 		D138ADFE25BFE8D100E4F9E4 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */; };
 		D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */; };
@@ -40,7 +39,6 @@
 		D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
-		D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BF0025E9CFC700B4827F /* TaskRunner.swift */; };
 		D19B16B726158E610072F8A8 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19B16B626158E610072F8A8 /* Device.swift */; };
 		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
 		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
@@ -85,7 +83,6 @@
 		D13544F72605E24800C6DADC /* GDriveRootChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveRootChooser.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
-		D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoNode.swift; sourceTree = "<group>"; };
 		D138ADFA25BEC35E00E4F9E4 /* Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
 		D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
@@ -103,7 +100,6 @@
 		D19109A32607292E00C0D9B4 /* TreePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanel.swift; sourceTree = "<group>"; };
 		D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
-		D194BF0025E9CFC700B4827F /* TaskRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRunner.swift; sourceTree = "<group>"; };
 		D19B16B626158E610072F8A8 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
@@ -183,7 +179,6 @@
 				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
 				D1D090EC25CD3C980070B69D /* StringUtil.swift */,
 				D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */,
-				D194BF0025E9CFC700B4827F /* TaskRunner.swift */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
 				D15E773226045B9700D63A14 /* IconStore.swift */,
 				CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */,
@@ -269,7 +264,6 @@
 				D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */,
 				D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */,
 				D138ADF425BE342000E4F9E4 /* UserOp.swift */,
-				D138ADF725BE69ED00E4F9E4 /* DecoNode.swift */,
 				D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */,
 				D19B16B626158E610072F8A8 /* Device.swift */,
 			);
@@ -448,7 +442,6 @@
 				D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
 				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
-				D138ADF825BE69ED00E4F9E4 /* DecoNode.swift in Sources */,
 				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
 				D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */,
 				D1E913BA25AA735C008E958B /* TreeView.swift in Sources */,
@@ -463,7 +456,6 @@
 				D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
 				D1C20DFE264489410068C3FC /* CellFactory.swift in Sources */,
-				D194BF0125E9CFC700B4827F /* TaskRunner.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,

@@ -39,11 +39,6 @@ class NodeIdentifier: CustomStringConvertible, Equatable {
     return "\(self.deviceUID):\(self.nodeUID)"
   }
 
-  func copy(with nodeUID: UID? = nil) -> NodeIdentifier {
-    let uidToCopy: UID = nodeUID ?? self.nodeUID
-    return NodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.pathList)
-  }
-
   // MARK: SPID
   
   func isSPID() -> Bool {
@@ -182,11 +177,6 @@ class GDriveSPID: SinglePathNodeIdentifier {
     }
   }
 
-  override func copy(with nodeUID: UID? = nil) -> GDriveSPID {
-    let uidToCopy: UID = nodeUID ?? self.nodeUID
-    return GDriveSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self._pathUID, self.getSinglePath())
-  }
-
   func equals(_ rhs: GDriveSPID) -> Bool {
     return super.equals(_: rhs) && self.pathUID == rhs.pathUID
   }
@@ -230,12 +220,6 @@ class MixedTreeSPID: SinglePathNodeIdentifier {
     }
   }
 
-  // TODO: delete this method. Remove all DecoNode code
-  override func copy(with uid: UID? = nil) -> MixedTreeSPID {
-    let uidToCopy: UID = uid ?? self.nodeUID
-    return MixedTreeSPID(uidToCopy, deviceUID: self.deviceUID, pathUID: self.pathUID, self.getSinglePath(), parentGUID: self.parentGUID)
-  }
-
   func equals(_ rhs: MixedTreeSPID) -> Bool {
     return super.equals(_: rhs) && self.pathUID == rhs.pathUID
   }
@@ -258,11 +242,6 @@ class GDriveIdentifier: NodeIdentifier {
     }
   }
 
-  override func copy(with nodeUID: UID? = nil) -> GDriveIdentifier {
-    let uidToCopy: UID = nodeUID ?? self.nodeUID
-    return GDriveIdentifier(uidToCopy, deviceUID: self.deviceUID, self.pathList)
-  }
-
   public override var description: String {
     return "∣\(TreeType.display(treeType))-\(deviceUID):\(nodeUID):x⩨\(pathList)∣"
   }
@@ -280,10 +259,6 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
     }
   }
 
-  override func copy(with nodeUID: UID? = nil) -> LocalNodeIdentifier {
-    let uidToCopy: UID = nodeUID ?? self.nodeUID
-    return LocalNodeIdentifier(uidToCopy, deviceUID: self.deviceUID, self.getSinglePath(), parentGUID: parentGUID)
-  }
 }
 
 /**

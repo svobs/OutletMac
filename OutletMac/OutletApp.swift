@@ -84,7 +84,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   var conLeft: TreePanelController? = nil
   var conRight: TreePanelController? = nil
-  let taskRunner: TaskRunner = TaskRunner()
+  private let serialQueue = DispatchQueue(label: "App-Global-SerialQueue") // custom dispatch queues are serial by default
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
   private var treeControllerDict: [String: TreePanelControllable] = [:]
@@ -413,11 +413,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   public func execAsync(_ workItem: @escaping NoArgVoidFunc) {
-    self.taskRunner.execAsync(workItem)
+    self.serialQueue.async(execute: workItem)
   }
 
   public func execSync(_ workItem: @escaping NoArgVoidFunc) {
-    self.taskRunner.execSync(workItem)
+    self.serialQueue.sync(execute: workItem)
   }
 
   public func sendEnableUISignal(enable: Bool) {
