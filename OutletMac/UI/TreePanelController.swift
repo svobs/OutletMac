@@ -596,7 +596,7 @@ class TreePanelController: TreePanelControllable {
     let parentGUID = sn.spid.parentGUID!
     NSLog("INFO  [\(self.treeID)] Received upserted node: \(sn.spid) for parent: \(parentGUID)")
 
-    let alreadyPresent: Bool = self.displayStore.upsertSN(parentGUID, sn)
+    let alreadyPresent: Bool = self.displayStore.putSN(parentGUID, sn)
 
     DispatchQueue.main.async {
       if alreadyPresent {
@@ -621,7 +621,7 @@ class TreePanelController: TreePanelControllable {
     // FIXME: there is a bug here which results in phantom nodes at the topmost level
     if self.displayStore.removeSN(sn.spid.guid) {
       DispatchQueue.main.async {
-        if parentGUID == self.tree.rootSN.spid.guid {
+        if parentGUID == self.tree.rootSPID.guid {
           NSLog("DEBUG Parent of removed node is root node!")
         }
         self.treeView!.reloadItem(parentGUID, reloadChildren: true)
@@ -641,7 +641,7 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(self.treeID)] Received changes with root \(subtreeRootSPID) and \(upsertedList.count) upserts & \(removedList.count) removes")
 
     for upsertedSN in upsertedList {
-      _ = self.displayStore.upsertSN(upsertedSN.spid.parentGUID!, upsertedSN)
+      _ = self.displayStore.putSN(upsertedSN.spid.parentGUID!, upsertedSN)
     }
     for removedSN in removedList {
       _ = self.displayStore.removeSN(removedSN.spid.guid)

@@ -66,31 +66,8 @@ class DisplayStore {
     return isLoaded
   }
 
-  private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
-    let childGUID: GUID = childSN.spid.guid
-    var realParentGUID: GUID = (parentGUID == nil) ? TOPMOST_GUID : parentGUID!
-    if realParentGUID == self.con.tree.rootSPID.guid {
-      realParentGUID = TOPMOST_GUID
-    }
-
-    // Parent -> Child
-    // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
-    if self.parentChildListDict[realParentGUID] == nil {
-      self.parentChildListDict[realParentGUID] = []
-    }
-    // TODO: this may get slow for very large directories...
-    for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
-      if existing == childGUID {
-        // found: replace existing
-        self.parentChildListDict[realParentGUID]![index] = childGUID
-        return
-      }
-    }
-    self.parentChildListDict[realParentGUID]!.append(childGUID)
-
-    // Child -> Parent
-    self.childParentDict[childGUID] = realParentGUID
-  }
+  // Sorting
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func getColSortOrder() -> ColSortOrder {
     return self.colSortOrder
@@ -123,20 +100,6 @@ class DisplayStore {
         self.parentChildListDict[parentGUID] = self.sortDirContents(childList)
       }
     }
-  }
-
-  private func toSNList(guidList: [GUID]) throws -> [SPIDNodePair] {
-    var snList: [SPIDNodePair] = []
-
-    for guid in guidList {
-      let sn = primaryDict[guid]
-      if sn == nil {
-        throw OutletError.invalidState("toSNList(): failed to find GUID in primaryDict: \(guid)")
-      }
-      snList.append(sn!)
-    }
-
-    return snList
   }
 
   private func sortDirContents(_ childList: [GUID]) -> [GUID] {
@@ -201,13 +164,13 @@ class DisplayStore {
 
       self.primaryDict[TOPMOST_GUID] = rootSN // needed for determining implicitly checked checkboxes
 
-      let sortedList = self.sortDirContents(snList: topLevelSNList)
-      self.parentChildListDict[TOPMOST_GUID] = sortedList.map { $0.spid.guid }
-      for childSN in sortedList {
+      for childSN in topLevelSNList {
         let childGUID = childSN.spid.guid
         self.primaryDict[childGUID] = childSN
         self.childParentDict[childGUID] = TOPMOST_GUID
       }
+      let sortedList = self.sortDirContents(snList: topLevelSNList)
+      self.parentChildListDict[TOPMOST_GUID] = sortedList.map { $0.spid.guid }
     }
   }
 
@@ -226,15 +189,16 @@ class DisplayStore {
           // all children are implicitly checked:
           self.checkedNodeSet.insert(childSN.spid.guid)
         }
+
+        let sortedSNList = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
+        self.parentChildListDict[parentGUID] = sortedSNList
       }
-      let sortedGUIDList = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
-      self.parentChildListDict[parentGUID] = sortedGUIDList
 
       NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
     }
   }
 
-  func upsertSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
+  func putSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
     var wasPresent: Bool = false
     dq.sync {
       let childGUID = childSN.spid.guid
@@ -246,6 +210,96 @@ class DisplayStore {
     }
 
     return wasPresent
+  }
+
+  private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
+    let childGUID: GUID = childSN.spid.guid
+    var realParentGUID: GUID = (parentGUID == nil) ? TOPMOST_GUID : parentGUID!
+    if realParentGUID == self.con.tree.rootSPID.guid {
+      realParentGUID = TOPMOST_GUID
+    }
+
+    // Parent -> Child
+    // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
+    if self.parentChildListDict[realParentGUID] == nil {
+      self.parentChildListDict[realParentGUID] = []
+    }
+    // TODO: this may get slow for very large directories...
+    for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
+      if existing == childGUID {
+        // found: replace existing
+        self.parentChildListDict[realParentGUID]![index] = childGUID
+        return
+      }
+    }
+    self.parentChildListDict[realParentGUID]!.append(childGUID)
+
+    // Child -> Parent
+    self.childParentDict[childGUID] = realParentGUID
+  }
+
+  // "Remove" operations
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  func removeSN(_ guid: GUID) -> Bool {
+    var removed: Bool = false
+    dq.sync {
+      removed = self.removeSN_NoLock(guid)
+    }
+    return removed
+  }
+
+  func removeSubtree(_ guid: GUID) {
+    let applyFunc: ApplyToSNFunc = { sn in
+      _ = self.removeSN_NoLock(sn.spid.guid)
+    }
+
+    dq.sync {
+      self.doForDescendants(guid, applyFunc)
+    }
+  }
+
+  private func removeSN_NoLock(_ guid: GUID) -> Bool {
+    // delete its checkbox state, if any:
+    self.checkedNodeSet.remove(guid)
+    self.mixedNodeSet.remove(guid)
+
+    // if we are deleting a non-empty directory, it likely indicates an error on the backend. Not really our concern.
+    // Just log error and continue.
+    if let childList = self.parentChildListDict.removeValue(forKey: guid) {
+      NSLog("ERROR [\(self.treeID)] Should not be deleting node which has children! DeletedNode \(guid) had \(childList.count) children")
+    }
+
+    // delete back pointer to parent, and get parent GUID:
+    if let parentGUID = self.childParentDict.removeValue(forKey: guid) {
+      // delete from parent's list of children:
+      if !self.removeChildFromParentChildDict(child: guid, parent: parentGUID) {
+        NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in list of children for parent: \(parentGUID)")
+      }
+    } else {
+      NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in ChildParentDict!")
+    }
+
+    if self.primaryDict.removeValue(forKey: guid) == nil {
+      NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
+    } else {
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
+      }
+      return true
+    }
+    return false
+  }
+
+  private func removeChildFromParentChildDict(child: GUID, parent: GUID) -> Bool {
+    if var childrenOfParentList = self.parentChildListDict[parent] {
+      if let index = childrenOfParentList.firstIndex(of: child) {
+        childrenOfParentList.remove(at: index)
+        self.parentChildListDict[parent] = childrenOfParentList
+        return true
+      }
+    }
+    return false
   }
 
   // "Get" operations
@@ -498,40 +552,6 @@ class DisplayStore {
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func removeSN_NoLock(_ guid: GUID) -> Bool {
-    self.checkedNodeSet.remove(guid)
-    self.mixedNodeSet.remove(guid)
-    self.parentChildListDict.removeValue(forKey: guid)
-
-    if self.primaryDict.removeValue(forKey: guid) == nil {
-      NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
-    } else {
-      if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
-      }
-      return true
-    }
-    return false
-  }
-
-  func removeSN(_ guid: GUID) -> Bool {
-    var removed: Bool = false
-    dq.sync {
-      removed = self.removeSN_NoLock(guid)
-    }
-    return removed
-  }
-
-  public func removeSubtree(_ guid: GUID) {
-    let applyFunc: ApplyToSNFunc = { sn in
-      _ = self.removeSN_NoLock(sn.spid.guid)
-    }
-
-    dq.sync {
-      self.doForDescendants(guid, applyFunc)
-    }
-  }
-
   public func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node.isDir ?? false
   }
@@ -560,6 +580,20 @@ class DisplayStore {
         }
       }
     }
+  }
+
+  private func toSNList(guidList: [GUID]) throws -> [SPIDNodePair] {
+    var snList: [SPIDNodePair] = []
+
+    for guid in guidList {
+      let sn = primaryDict[guid]
+      if sn == nil {
+        throw OutletError.invalidState("toSNList(): failed to find GUID in primaryDict: \(guid)")
+      }
+      snList.append(sn!)
+    }
+
+    return snList
   }
 
   /**
