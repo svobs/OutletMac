@@ -33,9 +33,22 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
+     Del key pressed: confirm delete, then delete all selected items
+     */
+    override func deleteForward(_ sender: Any?) {
+        NSLog("DEBUG [\(self.treeID)] TreeViewController: Del key detected")
+        self.deleteSelectedNodes()
+    }
+
+    /**
      Delete key pressed: confirm delete, then delete all selected items
      */
     override func deleteBackward(_ sender: Any?) {
+        NSLog("DEBUG [\(self.treeID)] TreeViewController: Delete key detected")
+        self.deleteSelectedNodes()
+    }
+
+    private func deleteSelectedNodes() {
         let selectedRowIndexes: IndexSet = outlineView.selectedRowIndexes
         if selectedRowIndexes.isEmpty {
             return
@@ -50,7 +63,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let selectedSNList = displayStore.getSNList(selectedGUIDList)
         self.con.treeActions.confirmAndDeleteSubtrees(selectedSNList)
     }
-
 
     @objc func doubleClickedItem(_ sender: NSOutlineView) {
         let item = sender.item(atRow: sender.clickedRow)
