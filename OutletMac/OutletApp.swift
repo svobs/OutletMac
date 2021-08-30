@@ -67,9 +67,9 @@ class AppMenu: NSMenu {
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   private var mainWindowIsOpen = false
 
-  var rootChooserView: GDriveRootChooser!
-  var mergePreviewView: MergePreview!
-  var connectionProblemView: ConnectionProblemView!
+  var rootChooserView: GDriveRootChooser? = nil
+  var mergePreviewView: MergePreview? = nil
+  var connectionProblemView: ConnectionProblemView? = nil
   var mainWindow: NSWindow? = nil
   private var wasShutdown: Bool = false
 
@@ -211,13 +211,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // Open Connection Problem window
       NSLog("INFO  Showing ConnectionProblem window")
       do {
-        if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+        if self.connectionProblemView != nil && self.connectionProblemView!.isOpen {
           NSLog("DEBUG Closing existing ConnectionProblem window")
-          self.connectionProblemView.window.close()
+          self.connectionProblemView!.window.close()
         }
         self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
-        try self.connectionProblemView.start()
-        self.connectionProblemView.showWindow()
+        try self.connectionProblemView!.start()
+        self.connectionProblemView!.showWindow()
       } catch {
         NSLog("ERROR Failed to open ConnectionProblem window: \(error)")
         self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
@@ -262,13 +262,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
 
-      self.connectionProblemView?.window.close()
+    self.connectionProblemView?.window.close()
 
-      let screenSize = NSScreen.main?.frame.size ?? .zero
-      NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
+    let screenSize = NSScreen.main?.frame.size ?? .zero
+    NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
 
-      NSLog("DEBUG OutletMacApp start done")
-      self.createMainWindow()
+    NSLog("DEBUG OutletMacApp start done")
+    self.createMainWindow()
   }
 
   /**
@@ -483,7 +483,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
     // This signal is also emitted after merge is done:
     DispatchQueue.main.async {
-      self.mergePreviewView.window.close()
+      self.mergePreviewView?.window.close()
     }
 
     let leftTree = try propDict.get("tree_left") as! DisplayTree
@@ -551,7 +551,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       DispatchQueue.main.async {
-        if self.connectionProblemView != nil && self.connectionProblemView.isOpen {
+        if self.connectionProblemView != nil && self.connectionProblemView!.isOpen {
           NSLog("INFO  Will not display error alert ('\(msg)'): the Connection Problem window is open")
         } else if !self.mainWindowIsOpen {
           NSLog("INFO  Will not display error alert ('\(msg)'): the main window is not open to display it")
@@ -585,16 +585,16 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
     DispatchQueue.main.async {
-      if self.rootChooserView != nil && self.rootChooserView.isOpen {
-        self.rootChooserView.moveToFront()
-        self.rootChooserView.selectSPID(currentSN.spid)
+      if self.rootChooserView != nil && self.rootChooserView!.isOpen {
+        self.rootChooserView!.moveToFront()
+        self.rootChooserView!.selectSPID(currentSN.spid)
       } else {
         do {
           let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
           let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
 
           self.rootChooserView = GDriveRootChooser(self, con, initialSelection: currentSN, targetTreeID: treeID)
-          try self.rootChooserView.start()
+          try self.rootChooserView!.start()
         } catch {
           self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
         }
@@ -610,14 +610,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
 
     DispatchQueue.main.async {
-      if self.mergePreviewView != nil && self.mergePreviewView.isOpen {
+      if self.mergePreviewView != nil && self.mergePreviewView!.isOpen {
         NSLog("DEBUG Looks like there is an existing Merge Preview window open: closing it")
-        self.mergePreviewView.window.close()
+        self.mergePreviewView!.window.close()
       }
 
       do {
         self.mergePreviewView = MergePreview(self, con)
-        try self.mergePreviewView.start()
+        try self.mergePreviewView!.start()
       } catch {
         self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
       }
