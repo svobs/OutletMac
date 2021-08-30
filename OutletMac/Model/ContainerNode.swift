@@ -37,6 +37,39 @@ class ContainerNode: Node {
   override func getDirStats() -> DirectoryStats? {
     return self._dirStats
   }
+
+  override var etc: String {
+    get {
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.etc
+      }
+    }
+  }
+
+  override var summary: String {
+    get {
+      if self._dirStats == nil {
+        return ""
+      } else {
+        return self._dirStats!.summary
+      }
+    }
+  }
+
+  override var sizeBytes: UInt64? {
+    get {
+      return self._dirStats?.sizeBytes
+    }
+    set (sizeBytes) {
+      if self._dirStats == nil {
+        self._dirStats = DirectoryStats()
+      }
+      self._dirStats!.sizeBytes = sizeBytes!
+    }
+  }
+
 }
 
 /**

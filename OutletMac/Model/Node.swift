@@ -67,13 +67,13 @@ class Node: CustomStringConvertible {
   
   var etc: String {
     get {
-      ""
+      self.getDirStats()?.etc ?? ""
     }
   }
   
   var summary: String {
     get {
-      ""
+      return self.getDirStats()?.summary ?? ""
     }
   }
   
@@ -91,7 +91,7 @@ class Node: CustomStringConvertible {
   
   var sizeBytes: UInt64? {
     get {
-      return nil
+      return self.getDirStats()?.sizeBytes
     }
   }
   
@@ -191,7 +191,7 @@ class Node: CustomStringConvertible {
   }
   
   func getDirStats() -> DirectoryStats? {
-    preconditionFailure("getDirStats(): class does not implement getDirStats(): \(type(of: self))!")
+    nil
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {

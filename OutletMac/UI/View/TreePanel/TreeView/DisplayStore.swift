@@ -569,22 +569,16 @@ class DisplayStore {
     dq.sync {
       NSLog("DEBUG [\(self.treeID)] Updating dir stats with counts: byGUID=\(byGUID.count), byUID=\(byUID.count)")
       for (guid, sn) in self.primaryDict {
-        if byGUID.count > 0 {
-          if let dirStats = byGUID[guid] {
-            if sn.node.isDir {
+        if !sn.node.isEphemeral && sn.node.isDir {
+          if byGUID.count > 0 {
+            if let dirStats = byGUID[guid] {
               sn.node.setDirStats(dirStats)
               self.primaryDict[guid] = sn
-            } else {
-              NSLog("ERROR [\(treeID)] Cannot update DirStats: Node is not a dir: \(sn.spid) (matched guid=\(guid))")
             }
-          }
-        } else if byUID.count > 0 {
-          if let dirStats = byUID[sn.node.uid] {
-            if sn.node.isDir {
+          } else if byUID.count > 0 {
+            if let dirStats = byUID[sn.node.uid] {
               sn.node.setDirStats(dirStats)
               self.primaryDict[guid] = sn
-            } else {
-              NSLog("ERROR [\(treeID)] Cannot update DirStats: Node is not a dir: \(sn.spid) (matched node_uid=\(sn.node.uid))")
             }
           }
         }

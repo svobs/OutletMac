@@ -56,47 +56,7 @@ class LocalDirNode: LocalNode {
   override public var description: String {
     return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
   }
-  
-  override var etc: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.etc
-      }
-    }
-  }
-  
-  override var summary: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.summary
-      }
-    }
-  }
-  
-  override var sizeBytes: UInt64? {
-    get {
-      return self._dirStats?.sizeBytes
-    }
-    set (sizeBytes) {
-      if self._dirStats == nil {
-        self._dirStats = DirectoryStats()
-      }
-      self._dirStats!.sizeBytes = sizeBytes!
-    }
-  }
-  
-  func zeroOutStats() {
-    self._dirStats?.clear()
-  }
-  
-  func isStatsLoaded() -> Bool {
-    return self._dirStats != nil
-  }
-  
+
   override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }

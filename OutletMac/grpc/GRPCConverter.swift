@@ -192,7 +192,7 @@ class GRPCConverter {
 
       if node.isDir {
         let dirStatsStr = node.getDirStats() == nil ? "nil" : "\(node.getDirStats()!)"
-        NSLog("DEBUG DirNode \(node.nodeIdentifier) has DirStats: \(dirStatsStr)")
+        NSLog("DEBUG DirNode \(node.nodeIdentifier) has DirStats: \(dirStatsStr), etc='\(node.etc)'")
       }
     }
 

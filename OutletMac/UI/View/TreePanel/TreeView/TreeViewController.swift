@@ -139,7 +139,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         outlineView.sortDescriptors = [sortDescriptor]
         assert (displayStore.getColSortOrder() == .NAME)
 
-        NSLog("DEBUG viewDidLoad(): clearing tree and displaying loading msg")
+        NSLog("DEBUG [\(treeID)] viewDidLoad(): clearing tree and displaying loading msg")
         self.con.clearTreeAndDisplayLoadingMsg()
     }
 

@@ -162,28 +162,6 @@ class GDriveFolder: GDriveNode {
     }
   }
 
-  override var sizeBytes: UInt64? {
-    get {
-      return self._dirStats?.sizeBytes
-    }
-  }
-
-  override var etc: String {
-    get {
-      return self._dirStats?.etc ?? ""
-    }
-  }
-  
-  override var summary: String {
-    get {
-      if self._dirStats == nil {
-        return "0 items"
-      } else {
-        return self._dirStats!.summary
-      }
-    }
-  }
-  
   override func setDirStats(_ dirStats: DirectoryStats?) {
     self._dirStats = dirStats
   }

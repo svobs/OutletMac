@@ -110,19 +110,13 @@ typealias SPID = SinglePathNodeIdentifier
  lookup which would be normally required for GDrive trees.
 
  To accomplish this, I take advantage of the fact that only one ephemeral child can exist for a given parent.
- This class inherits everything from
+ This class inherits everything from the parent (except its parentGUID, of course), and should have the parent's GUID except for an 'E' appended
  */
 class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
 
   init(parent: SinglePathNodeIdentifier?) {
-    if parent != nil {
-      self._pathUID = parent!.pathUID
-      super.init(parent!.nodeUID, deviceUID: parent!.deviceUID, "", parentGUID: parent!.parentGUID)
-    } else {
-      // root of tree
-      self._pathUID = NULL_UID
-      super.init(NULL_UID, deviceUID: NULL_UID, "")
-    }
+    self._pathUID = parent?.pathUID ?? NULL_UID
+    super.init(parent?.nodeUID ?? NULL_UID, deviceUID: parent?.deviceUID ?? NULL_UID, "", parentGUID: parent?.parentGUID)
   }
 
   let _pathUID: UID
@@ -134,7 +128,7 @@ class EphemeralNodeIdentifier: SinglePathNodeIdentifier {
   }
 
   override var guid: GUID {
-    return "0:0:\(self._pathUID):E"
+    return "\(self.deviceUID):\(self.nodeUID):\(self._pathUID):E"
   }
 
   override public var description: String {
