@@ -8,14 +8,15 @@
 import SwiftUI
 import LinkedList
 
-// Context Menu Actions
-// ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 class TreeActions {
   weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
 
   var treeID: String {
     return con.treeID
   }
+
+  // Context Menu Actions
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   @objc public func expandAll(_ sender: MenuItemWithSNList) {
     guard sender.snList.count > 0 else {
@@ -84,13 +85,7 @@ class TreeActions {
 
     let node = sender.nodeList[0]
 
-    self.con.app.execAsync {
-      do {
-        try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
-      } catch {
-        self.con.reportException("Failed to download file from Google Drive", error)
-      }
-    }
+    self.downloadFileFromGDrive(node)
   }
 
   @objc public func openFile(_ sender: MenuItemWithSNList) {
@@ -145,6 +140,20 @@ class TreeActions {
 
   @objc func deleteSubtree(_ sender: MenuItemWithSNList) {
     self.confirmAndDeleteSubtrees(sender.snList)
+  }
+
+  // Reusable actions
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  public func downloadFileFromGDrive(_ node: Node) {
+    self.con.app.execAsync {
+      do {
+        NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
+        try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
+      } catch {
+        self.con.reportException("Failed to download file from Google Drive", error)
+      }
+    }
   }
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {

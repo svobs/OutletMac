@@ -250,12 +250,18 @@ class DisplayStore {
   }
 
   func removeSubtree(_ guid: GUID) {
-    let applyFunc: ApplyToSNFunc = { sn in
-      _ = self.removeSN_NoLock(sn.spid.guid)
-    }
-
     dq.sync {
-      self.doForDescendants(guid, applyFunc)
+      for guid in self.getSelfAndAllDescendants(guid).reversed() {
+        _ = self.removeSN_NoLock(guid)
+      }
+    }
+  }
+
+  func removeDescendants(_ guid: GUID) {
+    dq.sync {
+      for guid in self.getDescendants(guid).reversed() {
+        _ = self.removeSN_NoLock(guid)
+      }
     }
   }
 
@@ -267,14 +273,16 @@ class DisplayStore {
     // if we are deleting a non-empty directory, it likely indicates an error on the backend. Not really our concern.
     // Just log error and continue.
     if let childList = self.parentChildListDict.removeValue(forKey: guid) {
-      NSLog("ERROR [\(self.treeID)] Should not be deleting node which has children! DeletedNode \(guid) had \(childList.count) children")
+      if childList.count > 0 {
+        NSLog("ERROR [\(self.treeID)] Should not be deleting node which has children! DeletedNode \(guid) had \(childList.count) children")
+      }
     }
 
     // delete back pointer to parent, and get parent GUID:
     if let parentGUID = self.childParentDict.removeValue(forKey: guid) {
       // delete from parent's list of children:
       if !self.removeChildFromParentChildDict(child: guid, parent: parentGUID) {
-        NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in list of children for parent: \(parentGUID)")
+        NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in list of children for parent: \(parentGUID) (found: \(self.parentChildListDict[parentGUID] ?? []))")
       }
     } else {
       NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in ChildParentDict!")
@@ -467,8 +475,9 @@ class DisplayStore {
        This will not update it in the UI, however.
        */
       NSLog("DEBUG [\(treeID)] updateCheckboxState(): setting self and descendants of \(guid): checked => \(newIsCheckedValue)")
-      let applyFunc: ApplyToSNFunc = { sn in self.updateCheckedStateTracking_NoLock(guid, isChecked: newIsCheckedValue, isMixed: false) }
-      self.doForSelfAndAllDescendants(guid, applyFunc)
+      for guid in self.getSelfAndAllDescendants(guid) {
+        self.updateCheckedStateTracking_NoLock(guid, isChecked: newIsCheckedValue, isMixed: false)
+      }
 
       /*
        2. Siblings
@@ -599,71 +608,57 @@ class DisplayStore {
 
   /**
    Applies the given applyFunc to the given item's descendants in breadth-first order.
-
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func doForDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
+  private func getDescendants(_ guid: GUID) -> LinkedList<GUID> {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    applyBreadthFirst(guid, includeTopmostGUID: false, applyFunc)
+    return bfsList(guid, includeTopmostGUID: false)
   }
 
   /**
-   Applies the given applyFunc to the given item and its descendants in breadth-first order.
-
+   Returns a list of the GUID and its descendants in breadth-first order.
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func doForSelfAndAllDescendants(_ guid: GUID, _ applyFunc: ApplyToSNFunc) {
+  private func getSelfAndAllDescendants(_ guid: GUID) -> LinkedList<GUID> {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
-    applyBreadthFirst(guid, includeTopmostGUID: true, applyFunc)
+    return bfsList(guid, includeTopmostGUID: true)
   }
 
   /**
-   Applies the given applyFunc to each item in the given searchQueue and its descendants in the queue in breadth-first order.
-   The queue is assumed to contain an initial set of SPIDNodePairs, and will be depleted at the end.
-
+   Returns a list of GUIDs in the given subtree in breadth-first order.
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func applyBreadthFirst(_ topmostGUID: GUID, includeTopmostGUID: Bool, _ applyFunc: ApplyToSNFunc) {
-    // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
-    // (likely?) that 'applyFunc' also contains a dispatch queue work item.
+  private func bfsList(_ topmostGUID: GUID, includeTopmostGUID: Bool) -> LinkedList<GUID> {
+    var bfsList = LinkedList<GUID>()
 
     guard let sn = self.getSN_NoLock(topmostGUID) else {
-      return
+      return bfsList
     }
 
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(treeID)] doForSelfAndAllDescendants(): self=\(sn.spid)")
+      NSLog("DEBUG [\(treeID)] bfsList(): topmost_spid=\(sn.spid)")
     }
 
     var searchQueue = LinkedList<GUID>()
     if includeTopmostGUID {
-      searchQueue.append(topmostGUID)
-    } else {
-      for childGUID in self.getChildGUIDList_NoLock(topmostGUID) {
-        searchQueue.append(childGUID)
-      }
+      bfsList.append(topmostGUID)
+    }
+    for childGUID in self.getChildGUIDList_NoLock(topmostGUID) {
+      searchQueue.append(childGUID)
     }
 
 
     while !searchQueue.isEmpty {
       let guid = searchQueue.popFirst()!
+      bfsList.append(guid)
 
       for childGUID in self.getChildGUIDList_NoLock(guid) {
         searchQueue.append(childGUID)
       }
-
-      // Apply this AFTER adding its children
-      if let sn = getSN_NoLock(guid) {
-        if SUPER_DEBUG_ENABLED {
-          NSLog("DEBUG [\(treeID)] applyBreadthFirst(): applying func for: \(sn.spid)")
-        }
-        applyFunc(sn)
-      } else {
-        // should never happen but let's log if it does
-        NSLog("ERROR [\(treeID)] applyBreadthFirst(): failed to find SN for GUID, skipping: \(guid)")
-      }
     }
+
+    return bfsList
   }
 }

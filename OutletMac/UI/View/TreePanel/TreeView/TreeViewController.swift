@@ -64,6 +64,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         self.con.treeActions.confirmAndDeleteSubtrees(selectedSNList)
     }
 
+    /**
+     Double-click handler
+     */
     @objc func doubleClickedItem(_ sender: NSOutlineView) {
         let item = sender.item(atRow: sender.clickedRow)
 
@@ -72,30 +75,30 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
+        NSLog("DEBUG [\(treeID)] User double-clicked on: \(sn.spid)")
+
         if sn.node.isDir {
             // Is dir -> toggle expand/collapse
 
             if outlineView.isItemExpanded(guid) {
-                NSLog("DEBUG [\(treeID)] User double-clicked: collapsing item: \(guid)")
+                NSLog("DEBUG [\(treeID)] User double-clicked on dir node: collapsing item: \(guid)")
                 outlineView.animator().collapseItem(guid, collapseChildren: true)
             } else {
-                NSLog("DEBUG [\(treeID)] User double-clicked: expanding item: \(guid)")
+                NSLog("DEBUG [\(treeID)] User double-clicked on dir node: expanding item: \(guid)")
                 outlineView.animator().expandItem(guid)
             }
 
         } else {
-            if sn.spid.treeType == .LOCAL_DISK {
-                NSLog("DEBUG [\(treeID)] User double-clicked: opening local file with default app: \(sn.spid.getSinglePath())")
-                self.con.treeActions.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
-            } else if sn.spid.treeType == .GDRIVE {
-                NSLog("DEBUG [\(treeID)] User double-clicked on Google Drive node: \(sn.spid)")
-                let item = MenuItemWithNodeList(title: "Download from Google Drive", action: #selector(self.con.treeActions.downloadFromGDrive(_:)), keyEquivalent: "")
-                item.nodeList = [sn.node]
-                item.target = self.con.treeActions
-                self.con.treeActions.downloadFromGDrive(item)
-                // note: see DOWNLOAD_FROM_GDRIVE_DONE for handling of async response
+            if sn.node.isLive {
+                if sn.node.treeType == .LOCAL_DISK {
+                    NSLog("DEBUG [\(treeID)] Opening local file with default app: \(sn.spid.getSinglePath())")
+                    self.con.treeActions.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
+                } else if sn.node.treeType == .GDRIVE {
+                    self.con.treeActions.downloadFileFromGDrive(sn.node)
+                    // See signal "DOWNLOAD_FROM_GDRIVE_DONE" for handling of async response
+                }
             } else {
-                NSLog("DEBUG [\(treeID)] User double-clicked on node: \(sn.spid)")
+                NSLog("INFO  [\(treeID)] No action for double-click: node is not live")
             }
         }
     }
@@ -262,11 +265,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
+        NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
+
         guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
+            NSLog("ERROR [\(treeID)] Cannot expand: GUID '\(parentGUID)' not found in DisplayStore. Ignoring request")
             return
         }
-
-        NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
 
         guard parentGUID != TOPMOST_GUID else {
             NSLog("ERROR [\(treeID)] Cannot expand topmost GUID ('\(parentGUID)')! Ignoring request")
@@ -312,7 +316,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
         NSLog("DEBUG [\(treeID)] Row is collapsing: \(parentGUID)")
 
-        displayStore.removeSubtree(parentGUID)
+        displayStore.removeDescendants(parentGUID)
 
         do {
             // Tell BE to remove the GUID from its persisted state of expanded rows. (No need to make a
