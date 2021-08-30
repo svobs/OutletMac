@@ -28,7 +28,10 @@ class Node: CustomStringConvertible {
       false
     }
   }
-  
+
+  /**
+   Returns true if this node does not correspond to a particular path in a filesystem (e.g. a CategoryNode)
+   */
   var isDisplayOnly: Bool {
     get {
       false
@@ -316,14 +319,34 @@ class EphemeralNode: Node {
   }
 }
 
+class DirNode: Node {
+  // need to include this for all nodes where isDir==true
+  var _dirStats: DirectoryStats? = nil
+  init(_ nodeIdentifer: NodeIdentifier) {
+    super.init(nodeIdentifer)
+  }
+
+  override var isDir: Bool {
+    get {
+      return true
+    }
+  }
+
+  override func setDirStats(_ dirStats: DirectoryStats?) {
+    self._dirStats = dirStats
+  }
+
+  override func getDirStats() -> DirectoryStats? {
+    return self._dirStats
+  }
+}
+
 /**
   Represents a directory which does not exist. Use this in SPIDNodePair objects when the SPID points to something which doesn't exist.
   It's much safer to use this class rather than remembering to deal with null/nil/None.
  */
-class NonexistentDirNode: Node {
+class NonexistentDirNode: DirNode {
   let _name: String
-  // need to include this for all nodes where isDir==true
-  var _dirStats: DirectoryStats? = nil
 
   init(_ nodeIdentifer: NodeIdentifier, _ name: String) {
     self._name = name
@@ -336,10 +359,6 @@ class NonexistentDirNode: Node {
     }
   }
 
-  override var isDir: Bool {
-    return true
-  }
-
   override func updateFrom(_ otherNode: Node) {
     self.parentList = otherNode.parentList
     self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
@@ -350,11 +369,4 @@ class NonexistentDirNode: Node {
     return false
   }
 
-  override func setDirStats(_ dirStats: DirectoryStats?) {
-    self._dirStats = dirStats
-  }
-
-  override func getDirStats() -> DirectoryStats? {
-    return self._dirStats
-  }
 }

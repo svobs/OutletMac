@@ -148,7 +148,15 @@ class GDriveFolder: GDriveNode {
       true
     }
   }
-  
+
+  override func setDirStats(_ dirStats: DirectoryStats?) {
+    self._dirStats = dirStats
+  }
+
+  override func getDirStats() -> DirectoryStats? {
+    return self._dirStats
+  }
+
   override var defaultIcon: IconID {
     get {
       if self.trashed == .NOT_TRASHED {
@@ -162,14 +170,6 @@ class GDriveFolder: GDriveNode {
     }
   }
 
-  override func setDirStats(_ dirStats: DirectoryStats?) {
-    self._dirStats = dirStats
-  }
-
-  override func getDirStats() -> DirectoryStats? {
-    return self._dirStats
-  }
-  
   override public var description: String {
     return "GDriveFolder(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) trashed=\(trashed) " +
       "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUID ?? 0) syncTS=\(syncTS ?? 0) " +

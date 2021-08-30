@@ -8,20 +8,10 @@
 /**
  CLASS ContainerNode
  */
-class ContainerNode: Node {
-  var _dirStats: DirectoryStats? = nil
-  init(_ nodeIdentifer: NodeIdentifier) {
-    super.init(nodeIdentifer)
-  }
+class ContainerNode: DirNode {
 
   override public var description: String {
     return "ContainerNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
-  }
-
-  override var isDir: Bool {
-    get {
-      true
-    }
   }
 
   override var isContainerNode: Bool {
@@ -29,47 +19,6 @@ class ContainerNode: Node {
       true
     }
   }
-
-  override func setDirStats(_ dirStats: DirectoryStats?) {
-    self._dirStats = dirStats
-  }
-
-  override func getDirStats() -> DirectoryStats? {
-    return self._dirStats
-  }
-
-  override var etc: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.etc
-      }
-    }
-  }
-
-  override var summary: String {
-    get {
-      if self._dirStats == nil {
-        return ""
-      } else {
-        return self._dirStats!.summary
-      }
-    }
-  }
-
-  override var sizeBytes: UInt64? {
-    get {
-      return self._dirStats?.sizeBytes
-    }
-    set (sizeBytes) {
-      if self._dirStats == nil {
-        self._dirStats = DirectoryStats()
-      }
-      self._dirStats!.sizeBytes = sizeBytes!
-    }
-  }
-
 }
 
 /**

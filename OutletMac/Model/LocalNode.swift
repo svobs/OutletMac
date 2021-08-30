@@ -46,7 +46,15 @@ class LocalDirNode: LocalNode {
       true
     }
   }
-  
+
+  override func setDirStats(_ dirStats: DirectoryStats?) {
+    self._dirStats = dirStats
+  }
+
+  override func getDirStats() -> DirectoryStats? {
+    return self._dirStats
+  }
+
   override var defaultIcon: IconID {
     get {
       return .ICON_GENERIC_DIR
@@ -57,13 +65,6 @@ class LocalDirNode: LocalNode {
     return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
   }
 
-  override func setDirStats(_ dirStats: DirectoryStats?) {
-    self._dirStats = dirStats
-  }
-
-  override func getDirStats() -> DirectoryStats? {
-    return self._dirStats
-  }
 
   override func isParentOf(_ potentialChildNode: Node) -> Bool {
     if potentialChildNode.deviceUID == self.deviceUID {
