@@ -620,11 +620,20 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate {
 
   public var loadStateInt: UInt32 = 0
 
-  public var statusMsg: String = String()
+  public var statsUpdate: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate {
+    get {return _statsUpdate ?? Outlet_Backend_Agent_Grpc_Generated_StatsUpdate()}
+    set {_statsUpdate = newValue}
+  }
+  /// Returns true if `statsUpdate` has been explicitly set.
+  public var hasStatsUpdate: Bool {return self._statsUpdate != nil}
+  /// Clears the value of `statsUpdate`. Subsequent reads from it will return its default value.
+  public mutating func clearStatsUpdate() {self._statsUpdate = nil}
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
+
+  fileprivate var _statsUpdate: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData {
@@ -2558,7 +2567,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Mess
   public static let protoMessageName: String = _protobuf_package + ".TreeLoadUpdate"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "load_state_int"),
-    2: .standard(proto: "status_msg"),
+    2: .standard(proto: "stats_update"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2568,7 +2577,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Mess
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.loadStateInt) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.statusMsg) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._statsUpdate) }()
       default: break
       }
     }
@@ -2578,15 +2587,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Mess
     if self.loadStateInt != 0 {
       try visitor.visitSingularUInt32Field(value: self.loadStateInt, fieldNumber: 1)
     }
-    if !self.statusMsg.isEmpty {
-      try visitor.visitSingularStringField(value: self.statusMsg, fieldNumber: 2)
+    if let v = self._statsUpdate {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate) -> Bool {
     if lhs.loadStateInt != rhs.loadStateInt {return false}
-    if lhs.statusMsg != rhs.statusMsg {return false}
+    if lhs._statsUpdate != rhs._statsUpdate {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

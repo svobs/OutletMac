@@ -295,29 +295,33 @@ class OutletGRPCClient: OutletBackend {
         argDict["removed_sn_list"] = try self.grpcConverter.snListFromGRPC(signalGRPC.subtree.removedSnList)
       case .TREE_LOAD_STATE_UPDATED:
         argDict["tree_load_state"] = TreeLoadState(rawValue: signalGRPC.treeLoadUpdate.loadStateInt)
-        argDict["status_msg"] = signalGRPC.treeLoadUpdate.statusMsg
+        try self.convertStatsAndStatus(statsUpdate: signalGRPC.treeLoadUpdate.statsUpdate, argDict: &argDict)
       case .DOWNLOAD_FROM_GDRIVE_DONE:
         argDict["filename"] = signalGRPC.downloadMsg.filename
       case .STATS_UPDATED:
-        argDict["status_msg"] = signalGRPC.statsUpdate.statusMsg
-
-        var dirStatsByUidDict: [UID:DirectoryStats] = [:]
-        for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaByUidList {
-          dirStatsByUidDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-        }
-        argDict["dir_stats_dict_by_uid"] = dirStatsByUidDict
-
-        var dirStatsByGuidDict: [GUID:DirectoryStats] = [:]
-        for dirMetaUpdate in signalGRPC.statsUpdate.dirMetaByGuidList {
-          dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-        }
-        argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
+        try self.convertStatsAndStatus(statsUpdate: signalGRPC.statsUpdate, argDict: &argDict)
       default:
         break
     }
     argDict["signal"] = signal
 
     app.dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
+  }
+
+  private func convertStatsAndStatus(statsUpdate: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate, argDict: inout [String: Any]) throws {
+    argDict["status_msg"] = statsUpdate.statusMsg
+
+    var dirStatsByUidDict: [UID:DirectoryStats] = [:]
+    for dirMetaUpdate in statsUpdate.dirMetaByUidList {
+      dirStatsByUidDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
+    }
+    argDict["dir_stats_dict_by_uid"] = dirStatsByUidDict
+
+    var dirStatsByGuidDict: [GUID:DirectoryStats] = [:]
+    for dirMetaUpdate in statsUpdate.dirMetaByGuidList {
+      dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
+    }
+    argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
   }
 
   /**

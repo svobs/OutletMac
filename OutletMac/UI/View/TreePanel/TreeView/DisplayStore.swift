@@ -558,6 +558,7 @@ class DisplayStore {
 
   public func updateDirStats(_ byGUID: Dictionary<GUID, DirectoryStats>, _ byUID: Dictionary<UID, DirectoryStats>) {
     dq.sync {
+      NSLog("DEBUG [\(self.treeID)] Updating dir stats with counts: byGUID=\(byGUID.count), byUID=\(byUID.count)")
       for (guid, sn) in self.primaryDict {
         if byGUID.count > 0 {
           if let dirStats = byGUID[guid] {

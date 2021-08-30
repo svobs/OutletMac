@@ -208,7 +208,7 @@ class TreePanelController: TreePanelControllable {
     // Clear display store & TreeView (which draws from display store)
     NSLog("DEBUG [\(treeID)] Clearing TreeView")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
-    self.treeView!.outlineView.reloadData()
+    self.treeView?.outlineView.reloadData()
   }
 
   func clearTreeAndDisplayLoadingMsg() {
@@ -387,7 +387,7 @@ class TreePanelController: TreePanelControllable {
     // What a mouthful. At least we are handling the bulk of the work in one batch:
     self.displayStore.updateCheckboxStateForSameLevelAndBelow(guid, isChecked, self.treeID)
     // Now update all of those in the UI:
-    self.treeView!.reloadItem(guid, reloadChildren: true)
+    self.treeView?.reloadItem(guid, reloadChildren: true)
 
     /*
      3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
@@ -535,11 +535,20 @@ class TreePanelController: TreePanelControllable {
   private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
     let statusBarMsg = try propDict.getString("status_msg")
+    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
+    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
+
+
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg='\(statusBarMsg)'")
       self.treeLoadState = treeLoadState
       self.updateStatusBarMsg(statusBarMsg)
+
+      if dirStatsDictByGUID.count > 0 || dirStatsDictByUID.count > 0 {
+        self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
+        self.treeView?.outlineView.reloadData()
+      }
 
       switch treeLoadState {
       case .LOAD_STARTED:
@@ -582,7 +591,7 @@ class TreePanelController: TreePanelControllable {
       self.updateStatusBarMsg(statusBarMsg)
 
       self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-      self.treeView!.outlineView.reloadData()
+      self.treeView?.outlineView.reloadData()
     }
   }
 
@@ -601,10 +610,8 @@ class TreePanelController: TreePanelControllable {
     DispatchQueue.main.async {
       if alreadyPresent {
         NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(sn.spid.guid)")
-        self.treeView!.reloadItem(sn.spid.guid, reloadChildren: true)
-      } else {
-        self.treeView!.reloadItem(parentGUID, reloadChildren: true)
       }
+      self.treeView?.reloadItem(alreadyPresent ? sn.spid.guid : parentGUID, reloadChildren: true)
     }
   }
 
@@ -623,7 +630,7 @@ class TreePanelController: TreePanelControllable {
         if parentGUID == self.tree.rootSPID.guid {
           NSLog("DEBUG Parent of removed node is root node!")
         }
-        self.treeView!.reloadItem(parentGUID, reloadChildren: true)
+        self.treeView?.reloadItem(parentGUID, reloadChildren: true)
       }
     }
   }
@@ -648,7 +655,7 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.main.async {
       // just reload everything for now. Revisit if performance proves to be an issue
-      self.treeView!.outlineView.reloadData()
+      self.treeView?.outlineView.reloadData()
     }
   }
 
