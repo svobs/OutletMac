@@ -271,7 +271,11 @@ class GDriveFile: GDriveNode {
       true
     }
   }
-  
+
+  override var isLive: Bool {
+    return self.googID != nil
+  }
+
   override var defaultIcon: IconID {
     get {
       if self.trashed == .NOT_TRASHED {

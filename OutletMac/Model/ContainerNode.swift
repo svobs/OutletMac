@@ -13,8 +13,18 @@ class ContainerNode: Node {
   init(_ nodeIdentifer: NodeIdentifier) {
     super.init(nodeIdentifer)
   }
-  
+
+  override public var description: String {
+    return "ContainerNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
+  }
+
   override var isDir: Bool {
+    get {
+      true
+    }
+  }
+
+  override var isContainerNode: Bool {
     get {
       true
     }

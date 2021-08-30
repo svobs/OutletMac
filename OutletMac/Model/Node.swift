@@ -35,7 +35,7 @@ class Node: CustomStringConvertible {
     }
   }
   
-  var isDecorator: Bool {
+  var isContainerNode: Bool {
     get {
       false
     }

@@ -196,7 +196,12 @@ class TreeContextMenu {
   }
 
   private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) throws {
-    // FIXME: this currently fails for ChangeTree nodes
+    NSLog("DEBUG: building context menu for node: \(node), singlePath: '\(singlePath)'")
+
+    if node.isContainerNode {
+      return
+    }
+
     guard let sn: SPIDNodePair = try self.con.backend.getSNFor(nodeUID: node.uid, deviceUID: node.deviceUID, fullPath: singlePath) else {
       NSLog("ERROR [\(treeID)] Could not build context menu: backend couldn't find: \(node.nodeIdentifier)")
       return
