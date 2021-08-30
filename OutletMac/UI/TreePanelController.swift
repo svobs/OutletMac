@@ -392,11 +392,11 @@ class TreePanelController: TreePanelControllable {
     /*
      3. Ancestors: need to update all direct ancestors, but take into account all of the children of each.
      */
-    NSLog("DEBUG [\(treeID)] setNodeCheckedState(): checking ancestors of \(guid)")
+    NSLog("DEBUG [\(treeID)] setChecked(): Checking ancestors of \(guid)")
     var ancestorGUID: GUID = guid
     while true {
       ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
-      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): next higher ancestor: \(ancestorGUID)")
+      NSLog("DEBUG [\(treeID)] setChecked(): Next higher ancestor=\(ancestorGUID)")
       if ancestorGUID == TOPMOST_GUID {
         break
       }
@@ -414,14 +414,14 @@ class TreePanelController: TreePanelControllable {
       let isChecked = hasChecked && !hasUnchecked && !hasMixed
       let isMixed = hasMixed || (hasChecked && hasUnchecked)
       let ancestorSN = self.displayStore.getSN(ancestorGUID)
-      NSLog("DEBUG [\(treeID)] Ancestor: \(ancestorGUID) hasChecked=\(hasChecked) hasUnchecked=\(hasUnchecked) hasMixed=\(hasMixed) => isChecked=\(isChecked) isMixed=\(isMixed)")
+      NSLog("DEBUG [\(treeID)] setChecked(): Ancestor=\(ancestorGUID) hasChecked=\(hasChecked) hasUnchecked=\(hasUnchecked) hasMixed=\(hasMixed) => isChecked=\(isChecked) isMixed=\(isMixed)")
       self.setCheckedStateForSingleNode(ancestorSN!, isChecked: isChecked, isMixed: isMixed)
     }
   }
 
   private func setCheckedStateForSingleNode(_ sn: SPIDNodePair, isChecked: Bool, isMixed: Bool) {
     let guid = sn.spid.guid
-    NSLog("DEBUG [\(treeID)] Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
+    NSLog("DEBUG [\(treeID)] setChecked(): Updating checkbox state of: \(guid) (\(sn.spid)) => \(isChecked)/\(isMixed)")
 
     // Update model here:
     self.displayStore.updateCheckedStateTracking(guid, isChecked: isChecked, isMixed: isMixed)
@@ -588,7 +588,7 @@ class TreePanelController: TreePanelControllable {
 
   private func onNodeUpserted(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring upsert signal: signals are disabled")
+      NSLog("DEBUG [\(self.treeID)] Ignoring upserted node: signals are disabled")
       return
     }
 
@@ -610,7 +610,7 @@ class TreePanelController: TreePanelControllable {
 
   private func onNodeRemoved(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring remove signal: signals are disabled")
+      NSLog("DEBUG [\(self.treeID)] Ignoring removed node: signals are disabled")
       return
     }
 

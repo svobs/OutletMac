@@ -466,7 +466,7 @@ class DisplayStore {
        Need to update all the children of the node to match its checked state.
        This will not update it in the UI, however.
        */
-      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): setting self and descendants of \(guid): checked => \(newIsCheckedValue)")
+      NSLog("DEBUG [\(treeID)] updateCheckboxState(): setting self and descendants of \(guid): checked => \(newIsCheckedValue)")
       let applyFunc: ApplyToSNFunc = { sn in self.updateCheckedStateTracking_NoLock(guid, isChecked: newIsCheckedValue, isMixed: false) }
       self.doForSelfAndAllDescendants(guid, applyFunc)
 
@@ -477,14 +477,14 @@ class DisplayStore {
        We can assume that if a parent is not mixed (i.e. is either checked or unchecked), the state of its children are implied.
        But if the parent is mixed, we must track the state of ALL of its children.
        */
-      NSLog("DEBUG [\(treeID)] setNodeCheckedState(): updating siblings of \(guid)")
+      NSLog("DEBUG [\(treeID)] updateCheckboxState(): updating siblings of \(guid)")
       let parentSN = self.getParentSN_NoLock(guid)!
       let parentGUID = parentSN.spid.guid
 
       if parentGUID != TOPMOST_GUID {
         for siblingGUID in self.getChildGUIDList_NoLock(parentGUID) {
           let state = self.getCheckboxState_NoLock(siblingGUID)
-          NSLog("DEBUG [\(treeID)] Sibling \(siblingGUID) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
+          NSLog("DEBUG [\(treeID)] updateCheckboxState(): Sibling \(siblingGUID) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
           self.updateCheckedStateTracking_NoLock(siblingGUID, isChecked: state == .on, isMixed: state == .mixed)
         }
       }
@@ -527,7 +527,7 @@ class DisplayStore {
   }
 
   private func updateCheckedStateTracking_NoLock(_ guid: GUID, isChecked: Bool, isMixed: Bool) {
-    NSLog("DEBUG [\(treeID)] Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
+    NSLog("DEBUG [\(treeID)] UpdateCheckedStateTracking: Setting node \(guid): checked=\(isChecked) mixed=\(isMixed)")
 
     if isChecked {
       self.checkedNodeSet.insert(guid)
