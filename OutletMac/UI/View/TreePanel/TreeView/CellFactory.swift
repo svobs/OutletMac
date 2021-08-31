@@ -116,7 +116,7 @@ class CellFactory {
   // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
   private static func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat,
                                _ tvc: TreeViewController) -> NSImage? {
-    return tvc.con.app.iconStore.getTreeIcon(sn.node, height: cellHeight)
+    return tvc.con.app.iconStore.getNodeIcon(sn.node, height: cellHeight)
   }
 
   private static func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier, _ tvc: TreeViewController) -> NameCellView {

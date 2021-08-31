@@ -156,160 +156,173 @@ class IconStore: HasLifecycle {
     toolbarIconCache.removeAllObjects()
   }
 
-  private func makeGenericCacheKey(_ iconId: IconID) -> String {
-    "\(iconId)"
-  }
-
-  private func makeFileCacheKey(_ iconId: IconID, _ node: Node) -> String {
-    let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
-    return "\(iconId):\(suffix)"
-  }
-
-  func getTreeIcon(_ node: Node, height: CGFloat) -> NSImage? {
+  func getNodeIcon(_ node: Node, height: CGFloat) -> NSImage? {
     var icon: NSImage
 
     let iconId = node.icon
     if TRACE_ENABLED {
-      NSLog("DEBUG Getting treeIcon for: \(iconId): \(node.nodeIdentifier)")
+      NSLog("DEBUG Getting nodeIcon for: \(iconId): \(node.nodeIdentifier)")
     }
     let key: String
-
-    var badge: IconID? = nil
 
     if node.isEphemeral {
       let toolIcon = self.getToolbarIcon(for: iconId)
       icon = (toolIcon as! NetworkImage).nsImage
       key = makeGenericCacheKey(iconId)
     } else if node.isDir {
-      // If dir, determine appropriate badge, if any
-      switch iconId {
-      case .ICON_DIR_MK:
-        badge = .BADGE_MKDIR
-        break
-      case .ICON_DIR_RM:
-        badge = .BADGE_RM
-        break
-      case .ICON_DIR_MV_SRC:
-        badge = .BADGE_MV_SRC
-        break
-      case .ICON_DIR_UP_SRC:
-        badge = .BADGE_UP_SRC
-        break
-      case .ICON_DIR_CP_SRC:
-        badge = .BADGE_CP_SRC
-        break
-      case .ICON_DIR_MV_DST:
-        badge = .BADGE_MV_DST
-        break
-      case .ICON_DIR_UP_DST:
-        badge = .BADGE_UP_DST
-        break
-      case .ICON_DIR_CP_DST:
-        badge = .BADGE_CP_DST
-        break
-      case .ICON_DIR_TRASHED:
-        badge = .BADGE_TRASHED
-        break
-      case .ICON_GENERIC_DIR:
-        // No badge
-        break
-      default:
-        break
-      }
-
-      key = makeGenericCacheKey(iconId)
-
-      // Used cached icon if available
-      if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
-        if TRACE_ENABLED {
-          NSLog("DEBUG Returning cached icon for (dir) key '\(key)'")
-        }
-        return cachedIcon
-      }
-
-      icon = NSWorkspace.shared.icon(for: .folder)
-
-      icon = self.addBadgeOverlay(src: icon, badge: badge)
-
+      icon = self.getIconForDirNode(node, height)
     } else {
-      let isFile: Bool
-      // If file, determine appropriate badge, if any
-      switch iconId {
-      case .ICON_FILE_RM:
-        badge = .BADGE_RM
-        isFile = true
-        break
-      case .ICON_FILE_MV_SRC:
-        badge = .BADGE_MV_SRC
-        isFile = true
-        break
-      case .ICON_FILE_UP_SRC:
-        badge = .BADGE_UP_SRC
-        isFile = true
-        break
-      case .ICON_FILE_CP_SRC:
-        badge = .BADGE_CP_SRC
-        isFile = true
-        break
-      case .ICON_FILE_MV_DST:
-        badge = .BADGE_MV_DST
-        isFile = true
-        break
-      case .ICON_FILE_UP_DST:
-        badge = .BADGE_UP_DST
-        isFile = true
-        break
-      case .ICON_FILE_CP_DST:
-        badge = .BADGE_CP_DST
-        isFile = true
-        break
-      case .ICON_FILE_TRASHED:
-        badge = .BADGE_TRASHED
-        isFile = true
-        break
-      case .ICON_GENERIC_FILE:
-        // No badge
-        isFile = true
-        break
+      icon = self.getIconForFileNode(node, height)
+    }
 
-      default:
-        isFile = false
-        break
+    return icon
+  }
+
+  private func getBestRepresentation(_ icon: NSImage, _ height: CGFloat) -> NSImage {
+    var bestRep: NSImage = icon
+    // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
+    if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: height, height: height), context: nil, hints: nil) {
+      bestRep = NSImage(size: imageRep.size)
+      bestRep.addRepresentation(imageRep)
+    }
+
+    bestRep.size = NSSize(width: height, height: height)
+    return bestRep
+  }
+
+  private func getIconForDirNode(_ node: Node, _ height: CGFloat) -> NSImage {
+    let iconId = node.icon
+    var badge: IconID? = nil
+    // If dir, determine appropriate badge, if any
+    switch iconId {
+    case .ICON_DIR_MK:
+      badge = .BADGE_MKDIR
+      break
+    case .ICON_DIR_RM:
+      badge = .BADGE_RM
+      break
+    case .ICON_DIR_MV_SRC:
+      badge = .BADGE_MV_SRC
+      break
+    case .ICON_DIR_UP_SRC:
+      badge = .BADGE_UP_SRC
+      break
+    case .ICON_DIR_CP_SRC:
+      badge = .BADGE_CP_SRC
+      break
+    case .ICON_DIR_MV_DST:
+      badge = .BADGE_MV_DST
+      break
+    case .ICON_DIR_UP_DST:
+      badge = .BADGE_UP_DST
+      break
+    case .ICON_DIR_CP_DST:
+      badge = .BADGE_CP_DST
+      break
+    case .ICON_DIR_TRASHED:
+      badge = .BADGE_TRASHED
+      break
+    case .ICON_GENERIC_DIR:
+      // No badge
+      break
+    default:
+      break
+    }
+
+    let key: String = makeGenericCacheKey(iconId)
+
+    if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+      // Used cached icon if available
+      if TRACE_ENABLED {
+        NSLog("DEBUG Returning cached icon for (dir) key '\(key)'")
       }
+      return cachedIcon
+    } else {
+      // build new icon
+      let baseIcon = NSWorkspace.shared.icon(for: .folder)
+      return buildAndCacheIcon(iconId, baseIcon, height, badge, key)
+    }
+  }
 
-      if isFile {
-        key = makeFileCacheKey(iconId, node)
-      } else {
-        key = makeGenericCacheKey(iconId)
+  private func getIconForFileNode(_ node: Node, _ height: CGFloat) -> NSImage {
+    let iconId = node.icon
+    let isFile: Bool
+    var badge: IconID? = nil
+    // If file, determine appropriate badge, if any
+    switch iconId {
+    case .ICON_FILE_RM:
+      badge = .BADGE_RM
+      isFile = true
+      break
+    case .ICON_FILE_MV_SRC:
+      badge = .BADGE_MV_SRC
+      isFile = true
+      break
+    case .ICON_FILE_UP_SRC:
+      badge = .BADGE_UP_SRC
+      isFile = true
+      break
+    case .ICON_FILE_CP_SRC:
+      badge = .BADGE_CP_SRC
+      isFile = true
+      break
+    case .ICON_FILE_MV_DST:
+      badge = .BADGE_MV_DST
+      isFile = true
+      break
+    case .ICON_FILE_UP_DST:
+      badge = .BADGE_UP_DST
+      isFile = true
+      break
+    case .ICON_FILE_CP_DST:
+      badge = .BADGE_CP_DST
+      isFile = true
+      break
+    case .ICON_FILE_TRASHED:
+      badge = .BADGE_TRASHED
+      isFile = true
+      break
+    case .ICON_GENERIC_FILE:
+      // No badge
+      isFile = true
+      break
+
+    default:
+      isFile = false
+      break
+    }
+
+    let key: String
+    if isFile {
+      key = makeFileCacheKey(iconId, node)
+    } else {
+      key = makeGenericCacheKey(iconId)
+    }
+
+    // Now that we have derived the key for the file type, use cached value if available
+    if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+      if TRACE_ENABLED {
+        NSLog("DEBUG Returning cached icon for (file) key '\(key)'")
       }
-
-      // Now that we have derived the key for the file type, use cached value if available
-      if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
-        if TRACE_ENABLED {
-          NSLog("DEBUG Returning cached icon for (file) key '\(key)'")
-        }
-        return cachedIcon
-      }
-
+      return cachedIcon
+    } else {
+      // build new icon
+      var baseIcon: NSImage
       // Get icon for suffix
       let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
       if suffix == "" {
-        icon = NSWorkspace.shared.icon(for: .data)
+        baseIcon = NSWorkspace.shared.icon(for: .data)
       } else {
-        icon = NSWorkspace.shared.icon(forFileType: suffix)
+        baseIcon = NSWorkspace.shared.icon(forFileType: suffix)
       }
 
-      icon = self.addBadgeOverlay(src: icon, badge: badge)
+      return buildAndCacheIcon(iconId, baseIcon, height, badge, key)
     }
+  }
 
-    // Thanks to "Sweeper" at https://stackoverflow.com/questions/62525921/how-to-get-a-high-resolution-app-icon-for-any-application-on-a-mac
-    if let imageRep = icon.bestRepresentation(for: NSRect(x: 0, y: 0, width: height, height: height), context: nil, hints: nil) {
-      icon = NSImage(size: imageRep.size)
-      icon.addRepresentation(imageRep)
-    }
-
-    icon.size = NSSize(width: height, height: height)
-
+  private func buildAndCacheIcon(_ iconId: IconID, _ baseIcon: NSImage, _ height: CGFloat, _ badge: IconID?, _ key: String)-> NSImage {
+    let baseIcon = self.getBestRepresentation(baseIcon, height)
+    let icon = self.addBadgeOverlay(src: baseIcon, badge: badge)
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG Storing icon=\(iconId) with badge=\(badge ?? IconID.NONE) for key: '\(key)'")
     }
@@ -350,6 +363,15 @@ class IconStore: HasLifecycle {
       toolbarIconCache.setObject(ImageContainerWrapper(imageContainer), forKey: key)
       return imageContainer
     }
+  }
+
+  private func makeGenericCacheKey(_ iconId: IconID) -> String {
+    "\(iconId)"
+  }
+
+  private func makeFileCacheKey(_ iconId: IconID, _ node: Node) -> String {
+    let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
+    return "\(iconId):\(suffix)"
   }
 
   private func makeNewImageContainer(for iconID: IconID) -> ImageContainer {

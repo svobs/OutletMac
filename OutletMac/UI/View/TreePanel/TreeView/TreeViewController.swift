@@ -36,6 +36,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      Del key pressed: confirm delete, then delete all selected items
      */
     override func deleteForward(_ sender: Any?) {
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Ignoring Del key: UI is disabled")
+            return
+        }
         NSLog("DEBUG [\(self.treeID)] TreeViewController: Del key detected")
         self.deleteSelectedNodes()
     }
@@ -44,6 +48,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      Delete key pressed: confirm delete, then delete all selected items
      */
     override func deleteBackward(_ sender: Any?) {
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Ignoring Delete key: UI is disabled")
+            return
+        }
         NSLog("DEBUG [\(self.treeID)] TreeViewController: Delete key detected")
         self.deleteSelectedNodes()
     }
@@ -60,14 +68,19 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         let selectedGUIDList = Array(self.getSelectedGUIDs())
-        let selectedSNList = displayStore.getSNList(selectedGUIDList)
-        self.con.treeActions.confirmAndDeleteSubtrees(selectedSNList)
+        let selectedNodeList = displayStore.getNodeList(selectedGUIDList)
+        self.con.treeActions.confirmAndDeleteSubtrees(selectedNodeList)
     }
 
     /**
      Double-click handler
      */
     @objc func doubleClickedItem(_ sender: NSOutlineView) {
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Ignoring double-click: UI is disabled")
+            return
+        }
+
         let item = sender.item(atRow: sender.clickedRow)
 
         let guid = itemToGUID(item)
@@ -338,6 +351,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      In our case, that means filtering out display-only nodes such as CategoryNodes.
      */
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Denying drag: UI is disabled")
+            return nil
+        }
         let guid: GUID = self.itemToGUID(item)
         if let sn = self.displayStore.getSN(guid) {
             if sn.node.isDisplayOnly {
@@ -377,8 +394,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         NSLog("INFO  [\(treeID)] User dragged to Trash: \(guidList)")
-        let snList = displayStore.getSNList(guidList)
-        self.con.treeActions.confirmAndDeleteSubtrees(snList)
+        let nodeList = displayStore.getNodeList(guidList)
+        self.con.treeActions.confirmAndDeleteSubtrees(nodeList)
     }
 
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
@@ -399,6 +416,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      */
     func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int)
                     -> NSDragOperation {
+
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Denying drop: UI is disabled")
+            return []
+        }
 
         if item == nil {
             // Special handling for dropping at the very top: allow the insert bar to be shown
@@ -613,10 +635,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
     }
 
-    func removeTopLevelItem(_ guid: GUID) {
-
-    }
-
     // Context Menu
     // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -643,10 +661,16 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return clickedGUID
     }
 
-    /**
-     Rebuilds the menu each time it's opened, based on the clicked item and/or selection
-     */
-    func menuWillOpen(_ menu: NSMenu) {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        if !self.con.app.settings.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] menuNeedsUpdate(): UI is disabled")
+            //This will prevent menu from showing
+            menu.removeAllItems()
+            return
+        }
+
+        NSLog("DEBUG [\(treeID)] menuNeedsUpdate() entered")
+
         guard let clickedGUID = self.getClickedRowGUID() else {
             return
         }
@@ -655,4 +679,5 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         self.con.contextMenu.rebuildMenuFor(menu, clickedGUID, selectedGUIDs)
     }
+
 }

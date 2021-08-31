@@ -345,6 +345,23 @@ class DisplayStore {
     return snList
   }
 
+  /**
+   Generic lookup func. Given a list of GUIDs, return a list of their corresponding Nodes in the same order.
+   */
+  public func getNodeList(_ guidList: [GUID]) -> [Node] {
+    var nodeList: [Node] = []
+    dq.sync {
+      for guid in guidList {
+        if let sn = self.getSN_NoLock(guid) {
+          nodeList.append(sn.node)
+        } else {
+          NSLog("[\(self.treeID)] WARN  Could not find node for GUID; ommitting: \(guid)")
+        }
+      }
+    }
+    return nodeList
+  }
+
   private func getChildGUIDList_NoLock(_ parentGUID: GUID?) -> [GUID] {
     return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
   }

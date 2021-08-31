@@ -50,6 +50,9 @@ class TreeContextMenu {
    Builds a context menu for multiple selected items.
   */
   private func buildContextMenuMultiple(_ menu: NSMenu, _ targetGUIDSet: Set<GUID>) throws {
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG Building context menu items for multiple selection of \(targetGUIDSet.count) items")
+    }
     let item = NSMenuItem(title: "\(targetGUIDSet.count) items selected", action: nil, keyEquivalent: "")
     item.isEnabled = false
     menu.addItem(item)
@@ -89,15 +92,15 @@ class TreeContextMenu {
     }
 
     if nodeLocalList.count > 0 {
-      let item = MenuItemWithSNList(title: "Delete \(nodeLocalList.count) Items from Local Disk", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.snList = snList
+      let item = MenuItemWithNodeList(title: "Delete \(nodeLocalList.count) Items from Local Disk", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = nodeLocalList
       item.target = self.con.treeActions
       menu.addItem(item)
     }
 
     if nodeGDriveList.count > 0 {
-      let item = MenuItemWithSNList(title: "Delete \(nodeGDriveList.count) Items from Google Drive", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.snList = snList
+      let item = MenuItemWithNodeList(title: "Delete \(nodeGDriveList.count) Items from Google Drive", action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = nodeGDriveList
       item.target = self.con.treeActions
       menu.addItem(item)
     }
@@ -113,11 +116,10 @@ class TreeContextMenu {
     }
 
     let op: UserOp? = try self.con.backend.getLastPendingOp(deviceUID: sn.node.deviceUID, nodeUID: sn.node.uid)
-
     let singlePath = sn.spid.getSinglePath()
 
     if op != nil && op!.hasDst() {
-      NSLog("DEBUG [\(treeID)] Building context menu for: \(op!)")
+      NSLog("DEBUG [\(treeID)] Building context menu items for src-dst op: \(op!)")
 
       // Split into separate entries for src and dst.
 
@@ -196,7 +198,7 @@ class TreeContextMenu {
   }
 
   private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) throws {
-    NSLog("DEBUG: building context menu for node: \(node), singlePath: '\(singlePath)'")
+    NSLog("DEBUG [\(treeID)] Building context menu for node: \(node), singlePath: '\(singlePath)'")
 
     if node.isContainerNode {
       return

@@ -538,8 +538,6 @@ class TreePanelController: TreePanelControllable {
     let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
     let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
 
-
-
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg='\(statusBarMsg)'")
       self.treeLoadState = treeLoadState

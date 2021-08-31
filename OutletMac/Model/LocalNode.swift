@@ -62,7 +62,7 @@ class LocalDirNode: LocalNode {
   }
   
   override public var description: String {
-    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
+    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed) live=\(self._isLive)"
   }
 
 
@@ -149,7 +149,7 @@ class LocaFileNode: LocalNode {
   }
   
   override public var description: String {
-    return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(self.sha256 ?? "null") sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed)"
+    return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(self.sha256 ?? "null") sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed) live=\(self._isLive)"
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,

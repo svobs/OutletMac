@@ -138,8 +138,8 @@ class TreeActions {
     self.setChecked(snList, false)
   }
 
-  @objc func deleteSubtree(_ sender: MenuItemWithSNList) {
-    self.confirmAndDeleteSubtrees(sender.snList)
+  @objc func deleteSubtree(_ sender: MenuItemWithNodeList) {
+    self.confirmAndDeleteSubtrees(sender.nodeList)
   }
 
   // Reusable actions
@@ -164,19 +164,19 @@ class TreeActions {
     }
   }
 
-  public func confirmAndDeleteSubtrees(_ snList: [SPIDNodePair]) {
-    if snList.count == 0 {
+  public func confirmAndDeleteSubtrees(_ nodeList: [Node]) {
+    if nodeList.count == 0 {
       self.con.reportError("Cannot Delete", "No items are selected!")
       return
     }
 
     var msg = "Are you sure you want to delete "
     var okText = "Delete"
-    if snList.count == 1 {
-      msg += "\"\(snList[0].node.name)\"?"
+    if nodeList.count == 1 {
+      msg += "\"\(nodeList[0].name)\"?"
     } else {
-      msg += "these \(snList.count) items?"
-      okText = "Delete \(snList.count) items"
+      msg += "these \(nodeList.count) items?"
+      okText = "Delete \(nodeList.count) items"
     }
 
     guard self.con.app.confirmWithUserDialog("Confirm Delete", msg, okButtonText: okText, cancelButtonText: "Cancel") else {
@@ -184,15 +184,15 @@ class TreeActions {
       return
     }
 
-    NSLog("DEBUG [\(treeID)] User confirmed delete of \(snList.count) items")
+    NSLog("DEBUG [\(treeID)] User confirmed delete of \(nodeList.count) items")
 
     var nodeUIDList: [UID] = []
-    for sn in snList {
-      nodeUIDList.append(sn.node.uid)
+    for node in nodeList {
+      nodeUIDList.append(node.uid)
     }
 
     do {
-      let deviceUID = snList[0].spid.deviceUID
+      let deviceUID = nodeList[0].deviceUID
       try self.con.backend.deleteSubtree(deviceUID: deviceUID, nodeUIDList: nodeUIDList)
     } catch {
       self.con.reportException("Failed to delete subtree", error)
