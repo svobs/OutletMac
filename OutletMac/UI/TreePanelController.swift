@@ -203,8 +203,11 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  // MUST RUN INSIDE MAIN DQ
+  /**
+   NOTE: Must run inside DispatchQueue.main!
+   */
   private func clearModelAndTreeView() {
+    assert(DispatchQueue.isExecutingIn(DispatchQueue.main))
     // Clear display store & TreeView (which draws from display store)
     NSLog("DEBUG [\(treeID)] Clearing model and tree view")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
@@ -212,9 +215,10 @@ class TreePanelController: TreePanelControllable {
   }
 
   /**
-   NOTE: executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
+   NOTE: Executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
    */
   func clearTreeAndDisplayMsg(_ msg: String) {
+    assert(DispatchQueue.isNotExecutingIn(DispatchQueue.main))
     DispatchQueue.main.sync {
       NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
       self.clearModelAndTreeView()
@@ -223,7 +227,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   /**
-   Executes async in a DispatchQueue, to ensure serial execution. This will catch and report exceptions.
+   Executes async in App-SerialQueue, to ensure serial execution. This will catch and report exceptions.
    */
   private func populateTreeView() {
     self.app.execAsync { [unowned self] in
@@ -243,6 +247,12 @@ class TreePanelController: TreePanelControllable {
       return
     }
     readyToPopulate = false
+
+    if !self.tree.state.rootExists {
+      NSLog("INFO  [\(treeID)] populateTreeView(): rootExists==false; bailling")
+      clearTreeAndDisplayMsg("Tree does not exist")
+      return
+    }
 
     let populateStartTimeMS = DispatchTime.now()
 

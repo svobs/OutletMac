@@ -166,9 +166,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if let child  = displayStore.getChild(itemToGUID(item), index) {
             return child.spid.guid
         } else {
-            NSLog("ERROR [\(treeID)] Could not find item index \(index) of item \(item ?? "nil") in DisplayStore!")
+            NSLog("ERROR [\(treeID)] Could not find item index \(index) of item \(item ?? "nil") in DisplayStore! Returning 'NULL'")
             // hopefully this won't crash!
-            return "nil"
+            return "NULL"
         }
     }
 
@@ -227,12 +227,13 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         if guid == self.con.tree.rootSPID.guid {
-            // TODO: why is this happening for change trees?
             NSLog("ERROR [\(treeID)] Should not be creating a row for the root GUID!")
             return nil
         }
 
-//        NSLog("DEBUG [\(treeID)] Cell requested for GUID: \(guid)")
+        if TRACE_ENABLED {
+            NSLog("DEBUG [\(treeID)] Cell requested for GUID: \(guid)")
+        }
         return CellFactory.upsertCellToOutlineView(self, identifier, guid)
     }
 
