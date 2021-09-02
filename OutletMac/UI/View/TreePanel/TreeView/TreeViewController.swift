@@ -151,9 +151,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let sortDescriptor = NSSortDescriptor(key: NAME_COL_KEY, ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:)));
         outlineView.sortDescriptors = [sortDescriptor]
         assert (displayStore.getColSortOrder() == .NAME)
-
-        NSLog("DEBUG [\(treeID)] viewDidLoad(): clearing tree and displaying loading msg")
-        self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE)
     }
 
     // DataSource methods

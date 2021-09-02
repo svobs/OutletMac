@@ -206,13 +206,17 @@ class TreePanelController: TreePanelControllable {
   // MUST RUN INSIDE MAIN DQ
   private func clearModelAndTreeView() {
     // Clear display store & TreeView (which draws from display store)
-    NSLog("DEBUG [\(treeID)] Clearing TreeView")
+    NSLog("DEBUG [\(treeID)] Clearing model and tree view")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
     self.treeView?.outlineView.reloadData()
   }
 
+  /**
+   NOTE: executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
+   */
   func clearTreeAndDisplayMsg(_ msg: String) {
-    DispatchQueue.main.async {
+    DispatchQueue.main.sync {
+      NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
       self.clearModelAndTreeView()
       self.appendEphemeralNode(self.tree.rootSPID, msg, reloadParent: true)
     }
@@ -242,7 +246,7 @@ class TreePanelController: TreePanelControllable {
 
     let populateStartTimeMS = DispatchTime.now()
 
-    NSLog("DEBUG populateTreeView(): clearing tree and displaying loading msg")
+    NSLog("DEBUG [\(treeID)] populateTreeView(): clearing tree and displaying loading msg")
     clearTreeAndDisplayMsg(LOADING_MESSAGE)
 
     let rows: RowsOfInterest
@@ -317,6 +321,7 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
+  // MUST RUN INSIDE MAIN DQ
   func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, reloadParent: Bool) {
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID)
     let ephemeralSN = ephemeralNode.toSN()
