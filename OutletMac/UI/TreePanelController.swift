@@ -115,7 +115,9 @@ class TreePanelController: TreePanelControllable {
     treeActions.con = self
     contextMenu.con = self
 
-    self.app.registerTreePanelController(self.treeID, self)
+    self.app.execSync {
+      self.app.registerTreePanelController(self.treeID, self)
+    }
 
     self.subscribeToSignals(treeID)
 

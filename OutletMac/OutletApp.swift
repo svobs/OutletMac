@@ -88,7 +88,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
   private var treeControllerDict: [String: TreePanelControllable] = [:]
-  private let treeControllerLock = NSLock()
 
   var backend: OutletBackend {
     get {
@@ -105,6 +104,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   override init() {
     dispatchListener = dispatcher.createListener(winID)
     super.init()
+
+    // Enable detection of our custom queue, for debugging and assertions:
+    DispatchQueue.registerDetection(of: self.serialQueue)
   }
 
   func start() throws {
@@ -172,15 +174,13 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     if self.wasShutdown {
       return
     }
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
-    }
-    for (treeID, controller) in self.treeControllerDict {
-      do {
-        try controller.shutdown()
-      } catch {
-        NSLog("ERROR [\(treeID)] Failed to shut down controller")
+    self.execSync {
+      for (treeID, controller) in self.treeControllerDict {
+        do {
+          try controller.shutdown()
+        } catch {
+          NSLog("ERROR [\(treeID)] Failed to shut down controller")
+        }
       }
     }
 
@@ -417,6 +417,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   public func execSync(_ workItem: @escaping NoArgVoidFunc) {
+    assert(DispatchQueue.isNotExecutingIn(self.serialQueue))
+
     self.serialQueue.sync(execute: workItem)
   }
 
@@ -457,7 +459,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func onTreePanelControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
-    self.deregisterTreePanelController(senderID)
+    self.execSync {
+      self.deregisterTreePanelController(senderID)
+    }
   }
 
   private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
@@ -519,28 +523,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func registerTreePanelController(_ treeID: TreeID, _ controller: TreePanelControllable) {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
-    }
+    assert(DispatchQueue.isExecutingIn(self.serialQueue))
+
     self.treeControllerDict[treeID] = controller
   }
 
   func deregisterTreePanelController(_ treeID: TreeID) {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
-    }
+    assert(DispatchQueue.isExecutingIn(self.serialQueue))
+
     NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
     self.treeControllerDict.removeValue(forKey: treeID)
   }
 
   func getTreePanelController(_ treeID: TreeID) -> TreePanelControllable? {
-    self.treeControllerLock.lock()
-    defer {
-      self.treeControllerLock.unlock()
+
+    var con: TreePanelControllable?
+    self.execSync {
+      con = self.treeControllerDict[treeID]
     }
-    return self.treeControllerDict[treeID]
+    return con
   }
 
   // Etc
