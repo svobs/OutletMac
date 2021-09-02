@@ -108,7 +108,7 @@ class TreeActions {
     self.con.app.execAsync {
       NSLog("DEBUG goIntoDir(): \(spid)")
 
-      self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE)
+      self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
 
       do {
         let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: spid)

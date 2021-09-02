@@ -38,8 +38,8 @@ protocol TreePanelControllable: HasLifecycle {
   func setChecked(_ guid: GUID, _ isChecked: Bool) throws
 
   func connectTreeView(_ treeView: TreeViewController)
-  func clearTreeAndDisplayMsg(_ msg: String)
-  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, reloadParent: Bool)
+  func clearTreeAndDisplayMsg(_ msg: String, _ iconID: IconID)
+  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, _ iconID: IconID, reloadParent: Bool)
 
   func reportError(_ title: String, _ errorMsg: String)
   func reportException(_ title: String, _ error: Error)
@@ -219,12 +219,12 @@ class TreePanelController: TreePanelControllable {
   /**
    NOTE: Executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
    */
-  func clearTreeAndDisplayMsg(_ msg: String) {
+  func clearTreeAndDisplayMsg(_ msg: String, _ iconID: IconID) {
     assert(DispatchQueue.isNotExecutingIn(DispatchQueue.main))
     DispatchQueue.main.sync {
       NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
       self.clearModelAndTreeView()
-      self.appendEphemeralNode(self.tree.rootSPID, msg, reloadParent: true)
+      self.appendEphemeralNode(self.tree.rootSPID, msg, iconID, reloadParent: true)
     }
   }
 
@@ -252,14 +252,14 @@ class TreePanelController: TreePanelControllable {
 
     if !self.tree.state.rootExists {
       NSLog("INFO  [\(treeID)] populateTreeView(): rootExists==false; bailling")
-      clearTreeAndDisplayMsg("Tree does not exist")
+      clearTreeAndDisplayMsg("Tree does not exist", .ICON_ALERT)
       return
     }
 
     let populateStartTimeMS = DispatchTime.now()
 
     NSLog("DEBUG [\(treeID)] populateTreeView(): clearing tree and displaying loading msg")
-    clearTreeAndDisplayMsg(LOADING_MESSAGE)
+    clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
 
     let rows: RowsOfInterest
     do {
@@ -289,7 +289,7 @@ class TreePanelController: TreePanelControllable {
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
-      self.clearTreeAndDisplayMsg("ERROR: too many items to display (\(actualCount))")
+      self.clearTreeAndDisplayMsg("ERROR: too many items to display (\(actualCount))", .ICON_ALERT)
       return
     }
 
@@ -313,7 +313,7 @@ class TreePanelController: TreePanelControllable {
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue
-          self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", reloadParent: false)
+          self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: false)
         }
       }
     }
@@ -334,8 +334,8 @@ class TreePanelController: TreePanelControllable {
   }
 
   // MUST RUN INSIDE MAIN DQ
-  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, reloadParent: Bool) {
-    let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID)
+  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, _ iconID: IconID, reloadParent: Bool) {
+    let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID, iconID)
     let ephemeralSN = ephemeralNode.toSN()
     let parentGUID = parentSPID.guid
 

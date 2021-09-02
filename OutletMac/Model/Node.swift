@@ -284,9 +284,10 @@ class DirectoryStats : CustomStringConvertible {
  */
 class EphemeralNode: Node {
   private let _name: String
-  init(_ name: String, parent: SPID) {
+  init(_ name: String, parent: SPID, _ iconID: IconID) {
     self._name = name
     super.init(EphemeralNodeIdentifier(parent: parent), [], .NOT_TRASHED)
+    self._icon = iconID
   }
 
   override var name: String {
@@ -303,10 +304,6 @@ class EphemeralNode: Node {
 
   override func isParentOf(_ otherNode: Node) -> Bool {
     return false
-  }
-
-  override var defaultIcon: IconID {
-    return .ICON_LOADING
   }
 
   override var isDisplayOnly: Bool {
