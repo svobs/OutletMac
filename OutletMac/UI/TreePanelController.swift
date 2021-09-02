@@ -38,8 +38,8 @@ protocol TreePanelControllable: HasLifecycle {
   func setChecked(_ guid: GUID, _ isChecked: Bool) throws
 
   func connectTreeView(_ treeView: TreeViewController)
-  func clearTreeAndDisplayLoadingMsg()
-  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String)
+  func clearTreeAndDisplayMsg(_ msg: String)
+  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, reloadParent: Bool)
 
   func reportError(_ title: String, _ errorMsg: String)
   func reportException(_ title: String, _ error: Error)
@@ -211,10 +211,10 @@ class TreePanelController: TreePanelControllable {
     self.treeView?.outlineView.reloadData()
   }
 
-  func clearTreeAndDisplayLoadingMsg() {
+  func clearTreeAndDisplayMsg(_ msg: String) {
     DispatchQueue.main.async {
       self.clearModelAndTreeView()
-      self.appendEphemeralNode(nil, "Loading...")
+      self.appendEphemeralNode(self.tree.rootSPID, msg, reloadParent: true)
     }
   }
 
@@ -242,8 +242,8 @@ class TreePanelController: TreePanelControllable {
 
     let populateStartTimeMS = DispatchTime.now()
 
-    NSLog("DEBUG populateTreeView_NoLock(): clearing tree and displaying loading msg")
-    clearTreeAndDisplayLoadingMsg()
+    NSLog("DEBUG populateTreeView(): clearing tree and displaying loading msg")
+    clearTreeAndDisplayMsg(LOADING_MESSAGE)
 
     let rows: RowsOfInterest
     do {
@@ -260,54 +260,51 @@ class TreePanelController: TreePanelControllable {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
-      DispatchQueue.main.async {
-        self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
-        if topLevelSNList.count == 0 {
-          // clear loading node
-          self.treeView!.outlineView.reloadData()
+      self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
+      if topLevelSNList.count == 0 {
+        // clear loading node
+        NSLog("INFO  [\(self.treeID)] populateTreeView(): no nodes in tree")
+        DispatchQueue.main.async {
+          self.clearModelAndTreeView()
         }
+        return
       }
       queue.append(contentsOf: topLevelSNList)
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
-      DispatchQueue.main.async {
-        self.clearModelAndTreeView()
-        self.appendEphemeralNode(nil, "ERROR: too many items to display (\(actualCount))")
-      }
+      self.clearTreeAndDisplayMsg("ERROR: too many items to display (\(actualCount))")
       return
     }
 
+    // We populate each expanded row in the DisplayStore first, and then reload the tree once it's fully populated.
+    // This way we avoid loading in fits and spurts, and it looks cleaner
     var toExpandInOrder: [GUID] = []
-    // populate each expanded dir:
     while !queue.isEmpty {
 
       let sn = queue.popFirst()!
-      if sn.node.isDir && rows.expanded.contains(sn.spid.guid) {
+      let guid = sn.spid.guid
+      if sn.node.isDir && rows.expanded.contains(guid) {
         // only expand rows which are actually present:
-        NSLog("DEBUG [\(treeID)] populateTreeView(): Will expand row: \(sn.spid.guid)")
-        toExpandInOrder.append(sn.spid.guid)
+        NSLog("DEBUG [\(treeID)] populateTreeView(): Will expand row: \(guid)")
+        toExpandInOrder.append(guid)
         do {
           let childSNList: [SPIDNodePair] = try self.tree.getChildList(sn.spid)
           NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) child nodes for parent \(sn.spid)")
 
-          DispatchQueue.main.async {
-            self.displayStore.putChildList(sn, childSNList)
-          }
+          self.displayStore.putChildList(guid, childSNList)
           queue.append(contentsOf: childSNList)
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue
-          DispatchQueue.main.async {
-            self.appendEphemeralNode(sn, "ERROR: too many items to display (\(actualCount))")
-          }
+          self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", reloadParent: false)
         }
       }
     }
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
-      self.treeView!.outlineView.reloadItem(nil, reloadChildren: true)
+      self.treeView?.outlineView.reloadData()
 
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): Expanding rows: \(toExpandInOrder)")
       self.restoreRowExpansionState(toExpandInOrder)
@@ -320,20 +317,22 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  func appendEphemeralNode(_ parentSN: SPIDNodePair?, _ nodeName: String) {
-    let parentSPID = (parentSN == nil ? self.tree.rootSPID : parentSN!.spid)
-
+  func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, reloadParent: Bool) {
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID)
     let ephemeralSN = ephemeralNode.toSN()
+    let parentGUID = parentSPID.guid
 
-    self.displayStore.putChildList(parentSN, [ephemeralSN])  // yeah, make sure we put this inside the main DQ or weird race conditions result
-
-    var itemToReload = parentSN?.spid.guid
-    if itemToReload == nil || itemToReload == self.tree.rootSPID.guid {
-      itemToReload  = nil
+    // yeah, make sure we put this inside the main DQ or weird race conditions result:
+    if parentGUID == self.tree.rootSPID.guid {
+      self.displayStore.putRootChildList(self.tree.rootSN, [ephemeralSN])
+    } else {
+      self.displayStore.putChildList(parentGUID, [ephemeralSN])
     }
-    self.treeView!.outlineView.reloadItem(itemToReload, reloadChildren: true)
-    NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(itemToReload ?? TOPMOST_GUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' ")
+
+    if reloadParent {
+      self.treeView!.reloadItem(parentGUID, reloadChildren: true)
+    }
+    NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(parentGUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' reloadParent=\(reloadParent)")
   }
 
   private func restoreRowSelectionState(_ selected: Set<GUID>) {
@@ -341,15 +340,7 @@ class TreePanelController: TreePanelControllable {
       return
     }
 
-    var indexSet = IndexSet()
-    for guid in selected {
-      let index = self.treeView!.outlineView.row(forItem: guid)
-      if index >= 0 {
-        indexSet.insert(index)
-      } else {
-        NSLog("DEBUG [\(self.treeID)] restoreRowSelectionState(): could not select row because it was not found: \(guid)")
-      }
-    }
+    let indexSet = self.treeView!.getIndexSetFor(selected)
 
     NSLog("DEBUG [\(self.treeID)] restoreRowSelectionState(): selecting \(indexSet.count) rows")
     self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
@@ -397,7 +388,7 @@ class TreePanelController: TreePanelControllable {
     while true {
       ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
       NSLog("DEBUG [\(treeID)] setChecked(): Next higher ancestor=\(ancestorGUID)")
-      if ancestorGUID == TOPMOST_GUID {
+      if ancestorGUID == self.tree.rootSPID.guid {
         break
       }
       var hasChecked = false
@@ -540,7 +531,9 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg='\(statusBarMsg)'")
+
       self.treeLoadState = treeLoadState
+
       self.updateStatusBarMsg(statusBarMsg)
 
       if dirStatsDictByGUID.count > 0 || dirStatsDictByUID.count > 0 {
@@ -550,10 +543,10 @@ class TreePanelController: TreePanelControllable {
 
       switch treeLoadState {
       case .LOAD_STARTED:
-        self.enableNodeUpdateSignals = true
+        DispatchQueue.main.async {
+          self.enableNodeUpdateSignals = true
 
-        if self.swiftTreeState.isManualLoadNeeded {
-          DispatchQueue.main.async {
+          if self.swiftTreeState.isManualLoadNeeded {
             self.swiftTreeState.isManualLoadNeeded = false
           }
         }
@@ -600,7 +593,10 @@ class TreePanelController: TreePanelControllable {
     }
 
     let sn = try propDict.get("sn") as! SPIDNodePair
-    let parentGUID = sn.spid.parentGUID!
+    guard let parentGUID = sn.spid.parentGUID else {
+      NSLog("ERROR [\(self.treeID)] Cannot process \(Signal.NODE_UPSERTED) signal: \(sn.spid) is missing parentGUID!")
+      return
+    }
     NSLog("INFO  [\(self.treeID)] Received \(Signal.NODE_UPSERTED) signal: \(sn.spid) for parent: \(parentGUID)")
 
     let alreadyPresent: Bool = self.displayStore.putSN(sn, parentGUID: parentGUID)
@@ -625,13 +621,16 @@ class TreePanelController: TreePanelControllable {
     }
 
     let sn = try propDict.get("sn") as! SPIDNodePair
-    let parentGUID = sn.spid.parentGUID!
+    guard let parentGUID = sn.spid.parentGUID else {
+      NSLog("ERROR [\(self.treeID)] Cannot process \(Signal.NODE_REMOVED) signal: \(sn.spid) is missing parentGUID!")
+      return
+    }
     NSLog("DEBUG [\(self.treeID)] Received \(Signal.NODE_REMOVED) signal: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
 
     if self.displayStore.removeSN(sn.spid.guid) {
       DispatchQueue.main.async {
         if parentGUID == self.tree.rootSPID.guid {
-          NSLog("DEBUG Parent of removed node is root node!")
+          NSLog("DEBUG [\(self.treeID)] Parent of removed node is root node!")
         }
         self.treeView?.reloadItem(parentGUID, reloadChildren: true)
       }
@@ -650,7 +649,12 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(self.treeID)] Received \(Signal.SUBTREE_NODES_CHANGED) signal with root \(subtreeRootSPID) and \(upsertedList.count) upserts & \(removedList.count) removes")
 
     for upsertedSN in upsertedList {
-      _ = self.displayStore.putSN(upsertedSN, parentGUID: upsertedSN.spid.parentGUID!)
+      if let parentGUID = upsertedSN.spid.parentGUID {
+        _ = self.displayStore.putSN(upsertedSN, parentGUID: parentGUID)
+      } else {
+        // make this non-lethal
+        NSLog("ERROR [\(self.treeID)] While processing \(Signal.SUBTREE_NODES_CHANGED) signal: upserted node \(upsertedSN.spid) is missing parentGUID!")
+      }
     }
     for removedSN in removedList {
       _ = self.displayStore.removeSN(removedSN.spid.guid)

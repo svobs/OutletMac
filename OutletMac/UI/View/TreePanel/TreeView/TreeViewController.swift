@@ -153,7 +153,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         assert (displayStore.getColSortOrder() == .NAME)
 
         NSLog("DEBUG [\(treeID)] viewDidLoad(): clearing tree and displaying loading msg")
-        self.con.clearTreeAndDisplayLoadingMsg()
+        self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE)
     }
 
     // DataSource methods
@@ -163,14 +163,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      Returns a GUID corresponding to the item with the given parameters
 
      1. You must give each row a unique identifier, referred to as `item` by the outline view.
-     2. For top-level rows, we use the values in the `keys` array
-     3. item == nil means it's the "root" row of the outline view, which is not visible
+     2. item == nil means it's the "root" row of the outline view, which is not visible
      */
     func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
         if let child  = displayStore.getChild(itemToGUID(item), index) {
             return child.spid.guid
         } else {
-            return TOPMOST_GUID
+            NSLog("ERROR [\(treeID)] Could not find item index \(index) of item \(item ?? "nil") in DisplayStore!")
+            // hopefully this won't crash!
+            return "nil"
         }
     }
 
@@ -228,7 +229,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return nil
         }
 
-        if guid == TOPMOST_GUID {
+        if guid == self.con.tree.rootSPID.guid {
             // TODO: why is this happening for change trees?
             NSLog("ERROR [\(treeID)] Should not be creating a row for the root GUID!")
             return nil
@@ -275,20 +276,21 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         guard let parentGUID: GUID = getKey(notification) else {
+            NSLog("ERROR [\(treeID)] Cannot expand topmost GUID (nil)! Ignoring request")
             return
         }
 
-        NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
+        guard parentGUID != self.con.tree.rootSPID.guid else {
+            NSLog("ERROR [\(treeID)] Cannot expand topmost GUID ('\(parentGUID)')! Ignoring request")
+            return
+        }
 
         guard let parentSN: SPIDNodePair = self.displayStore.getSN(parentGUID) else {
             NSLog("ERROR [\(treeID)] Cannot expand: GUID '\(parentGUID)' not found in DisplayStore. Ignoring request")
             return
         }
 
-        guard parentGUID != TOPMOST_GUID else {
-            NSLog("ERROR [\(treeID)] Cannot expand topmost GUID ('\(parentGUID)')! Ignoring request")
-            return
-        }
+        NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
 
         do {
             let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, isExpandingParent: true,
@@ -298,10 +300,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             defer {
                 outlineView.endUpdates()
             }
-            self.displayStore.putChildList(parentSN, childSNList)
+            self.displayStore.putChildList(parentSN.spid.guid, childSNList)
             self.outlineView.reloadItem(parentGUID, reloadChildren: true)
         } catch OutletError.maxResultsExceeded(let actualCount) {
-            self.con.appendEphemeralNode(parentSN, "ERROR: too many items to display (\(actualCount))")
+            self.con.appendEphemeralNode(parentSN.spid, "ERROR: too many items to display (\(actualCount))", reloadParent: true)
         } catch {
             self.con.reportException("Failed to expand row", error)
         }
@@ -323,7 +325,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         guard let parentGUID: GUID = getKey(notification) else {
             return
         }
-        guard parentGUID != TOPMOST_GUID else {
+        guard parentGUID != self.con.tree.rootSPID.guid else {
             NSLog("ERROR [\(treeID)] Trying to collapse topmost GUID (\(parentGUID)); ignoring")
             return
         }
@@ -401,8 +403,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
             if dropTargetSN.node.isParentOf(srcSN.node) {
-                if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering
-                    NSLog("DEBUG [\(self.treeID)] Target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
+                if TRACE_ENABLED {  // // this can get called a lot when user is hovering
+                    NSLog("DEBUG [\(self.treeID)] Drop target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
                 }
                 return true
             }
@@ -426,7 +428,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if item == nil {
             // Special handling for dropping at the very top: allow the insert bar to be shown
-            if SUPER_DEBUG_ENABLED {
+            if TRACE_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on subtree root")
             }
             // TODO: may want to change 'index' to 'NSOutlineViewDropOnItemIndex' in the future. Not sure which is more intuitive
@@ -438,12 +440,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if index == NSOutlineViewDropOnItemIndex {
             // Possibility I: Dropping ON
-            if SUPER_DEBUG_ENABLED {
+            if TRACE_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(dstGUID)")
             }
         } else {
             // Possibility II: Dropping BETWEEN
-            if SUPER_DEBUG_ENABLED {
+            if TRACE_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(dstGUID) child index \(index)")
             }
 
@@ -453,11 +455,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 let rowIndex = outlineView.row(at: point)
                 if rowIndex >= 0 {
                     if let item = outlineView.item(atRow: rowIndex) {
-                        if let guid = item as? GUID {
-                            if SUPER_DEBUG_ENABLED {
-                                NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(guid)")
-                            }
-                            dstGUID = guid
+                        dstGUID = itemToGUID(item)
+                        if TRACE_ENABLED {
+                            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(dstGUID)")
                         }
                     }
                 }
@@ -472,11 +472,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
             if !dstSN.node.isDir {
                 // cannot drop on file. Re-target the drop so that we are dropping on its parent dir
-                dstGUID = displayStore.getParentGUID(dstGUID)!
-                dstSN = displayStore.getSN(dstGUID)!
+                guard let parentGUID = displayStore.getParentGUID(dstGUID) else {
+                    return []
+                }
+                guard let parentSN = displayStore.getSN(parentGUID) else {
+                    return []
+                }
+                dstGUID = parentGUID
+                dstSN = parentSN
             }
 
             guard let srcGUIDList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
+                if SUPER_DEBUG_ENABLED {
+                    NSLog("DEBUG [\(treeID)] Validating drop: no src GUIDs found")
+                }
                 return []
             }
             if isDroppingOnSelf(srcGUIDList, dstSN) {
@@ -556,9 +565,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     private func itemToGUID(_ item: Any?) -> GUID {
         if item == nil {
-            return TOPMOST_GUID
+            return self.con.tree.rootSPID.guid
         } else {
             return item as! GUID
+        }
+    }
+
+    private func guidToItem(_ guid: GUID) -> Any? {
+        if guid == self.con.tree.rootSPID.guid {
+            return nil
+        } else {
+            return guid
         }
     }
 
@@ -566,10 +583,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         var uidSet = Set<UID>()
         for rowIndex in outlineView.selectedRowIndexes {
             if let item = outlineView.item(atRow: rowIndex) {
-                if let guid = item as? GUID {
-                    if let sn = displayStore.getSN(guid) {
-                        uidSet.insert(sn.node.uid)
-                    }
+                if let sn = displayStore.getSN(itemToGUID(item)) {
+                    uidSet.insert(sn.node.uid)
                 }
             }
         }
@@ -582,9 +597,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         var guidSet = Set<GUID>()
         for selectedRow in outlineView.selectedRowIndexes {
             if let item = outlineView.item(atRow: selectedRow) {
-                if let guid = item as? GUID {
-                    guidSet.insert(guid)
-                }
+                guidSet.insert(itemToGUID(item))
             }
         }
         return guidSet
@@ -596,32 +609,30 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return nil
         }
 
-        guard let guid = item as? GUID else {
-            NSLog("ERROR [\(treeID)] getKey(): not a GUID: \(item)")
-            return nil
-        }
-        return guid
+        return itemToGUID(item)
     }
 
-    // NOTE: this MUST be called on the main thread!
-    func getIndexSetFor(_ guid: GUID) -> IndexSet {
-        let index = self.outlineView.row(forItem: guid)
-
+    /**
+     NOTE: this MUST be called on the main thread!
+     */
+    func getIndexSetFor(_ guidSet: Set<GUID>) -> IndexSet {
         var indexSet = IndexSet()
-        guard index >= 0 else {
-            NSLog("ERROR [\(self.treeID)] Index not found for: \(guid). Returning empty index set")
-            return indexSet
+        for guid in guidSet {
+            // Item will never be nil because we cannot get row for root. However, row may not be present
+            let index = self.outlineView.row(forItem: guid)
+            if index < 0 {
+                NSLog("WARN  [\(self.treeID)] Index not found for GUID, omitting: \(guid)")
+            } else {
+                indexSet.insert(index)
+            }
         }
 
-        indexSet.insert(index)
         return indexSet
     }
 
     func selectSingleSPID(_ spid: SPID) {
-        let guid = spid.guid
-
         DispatchQueue.main.async {
-            let indexSet = self.getIndexSetFor(guid)
+            let indexSet = self.getIndexSetFor([spid.guid])
             if !indexSet.isEmpty {
                 NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
                 self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
@@ -640,9 +651,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 self.expandContractListenersEnabled = true
             }
             // remember, GUID at root of tree is nil
-            let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
-            NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
-            self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
+            let item = self.guidToItem(guid)
+            NSLog("DEBUG [\(self.treeID)] Reloading item: \(item ?? "<root>") (reloadChildren=\(reloadChildren))")
+            self.outlineView.reloadItem(item, reloadChildren: reloadChildren)
         }
     }
 
@@ -665,11 +676,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         guard let item = outlineView.item(atRow: outlineView.clickedRow) else {
             return nil
         }
-        guard let clickedGUID = item as? GUID else {
-            return nil
-        }
 
-        return clickedGUID
+        return itemToGUID(item)
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {

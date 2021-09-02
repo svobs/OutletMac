@@ -103,15 +103,15 @@ class TreeActions {
       return
     }
 
-    let sn = sender.snList[0]
-
-    NSLog("DEBUG goIntoDir(): \(sn.spid)")
-
-    self.con.clearTreeAndDisplayLoadingMsg()
+    let spid = sender.snList[0].spid
 
     self.con.app.execAsync {
+      NSLog("DEBUG goIntoDir(): \(spid)")
+
+      self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE)
+
       do {
-        let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: sn.spid)
+        let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: spid)
       } catch {
         self.con.reportException("Failed to change tree root directory", error)
       }

@@ -12,6 +12,8 @@ typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
 
 /**
  I suppose this class a repository for "ModelView" objects in the MVVC design pattern.
+
+ Note: although topmost GUID is nil in NSOutlineView, DisplayStore uses its normal GUID.
  */
 class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
@@ -24,6 +26,8 @@ class DisplayStore {
       return self.con.treeID
     }
   }
+
+  private var rootGUID: GUID! = nil
 
   private var colSortOrder: ColSortOrder = .NAME
   private var sortAscending: Bool = true
@@ -50,21 +54,6 @@ class DisplayStore {
   */
   private var checkedNodeSet = Set<GUID>()
   private var mixedNodeSet = Set<GUID>()
-
-  func isLoaded() -> Bool {
-    var isLoaded = false
-    let topmostGUID = self.con.tree.rootSPID.guid
-    dq.sync {
-      for sn in self.primaryDict.values {
-        if !sn.node.isEphemeral && sn.spid.guid != topmostGUID {
-          NSLog("DEBUG isLoaded(): node is not ephemeral: \(sn.spid)")
-          isLoaded = true
-          break
-        }
-      }
-    }
-    return isLoaded
-  }
 
   // Sorting
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -162,43 +151,39 @@ class DisplayStore {
       self.checkedNodeSet.removeAll()
       self.mixedNodeSet.removeAll()
 
-      self.primaryDict[TOPMOST_GUID] = rootSN // needed for determining implicitly checked checkboxes
+      self.rootGUID = rootSN.spid.guid
+      self.primaryDict[self.rootGUID] = rootSN // needed for determining implicitly checked checkboxes
 
-      for childSN in topLevelSNList {
-        let childGUID = childSN.spid.guid
-        self.primaryDict[childGUID] = childSN
-        self.childParentDict[childGUID] = TOPMOST_GUID
-      }
-      let sortedList = self.sortDirContents(snList: topLevelSNList)
-      self.parentChildListDict[TOPMOST_GUID] = sortedList.map { $0.spid.guid }
+      self.putChildSNList_Internal(rootGUID, topLevelSNList)
     }
   }
 
-  func putChildList(_ parentSN: SPIDNodePair?, _ childSNList: [SPIDNodePair]) {
+  func putChildList(_ parentGUID: GUID, _ childSNList: [SPIDNodePair]) {
     dq.sync {
-      // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
-      let parentGUID = parentSN == nil ? TOPMOST_GUID : parentSN!.spid.guid
-      let parentChecked: Bool = parentSN != nil && self.checkedNodeSet.contains(parentSN!.spid.guid)
-
-      for childSN in childSNList {
-        let childGUID = childSN.spid.guid
-        self.primaryDict[childGUID] = childSN
-        self.childParentDict[childGUID] = parentGUID
-
-        if parentChecked {
-          // all children are implicitly checked:
-          self.checkedNodeSet.insert(childSN.spid.guid)
-        }
-
-        let sortedSNList = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
-        self.parentChildListDict[parentGUID] = sortedSNList
-      }
-
-      NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
+      self.putChildSNList_Internal(parentGUID, childSNList)
     }
   }
 
-  func putSN(_ childSN: SPIDNodePair, parentGUID: GUID?) -> Bool {
+  private func putChildSNList_Internal(_ parentGUID: GUID, _ childSNList: [SPIDNodePair]) {
+    let parentChecked: Bool = self.checkedNodeSet.contains(parentGUID)
+
+    for childSN in childSNList {
+      let childGUID = childSN.spid.guid
+      self.primaryDict[childGUID] = childSN
+      self.childParentDict[childGUID] = parentGUID
+
+      if parentChecked {
+        // all children are implicitly checked:
+        self.checkedNodeSet.insert(childSN.spid.guid)
+      }
+    }
+
+    self.parentChildListDict[parentGUID] = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
+
+    NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
+  }
+
+  func putSN(_ childSN: SPIDNodePair, parentGUID: GUID) -> Bool {
     var wasPresent: Bool = false
     dq.sync {
       let childGUID = childSN.spid.guid
@@ -206,11 +191,9 @@ class DisplayStore {
         wasPresent = true
       }
       self.primaryDict[childGUID] = childSN
-      // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
-      let realParentGUID: GUID = toDisplayStoreParentGUID(parentGUID)
 
       // Parent -> Child
-      if var existingParentChildList = self.parentChildListDict[realParentGUID] {
+      if var existingParentChildList = self.parentChildListDict[parentGUID] {
         // TODO: this may get slow for very large directories...
         for (index, existing) in existingParentChildList.enumerated() {
           if existing == childGUID {
@@ -219,15 +202,15 @@ class DisplayStore {
             break
           }
         }
-        self.parentChildListDict[realParentGUID] = existingParentChildList
+        self.parentChildListDict[parentGUID] = existingParentChildList
       } else {
-        self.parentChildListDict[realParentGUID] = [childGUID]
+        self.parentChildListDict[parentGUID] = [childGUID]
       }
 
-      NSLog("DEBUG Children of parent \(realParentGUID): \(self.parentChildListDict[realParentGUID])")
+      NSLog("DEBUG Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID])")
 
       // Child -> Parent
-      self.childParentDict[childGUID] = realParentGUID
+      self.childParentDict[childGUID] = parentGUID
     }
 
     return wasPresent
@@ -308,8 +291,8 @@ class DisplayStore {
   // "Get" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  private func getSN_NoLock(_ guid: GUID?) -> SPIDNodePair? {
-    return self.primaryDict[guid ?? TOPMOST_GUID] ?? nil
+  private func getSN_NoLock(_ guid: GUID) -> SPIDNodePair? {
+    return self.primaryDict[guid] ?? nil
   }
 
   /**
@@ -357,14 +340,14 @@ class DisplayStore {
     return nodeList
   }
 
-  private func getChildGUIDList_NoLock(_ parentGUID: GUID?) -> [GUID] {
-    return self.parentChildListDict[toDisplayStoreParentGUID(parentGUID)] ?? []
+  private func getChildGUIDList_NoLock(_ parentGUID: GUID) -> [GUID] {
+    return self.parentChildListDict[parentGUID] ?? []
   }
 
-  func getChildCount(_ parentGUID: GUID?) -> Int? {
+  func getChildCount(_ parentGUID: GUID) -> Int? {
     var count: Int? = 0
     dq.sync {
-      count = self.parentChildListDict[parentGUID ?? TOPMOST_GUID]?.count
+      count = self.parentChildListDict[parentGUID]?.count
     }
     return count
   }
@@ -372,7 +355,7 @@ class DisplayStore {
   /**
    Returns the list of child GUIDs for a given parent GUID.
    */
-  func getChildGUIDList(_ parentGUID: GUID?) -> [GUID] {
+  func getChildGUIDList(_ parentGUID: GUID) -> [GUID] {
     var guidList: [GUID] = []
     dq.sync {
       guidList = self.getChildGUIDList_NoLock(parentGUID)
@@ -384,7 +367,7 @@ class DisplayStore {
    Returns the list of children for a given parent GUID as SPIDNodePairs. This is similar to getChildGUIDList, but is a slightly heavier operation,
    so getChildGUIDList should be used if possible.
    */
-  func getChildSNList(_ parentGUID: GUID?) -> [SPIDNodePair] {
+  func getChildSNList(_ parentGUID: GUID) -> [SPIDNodePair] {
     var snList: [SPIDNodePair] = []
     dq.sync {
       let guidList = self.getChildGUIDList_NoLock(parentGUID)
@@ -402,7 +385,7 @@ class DisplayStore {
    Called by NSOutlineView: returns a SPIDNodePair for the requested parent's key (GUID) and zero-based index.
    Sort-order dependent!
    */
-  func getChild(_ parentGUID: GUID?, _ childIndex: Int, useParentIfIndexInvalid: Bool = false) -> SPIDNodePair? {
+  func getChild(_ parentGUID: GUID, _ childIndex: Int, useParentIfIndexInvalid: Bool = false) -> SPIDNodePair? {
     var sn: SPIDNodePair?
     dq.sync {
       if childIndex < 0 {
@@ -410,16 +393,16 @@ class DisplayStore {
           // Return parent instead
           sn = self.getSN_NoLock(parentGUID)
         } else {
-          NSLog("ERROR [\(self.treeID)] getChild(): childIndex (\(childIndex)) is negative! (parentGUID=\(parentGUID ?? TOPMOST_GUID)")
+          NSLog("ERROR [\(self.treeID)] DisplayStore.getChild(): childIndex (\(childIndex)) is negative! (parentGUID=\(parentGUID)")
           sn = nil
         }
       } else {
-        let childList = self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
+        let childList = self.parentChildListDict[parentGUID] ?? []
         if childIndex >= childList.count {
           if useParentIfIndexInvalid {
             sn = self.getSN_NoLock(parentGUID)
           } else {
-            NSLog("ERROR [\(self.treeID)] getChild(): Could not find child of parent GUID \(parentGUID ?? TOPMOST_GUID) & index \(childIndex)")
+            NSLog("ERROR [\(self.treeID)] DisplayStore.getChild(): Could not find child of parent GUID \(parentGUID) & index \(childIndex)")
             sn = nil
           }
         } else {
@@ -442,7 +425,7 @@ class DisplayStore {
     if let parentGUID = self.childParentDict[childGUID] {
       return self.primaryDict[parentGUID]
     }
-    NSLog("[\(treeID)] ERROR Could not find parent of GUID \(childGUID) in childParentDict!")
+    NSLog("[\(treeID)] ERROR DisplayStore: Could not find parent of GUID \(childGUID) in childParentDict!")
     return nil
   }
 
@@ -500,9 +483,9 @@ class DisplayStore {
        */
       NSLog("DEBUG [\(treeID)] updateCheckboxState(): updating siblings of \(guid)")
       let parentSN = self.getParentSN_NoLock(guid)!
-      let parentGUID = toDisplayStoreParentGUID(parentSN.spid.guid)
+      let parentGUID = parentSN.spid.guid
 
-      if parentGUID != TOPMOST_GUID {
+      if parentGUID != self.rootGUID {
         for siblingGUID in self.getChildGUIDList_NoLock(parentGUID) {
           let state = self.getCheckboxState_NoLock(siblingGUID)
           NSLog("DEBUG [\(treeID)] updateCheckboxState(): Sibling \(siblingGUID) == \(DisplayStore.CHECKBOX_STATE_NAMES[state.rawValue])")
@@ -572,11 +555,6 @@ class DisplayStore {
 
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  // TODO: get rid of this TOPMOST_GUID nonsense. Store tree root like any other GUID, and all nil GUIDs replaced with that
-  private func toDisplayStoreParentGUID(_ parentGUID: GUID?) -> GUID {
-    return (parentGUID == nil || parentGUID == con.tree.rootSPID.guid) ? TOPMOST_GUID : parentGUID!
-  }
 
   public func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node.isDir ?? false
