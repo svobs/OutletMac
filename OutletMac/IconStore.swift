@@ -72,15 +72,8 @@ fileprivate class SystemImage: ImageContainer {
   }
 
   func getImage() -> Image {
-    let img = Image(systemName: self.systemImageName)
+    return Image(systemName: self.systemImageName)
       .renderingMode(.template)
-
-    // FIXME: this doesn't actually do anything. How to return a view?
-    let _ = img
-      .font(self.font)
-      .frame(width: self.width, height: self.height)
-
-    return img
   }
 }
 
