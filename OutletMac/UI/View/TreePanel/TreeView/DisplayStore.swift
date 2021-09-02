@@ -198,7 +198,7 @@ class DisplayStore {
     }
   }
 
-  func putSN(_ parentGUID: GUID?, _ childSN: SPIDNodePair) -> Bool {
+  func putSN(_ childSN: SPIDNodePair, parentGUID: GUID?) -> Bool {
     var wasPresent: Bool = false
     dq.sync {
       let childGUID = childSN.spid.guid
@@ -206,36 +206,31 @@ class DisplayStore {
         wasPresent = true
       }
       self.primaryDict[childGUID] = childSN
-      self.upsertParentChildRelationship_NoLock(parentGUID: parentGUID, childSN)
+      // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
+      let realParentGUID: GUID = toDisplayStoreParentGUID(parentGUID)
+
+      // Parent -> Child
+      if var existingParentChildList = self.parentChildListDict[realParentGUID] {
+        // TODO: this may get slow for very large directories...
+        for (index, existing) in existingParentChildList.enumerated() {
+          if existing == childGUID {
+            // found: replace existing
+            existingParentChildList[index] = childGUID
+            break
+          }
+        }
+        self.parentChildListDict[realParentGUID] = existingParentChildList
+      } else {
+        self.parentChildListDict[realParentGUID] = [childGUID]
+      }
+
+      NSLog("DEBUG Children of parent \(realParentGUID): \(self.parentChildListDict[realParentGUID])")
+
+      // Child -> Parent
+      self.childParentDict[childGUID] = realParentGUID
     }
 
     return wasPresent
-  }
-
-  private func upsertParentChildRelationship_NoLock(parentGUID: GUID?, _ childSN: SPIDNodePair) {
-    let childGUID: GUID = childSN.spid.guid
-    var realParentGUID: GUID = (parentGUID == nil) ? TOPMOST_GUID : parentGUID!
-    if realParentGUID == self.con.tree.rootSPID.guid {
-      realParentGUID = TOPMOST_GUID
-    }
-
-    // Parent -> Child
-    // note: top-level's parent is 'nil' in OutlineView, but is TOPMOST_GUID in DisplayStore
-    if self.parentChildListDict[realParentGUID] == nil {
-      self.parentChildListDict[realParentGUID] = []
-    }
-    // TODO: this may get slow for very large directories...
-    for (index, existing) in self.parentChildListDict[realParentGUID]!.enumerated() {
-      if existing == childGUID {
-        // found: replace existing
-        self.parentChildListDict[realParentGUID]![index] = childGUID
-        return
-      }
-    }
-    self.parentChildListDict[realParentGUID]!.append(childGUID)
-
-    // Child -> Parent
-    self.childParentDict[childGUID] = realParentGUID
   }
 
   // "Remove" operations
@@ -282,14 +277,14 @@ class DisplayStore {
     if let parentGUID = self.childParentDict.removeValue(forKey: guid) {
       // delete from parent's list of children:
       if !self.removeChildFromParentChildDict(child: guid, parent: parentGUID) {
-        NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in list of children for parent: \(parentGUID) (found: \(self.parentChildListDict[parentGUID] ?? []))")
+        NSLog("ERROR [\(self.treeID)] DisplayStore.removeSN(): \(guid) not found in list of children for parent: \(parentGUID) (found: \(self.parentChildListDict[parentGUID] ?? []))")
       }
     } else {
-      NSLog("ERROR [\(self.treeID)] DeletedNode \(guid) not found in ChildParentDict!")
+      NSLog("ERROR [\(self.treeID)] DisplayStore.removeSN(): \(guid) not found in ChildParentDict!")
     }
 
     if self.primaryDict.removeValue(forKey: guid) == nil {
-      NSLog("ERROR [\(self.treeID)] Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
+      NSLog("ERROR [\(self.treeID)] DisplayStore.removeSN(): Could not remove GUID from DisplayStore because it wasn't found: \(guid)")
     } else {
       if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG [\(self.treeID)] GUID removed from DisplayStore: \(guid)")
@@ -363,7 +358,7 @@ class DisplayStore {
   }
 
   private func getChildGUIDList_NoLock(_ parentGUID: GUID?) -> [GUID] {
-    return self.parentChildListDict[parentGUID ?? TOPMOST_GUID] ?? []
+    return self.parentChildListDict[toDisplayStoreParentGUID(parentGUID)] ?? []
   }
 
   func getChildCount(_ parentGUID: GUID?) -> Int? {
@@ -505,7 +500,7 @@ class DisplayStore {
        */
       NSLog("DEBUG [\(treeID)] updateCheckboxState(): updating siblings of \(guid)")
       let parentSN = self.getParentSN_NoLock(guid)!
-      let parentGUID = parentSN.spid.guid
+      let parentGUID = toDisplayStoreParentGUID(parentSN.spid.guid)
 
       if parentGUID != TOPMOST_GUID {
         for siblingGUID in self.getChildGUIDList_NoLock(parentGUID) {
@@ -577,6 +572,11 @@ class DisplayStore {
 
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  // TODO: get rid of this TOPMOST_GUID nonsense. Store tree root like any other GUID, and all nil GUIDs replaced with that
+  private func toDisplayStoreParentGUID(_ parentGUID: GUID?) -> GUID {
+    return (parentGUID == nil || parentGUID == con.tree.rootSPID.guid) ? TOPMOST_GUID : parentGUID!
+  }
 
   public func isDir(_ guid: GUID) -> Bool {
     return self.getSN(guid)?.node.isDir ?? false

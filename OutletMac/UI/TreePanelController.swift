@@ -595,33 +595,38 @@ class TreePanelController: TreePanelControllable {
 
   private func onNodeUpserted(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring upserted node: signals are disabled")
+      NSLog("DEBUG [\(self.treeID)] Ignoring \(Signal.NODE_UPSERTED) signal: signals are disabled")
       return
     }
 
     let sn = try propDict.get("sn") as! SPIDNodePair
     let parentGUID = sn.spid.parentGUID!
-    NSLog("INFO  [\(self.treeID)] Received upserted node: \(sn.spid) for parent: \(parentGUID)")
+    NSLog("INFO  [\(self.treeID)] Received \(Signal.NODE_UPSERTED) signal: \(sn.spid) for parent: \(parentGUID)")
 
-    let alreadyPresent: Bool = self.displayStore.putSN(parentGUID, sn)
+    let alreadyPresent: Bool = self.displayStore.putSN(sn, parentGUID: parentGUID)
 
     DispatchQueue.main.async {
+      let reloadTarget: GUID
       if alreadyPresent {
-        NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(sn.spid.guid)")
+        reloadTarget = sn.spid.guid
+        NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(reloadTarget)")
+      } else {
+        reloadTarget = parentGUID
+        NSLog("DEBUG [\(self.treeID)] Upserted node is new; reloading its parent: \(reloadTarget)")
       }
-      self.treeView?.reloadItem(alreadyPresent ? sn.spid.guid : parentGUID, reloadChildren: true)
+      self.treeView?.reloadItem(reloadTarget, reloadChildren: true)
     }
   }
 
   private func onNodeRemoved(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring removed node: signals are disabled")
+      NSLog("DEBUG [\(self.treeID)] Ignoring \(Signal.NODE_REMOVED) signal: signals are disabled")
       return
     }
 
     let sn = try propDict.get("sn") as! SPIDNodePair
     let parentGUID = sn.spid.parentGUID!
-    NSLog("DEBUG [\(self.treeID)] Received removed node: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
+    NSLog("DEBUG [\(self.treeID)] Received \(Signal.NODE_REMOVED) signal: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
 
     if self.displayStore.removeSN(sn.spid.guid) {
       DispatchQueue.main.async {
@@ -635,17 +640,17 @@ class TreePanelController: TreePanelControllable {
 
   private func onSubtreeNodesChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
     if !self.enableNodeUpdateSignals {
-      NSLog("DEBUG [\(self.treeID)] Ignoring SubtreeChanged signal: signals are disabled")
+      NSLog("DEBUG [\(self.treeID)] Ignoring \(Signal.SUBTREE_NODES_CHANGED) signal: signals are disabled")
       return
     }
     let subtreeRootSPID = try propDict.get("subtree_root_spid") as! SPID
     let upsertedList = try propDict.get("upserted_sn_list") as! [SPIDNodePair]
     let removedList = try propDict.get("removed_sn_list") as! [SPIDNodePair]
 
-    NSLog("DEBUG [\(self.treeID)] Received changes with root \(subtreeRootSPID) and \(upsertedList.count) upserts & \(removedList.count) removes")
+    NSLog("DEBUG [\(self.treeID)] Received \(Signal.SUBTREE_NODES_CHANGED) signal with root \(subtreeRootSPID) and \(upsertedList.count) upserts & \(removedList.count) removes")
 
     for upsertedSN in upsertedList {
-      _ = self.displayStore.putSN(upsertedSN.spid.parentGUID!, upsertedSN)
+      _ = self.displayStore.putSN(upsertedSN, parentGUID: upsertedSN.spid.parentGUID!)
     }
     for removedSN in removedList {
       _ = self.displayStore.removeSN(removedSN.spid.guid)

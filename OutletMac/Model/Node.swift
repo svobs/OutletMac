@@ -64,6 +64,7 @@ class Node: CustomStringConvertible {
   
   var name: String {
     get {
+      assert (self.nodeIdentifier.pathList.count > 0, "Node has no paths: \(nodeIdentifier)")
       return URL(fileURLWithPath: self.nodeIdentifier.pathList[0]).lastPathComponent
     }
   }

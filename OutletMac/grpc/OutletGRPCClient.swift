@@ -361,12 +361,10 @@ class OutletGRPCClient: OutletBackend {
     }
   }
   
-  func getNodeForUID(uid: UID, deviceUID: UID?) throws -> Node? {
+  func getNodeForUID(uid: UID, deviceUID: UID) throws -> Node? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request()
     request.uid = uid
-    if let deviceUID = deviceUID {
-      request.deviceUid = deviceUID
-    }
+    request.deviceUid = deviceUID
     let response = try self.callAndTranslateErrors(self.stub.get_node_for_uid(request), "getNodeForUID")
 
     if (response.hasNode) {
@@ -772,34 +770,6 @@ class OutletGRPCClient: OutletBackend {
         throw OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
       }
     }
-
-//    var response: Res? = nil
-//    var err: Error? = nil
-//
-//    self.app.execSync {
-//      NSLog("INFO  callAndTranslateErrors(): Current queue: \(DispatchQueue.currentQueueLabel ?? "nil")")
-//
-//      if !self.isConnected {
-//        err = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: client not connected!")
-//      } else {
-//
-//        do {
-//          NSLog("INFO  Calling gRPC: \(rpcName)")
-//          response = try call.response.wait()
-//        } catch is NIOConnectionError {
-//          self.grpcConnectionDown()
-//          err = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
-//        } catch {
-//          // General failure. Maybe server internal error, or bad data, or something else
-//          err = OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
-//        }
-//      }
-//
-//    }
-//    if let error = err {
-//      throw error
-//    }
-//    return response!
   }
 
   private func grpcConnectionDown() {

@@ -253,8 +253,8 @@ class TreeContextMenu {
       if node.treeType == .GDRIVE {
         title += " from Google Drive"
       }
-      let item = MenuItemWithSNList(title: title, action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
-      item.snList = [sn]
+      let item = MenuItemWithNodeList(title: title, action: #selector(self.con.treeActions.deleteSubtree(_:)), keyEquivalent: "")
+      item.nodeList = [sn.node]
       item.target = self.con.treeActions
       menu.addItem(item)
     }

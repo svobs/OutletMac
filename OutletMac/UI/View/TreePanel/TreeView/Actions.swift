@@ -139,6 +139,7 @@ class TreeActions {
   }
 
   @objc func deleteSubtree(_ sender: MenuItemWithNodeList) {
+    NSLog("DEBUG [\(self.con.treeID)] User selected to Delete Subtree menu item for \(sender.nodeList.count) nodes")
     self.confirmAndDeleteSubtrees(sender.nodeList)
   }
 

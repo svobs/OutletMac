@@ -401,7 +401,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
             if dropTargetSN.node.isParentOf(srcSN.node) {
-                NSLog("[\(self.treeID)] DEBUG Target dir (\(dropTargetSN.spid)) is parent of dragged node (\(srcSN.spid))")
+                if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering
+                    NSLog("DEBUG [\(self.treeID)] Target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
+                }
                 return true
             }
         }
@@ -424,7 +426,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if item == nil {
             // Special handling for dropping at the very top: allow the insert bar to be shown
-            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on subtree root")
+            if SUPER_DEBUG_ENABLED {
+                NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on subtree root")
+            }
             // TODO: may want to change 'index' to 'NSOutlineViewDropOnItemIndex' in the future. Not sure which is more intuitive
             outlineView.setDropItem(item, dropChildIndex: index)
             return self.dragOperation
@@ -434,10 +438,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if index == NSOutlineViewDropOnItemIndex {
             // Possibility I: Dropping ON
-            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(dstGUID)")
+            if SUPER_DEBUG_ENABLED {
+                NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(dstGUID)")
+            }
         } else {
             // Possibility II: Dropping BETWEEN
-            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(dstGUID) child index \(index)")
+            if SUPER_DEBUG_ENABLED {
+                NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(dstGUID) child index \(index)")
+            }
 
             // if the drop is between two rows then find the row under the cursor
             if let mouseLocation = NSApp.currentEvent?.locationInWindow {
@@ -446,7 +454,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 if rowIndex >= 0 {
                     if let item = outlineView.item(atRow: rowIndex) {
                         if let guid = item as? GUID {
-                            NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(guid)")
+                            if SUPER_DEBUG_ENABLED {
+                                NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(guid)")
+                            }
                             dstGUID = guid
                         }
                     }
@@ -619,19 +629,20 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
     }
 
-    private func reloadItem_NoLock(_ guid: GUID, reloadChildren: Bool) {
-        // remember, GUID at root of tree is nil
-        let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
-        NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
-        self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
-    }
-
     /**
      Reloads the row with the given GUID in the NSOutlineView. Convenience function for use by external classes
      */
     func reloadItem(_ guid: GUID, reloadChildren: Bool) {
         DispatchQueue.main.async {
-            self.reloadItem_NoLock(guid, reloadChildren: reloadChildren)
+            // turn off listeners so that we do not trigger gRPC getChildList() for expanded nodes:
+            self.expandContractListenersEnabled = false
+            defer {
+                self.expandContractListenersEnabled = true
+            }
+            // remember, GUID at root of tree is nil
+            let effectiveGUID = (guid == self.con.tree.rootSPID.guid) ? nil : guid
+            NSLog("DEBUG [\(self.treeID)] Reloading item: \(effectiveGUID ?? TOPMOST_GUID) (reloadChildren=\(reloadChildren))")
+            self.outlineView.reloadItem(effectiveGUID, reloadChildren: reloadChildren)
         }
     }
 

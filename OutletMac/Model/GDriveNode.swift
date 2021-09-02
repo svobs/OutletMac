@@ -173,7 +173,7 @@ class GDriveFolder: GDriveNode {
   override public var description: String {
     return "GDriveFolder(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) trashed=\(trashed) " +
       "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUID ?? 0) syncTS=\(syncTS ?? 0) " +
-      "allChildrenFetched=\(isAllChildrenFetched))"
+      "allChildrenFetched=\(isAllChildrenFetched) icon=\(icon))"
   }
 
   override func isParentOf(_ potentialChildNode: Node) -> Bool {
@@ -275,7 +275,7 @@ class GDriveFile: GDriveNode {
     let syncTSStr: String = syncTS == nil ? "null" : String(syncTS!)
     return "GDriveFile(\(nodeIdentifier.description) googID=\(googID ?? "null") parents=\(parentList) name=\(name) MD5=\(md5 ?? "null") " +
       "mimeTypeUID=\(mimeTypeUID) size=\(sizeStr) trashed=\(trashed) createTS=\(createTSStr) modifyTS=\(modifyTSStr) " +
-      "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUIDStr) syncTS=\(syncTSStr))"
+      "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUIDStr) syncTS=\(syncTSStr) icon=\(icon))"
   }
 
   override func isParentOf(_ otherNode: Node) -> Bool {
