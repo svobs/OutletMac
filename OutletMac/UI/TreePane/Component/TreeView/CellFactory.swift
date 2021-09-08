@@ -58,7 +58,8 @@ class CellFactory {
     }
   }
 
-  static func upsertCellToOutlineView(_ tvc: TreeViewController, _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
+  static func upsertCellToOutlineView(_ tvc: TreeViewController, _ outlineView: NSOutlineView,
+                                      _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
 
     guard let sn = tvc.displayStore.getSN(guid) else {
       NSLog("ERROR [\(tvc.treeID)] viewForTableColumn(): node not found with GUID: \(guid)")
@@ -68,7 +69,7 @@ class CellFactory {
     let node = sn.node
     switch identifier.rawValue {
       case "name":
-        var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NameCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NameCellView
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier, tvc)
         }
@@ -80,28 +81,28 @@ class CellFactory {
 
         return cell
       case "size":
-        var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NSTableCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
       case "etc":
-        var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NSTableCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = String(node.etc)
         return cell
       case "mtime":
-        var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NSTableCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
       case "ctime":
-        var cell = tvc.outlineView.makeView(withIdentifier: identifier, owner: tvc.outlineView.delegate) as? NSTableCellView
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }

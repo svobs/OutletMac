@@ -5,75 +5,21 @@
 
 import SwiftUI
 
-class ConnectionProblemWindow: NSWindow {
-    override func keyDown(with event: NSEvent) {
-        // Pass all key events to the project model
-        NSLog("KEY EVENT: \(event)")
-        // Enable key events
-        interpretKeyEvents([event])
-        if event.keyCode == 13 {
-            NSLog("ENTER KEY PRESSED!")
-        } else {
-            NSLog("User pressed key: \(event.keyCode)")
-        }
-    }
-}
-
-class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject {
-    unowned var app: OutletApp
-    private var parentWindow: ConnectionProblemWindow!
-    private var windowIsOpen = true
-
-    func windowWillClose(_ notification: Notification) {
-        windowIsOpen = false
-
-        do {
-            try self.shutdown()
-        } catch {
-            NSLog("ERROR Failure during window close: \(error)")
-        }
-    }
-
-    func close() {
-        self.parentWindow.close()
-    }
-
-    var isOpen: Bool {
-        get {
-            return self.windowIsOpen
-        }
-    }
-
+class ConnectionProblemView: AppWindow, ObservableObject {
     init(_ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
-        self.app = app
-
-        // TODO: save content rect in config
-        // note: x & y are from lower-left corner
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
-        parentWindow = ConnectionProblemWindow(
-                contentRect: contentRect,
-                styleMask: [.titled, .closable, .fullSizeContentView],
-                backing: .buffered, defer: false)
-        self.parentWindow.center()
-        self.parentWindow.title = "Connection to Agent Failed"
+        super.init(app, contentRect, styleMask: [.titled, .closable, .fullSizeContentView])
+        self.center()
+        self.title = "Connection to Agent Failed"
 
-        let content = ConnectionProblemContent(self.app, self.parentWindow, backendConnectionState)
-        parentWindow.contentView = NSHostingView(rootView: content)
+        let content = ConnectionProblemContent(self.app, self, backendConnectionState)
+        self.contentView = NSHostingView(rootView: content)
     }
 
-    func start() throws {
-        // Enables windowWillClose() callback
-        parentWindow.delegate = self
-    }
-
-    // This is called by windowWillClose()
-    func shutdown() throws {
-        NSLog("DEBUG ConnectionProblemWindow shutdown() called")
-    }
-
-    func showWindow() {
-        self.windowIsOpen = true
-        self.parentWindow.makeKeyAndOrderFront(nil)
+    override var winID: String {
+        get {
+            "ConnectionProblemWindow"
+        }
     }
 }
 

@@ -67,8 +67,8 @@ class AppMenu: NSMenu {
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   private var mainWindowIsOpen = false
 
-  var rootChooserView: GDriveRootChooser? = nil
-  var mergePreviewView: MergePreview? = nil
+  var rootChooserWindow: GDriveRootChooserWindow? = nil
+  var mergePreviewWindow: MergePreviewWindow? = nil
   var connectionProblemView: ConnectionProblemView? = nil
   var mainWindow: NSWindow? = nil
   private var wasShutdown: Bool = false
@@ -202,8 +202,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       self.enableWindowCloseListener = false
       // Close all other windows beside the Connection Problem window, if they exist
       self.mainWindow?.close()
-      self.rootChooserView?.close()
-      self.mergePreviewView?.close()
+      self.rootChooserWindow?.close()
+      self.mergePreviewWindow?.close()
       self.enableWindowCloseListener = true
 
       self.globalState.reset()
@@ -257,8 +257,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
     let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
     let treeRight: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-    self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowMultipleSelection: true)
-    self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowMultipleSelection: true)
+    self.conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
+    self.conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
 
@@ -271,9 +271,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
    NOTE:
   */
-  private func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowMultipleSelection: Bool) throws -> TreePanelController {
+  private func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreePanelController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowMultipleSelection: allowMultipleSelection)
+    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowsMultipleSelection: allowsMultipleSelection)
 
     try con.start()
     return con
@@ -488,7 +488,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
     // This signal is also emitted after merge is done:
     DispatchQueue.main.async {
-      self.mergePreviewView?.close()
+      self.mergePreviewWindow?.close()
     }
 
     let leftTree = try propDict.get("tree_left") as! DisplayTree
@@ -507,7 +507,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     // Need to execute in a different queue, 'cuz buildController() makes a gRPC call, and we can't do that in a thread which came from gRPC
     do {
       // This will put the controller in the registry as a side effect
-      let _ = try self.buildController(newTree, canChangeRoot: false, allowMultipleSelection: false)
+      let _ = try self.buildController(newTree, canChangeRoot: false, allowsMultipleSelection: false)
       // note: we can't send a controller directly to this method (cuz of @objc), so instead we put it in our controller registry and later look it up.
       NSApp.sendAction(#selector(OutletMacApp.openMergePreview), to: nil, from: newTree.treeID)
     } catch {
@@ -587,16 +587,16 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
     DispatchQueue.main.async {
-      if self.rootChooserView != nil && self.rootChooserView!.isOpen {
-        self.rootChooserView!.moveToFront()
-        self.rootChooserView!.selectSPID(currentSN.spid)
+      if self.rootChooserWindow != nil && self.rootChooserWindow!.isOpen {
+        self.rootChooserWindow!.showWindow()
+        self.rootChooserWindow!.selectSPID(currentSN.spid)
       } else {
         do {
           let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
-          let con = try self.buildController(tree, canChangeRoot: false, allowMultipleSelection: false)
+          let con = try self.buildController(tree, canChangeRoot: false, allowsMultipleSelection: false)
 
-          self.rootChooserView = GDriveRootChooser(self, con, initialSelection: currentSN, targetTreeID: treeID)
-          try self.rootChooserView!.start()
+          self.rootChooserWindow = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
+          try self.rootChooserWindow!.start()
         } catch {
           self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
         }
@@ -612,14 +612,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
 
     DispatchQueue.main.async {
-      if self.mergePreviewView != nil && self.mergePreviewView!.isOpen {
+      if self.mergePreviewWindow != nil && self.mergePreviewWindow!.isOpen {
         NSLog("DEBUG Looks like there is an existing Merge Preview window open: closing it")
-        self.mergePreviewView!.close()
+        self.mergePreviewWindow!.close()
       }
 
       do {
-        self.mergePreviewView = MergePreview(self, con)
-        try self.mergePreviewView!.start()
+        self.mergePreviewWindow = MergePreviewWindow(self, con)
+        try self.mergePreviewWindow!.start()
       } catch {
         self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
       }

@@ -12,23 +12,6 @@ import NIO
 
 /**
  CLASS OutletGRPCClient
- */
-class BackendConnectionState: ObservableObject {
-  @Published var host: String
-  @Published var port: Int
-
-  @Published var conecutiveStreamFailCount: Int = 0
-  @Published var isConnected: Bool = false
-  @Published var isRelaunching: Bool = false
-
-  init(host: String, port: Int) {
-    self.host = host
-    self.port = port
-  }
-}
-
-/**
- CLASS OutletGRPCClient
 
  Thin gRPC client to the backend service
  */

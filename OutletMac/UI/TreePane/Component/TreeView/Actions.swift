@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import LinkedList
 
 class TreeActions {
   weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
@@ -23,35 +22,7 @@ class TreeActions {
       return
     }
 
-    guard let outlineView = self.con.treeView?.outlineView else {
-      return
-    }
-
-    // contains items which were just expanded and need their children examined
-    var queue = LinkedList<SPIDNodePair>()
-
-    func process(_ sn: SPIDNodePair) {
-      if sn.node.isDir {
-        let guid = sn.spid.guid
-        if !outlineView.isItemExpanded(guid) {
-          outlineView.animator().expandItem(guid)
-        }
-        queue.append(sn)
-      }
-    }
-
-    for sn in sender.snList {
-      process(sn)
-    }
-
-    while !queue.isEmpty {
-      let parentSN = queue.popFirst()!
-      let parentGUID = parentSN.spid.guid
-      for sn in self.con.displayStore.getChildSNList(parentGUID) {
-        process(sn)
-      }
-    }
-
+    self.con.treeView?.expandAll(sender.snList)
   }
 
   @objc public func refreshSubtree(_ sender: MenuItemWithSNList) {

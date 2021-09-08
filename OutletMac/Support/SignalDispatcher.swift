@@ -17,7 +17,7 @@ typealias ParamDict = [String: Any]
 /**
  CLASS PropDict
 
- Basically a plain dictionary with a bunch of mechnaics to get around serialization issues for various types.
+ Basically a plain dictionary with a bunch of mechanics to get around serialization issues for various types.
  Its keys must always be Strings, but its values can be stored at any type, with type conversion (if any) occurring when getters are called.
  This facilitates using values received via gRPC (which will usually be serialized as Strings), and also provides a convenient way to enforce
  type checking for whoever is doing the getting.

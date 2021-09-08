@@ -28,7 +28,8 @@ protocol TreePanelControllable: HasLifecycle {
   var treeLoadState: TreeLoadState { get }
 
   var canChangeRoot: Bool { get }
-  var allowMultipleSelection: Bool { get }
+  var allowsMultipleSelection: Bool { get }
+  var expandContractListenersEnabled: Bool { get set }
 
   var dispatchListener: DispatchListener { get }
 
@@ -83,30 +84,29 @@ class TreePanelController: TreePanelControllable {
   let displayStore: DisplayStore = DisplayStore()
   let treeActions: TreeActions = TreeActions()
   let contextMenu: TreeContextMenu = TreeContextMenu()
+  var treeView: TreeViewController? = nil
 
-  var treeLoadState: TreeLoadState = .NOT_LOADED
+  // State variables:
   var swiftTreeState: SwiftTreeState
   var swiftFilterState: SwiftFilterState
-
-  var treeView: TreeViewController? = nil
+  var treeLoadState: TreeLoadState = .NOT_LOADED
+  var canChangeRoot: Bool
+  var allowsMultipleSelection: Bool
+  var expandContractListenersEnabled: Bool = true
+  private var enableNodeUpdateSignals: Bool = false
   // workaround for race condition, in case we are ready to populate before the UI is ready
   private var readyToPopulate: Bool = false
 
-  var enableNodeUpdateSignals: Bool = false
-
-  var canChangeRoot: Bool
-  var allowMultipleSelection: Bool
-
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
 
-  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowMultipleSelection: Bool) throws {
+  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws {
     self.app = app
     self.tree = tree
     self.swiftTreeState = try SwiftTreeState.from(tree)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.canChangeRoot = canChangeRoot
-    self.allowMultipleSelection = allowMultipleSelection
+    self.allowsMultipleSelection = allowsMultipleSelection
   }
 
   func start() throws {
@@ -209,18 +209,20 @@ class TreePanelController: TreePanelControllable {
    NOTE: Must run inside DispatchQueue.main!
    */
   private func clearModelAndTreeView() {
-    assert(DispatchQueue.isExecutingIn(DispatchQueue.main))
+    assert(DispatchQueue.isExecutingIn(.main))
+
     // Clear display store & TreeView (which draws from display store)
     NSLog("DEBUG [\(treeID)] Clearing model and tree view")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
-    self.treeView?.outlineView.reloadData()
+    self.treeView?.reloadData()
   }
 
   /**
    NOTE: Executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
    */
   func clearTreeAndDisplayMsg(_ msg: String, _ iconID: IconID) {
-    assert(DispatchQueue.isNotExecutingIn(DispatchQueue.main))
+    assert(DispatchQueue.isNotExecutingIn(.main))
+
     DispatchQueue.main.sync {
       NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
       self.clearModelAndTreeView()
@@ -320,12 +322,11 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
-      self.treeView?.outlineView.reloadData()
+      self.treeView?.reloadData()
 
-      NSLog("DEBUG [\(self.treeID)] populateTreeView(): Expanding rows: \(toExpandInOrder)")
-      self.restoreRowExpansionState(toExpandInOrder)
+      self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)
 
-      self.restoreRowSelectionState(rows.selected)
+      self.treeView!.selectGUIDList(rows.selected)
 
       let timeElapsed = populateStartTimeMS.distance(to: DispatchTime.now())
       NSLog("INFO  [\(self.treeID)] populateTreeView() completed in \(timeElapsed.toString())")
@@ -352,32 +353,6 @@ class TreePanelController: TreePanelControllable {
     NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(parentGUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' reloadParent=\(reloadParent)")
   }
 
-  private func restoreRowSelectionState(_ selected: Set<GUID>) {
-    guard selected.count > 0 else {
-      return
-    }
-
-    let indexSet = self.treeView!.getIndexSetFor(selected)
-
-    NSLog("DEBUG [\(self.treeID)] restoreRowSelectionState(): selecting \(indexSet.count) rows")
-    self.treeView!.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
-  }
-
-  private func restoreRowExpansionState(_ toExpandInOrder: [GUID]) {
-    self.treeView!.outlineView.beginUpdates()
-    // disable listeners while we restore expansion state
-    self.treeView!.expandContractListenersEnabled = false
-    defer {
-      self.treeView!.expandContractListenersEnabled = true
-      self.treeView!.outlineView.endUpdates()
-    }
-
-    for guid in toExpandInOrder {
-      NSLog("DEBUG [\(self.treeID)] Expanding item: \"\(guid)\"")
-      self.treeView!.outlineView.expandItem(guid)
-    }
-  }
-  
   private func updateStatusBarMsg(_ statusBarMsg: String) {
     NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
     self.swiftTreeState.statusBarMsg = statusBarMsg
@@ -555,7 +530,7 @@ class TreePanelController: TreePanelControllable {
 
       if dirStatsDictByGUID.count > 0 || dirStatsDictByUID.count > 0 {
         self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-        self.treeView?.outlineView.reloadData()
+        self.treeView?.reloadData()
       }
 
       switch treeLoadState {
@@ -599,7 +574,7 @@ class TreePanelController: TreePanelControllable {
       self.updateStatusBarMsg(statusBarMsg)
 
       self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-      self.treeView?.outlineView.reloadData()
+      self.treeView?.reloadData()
     }
   }
 
@@ -679,7 +654,7 @@ class TreePanelController: TreePanelControllable {
 
     DispatchQueue.main.async {
       // just reload everything for now. Revisit if performance proves to be an issue
-      self.treeView?.outlineView.reloadData()
+      self.treeView?.reloadData()
     }
   }
 

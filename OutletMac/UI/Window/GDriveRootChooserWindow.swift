@@ -16,20 +16,54 @@ class ChooserState: ObservableObject {
 }
 
 /**
+ Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
+ */
+class GDriveRootChooserWindow: SingleTreePopUpWindow {
+  var chooserState: ChooserState = ChooserState()
+
+  init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair, targetTreeID: TreeID) {
+    super.init(app, con, initialSelection: initialSelection)
+    assert(con.treeID == ID_GDRIVE_DIR_SELECT)
+    self.center()
+    self.title = "Google Drive Root Chooser"
+    // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
+//    window.setFrameAutosaveName(window.title)
+    let content = GDriveRootChooserContent(targetTreeID, self, self.chooserState)
+            .environmentObject(self.app.globalState)
+    self.contentView = NSHostingView(rootView: content)
+  }
+
+  // DispatchListener callbacks
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  override func onSelectionChanged(_ senderID: SenderID, _ props: PropDict) throws {
+    let snList: [SPIDNodePair] = try props.getArray("sn_list") as! [SPIDNodePair]
+    assert(snList.count <= 1)
+
+    DispatchQueue.main.async {
+      let selectionValid = (snList.count == 1 && snList[0].node.isDir)
+      self.chooserState.selectionIsValid = selectionValid
+      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
+    }
+  }
+
+/**
  The content area of the Google Drive root chooser.
  */
 struct GDriveRootChooserContent: View {
   @StateObject var windowState: WindowState = WindowState()
-  var parentWindow: NSWindow
-  weak var app: OutletApp!
-  let con: TreePanelControllable
+  var parentWindow: GDriveRootChooserWindow
   let targetTreeID: String
   @ObservedObject var chooserState: ChooserState
 
-  init(_ app: OutletApp, _ con: TreePanelControllable, _ targetTreeID: String, _ parentWindow: NSWindow, _ chooserState: ChooserState) {
+  var con: TreePanelControllable {
+    get {
+      return self.parentWindow.con
+    }
+  }
+
+  init(_ targetTreeID: String, _ parentWindow: GDriveRootChooserWindow, _ chooserState: ChooserState) {
     self.parentWindow = parentWindow
-    self.app = app
-    self.con = con
     self.targetTreeID = targetTreeID
     self.chooserState = chooserState
   }
@@ -67,8 +101,7 @@ struct GDriveRootChooserContent: View {
   var body: some View {
     VStack {
       GeometryReader { geo in
-        SinglePaneView(self.app, self.con, self.windowState)
-          .environmentObject(self.app.globalState)
+        SinglePaneView(self.parentWindow.app, self.con, self.windowState)
           .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
           .contentShape(Rectangle()) // taps should be detected in the whole window
           .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
@@ -90,36 +123,5 @@ struct GDriveRootChooserContent: View {
   }
 
 }
-
-/**
- Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
- */
-class GDriveRootChooser: SingleTreePopUpWindow {
-  var chooserState: ChooserState = ChooserState()
-
-  init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair, targetTreeID: TreeID) {
-    super.init(app, con, initialSelection: initialSelection)
-    assert(con.treeID == ID_GDRIVE_DIR_SELECT)
-    self.center()
-    self.title = "Google Drive Root Chooser"
-    // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
-//    window.setFrameAutosaveName(window.title)
-    let content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self, self.chooserState)
-    self.contentView = NSHostingView(rootView: content)
-  }
-
-  // DispatchListener callbacks
-  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  override func onSelectionChanged(_ senderID: SenderID, _ props: PropDict) throws {
-    let snList: [SPIDNodePair] = try props.getArray("sn_list") as! [SPIDNodePair]
-    assert(snList.count <= 1)
-
-    DispatchQueue.main.async {
-      let selectionValid = (snList.count == 1 && snList[0].node.isDir)
-      self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
-    }
-  }
 
 }

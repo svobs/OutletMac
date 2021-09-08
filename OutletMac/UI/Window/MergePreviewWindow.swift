@@ -6,6 +6,23 @@
 import SwiftUI
 
 /**
+ Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
+ */
+class MergePreviewWindow: SingleTreePopUpWindow {
+    override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
+        super.init(app, con, initialSelection: initialSelection)
+        assert(con.treeID == ID_MERGE_TREE)
+        self.center()
+        self.title = "Confirm Merge"
+
+        let content = MergePreviewContent(self)
+                .environmentObject(self.app.globalState)
+        self.contentView = NSHostingView(rootView: content)
+    }
+
+}
+
+/**
  The content area of the Merge Preview dialog.
  */
 struct MergePreviewContent: View {
@@ -27,7 +44,6 @@ struct MergePreviewContent: View {
         VStack {
             GeometryReader { geo in
                 SinglePaneView(self.parentWindow.app, self.parentWindow.con, self.windowState)
-                        .environmentObject(self.parentWindow.app.globalState)
                         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
                         .contentShape(Rectangle()) // taps should be detected in the whole window
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
@@ -48,23 +64,6 @@ struct MergePreviewContent: View {
             }
                     .padding(.bottom).padding(.horizontal)  // we have enough padding above already
         }.frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)  // set minimum window dimensions
-    }
-
-}
-
-/**
- Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
- */
-class MergePreview: SingleTreePopUpWindow {
-
-    override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
-        super.init(app, con, initialSelection: initialSelection)
-        assert(con.treeID == ID_MERGE_TREE)
-        self.center()
-        self.title = "Confirm Merge"
-
-        let content = MergePreviewContent(self)
-        self.contentView = NSHostingView(rootView: content)
     }
 
 }

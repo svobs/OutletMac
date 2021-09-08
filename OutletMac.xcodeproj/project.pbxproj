@@ -8,23 +8,25 @@
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
+		CDF2F074C68FB2C637C8B552 /* MergePreviewWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */; };
 		CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */; };
 		CDF2F17E1486B7E6CF9930FA /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */; };
+		CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F26A81EB1214E0F983EE /* AppWindow.swift */; };
 		CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */; };
 		CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB2EA146750617D29EDD /* GlobalState.swift */; };
 		CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */; };
 		CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */; };
-		CDF2F345DB9EC8B949A698C1 /* ConnectionProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */; };
+		CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */; };
 		CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */; };
 		CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F40499F9D376AD844203 /* DateUtil.swift */; };
 		CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */; };
 		CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */; };
+		CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */; };
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
-		CDF2F548F0E1E4AC080AAA0E /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F93A3F22F90447CFED4D /* MergePreview.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
 		CDF2F5CE2C6D0C179C6EBB3E /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F189916C43043D64540F /* Bonjour.swift */; };
-		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */; };
+		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */; };
 		CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */; };
 		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
 		CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */; };
@@ -79,6 +81,7 @@
 		CDF2F189916C43043D64540F /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
 		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
 		CDF2F265942131BB8C84EB29 /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
+		CDF2F26A81EB1214E0F983EE /* AppWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppWindow.swift; sourceTree = "<group>"; };
 		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		CDF2F40499F9D376AD844203 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
 		CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
@@ -87,6 +90,7 @@
 		CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
+		CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendConnectionState.swift; sourceTree = "<group>"; };
 		CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		CDF2F77AA899F692856B9A3D /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
@@ -95,18 +99,18 @@
 		CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
 		CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineViewFactory.swift; sourceTree = "<group>"; };
 		CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTreeState.swift; sourceTree = "<group>"; };
-		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooser.swift; sourceTree = "<group>"; };
-		CDF2F93A3F22F90447CFED4D /* MergePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreview.swift; sourceTree = "<group>"; };
+		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooserWindow.swift; sourceTree = "<group>"; };
 		CDF2FAC3B920540522051982 /* UnwrapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		CDF2FB2EA146750617D29EDD /* GlobalState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalState.swift; sourceTree = "<group>"; };
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
 		CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreviewWindow.swift; sourceTree = "<group>"; };
 		CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
 		CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
 		CDF2FE3CBB814776E801E1E4 /* WindowState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
 		CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
-		CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblem.swift; sourceTree = "<group>"; };
+		CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblemWindow.swift; sourceTree = "<group>"; };
 		CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftFilterState.swift; sourceTree = "<group>"; };
 		CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
@@ -228,7 +232,6 @@
 			children = (
 				CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */,
 				CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */,
-				CDF2F93A3F22F90447CFED4D /* MergePreview.swift */,
 				CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */,
 				CDF2F0E133427A4E93041CCA /* TreeView */,
 			);
@@ -253,9 +256,11 @@
 			isa = PBXGroup;
 			children = (
 				CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */,
-				CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */,
-				CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */,
+				CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */,
+				CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */,
 				CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */,
+				CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */,
+				CDF2F26A81EB1214E0F983EE /* AppWindow.swift */,
 			);
 			path = Window;
 			sourceTree = "<group>";
@@ -286,6 +291,7 @@
 				D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */,
 				D16839AD25AD551100D76169 /* generated */,
 				D1CB04A025B1832E00556B28 /* GRPCConverter.swift */,
+				CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */,
 			);
 			path = grpc;
 			sourceTree = "<group>";
@@ -473,14 +479,13 @@
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,
 				CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */,
-				CDF2F345DB9EC8B949A698C1 /* ConnectionProblem.swift in Sources */,
-				CDF2F6C5E603DB335DB8E920 /* GDriveRootChooser.swift in Sources */,
+				CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */,
+				CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */,
 				CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */,
 				CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */,
 				CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */,
 				CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */,
 				CDF2FB80159CBF6C270357DB /* FilterPanel.swift in Sources */,
-				CDF2F548F0E1E4AC080AAA0E /* MergePreview.swift in Sources */,
 				CDF2F17E1486B7E6CF9930FA /* RootPathPanel.swift in Sources */,
 				CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */,
 				CDF2FB998C59041CEFBDCA17 /* TwoPaneView.swift in Sources */,
@@ -508,6 +513,9 @@
 				CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */,
 				CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */,
 				CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */,
+				CDF2F074C68FB2C637C8B552 /* MergePreviewWindow.swift in Sources */,
+				CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */,
+				CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

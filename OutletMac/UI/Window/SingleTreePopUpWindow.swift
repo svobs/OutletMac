@@ -5,58 +5,24 @@
 
 import SwiftUI
 
-class SingleTreePopUpWindow: NSWindow, NSWindowDelegate, HasLifecycle, ObservableObject {
-    let app: OutletApp
+class SingleTreePopUpWindow: AppWindow, ObservableObject {
     let con: TreePanelControllable
-    let dispatchListener: DispatchListener
-
-    private var windowIsOpen = true
     let initialSelection: SPIDNodePair?
 
-    func windowWillClose(_ notification: Notification) {
-        NSLog("DEBUG [\(self.winID)] windowWillClose() entered")
-        windowIsOpen = false
-
-        do {
-            try self.shutdown()
-        } catch {
-            NSLog("ERROR Failure during parentWindow close: \(error)")
-        }
-    }
-
-    var isOpen: Bool {
-        get {
-            return self.windowIsOpen
-        }
-    }
-
-    var winID: String {
+    override var winID: String {
         get {
             self.con.treeID
         }
     }
 
     init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
-        self.app = app
         self.con = con
         self.initialSelection = initialSelection
-        self.dispatchListener = self.app.dispatcher.createListener("\(con.treeID)-dialog")
-
-        // TODO: save content rect in config
-        // note: x & y are from lower-left corner
         let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
-        super.init(
-                contentRect: contentRect,
-                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-                backing: .buffered, defer: false)
-        // this will override x & y from content rect
-
+        super.init(app, contentRect, styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView])
     }
 
-    func start() throws {
-        // Enables windowWillClose() callback
-        self.delegate = self
-
+    override func start() throws {
         self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.winID)
         self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.winID)
         self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.winID)
@@ -67,37 +33,15 @@ class SingleTreePopUpWindow: NSWindow, NSWindowDelegate, HasLifecycle, Observabl
     }
 
     // This is called by windowWillClose()
-    func shutdown() throws {
-        NSLog("DEBUG [\(self.winID)] Window shutdown() called")
+    override func shutdown() throws {
+        try super.shutdown()
         try self.con.shutdown()
-        self.dispatchListener.unsubscribeAll()
     }
 
     func selectSPID(_ spid: SPID) {
         // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
         // being hit
-        self.con.treeView!.selectSingleSPID(spid)
-    }
-
-    func moveToFront() {
-        NSLog("DEBUG [\(self.winID)] moveToFront() called")
-        self.makeKeyAndOrderFront(nil)
-        self.windowIsOpen = true
-    }
-
-    /**
-     NSWindow method
-     */
-    override func keyDown(with event: NSEvent) {
-        // Pass all key events to the project model
-        NSLog("KEY EVENT: \(event)")
-        // Enable key events
-        interpretKeyEvents([event])
-        if event.keyCode == 13 {
-            NSLog("ENTER KEY PRESSED!")
-        } else {
-            NSLog("User pressed key: \(event.keyCode)")
-        }
+        self.con.treeView!.selectSingleGUID(spid.guid)
     }
 
     // DispatchListener callbacks
@@ -112,7 +56,7 @@ class SingleTreePopUpWindow: NSWindow, NSWindowDelegate, HasLifecycle, Observabl
             // note: around exactly the same time, the TreePanelController will receive this and start populating
             DispatchQueue.main.async {
                 NSLog("DEBUG [\(self.winID)] Backend load complete. Showing dialog")
-                self.moveToFront()
+                self.showWindow()
             }
         default:
             break
@@ -122,7 +66,7 @@ class SingleTreePopUpWindow: NSWindow, NSWindowDelegate, HasLifecycle, Observabl
     // This will be triggered by the tree panel controller
     func onPopulateTreeDone(_ senderID: SenderID, _ props: PropDict) throws {
         DispatchQueue.main.async {
-            self.moveToFront()
+            self.showWindow()
 
             if let selectionSPID = self.initialSelection?.spid {
                 NSLog("DEBUG [\(self.winID)] Populate complete! Selecting SPID: \(selectionSPID)")

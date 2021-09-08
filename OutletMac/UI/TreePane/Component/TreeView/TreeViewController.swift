@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import LinkedList
 
 /*
  TreeViewController: AppKit controller for TreeViewRepresentable.
@@ -15,9 +16,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // Cannot override init(), but this must be set manually before loadView() is called
     var con: TreePanelControllable! = nil
 
-    let outlineView = NSOutlineView()
-    var expandContractListenersEnabled: Bool = true
-    var dragOperation: NSDragOperation = .move
+    private let outlineView = NSOutlineView()
+    private var dragOperation: NSDragOperation = .move
 
     var displayStore: DisplayStore {
         return self.con.displayStore
@@ -132,7 +132,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         OutlineViewFactory.buildOutlineView(self.view, outlineView: outlineView)
 
-        outlineView.allowsMultipleSelection = self.con.allowMultipleSelection
+        outlineView.allowsMultipleSelection = self.con.allowsMultipleSelection
 
         // Hook up double-click handler
         outlineView.doubleAction = #selector(doubleClickedItem)
@@ -208,7 +208,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 }
             }
         }
-
     }
 
     // NSOutlineViewDelegate methods
@@ -234,7 +233,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if TRACE_ENABLED {
             NSLog("DEBUG [\(treeID)] Cell requested for GUID: \(guid)")
         }
-        return CellFactory.upsertCellToOutlineView(self, identifier, guid)
+
+        return CellFactory.upsertCellToOutlineView(self, outlineView, identifier, guid)
     }
 
     /**
@@ -269,11 +269,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      From NSOutlineViewDelegate
      */
     func outlineViewItemWillExpand(_ notification: Notification) {
-        guard self.expandContractListenersEnabled else {
+        guard self.con.expandContractListenersEnabled else {
             return
         }
 
-        guard let parentGUID: GUID = getKey(notification) else {
+        guard let parentGUID: GUID = getGUID(notification) else {
             NSLog("ERROR [\(treeID)] Cannot expand topmost GUID (nil)! Ignoring request")
             return
         }
@@ -320,7 +320,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      app is closed, on the next run any descendants which were collapsed at the end of the last run will stay that way.
      */
     func outlineViewItemWillCollapse(_ notification: Notification) {
-        guard let parentGUID: GUID = getKey(notification) else {
+        guard let parentGUID: GUID = getGUID(notification) else {
             return
         }
         guard parentGUID != self.con.tree.rootSPID.guid else {
@@ -589,8 +589,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return uidSet
     }
 
-    // Note: currently this will include any selected ephemeral nodes. It's currently not worth the cycles
-    // to weed them out.
+    /**
+     Note: currently this will include any selected ephemeral nodes. It's currently not worth the cycles
+     to weed them out (we are not currently doing any lookups in the DisplayStore)
+     */
     func getSelectedGUIDs() -> Set<GUID> {
         var guidSet = Set<GUID>()
         for selectedRow in outlineView.selectedRowIndexes {
@@ -601,9 +603,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return guidSet
     }
 
-    private func getKey(_ notification: Notification) -> GUID? {
+    /**
+     Gets the GUID (if any) from the given Notification, and returns it.
+     */
+    private func getGUID(_ notification: Notification) -> GUID? {
         guard let item = notification.userInfo?["NSObject"] else {
-            NSLog("ERROR [\(treeID)] getKey(): no item")
+            NSLog("ERROR [\(treeID)] getGUID(): no item")
             return nil
         }
 
@@ -628,13 +633,30 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return indexSet
     }
 
-    func selectSingleSPID(_ spid: SPID) {
-        DispatchQueue.main.async {
-            let indexSet = self.getIndexSetFor([spid.guid])
-            if !indexSet.isEmpty {
-                NSLog("DEBUG [\(self.treeID)] Selecting single SPID \(spid)")
-                self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
-            }
+    /**
+     Selects the row with the given GUID in the tree UI, if it exists
+     */
+    func selectSingleGUID(_ guid: GUID) {
+        assert(DispatchQueue.isExecutingIn(.main))
+
+        let indexSet = self.getIndexSetFor([guid])
+        if !indexSet.isEmpty {
+            NSLog("DEBUG [\(self.treeID)] Selecting single GUID \(guid)")
+            self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+        }
+    }
+
+    func selectGUIDList(_ guidSet: Set<GUID>) {
+        assert(DispatchQueue.isExecutingIn(.main))
+
+        guard guidSet.count > 0 else {
+            return
+        }
+
+        let indexSet = self.getIndexSetFor(guidSet)
+        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): selecting \(indexSet.count) rows")
+        if !indexSet.isEmpty {
+            self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
         }
     }
 
@@ -644,15 +666,81 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func reloadItem(_ guid: GUID, reloadChildren: Bool) {
         DispatchQueue.main.async {
             // turn off listeners so that we do not trigger gRPC getChildList() for expanded nodes:
-            self.expandContractListenersEnabled = false
+            self.con.expandContractListenersEnabled = false
             defer {
-                self.expandContractListenersEnabled = true
+                self.con.expandContractListenersEnabled = true
             }
             // remember, GUID at root of tree is nil
             let item = self.guidToItem(guid)
             NSLog("DEBUG [\(self.treeID)] Reloading item: \(item ?? "<root>") (reloadChildren=\(reloadChildren))")
             self.outlineView.reloadItem(item, reloadChildren: reloadChildren)
         }
+    }
+
+    /**
+     Do not use the animator to expand the nodes. If isAlreadyPopulated==true, we disable the listeners so that network calls are not made to
+     populate the DisplayStore.
+     */
+    func expand(_ toExpandInOrder: [GUID], isAlreadyPopulated: Bool) {
+        assert(DispatchQueue.isExecutingIn(.main))
+
+        self.outlineView.beginUpdates()
+        if isAlreadyPopulated {
+            // disable listeners while we restore expansion state
+            self.con.expandContractListenersEnabled = false
+        }
+        defer {
+            if isAlreadyPopulated {
+                self.con.expandContractListenersEnabled = true
+            }
+            self.outlineView.endUpdates()
+        }
+
+        NSLog("DEBUG [\(self.treeID)] Expanding rows: \(toExpandInOrder)")
+        for guid in toExpandInOrder {
+            NSLog("DEBUG [\(self.treeID)] Expanding item: \"\(guid)\"")
+            self.outlineView.expandItem(guid)
+        }
+    }
+
+    func expandAll(_ snList: [SPIDNodePair]) {
+        assert(DispatchQueue.isExecutingIn(.main))
+        self.outlineView.beginUpdates()
+        defer {
+            self.outlineView.endUpdates()
+        }
+
+        // contains items which were just expanded and need their children examined
+        var queue = LinkedList<SPIDNodePair>()
+
+        func process(_ sn: SPIDNodePair) {
+            if sn.node.isDir {
+                let guid = sn.spid.guid
+                if !outlineView.isItemExpanded(guid) {
+                    NSLog("DEBUG [\(self.treeID)] Expanding item: \"\(guid)\"")
+                    outlineView.animator().expandItem(guid)
+                }
+                queue.append(sn)
+            }
+        }
+
+        for sn in snList {
+            process(sn)
+        }
+
+        while !queue.isEmpty {
+            let parentSN = queue.popFirst()!
+            let parentGUID = parentSN.spid.guid
+            for sn in self.con.displayStore.getChildSNList(parentGUID) {
+                process(sn)
+            }
+        }
+    }
+
+    func reloadData() {
+        assert(DispatchQueue.isExecutingIn(.main))
+
+        self.outlineView.reloadData()
     }
 
     // Context Menu
@@ -666,7 +754,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return rightClickMenu
     }
 
-    // This should only be called while the context menu is active
+    /**
+     This should only be called while the context menu is active
+     */
     private func getClickedRowGUID() -> GUID? {
         guard outlineView.clickedRow >= 0 else {
             return nil
