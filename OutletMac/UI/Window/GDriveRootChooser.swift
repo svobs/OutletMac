@@ -68,7 +68,7 @@ struct GDriveRootChooserContent: View {
     VStack {
       GeometryReader { geo in
         SinglePaneView(self.app, self.con, self.windowState)
-          .environmentObject(self.app.settings)
+          .environmentObject(self.app.globalState)
           .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
           .contentShape(Rectangle()) // taps should be detected in the whole window
           .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))

@@ -10,7 +10,7 @@ Pods
 .idea
 .build
 
-## User settings
+## User globalState
 xcuserdata
 *.xcuserstate
 

@@ -28,7 +28,7 @@ struct TodoPlaceholder: View {
  STRUCT ButtonBar
  */
 fileprivate struct ButtonBar: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   let app: OutletApp
   let conLeft: TreePanelControllable
   let conRight: TreePanelControllable
@@ -41,14 +41,14 @@ fileprivate struct ButtonBar: View {
 
   var body: some View {
     HStack {
-      if settings.mode == .BROWSING {
+      if globalState.mode == .BROWSING {
         Button("Diff (content-first)", action: self.onDiffButtonClicked)
-                .disabled(!self.settings.isUIEnabled)
-      } else if settings.mode == .DIFF {
+                .disabled(!self.globalState.isUIEnabled)
+      } else if globalState.mode == .DIFF {
         Button("Merge...", action: self.onMergeButtonClicked)
-                .disabled(!self.settings.isUIEnabled)
+                .disabled(!self.globalState.isUIEnabled)
         Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
-                .disabled(!self.settings.isUIEnabled)
+                .disabled(!self.globalState.isUIEnabled)
       }
       PlayPauseToggleButton(app.iconStore, conLeft.dispatcher)
       Spacer()
@@ -69,7 +69,7 @@ fileprivate struct ButtonBar: View {
       self.conRight.reportError("Cannot start diff", "Right tree is not finished loading")
       return
     }
-    if settings.mode != .BROWSING {
+    if globalState.mode != .BROWSING {
       self.conRight.reportError("Cannot start diff", "A diff is already in process, apparently (this is a bug)")
       return
     }
@@ -90,7 +90,7 @@ fileprivate struct ButtonBar: View {
   }
 
   func onMergeButtonClicked() {
-    if self.settings.mode != .DIFF {
+    if self.globalState.mode != .DIFF {
       self.conLeft.reportError("Cannot merge changes", "A diff is not currently in progress")
       return
     }
@@ -117,7 +117,7 @@ fileprivate struct ButtonBar: View {
   }
 
   func onCancelDiffButtonClicked() {
-    if self.settings.mode != .DIFF {
+    if self.globalState.mode != .DIFF {
       self.conLeft.reportError("Cannot cancel diff", "A diff is not currently in progress")
       return
     }
@@ -132,7 +132,7 @@ fileprivate struct ButtonBar: View {
  This forms almost all (or all?) of the content for the main window
  */
 struct TwoPaneView: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   @ObservedObject var windowState: WindowState
 
   private var columns: [GridItem] = [
@@ -224,7 +224,7 @@ struct TwoPaneView: View {
         totalHeight += max(height0, height1)
       }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.windowHeight))")
+//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(globalState.windowHeight))")
       self.windowState.nonTreeViewHeight = totalHeight
     }
   }

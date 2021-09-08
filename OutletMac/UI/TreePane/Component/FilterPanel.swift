@@ -45,7 +45,7 @@ struct FancyTextField: View {
  Reminder: use the "SF Symbols" app to browse Mac OS system icons
  */
 struct FilterPanel: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftFilterState: SwiftFilterState
   let con: TreePanelControllable
 
@@ -81,6 +81,6 @@ struct FilterPanel: View {
     .frame(minWidth: 200,
            maxWidth: .infinity,
            alignment: .topLeading)
-    .disabled(!self.settings.isUIEnabled)
+    .disabled(!self.globalState.isUIEnabled)
   }
 }

@@ -103,8 +103,8 @@ class TreePanelController: TreePanelControllable {
     self.app = app
     self.tree = tree
     self.swiftTreeState = try SwiftTreeState.from(tree)
-    self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
+    self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.canChangeRoot = canChangeRoot
     self.allowMultipleSelection = allowMultipleSelection
   }

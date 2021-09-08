@@ -9,7 +9,7 @@ import SwiftUI
 
 // Main window content view
 struct MainContentView: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   @StateObject var windowState: WindowState = WindowState()
   weak var app: OutletApp!
   weak var conLeft: TreePanelControllable!
@@ -24,7 +24,7 @@ struct MainContentView: View {
 
   func dismissAlert() {
      DispatchQueue.main.async {
-       self.settings.dismissAlert()
+       self.globalState.dismissAlert()
      }
   }
 
@@ -41,10 +41,10 @@ struct MainContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .contentShape(Rectangle()) // taps should be detected in the whole window
         .gesture(tapCancelEdit)
-        .alert(isPresented: $settings.showingAlert) {
-          Alert(title: Text(settings.alertTitle),
-                message: Text(settings.alertMsg),
-                dismissButton: .default(Text(settings.dismissButtonText), action: self.dismissAlert))
+        .alert(isPresented: $globalState.showingAlert) {
+          Alert(title: Text(globalState.alertTitle),
+                message: Text(globalState.alertMsg),
+                dismissButton: .default(Text(globalState.dismissButtonText), action: self.dismissAlert))
         }
         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       .onPreferenceChange(ContentAreaPrefKey.self) { key in

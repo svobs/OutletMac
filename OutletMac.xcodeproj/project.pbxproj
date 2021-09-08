@@ -8,125 +8,131 @@
 
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
-		CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */; };
-		CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */; };
-		CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */; };
-		CDF2FB78F343217AC2CC6B0A /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDE09D07A543DE42203C /* DispatchQueueExtensions.swift */; };
-		CDF2FC51828D5D39AF021168 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */; };
-		CDF2FE4E8BE4CD5A8D1DDBC0 /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */; };
-		CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AB9766F071E5450156 /* MergePreview.swift */; };
-		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
-		D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */; };
-		D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12C2CB02601FEB600E91EC9 /* Actions.swift */; };
-		D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13544F72605E24800C6DADC /* GDriveRootChooser.swift */; };
+		CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */; };
+		CDF2F17E1486B7E6CF9930FA /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */; };
+		CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */; };
+		CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB2EA146750617D29EDD /* GlobalState.swift */; };
+		CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */; };
+		CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */; };
+		CDF2F345DB9EC8B949A698C1 /* ConnectionProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */; };
+		CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */; };
+		CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F40499F9D376AD844203 /* DateUtil.swift */; };
+		CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */; };
+		CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */; };
+		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
+		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
+		CDF2F548F0E1E4AC080AAA0E /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F93A3F22F90447CFED4D /* MergePreview.swift */; };
+		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
+		CDF2F5CE2C6D0C179C6EBB3E /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F189916C43043D64540F /* Bonjour.swift */; };
+		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */; };
+		CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */; };
+		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
+		CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */; };
+		CDF2F78FB501FB569A528DDB /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */; };
+		CDF2F7BB73F2144A7AE9BD31 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */; };
+		CDF2F889C9D3A7C82422AB93 /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F1282202188B26AB6D98 /* TreeView.swift */; };
+		CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */; };
+		CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */; };
+		CDF2F9EB179BD47115578D6A /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F77AA899F692856B9A3D /* CellFactory.swift */; };
+		CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */; };
+		CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F81C318FC582AE23E023 /* IfView.swift */; };
+		CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F521214ABD01967F51E8 /* DisplayStore.swift */; };
+		CDF2FB80159CBF6C270357DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */; };
+		CDF2FB998C59041CEFBDCA17 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */; };
+		CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */; };
+		CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */; };
+		CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */; };
+		CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */; };
+		CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F265942131BB8C84EB29 /* IconStore.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADFA25BEC35E00E4F9E4 /* Backend.swift */; };
-		D138ADFE25BFE8D100E4F9E4 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */; };
 		D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */; };
-		D15E773326045B9700D63A14 /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15E773226045B9700D63A14 /* IconStore.swift */; };
-		D15E7737260572A900D63A14 /* IfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15E7736260572A900D63A14 /* IfView.swift */; };
 		D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D168399F25AD532800D76169 /* Outlet.pb.swift */; };
 		D16839A925AD532800D76169 /* Node.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A325AD532800D76169 /* Node.pb.swift */; };
 		D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A125AD532800D76169 /* Outlet.grpc.swift */; };
 		D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */; };
-		D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839E725AD8D0600D76169 /* SignalConstants.swift */; };
 		D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */; };
 		D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCE25BA380E00B2A4F5 /* OutletError.swift */; };
 		D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */; };
 		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
-		D19109A42607292E00C0D9B4 /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A32607292E00C0D9B4 /* StatusPanel.swift */; };
-		D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
-		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
 		D19B16B726158E610072F8A8 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19B16B626158E610072F8A8 /* Device.swift */; };
-		D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */; };
-		D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
 		D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* OutletApp.swift */; };
-		D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55F25A193C800D951A2 /* MainContentView.swift */; };
-		D1C20DFE264489410068C3FC /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C20DFD264489410068C3FC /* CellFactory.swift */; };
-		D1C20E0026448D1C0068C3FC /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */; };
-		D1C20E022644912A0068C3FC /* OutlineViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C20E012644912A0068C3FC /* OutlineViewFactory.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
-		D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CDE54325E3628E003816CF /* DisplayStore.swift */; };
 		D1CDE56525E4A9DC003816CF /* outlet-icon-256.icns in Resources */ = {isa = PBXBuildFile; fileRef = D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */; };
-		D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D090EC25CD3C980070B69D /* StringUtil.swift */; };
 		D1D8711725F1F8D60072CB97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D8711625F1F8D60072CB97 /* main.swift */; };
-		D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B525AA6E29008E958B /* UnwrapView.swift */; };
-		D1E913BA25AA735C008E958B /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1E913B925AA735C008E958B /* TreeView.swift */; };
-		D1ED5E2725C7D7A400A8E5DB /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */; };
-		D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */; };
-		D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */; };
-		D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */; };
 		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
-		D1FCD9AB25D8EF9E000C8FF3 /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1FCD9AA25D8EF9E000C8FF3 /* ToolbarButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
-		CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
-		CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
-		CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblem.swift; sourceTree = "<group>"; };
-		CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
-		CDF2F8AB9766F071E5450156 /* MergePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreview.swift; sourceTree = "<group>"; };
-		CDF2FDE09D07A543DE42203C /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
-		CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
-		D1175BFC25DCF25700602B7F /* ObservableObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableObjects.swift; sourceTree = "<group>"; };
-		D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
-		D12C2CB02601FEB600E91EC9 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
-		D13544F72605E24800C6DADC /* GDriveRootChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveRootChooser.swift; sourceTree = "<group>"; };
+		CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
+		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
+		CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
+		CDF2F189916C43043D64540F /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
+		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
+		CDF2F265942131BB8C84EB29 /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
+		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
+		CDF2F40499F9D376AD844203 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
+		CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
+		CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
+		CDF2F521214ABD01967F51E8 /* DisplayStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayStore.swift; sourceTree = "<group>"; };
+		CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
+		CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
+		CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
+		CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
+		CDF2F77AA899F692856B9A3D /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
+		CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
+		CDF2F81C318FC582AE23E023 /* IfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IfView.swift; sourceTree = "<group>"; };
+		CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
+		CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
+		CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineViewFactory.swift; sourceTree = "<group>"; };
+		CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTreeState.swift; sourceTree = "<group>"; };
+		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooser.swift; sourceTree = "<group>"; };
+		CDF2F93A3F22F90447CFED4D /* MergePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreview.swift; sourceTree = "<group>"; };
+		CDF2FAC3B920540522051982 /* UnwrapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
+		CDF2FB2EA146750617D29EDD /* GlobalState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalState.swift; sourceTree = "<group>"; };
+		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
+		CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
+		CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
+		CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
+		CDF2FE3CBB814776E801E1E4 /* WindowState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
+		CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
+		CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblem.swift; sourceTree = "<group>"; };
+		CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftFilterState.swift; sourceTree = "<group>"; };
+		CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
 		D138ADFA25BEC35E00E4F9E4 /* Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
-		D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
 		D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
-		D15E773226045B9700D63A14 /* IconStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
-		D15E7736260572A900D63A14 /* IfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IfView.swift; sourceTree = "<group>"; };
 		D168399F25AD532800D76169 /* Outlet.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.pb.swift; sourceTree = "<group>"; };
 		D16839A125AD532800D76169 /* Outlet.grpc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.grpc.swift; sourceTree = "<group>"; };
 		D16839A325AD532800D76169 /* Node.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.pb.swift; sourceTree = "<group>"; };
 		D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletGRPCClient.swift; sourceTree = "<group>"; };
-		D16839E725AD8D0600D76169 /* SignalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
 		D1767FCB25B8E0A200B2A4F5 /* GDriveNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDriveNode.swift; sourceTree = "<group>"; };
 		D1767FCE25BA380E00B2A4F5 /* OutletError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutletError.swift; sourceTree = "<group>"; };
 		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
 		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
-		D19109A32607292E00C0D9B4 /* StatusPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
-		D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
-		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
 		D19B16B626158E610072F8A8 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
-		D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
-		D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
 		D1BAC55E25A193C800D951A2 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
-		D1BAC55F25A193C800D951A2 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
-		D1C20DFD264489410068C3FC /* CellFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
-		D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
-		D1C20E012644912A0068C3FC /* OutlineViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewFactory.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
-		D1CDE54325E3628E003816CF /* DisplayStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayStore.swift; sourceTree = "<group>"; };
 		D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "outlet-icon-256.icns"; sourceTree = "<group>"; };
-		D1D090EC25CD3C980070B69D /* StringUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringUtil.swift; sourceTree = "<group>"; };
 		D1D8711625F1F8D60072CB97 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		D1E913B525AA6E29008E958B /* UnwrapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
-		D1E913B925AA735C008E958B /* TreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
-		D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
-		D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
-		D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
-		D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
-		D1FCD9AA25D8EF9E000C8FF3 /* ToolbarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -174,15 +180,9 @@
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
 				D1F36C3B25B54E73009498D8 /* Constants.swift */,
 				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
-				D138ADFD25BFE8D100E4F9E4 /* DateUtil.swift */,
-				D1ED5E4825C946B600A8E5DB /* SignalDispatcher.swift */,
-				D1AB2D0B25CA13BC00B1B539 /* HasLifecycle.swift */,
-				D1D090EC25CD3C980070B69D /* StringUtil.swift */,
-				D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
-				D15E773226045B9700D63A14 /* IconStore.swift */,
-				CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */,
-				CDF2FDE09D07A543DE42203C /* DispatchQueueExtensions.swift */,
+				CDF2FCDDCFE5BFFDBDD633DD /* Support */,
+				CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -204,18 +204,80 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		D1175BFF25DCF27300602B7F /* View */ = {
+		CDF2F0E133427A4E93041CCA /* TreeView */ = {
 			isa = PBXGroup;
 			children = (
-				D19109A7260729F600C0D9B4 /* TreePanel */,
-				D1ED5E2525C7D78700A8E5DB /* Component */,
-				D1BAC55F25A193C800D951A2 /* MainContentView.swift */,
-				D1AAE22A25A6ED63005BE680 /* TwoPaneView.swift */,
-				D13544F72605E24800C6DADC /* GDriveRootChooser.swift */,
-				D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */,
-				CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */,
+				CDF2F1282202188B26AB6D98 /* TreeView.swift */,
+				CDF2F521214ABD01967F51E8 /* DisplayStore.swift */,
+				CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */,
+				CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */,
+				CDF2F77AA899F692856B9A3D /* CellFactory.swift */,
+				CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */,
+				CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */,
+				CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */,
+				CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */,
+				CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */,
+				CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */,
+				CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */,
 			);
-			path = View;
+			path = TreeView;
+			sourceTree = "<group>";
+		};
+		CDF2FB4110AAC7565C7357F3 /* Component */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */,
+				CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */,
+				CDF2F93A3F22F90447CFED4D /* MergePreview.swift */,
+				CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */,
+				CDF2F0E133427A4E93041CCA /* TreeView */,
+			);
+			path = Component;
+			sourceTree = "<group>";
+		};
+		CDF2FCDDCFE5BFFDBDD633DD /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */,
+				CDF2F189916C43043D64540F /* Bonjour.swift */,
+				CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */,
+				CDF2F40499F9D376AD844203 /* DateUtil.swift */,
+				CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */,
+				CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */,
+				CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		CDF2FD6DDB4704833FC99359 /* Window */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */,
+				CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblem.swift */,
+				CDF2F90A12D2FA42A43E44AC /* GDriveRootChooser.swift */,
+				CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */,
+			);
+			path = Window;
+			sourceTree = "<group>";
+		};
+		CDF2FFBCB0C091456F39F518 /* TreePane */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2FB4110AAC7565C7357F3 /* Component */,
+				CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */,
+				CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */,
+			);
+			path = TreePane;
+			sourceTree = "<group>";
+		};
+		D1175BFF25DCF27300602B7F /* ViewMisc */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2FAC3B920540522051982 /* UnwrapView.swift */,
+				CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */,
+				CDF2F81C318FC582AE23E023 /* IfView.swift */,
+			);
+			path = ViewMisc;
 			sourceTree = "<group>";
 		};
 		D168399E25AD532800D76169 /* grpc */ = {
@@ -223,7 +285,6 @@
 			children = (
 				D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */,
 				D16839AD25AD551100D76169 /* generated */,
-				D16839E725AD8D0600D76169 /* SignalConstants.swift */,
 				D1CB04A025B1832E00556B28 /* GRPCConverter.swift */,
 			);
 			path = grpc;
@@ -237,19 +298,6 @@
 				D16839A125AD532800D76169 /* Outlet.grpc.swift */,
 			);
 			path = generated;
-			sourceTree = "<group>";
-		};
-		D19109A7260729F600C0D9B4 /* TreePanel */ = {
-			isa = PBXGroup;
-			children = (
-				D1E913B825AA7342008E958B /* TreeView */,
-				D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */,
-				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
-				D19109A32607292E00C0D9B4 /* StatusPanel.swift */,
-				CDF2F8AB9766F071E5450156 /* MergePreview.swift */,
-				CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */,
-			);
-			path = TreePanel;
 			sourceTree = "<group>";
 		};
 		D1CB049C25B182A000556B28 /* Model */ = {
@@ -270,40 +318,17 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		D1E913B825AA7342008E958B /* TreeView */ = {
-			isa = PBXGroup;
-			children = (
-				D1E913B925AA735C008E958B /* TreeView.swift */,
-				D1CDE54325E3628E003816CF /* DisplayStore.swift */,
-				D12C2CAD2601FD3100E91EC9 /* ContextMenu.swift */,
-				D12C2CB02601FEB600E91EC9 /* Actions.swift */,
-				D1C20DFD264489410068C3FC /* CellFactory.swift */,
-				D1C20DFF26448D1C0068C3FC /* CellCheckboxButton.swift */,
-				D1C20E012644912A0068C3FC /* OutlineViewFactory.swift */,
-				CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */,
-				CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */,
-			);
-			path = TreeView;
-			sourceTree = "<group>";
-		};
 		D1ED5E2425C7D75D00A8E5DB /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				D1175BFF25DCF27300602B7F /* View */,
-				D1175BFC25DCF25700602B7F /* ObservableObjects.swift */,
-				D1ED5E2C25C8DA7F00A8E5DB /* TreePanelController.swift */,
+				D1175BFF25DCF27300602B7F /* ViewMisc */,
+				CDF2FD6DDB4704833FC99359 /* Window */,
+				CDF2FB2EA146750617D29EDD /* GlobalState.swift */,
+				CDF2FE3CBB814776E801E1E4 /* WindowState.swift */,
+				CDF2FFBCB0C091456F39F518 /* TreePane */,
+				CDF2F265942131BB8C84EB29 /* IconStore.swift */,
 			);
 			path = UI;
-			sourceTree = "<group>";
-		};
-		D1ED5E2525C7D78700A8E5DB /* Component */ = {
-			isa = PBXGroup;
-			children = (
-				D15E7736260572A900D63A14 /* IfView.swift */,
-				D1E913B525AA6E29008E958B /* UnwrapView.swift */,
-				D1FCD9AA25D8EF9E000C8FF3 /* ToolbarButton.swift */,
-			);
-			path = Component;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -430,56 +455,59 @@
 				D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */,
 				D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */,
 				D19B16B726158E610072F8A8 /* Device.swift in Sources */,
-				D1ED5E2725C7D7A400A8E5DB /* RootPathPanel.swift in Sources */,
-				D16839E825AD8D0600D76169 /* SignalConstants.swift in Sources */,
-				D1ED5E2A25C7D7C200A8E5DB /* FilterPanel.swift in Sources */,
-				D1AB2D0C25CA13BC00B1B539 /* HasLifecycle.swift in Sources */,
-				D1FCD9AB25D8EF9E000C8FF3 /* ToolbarButton.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
-				D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */,
-				D15E7737260572A900D63A14 /* IfView.swift in Sources */,
 				D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */,
-				D13544F82605E24800C6DADC /* GDriveRootChooser.swift in Sources */,
 				D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */,
-				D1CDE54425E3628E003816CF /* DisplayStore.swift in Sources */,
-				D1ED5E4925C946B600A8E5DB /* SignalDispatcher.swift in Sources */,
-				D12C2CAE2601FD3100E91EC9 /* ContextMenu.swift in Sources */,
-				D1E913BA25AA735C008E958B /* TreeView.swift in Sources */,
 				D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
-				D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */,
-				D1E913B625AA6E29008E958B /* UnwrapView.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
-				D1BAC56825A193C800D951A2 /* MainContentView.swift in Sources */,
-				D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */,
 				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
-				D1ED5E2D25C8DA7F00A8E5DB /* TreePanelController.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
-				D1C20DFE264489410068C3FC /* CellFactory.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,
-				D1D090ED25CD3C980070B69D /* StringUtil.swift in Sources */,
 				D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */,
-				D138ADFE25BFE8D100E4F9E4 /* DateUtil.swift in Sources */,
-				D1C20E0026448D1C0068C3FC /* CellCheckboxButton.swift in Sources */,
-				D1AAE22B25A6ED63005BE680 /* TwoPaneView.swift in Sources */,
 				D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */,
-				D12C2CB12601FEB600E91EC9 /* Actions.swift in Sources */,
 				D16839A925AD532800D76169 /* Node.pb.swift in Sources */,
-				D15E773326045B9700D63A14 /* IconStore.swift in Sources */,
 				D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */,
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,
-				D1C20E022644912A0068C3FC /* OutlineViewFactory.swift in Sources */,
-				D19109A42607292E00C0D9B4 /* StatusPanel.swift in Sources */,
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,
-				CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */,
-				CDF2FC51828D5D39AF021168 /* SingleTreePopUpWindow.swift in Sources */,
-				CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */,
-				CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */,
-				CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */,
-				CDF2FE4E8BE4CD5A8D1DDBC0 /* Bonjour.swift in Sources */,
-				CDF2FB78F343217AC2CC6B0A /* DispatchQueueExtensions.swift in Sources */,
+				CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */,
+				CDF2F345DB9EC8B949A698C1 /* ConnectionProblem.swift in Sources */,
+				CDF2F6C5E603DB335DB8E920 /* GDriveRootChooser.swift in Sources */,
+				CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */,
+				CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */,
+				CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */,
+				CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */,
+				CDF2FB80159CBF6C270357DB /* FilterPanel.swift in Sources */,
+				CDF2F548F0E1E4AC080AAA0E /* MergePreview.swift in Sources */,
+				CDF2F17E1486B7E6CF9930FA /* RootPathPanel.swift in Sources */,
+				CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */,
+				CDF2FB998C59041CEFBDCA17 /* TwoPaneView.swift in Sources */,
+				CDF2F889C9D3A7C82422AB93 /* TreeView.swift in Sources */,
+				CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */,
+				CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */,
+				CDF2F7BB73F2144A7AE9BD31 /* Actions.swift in Sources */,
+				CDF2F9EB179BD47115578D6A /* CellFactory.swift in Sources */,
+				CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */,
+				CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */,
+				CDF2F78FB501FB569A528DDB /* TreeViewController.swift in Sources */,
+				CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */,
+				CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */,
+				CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */,
+				CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */,
+				CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */,
+				CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */,
+				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
+				CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */,
+				CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */,
+				CDF2F5CE2C6D0C179C6EBB3E /* Bonjour.swift in Sources */,
+				CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */,
+				CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */,
+				CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */,
+				CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */,
+				CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */,
+				CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

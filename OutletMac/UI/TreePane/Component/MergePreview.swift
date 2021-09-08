@@ -27,7 +27,7 @@ struct MergePreviewContent: View {
         VStack {
             GeometryReader { geo in
                 SinglePaneView(self.parentWindow.app, self.parentWindow.con, self.windowState)
-                        .environmentObject(self.parentWindow.app.settings)
+                        .environmentObject(self.parentWindow.app.globalState)
                         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
                         .contentShape(Rectangle()) // taps should be detected in the whole window
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))

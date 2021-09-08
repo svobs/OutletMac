@@ -137,7 +137,7 @@ struct BoolToggleButton: View {
  CLASS PlayPauseToggleButton
  */
 struct PlayPauseToggleButton: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   let iconStore: IconStore
   let dispatcher: SignalDispatcher
 
@@ -147,7 +147,7 @@ struct PlayPauseToggleButton: View {
   }
 
   private func toggleValue() {
-    if self.settings.isPlaying {
+    if self.globalState.isPlaying {
       NSLog("INFO  Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
       dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
     } else {
@@ -158,7 +158,7 @@ struct PlayPauseToggleButton: View {
 
   var body: some View {
     Button(action: toggleValue) {
-      if settings.isPlaying {
+      if globalState.isPlaying {
         UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PAUSE))
       } else {
         UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PLAY))

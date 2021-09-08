@@ -10,7 +10,7 @@ import SwiftUI
  STRUCT RootPathPanel
  */
 struct RootPathPanel: View {
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftTreeState: SwiftTreeState
   let con: TreePanelControllable
 
@@ -130,7 +130,7 @@ struct RootPathPanel: View {
           .padding(.leading, H_PAD)
       }
       .contextMenu {
-        ForEach(self.settings.deviceList, id: \.self) { device in
+        ForEach(self.globalState.deviceList, id: \.self) { device in
           Button(device.friendlyName, action: self.openRootSelectionDialog(device))
         }
       }
@@ -195,7 +195,7 @@ struct RootPathPanel: View {
       } // editing / not editing
 
     }  // HStack
-    .disabled(!settings.isUIEnabled)
+    .disabled(!globalState.isUIEnabled)
     .frame(minWidth: 300,
            maxWidth: .infinity,
            alignment: .topLeading)

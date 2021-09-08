@@ -16,7 +16,7 @@ protocol OutletApp: HasLifecycle {
   var backend: OutletBackend { get }
   var iconStore: IconStore { get }
 
-  var settings: GlobalSettings { get }
+  var globalState: GlobalState { get }
 
   func grpcDidGoDown()
   func grpcDidGoUp()
@@ -76,7 +76,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private var enableWindowCloseListener: Bool = true
 
   let winID = ID_MAIN_WINDOW
-  let settings = GlobalSettings()
+  let globalState = GlobalState()
   let dispatcher = SignalDispatcher()
   let dispatchListener: DispatchListener!
   private var _backend: OutletGRPCClient?
@@ -206,7 +206,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       self.mergePreviewView?.close()
       self.enableWindowCloseListener = true
 
-      self.settings.reset()
+      self.globalState.reset()
 
       // Open Connection Problem window
       NSLog("INFO  [Main] Showing ConnectionProblem window")
@@ -250,9 +250,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     NSLog("DEBUG [Main] Entered launchFrontend()")
     try self.iconStore.start()
 
-    settings.deviceList = try self.backend.getDeviceList()
+    globalState.deviceList = try self.backend.getDeviceList()
 
-    settings.isPlaying = try self.backend.getOpExecutionPlayState()
+    globalState.isPlaying = try self.backend.getOpExecutionPlayState()
 
     // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
     let treeLeft: DisplayTree = try backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
@@ -326,7 +326,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     mainWindowIsOpen = true
     mainWindow!.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
-            .environmentObject(self.settings)
+            .environmentObject(self.globalState)
     mainWindow!.contentView = NSHostingView(rootView: contentView)
   }
 
@@ -430,7 +430,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func changeWindowMode(_ newMode: WindowMode) {
     DispatchQueue.main.async {
       NSLog("DEBUG Setting WindowMode to: \(newMode)")
-      self.settings.mode = newMode
+      self.globalState.mode = newMode
     }
   }
 
@@ -448,14 +448,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func onEnableUIToggled(_ senderID: SenderID, _ propDict: PropDict) throws {
     let isEnabled = try propDict.getBool("enable")
     DispatchQueue.main.async {
-      self.settings.isUIEnabled = isEnabled
+      self.globalState.isUIEnabled = isEnabled
     }
   }
 
   private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
     let isEnabled = try propDict.getBool("is_enabled")
     DispatchQueue.main.async {
-      self.settings.isPlaying = isEnabled
+      self.globalState.isPlaying = isEnabled
     }
   }
 
@@ -558,7 +558,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         } else if !self.mainWindowIsOpen {
           NSLog("INFO  Will not display error alert ('\(msg)'): the main window is not open to display it")
         } else {
-          self.settings.showAlert(title: msg, msg: secondaryMsg)
+          self.globalState.showAlert(title: msg, msg: secondaryMsg)
         }
       }
   }

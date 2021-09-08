@@ -11,7 +11,7 @@ class NodeIdentifierFactory {
   weak var backend: OutletBackend! = nil
 
   func getDeviceList() throws -> [Device] {
-    return backend.app.settings.deviceList
+    return backend.app.globalState.deviceList
   }
 
   func getTreeType(for deviceUID: UID) throws -> TreeType {

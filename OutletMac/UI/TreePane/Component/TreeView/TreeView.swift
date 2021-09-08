@@ -6,7 +6,7 @@ import SwiftUI
  */
 struct TreeView: View {
   let con: TreePanelControllable
-  @EnvironmentObject var settings: GlobalSettings
+  @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftTreeState: SwiftTreeState
   @ObservedObject var windowState: WindowState
 

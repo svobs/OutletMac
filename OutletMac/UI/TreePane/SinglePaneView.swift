@@ -14,8 +14,8 @@ import SwiftUI
  (if it works, why add effort and bugs?)
  */
 struct SinglePaneView: View {
-  @EnvironmentObject var settings: GlobalSettings
-  @ObservedObject var heightTracking: WindowState
+  @EnvironmentObject var globalState: GlobalState
+  @ObservedObject var windowState: WindowState
 
   private var columns: [GridItem] = [
     // these specify spacing between columns
@@ -26,10 +26,10 @@ struct SinglePaneView: View {
   let app: OutletApp
   let con: TreePanelControllable
 
-  init(_ app: OutletApp, _ con: TreePanelControllable, _ heightTracking: WindowState) {
+  init(_ app: OutletApp, _ con: TreePanelControllable, _ windowState: WindowState) {
     self.app = app
     self.con = con
-    self.heightTracking = heightTracking
+    self.windowState = windowState
   }
 
   var body: some View {
@@ -53,7 +53,7 @@ struct SinglePaneView: View {
         })
 
       // Row2: Tree view
-      TreeView(controller: self.con, heightTracking)
+      TreeView(controller: self.con, windowState)
 
       // Row3: Status msg
       StatusPanel(self.con)
@@ -69,8 +69,8 @@ struct SinglePaneView: View {
         totalHeight += height0
       }
 //      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(settings.windowHeight))")
-      self.heightTracking.nonTreeViewHeight = totalHeight
+//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(globalState.windowHeight))")
+      self.windowState.nonTreeViewHeight = totalHeight
     }
   }
 }
