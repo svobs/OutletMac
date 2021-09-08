@@ -94,18 +94,18 @@ struct GDriveRootChooserContent: View {
 /**
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
-class GDriveRootChooser: PopUpTreePanel {
+class GDriveRootChooser: SingleTreePopUpWindow {
   var chooserState: ChooserState = ChooserState()
 
   init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair, targetTreeID: TreeID) {
     super.init(app, con, initialSelection: initialSelection)
     assert(con.treeID == ID_GDRIVE_DIR_SELECT)
-    self.window.center()
-    self.window.title = "Google Drive Root Chooser"
+    self.center()
+    self.title = "Google Drive Root Chooser"
     // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
 //    window.setFrameAutosaveName(window.title)
-    let content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self.window, self.chooserState)
-    window.contentView = NSHostingView(rootView: content)
+    let content = GDriveRootChooserContent(self.app, self.con, targetTreeID, self, self.chooserState)
+    self.contentView = NSHostingView(rootView: content)
   }
 
   // DispatchListener callbacks
@@ -118,7 +118,7 @@ class GDriveRootChooser: PopUpTreePanel {
     DispatchQueue.main.async {
       let selectionValid = (snList.count == 1 && snList[0].node.isDir)
       self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.con.treeID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
+      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
     }
   }
 

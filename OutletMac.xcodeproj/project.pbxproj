@@ -12,7 +12,7 @@
 		CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */; };
 		CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */; };
 		CDF2FB78F343217AC2CC6B0A /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDE09D07A543DE42203C /* DispatchQueueExtensions.swift */; };
-		CDF2FC51828D5D39AF021168 /* PopUpTreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */; };
+		CDF2FC51828D5D39AF021168 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */; };
 		CDF2FE4E8BE4CD5A8D1DDBC0 /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */; };
 		CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AB9766F071E5450156 /* MergePreview.swift */; };
 		D1175BFD25DCF25700602B7F /* ObservableObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1175BFC25DCF25700602B7F /* ObservableObjects.swift */; };
@@ -35,7 +35,7 @@
 		D1767FCF25BA380E00B2A4F5 /* OutletError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FCE25BA380E00B2A4F5 /* OutletError.swift */; };
 		D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */; };
 		D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */; };
-		D19109A42607292E00C0D9B4 /* TreePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A32607292E00C0D9B4 /* TreePanel.swift */; };
+		D19109A42607292E00C0D9B4 /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A32607292E00C0D9B4 /* StatusPanel.swift */; };
 		D19109A926072B0D00C0D9B4 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */; };
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D194BEFE25E9C5E800B4827F /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */; };
@@ -73,7 +73,7 @@
 		CDF2F0EE2E8F9257D58AD505 /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
 		CDF2F62882A5E3AD4E615A2B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
 		CDF2F71637BE17683AC2033F /* ConnectionProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblem.swift; sourceTree = "<group>"; };
-		CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopUpTreePanel.swift; sourceTree = "<group>"; };
+		CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
 		CDF2F8AB9766F071E5450156 /* MergePreview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreview.swift; sourceTree = "<group>"; };
 		CDF2FDE09D07A543DE42203C /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		CDF2FF5B2342647B1DB6BC13 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
@@ -97,7 +97,7 @@
 		D1767FCE25BA380E00B2A4F5 /* OutletError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutletError.swift; sourceTree = "<group>"; };
 		D1767FD125BA3A8100B2A4F5 /* DisplayTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTree.swift; sourceTree = "<group>"; };
 		D1767FD425BA3B3800B2A4F5 /* NodeIdentifierFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifierFactory.swift; sourceTree = "<group>"; };
-		D19109A32607292E00C0D9B4 /* TreePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreePanel.swift; sourceTree = "<group>"; };
+		D19109A32607292E00C0D9B4 /* StatusPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
 		D19109A826072B0D00C0D9B4 /* SinglePaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		D194BEFD25E9C5E800B4827F /* HoldOffTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
 		D19B16B626158E610072F8A8 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
@@ -245,9 +245,9 @@
 				D1E913B825AA7342008E958B /* TreeView */,
 				D1ED5E2625C7D7A400A8E5DB /* RootPathPanel.swift */,
 				D1ED5E2925C7D7C200A8E5DB /* FilterPanel.swift */,
-				D19109A32607292E00C0D9B4 /* TreePanel.swift */,
+				D19109A32607292E00C0D9B4 /* StatusPanel.swift */,
 				CDF2F8AB9766F071E5450156 /* MergePreview.swift */,
-				CDF2F7461556503AE636A05E /* PopUpTreePanel.swift */,
+				CDF2F7461556503AE636A05E /* SingleTreePopUpWindow.swift */,
 			);
 			path = TreePanel;
 			sourceTree = "<group>";
@@ -471,10 +471,10 @@
 				D1767FCC25B8E0A200B2A4F5 /* GDriveNode.swift in Sources */,
 				D16839AA25AD532800D76169 /* Outlet.grpc.swift in Sources */,
 				D1C20E022644912A0068C3FC /* OutlineViewFactory.swift in Sources */,
-				D19109A42607292E00C0D9B4 /* TreePanel.swift in Sources */,
+				D19109A42607292E00C0D9B4 /* StatusPanel.swift in Sources */,
 				D16839AF25AD553A00D76169 /* OutletGRPCClient.swift in Sources */,
 				CDF2FF3DE36462DE6E97F3EF /* MergePreview.swift in Sources */,
-				CDF2FC51828D5D39AF021168 /* PopUpTreePanel.swift in Sources */,
+				CDF2FC51828D5D39AF021168 /* SingleTreePopUpWindow.swift in Sources */,
 				CDF2F341B05938414DF3AF58 /* TreeViewController.swift in Sources */,
 				CDF2F7CB3CF7498A4A866B71 /* NodePasteboardWriter.swift in Sources */,
 				CDF2F90EFCFA4C1B0B51290B /* ConnectionProblem.swift in Sources */,

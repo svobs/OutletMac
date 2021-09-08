@@ -21,7 +21,7 @@ class ConnectionProblemWindow: NSWindow {
 
 class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject {
     unowned var app: OutletApp
-    var window: ConnectionProblemWindow!
+    private var parentWindow: ConnectionProblemWindow!
     private var windowIsOpen = true
 
     func windowWillClose(_ notification: Notification) {
@@ -30,8 +30,12 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
         do {
             try self.shutdown()
         } catch {
-            NSLog("ERROR Failure during window close; \(error)")
+            NSLog("ERROR Failure during window close: \(error)")
         }
+    }
+
+    func close() {
+        self.parentWindow.close()
     }
 
     var isOpen: Bool {
@@ -46,20 +50,20 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
         // TODO: save content rect in config
         // note: x & y are from lower-left corner
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
-        window = ConnectionProblemWindow(
+        parentWindow = ConnectionProblemWindow(
                 contentRect: contentRect,
                 styleMask: [.titled, .closable, .fullSizeContentView],
                 backing: .buffered, defer: false)
-        self.window.center()
-        self.window.title = "Connection to Agent Failed"
+        self.parentWindow.center()
+        self.parentWindow.title = "Connection to Agent Failed"
 
-        let content = ConnectionProblemContent(self.app, self.window, backendConnectionState)
-        window.contentView = NSHostingView(rootView: content)
+        let content = ConnectionProblemContent(self.app, self.parentWindow, backendConnectionState)
+        parentWindow.contentView = NSHostingView(rootView: content)
     }
 
     func start() throws {
         // Enables windowWillClose() callback
-        window.delegate = self
+        parentWindow.delegate = self
     }
 
     // This is called by windowWillClose()
@@ -69,7 +73,7 @@ class ConnectionProblemView: NSObject, NSWindowDelegate, HasLifecycle, Observabl
 
     func showWindow() {
         self.windowIsOpen = true
-        self.window.makeKeyAndOrderFront(nil)
+        self.parentWindow.makeKeyAndOrderFront(nil)
     }
 }
 
@@ -118,7 +122,7 @@ struct ConnectionProblemContent: View {
                         .keyboardShortcut(.cancelAction)
             }.frame(alignment: .center)
                     .padding(.bottom).padding(.horizontal)  // we have enough padding above already
-        }.frame(width: 300, height: 100)  // set minimum window dimensions
+        }.frame(width: 300, height: 100)  // set minimum parentWindow dimensions
     }
 
 }

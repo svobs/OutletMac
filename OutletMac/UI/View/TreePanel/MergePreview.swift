@@ -10,19 +10,15 @@ import SwiftUI
  */
 struct MergePreviewContent: View {
     @StateObject var windowState: WindowState = WindowState()
-    var parentWindow: NSWindow
-    let app: OutletApp
-    let con: TreePanelControllable
+    var parentWindow: SingleTreePopUpWindow
 
-    init(_ app: OutletApp, _ con: TreePanelControllable, _ parentWindow: NSWindow) {
+    init(_ parentWindow: SingleTreePopUpWindow) {
         self.parentWindow = parentWindow
-        self.app = app
-        self.con = con
     }
 
     func doMerge() {
-        NSLog("DEBUG OK btn clicked! Sending signal: '\(Signal.COMPLETE_MERGE)'")
-        self.con.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
+        NSLog("DEBUG [\(self.parentWindow.winID)] OK btn clicked! Sending signal: '\(Signal.COMPLETE_MERGE)'")
+        self.parentWindow.con.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
 
         // BE will notify the app on success or failure, and it will decide whether to close this window.
     }
@@ -30,8 +26,8 @@ struct MergePreviewContent: View {
     var body: some View {
         VStack {
             GeometryReader { geo in
-                SinglePaneView(self.app, self.con, self.windowState)
-                        .environmentObject(self.app.settings)
+                SinglePaneView(self.parentWindow.app, self.parentWindow.con, self.windowState)
+                        .environmentObject(self.parentWindow.app.settings)
                         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
                         .contentShape(Rectangle()) // taps should be detected in the whole window
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
@@ -43,7 +39,7 @@ struct MergePreviewContent: View {
             HStack {
                 Spacer()
                 Button("Cancel", action: {
-                    NSLog("DEBUG [\(self.con.treeID)] Cancel button was clicked")
+                    NSLog("DEBUG [\(self.parentWindow.winID)] Cancel button was clicked")
                     self.parentWindow.close()
                 })
                         .keyboardShortcut(.cancelAction)
@@ -59,16 +55,16 @@ struct MergePreviewContent: View {
 /**
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
-class MergePreview: PopUpTreePanel {
+class MergePreview: SingleTreePopUpWindow {
 
     override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
         super.init(app, con, initialSelection: initialSelection)
         assert(con.treeID == ID_MERGE_TREE)
-        self.window.center()
-        self.window.title = "Confirm Merge"
+        self.center()
+        self.title = "Confirm Merge"
 
-        let content = MergePreviewContent(self.app, self.con, self.window)
-        window.contentView = NSHostingView(rootView: content)
+        let content = MergePreviewContent(self)
+        self.contentView = NSHostingView(rootView: content)
     }
 
 }

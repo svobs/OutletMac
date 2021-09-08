@@ -5,37 +5,22 @@
 
 import SwiftUI
 
-class PopUpTreePanelWindow: NSWindow {
-    override func keyDown(with event: NSEvent) {
-        // Pass all key events to the project model
-        NSLog("KEY EVENT: \(event)")
-        // Enable key events
-        interpretKeyEvents([event])
-        if event.keyCode == 13 {
-            NSLog("ENTER KEY PRESSED!")
-        } else {
-            NSLog("User pressed key: \(event.keyCode)")
-        }
-    }
-}
-
-class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject {
+class SingleTreePopUpWindow: NSWindow, NSWindowDelegate, HasLifecycle, ObservableObject {
     let app: OutletApp
     let con: TreePanelControllable
     let dispatchListener: DispatchListener
 
     private var windowIsOpen = true
-    var window: NSWindow!
     let initialSelection: SPIDNodePair?
 
     func windowWillClose(_ notification: Notification) {
-        NSLog("DEBUG [\(self.con.treeID)] windowWillClose() entered")
+        NSLog("DEBUG [\(self.winID)] windowWillClose() entered")
         windowIsOpen = false
 
         do {
             try self.shutdown()
         } catch {
-            NSLog("ERROR Failure during window close; \(error)")
+            NSLog("ERROR Failure during parentWindow close: \(error)")
         }
     }
 
@@ -45,16 +30,22 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
         }
     }
 
+    var winID: String {
+        get {
+            self.con.treeID
+        }
+    }
+
     init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
         self.app = app
         self.con = con
         self.initialSelection = initialSelection
-        self.dispatchListener = self.app.dispatcher.createListener("\(self.con.treeID)-dialog")
+        self.dispatchListener = self.app.dispatcher.createListener("\(con.treeID)-dialog")
 
         // TODO: save content rect in config
         // note: x & y are from lower-left corner
         let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
-        window = PopUpTreePanelWindow(
+        super.init(
                 contentRect: contentRect,
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered, defer: false)
@@ -64,11 +55,11 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
 
     func start() throws {
         // Enables windowWillClose() callback
-        window.delegate = self
+        self.delegate = self
 
-        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.con.treeID)
-        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
-        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.winID)
+        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.winID)
+        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.winID)
 
         // TODO: create & populate progress bar to show user that something is being done here
 
@@ -77,7 +68,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
 
     // This is called by windowWillClose()
     func shutdown() throws {
-        NSLog("DEBUG [\(self.con.treeID)] Window shutdown() called")
+        NSLog("DEBUG [\(self.winID)] Window shutdown() called")
         try self.con.shutdown()
         self.dispatchListener.unsubscribeAll()
     }
@@ -89,9 +80,24 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
     }
 
     func moveToFront() {
-        NSLog("DEBUG [\(self.con.treeID)] moveToFront() called")
-        self.window.makeKeyAndOrderFront(nil)
+        NSLog("DEBUG [\(self.winID)] moveToFront() called")
+        self.makeKeyAndOrderFront(nil)
         self.windowIsOpen = true
+    }
+
+    /**
+     NSWindow method
+     */
+    override func keyDown(with event: NSEvent) {
+        // Pass all key events to the project model
+        NSLog("KEY EVENT: \(event)")
+        // Enable key events
+        interpretKeyEvents([event])
+        if event.keyCode == 13 {
+            NSLog("ENTER KEY PRESSED!")
+        } else {
+            NSLog("User pressed key: \(event.keyCode)")
+        }
     }
 
     // DispatchListener callbacks
@@ -99,13 +105,13 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
 
     private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
         let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
-        NSLog("DEBUG [\(self.con.treeID)] PopUpTreePanel: Got signal \(Signal.TREE_LOAD_STATE_UPDATED) with tree_load_state=\(treeLoadState)")
+        NSLog("DEBUG [\(self.winID)] SingleTreePopUpWindow: Got signal \(Signal.TREE_LOAD_STATE_UPDATED) with tree_load_state=\(treeLoadState)")
 
         switch treeLoadState {
         case .COMPLETELY_LOADED:
             // note: around exactly the same time, the TreePanelController will receive this and start populating
             DispatchQueue.main.async {
-                NSLog("DEBUG [\(self.con.treeID)] Backend load complete. Showing dialog")
+                NSLog("DEBUG [\(self.winID)] Backend load complete. Showing dialog")
                 self.moveToFront()
             }
         default:
@@ -119,7 +125,7 @@ class PopUpTreePanel: NSObject, NSWindowDelegate, HasLifecycle, ObservableObject
             self.moveToFront()
 
             if let selectionSPID = self.initialSelection?.spid {
-                NSLog("DEBUG [\(self.con.treeID)] Populate complete! Selecting SPID: \(selectionSPID)")
+                NSLog("DEBUG [\(self.winID)] Populate complete! Selecting SPID: \(selectionSPID)")
                 self.selectSPID(selectionSPID)
             }
         }

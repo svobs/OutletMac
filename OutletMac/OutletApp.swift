@@ -198,28 +198,28 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   private func grpcDidGoDown_internal() {
     DispatchQueue.main.async {
-      NSLog("DEBUG Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
+      NSLog("DEBUG [Main] Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
       self.enableWindowCloseListener = false
       // Close all other windows beside the Connection Problem window, if they exist
       self.mainWindow?.close()
-      self.rootChooserView?.window.close()
-      self.mergePreviewView?.window.close()
+      self.rootChooserView?.close()
+      self.mergePreviewView?.close()
       self.enableWindowCloseListener = true
 
       self.settings.reset()
 
       // Open Connection Problem window
-      NSLog("INFO  Showing ConnectionProblem window")
+      NSLog("INFO  [Main] Showing ConnectionProblem window")
       do {
         if self.connectionProblemView != nil && self.connectionProblemView!.isOpen {
-          NSLog("DEBUG Closing existing ConnectionProblem window")
-          self.connectionProblemView!.window.close()
+          NSLog("DEBUG [Main] Closing existing ConnectionProblem window")
+          self.connectionProblemView!.close()
         }
         self.connectionProblemView = ConnectionProblemView(self, self._backend!.backendConnectionState)
         try self.connectionProblemView!.start()
         self.connectionProblemView!.showWindow()
       } catch {
-        NSLog("ERROR Failed to open ConnectionProblem window: \(error)")
+        NSLog("ERROR [Main] Failed to open ConnectionProblem window: \(error)")
         self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
       }
     }
@@ -227,17 +227,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   func grpcDidGoUp() {
     DispatchQueue.main.async {
-      NSLog("INFO  grpcDidGoUp: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+      NSLog("INFO  [Main] grpcDidGoUp: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
       do {
         try self.launchFrontend()
       } catch {
         if let grpcClient = self._backend, !grpcClient.isConnected {
           // we can handle a disconnect
-          NSLog("ERROR While creating main window: \(error)")
+          NSLog("ERROR [Main] While creating main window: \(error)")
           self.grpcDidGoDown_internal()
 
         } else { // unknown error...try to handle
-          NSLog("ERROR while launching frontend: \(error)")
+          NSLog("ERROR [Main] while launching frontend: \(error)")
           self.grpcDidGoDown_internal()
         }
       }
@@ -247,7 +247,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func launchFrontend() throws {
     // These make gRPC calls and will be the first thing to fail if the BE is not online
     // (note: they will fail separately, since OutletGRPCClient operates on a separate thread)
-    NSLog("DEBUG Entered launchFrontend()")
+    NSLog("DEBUG [Main] Entered launchFrontend()")
     try self.iconStore.start()
 
     settings.deviceList = try self.backend.getDeviceList()
@@ -262,12 +262,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     try self.conLeft!.requestTreeLoad()
     try self.conRight!.requestTreeLoad()
 
-    self.connectionProblemView?.window.close()
-
-    let screenSize = NSScreen.main?.frame.size ?? .zero
-    NSLog("DEBUG Screen size is \(screenSize.width)x\(screenSize.height)")
-
-    NSLog("DEBUG OutletMacApp start done")
+    NSLog("DEBUG [Main] OutletMacApp start done")
     self.createMainWindow()
   }
 
@@ -285,7 +280,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   private func loadWindowContentRectFromConfig() throws -> NSRect {
-    NSLog("DEBUG Entered loadWindowContentRectFromConfig()")
+    NSLog("DEBUG [Main] Entered loadWindowContentRectFromConfig()")
     let xLocConfigPath = "ui_state.\(winID).x"
     let yLocConfigPath = "ui_state.\(winID).y"
     let widthConfigPath = "ui_state.\(winID).width"
@@ -296,22 +291,28 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     let winWidth : Int = try backend.getIntConfig(widthConfigPath)
     let winHeight : Int = try backend.getIntConfig(heightConfigPath)
 
-    NSLog("DEBUG WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
+    NSLog("DEBUG [Main] WinCoords: (\(winX), \(winY)), width/height: \(winWidth)x\(winHeight)")
 
     return NSRect(x: winX, y: winY, width: winWidth, height: winHeight)
   }
 
   private func createMainWindow() {
+    let screenSize = NSScreen.main?.frame.size ?? .zero
+    NSLog("DEBUG [Main] Screen size is \(screenSize.width)x\(screenSize.height)")
+
+    // Close Connection Problem window if it is open:
+    self.connectionProblemView?.close()
+
     // FIXME: actually get the app to use these values
     do {
       self.contentRect = try self.loadWindowContentRectFromConfig()
     } catch {
       // recoverable error: just use defaults
-      NSLog("ERROR Failed to load contentRect from config: \(error)")
+      NSLog("ERROR [Main] Failed to load contentRect from config: \(error)")
     }
 
     if mainWindow == nil {
-      NSLog("DEBUG Creating mainWindow")
+      NSLog("DEBUG [Main] Creating mainWindow")
       mainWindow = NSWindow(
               contentRect: self.contentRect,
               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -321,7 +322,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       mainWindow!.title = "OutletMac"
     }
 
-    NSLog("DEBUG Showing mainWindow")
+    NSLog("DEBUG [Main] Showing mainWindow")
     mainWindowIsOpen = true
     mainWindow!.makeKeyAndOrderFront(nil)
     let contentView = MainContentView(app: self, conLeft: self.conLeft!, conRight: self.conRight!)
@@ -487,7 +488,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
     // This signal is also emitted after merge is done:
     DispatchQueue.main.async {
-      self.mergePreviewView?.window.close()
+      self.mergePreviewView?.close()
     }
 
     let leftTree = try propDict.get("tree_left") as! DisplayTree
@@ -613,7 +614,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     DispatchQueue.main.async {
       if self.mergePreviewView != nil && self.mergePreviewView!.isOpen {
         NSLog("DEBUG Looks like there is an existing Merge Preview window open: closing it")
-        self.mergePreviewView!.window.close()
+        self.mergePreviewView!.close()
       }
 
       do {
