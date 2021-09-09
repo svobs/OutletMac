@@ -183,6 +183,9 @@ class MainWindow: AppWindow, ObservableObject {
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  /**
+   Fired by HoldOffTimer
+   */
   private func reportWinCoords() {
     let rect = self.contentRect
     NSLog("DEBUG [\(self.winID)] Firing timer to report mainWindow size: \(rect)")
@@ -202,7 +205,9 @@ class MainWindow: AppWindow, ObservableObject {
   }
 }
 
-// Main window content view
+/**
+ MainWindow's main view
+ */
 struct MainContentView: View {
   @EnvironmentObject var globalState: GlobalState
   @StateObject var windowState: WindowState = WindowState()
@@ -244,7 +249,7 @@ struct MainContentView: View {
         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
       .onPreferenceChange(ContentAreaPrefKey.self) { key in
         if TRACE_ENABLED {
-          NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
+          NSLog("DEBUG [\(ID_MAIN_WINDOW)] HEIGHT OF WINDOW CANVAS: \(key.height)")
         }
         self.windowState.windowHeight = key.height
       }

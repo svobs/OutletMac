@@ -27,7 +27,7 @@ class MergePreviewWindow: SingleTreePopUpWindow {
  */
 struct MergePreviewContent: View {
     @StateObject var windowState: WindowState = WindowState()
-    var parentWindow: SingleTreePopUpWindow
+    weak var parentWindow: SingleTreePopUpWindow!
 
     init(_ parentWindow: SingleTreePopUpWindow) {
         self.parentWindow = parentWindow

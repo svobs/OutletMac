@@ -25,23 +25,23 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
 
 struct ConnectionProblemContent: View {
     @ObservedObject var backendConnectionState: BackendConnectionState
-    var parentWindow: NSWindow
+    weak var parentWindow: ConnectionProblemWindow!
     weak var app: OutletApp!
 
-    init(_ app: OutletApp, _ parentWindow: NSWindow, _ backendConnectionState: BackendConnectionState) {
+    init(_ app: OutletApp, _ parentWindow: ConnectionProblemWindow, _ backendConnectionState: BackendConnectionState) {
         self.parentWindow = parentWindow
         self.app = app
         self.backendConnectionState = backendConnectionState
     }
 
     func quitButtonClicked() {
-        NSLog("DEBUG ConnectionProblemContent: Quit btn clicked!")
+        NSLog("DEBUG [\(self.parentWindow.winID)]: Quit btn clicked!")
         self.parentWindow.close()
         do {
             try self.app.shutdown()
         } catch {
             // this shouldn't happen in principle
-            NSLog("ERROR Failure during shutdown: \(error)")
+            NSLog("ERROR Failure during app shutdown: \(error)")
         }
     }
 

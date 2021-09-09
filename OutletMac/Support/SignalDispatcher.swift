@@ -89,7 +89,7 @@ class PropDict {
  */
 class DispatchListener {
   private let _id: ListenerID
-  private let _dispatcher: SignalDispatcher
+  private weak var _dispatcher: SignalDispatcher!
   private var _subscribedSignals = Set<Signal>()
 
   init(_ id: ListenerID, _ dispatcher: SignalDispatcher) {
