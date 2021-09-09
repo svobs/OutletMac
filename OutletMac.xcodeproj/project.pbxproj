@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		250CFB79C26C9D722A77955C /* Pods_OutletMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */; };
 		CDF2F074C68FB2C637C8B552 /* MergePreviewWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */; };
-		CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */; };
+		CDF2F095CE30EB52A815BDF2 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6EABEEFF996A1F3EDB0 /* MainWindow.swift */; };
 		CDF2F17E1486B7E6CF9930FA /* RootPathPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */; };
 		CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F26A81EB1214E0F983EE /* AppWindow.swift */; };
 		CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */; };
@@ -91,7 +91,7 @@
 		CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendConnectionState.swift; sourceTree = "<group>"; };
-		CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
+		CDF2F6EABEEFF996A1F3EDB0 /* MainWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		CDF2F77AA899F692856B9A3D /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		CDF2F81C318FC582AE23E023 /* IfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IfView.swift; sourceTree = "<group>"; };
@@ -258,7 +258,7 @@
 				CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */,
 				CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */,
 				CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */,
-				CDF2F6EABEEFF996A1F3EDB0 /* MainContentView.swift */,
+				CDF2F6EABEEFF996A1F3EDB0 /* MainWindow.swift */,
 				CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */,
 				CDF2F26A81EB1214E0F983EE /* AppWindow.swift */,
 			);
@@ -481,7 +481,7 @@
 				CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */,
 				CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */,
 				CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */,
-				CDF2F095CE30EB52A815BDF2 /* MainContentView.swift in Sources */,
+				CDF2F095CE30EB52A815BDF2 /* MainWindow.swift in Sources */,
 				CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */,
 				CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */,
 				CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */,
