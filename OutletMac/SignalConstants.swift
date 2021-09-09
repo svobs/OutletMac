@@ -92,6 +92,7 @@ enum Signal: UInt32 {
 }
 
 // --- Sender identifiers ---
+let ID_APP = "app"
 let ID_MAIN_WINDOW = "main_win"
 let ID_LEFT_TREE = "left_tree"
 let ID_RIGHT_TREE = "right_tree"

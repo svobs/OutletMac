@@ -51,7 +51,7 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
 
     func start() throws {
         NSLog("DEBUG [\(self.winID)] Starting")
-        self.dispatchListener = self.app.dispatcher.createListener("\(self.winID)-dialog")
+        self.dispatchListener = self.app.dispatcher.createListener(self.winID)
 
         // Enables windowWillClose() callback
         self.delegate = self
