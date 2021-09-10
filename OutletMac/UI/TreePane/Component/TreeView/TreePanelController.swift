@@ -351,6 +351,7 @@ class TreePanelController: TreePanelControllable {
 
   private func updateStatusBarMsg(_ statusBarMsg: String) {
     NSLog("DEBUG [\(self.treeID)] Updating status bar msg with content: \"\(statusBarMsg)\"")
+    assert(DispatchQueue.isExecutingIn(.main))
     self.swiftTreeState.statusBarMsg = statusBarMsg
   }
 
@@ -514,8 +515,8 @@ class TreePanelController: TreePanelControllable {
   private func onTreeLoadStateUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let treeLoadState = try propDict.get("tree_load_state") as! TreeLoadState
     let statusBarMsg = try propDict.getString("status_msg")
-    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
-    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
+    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! [GUID:DirectoryStats]
+    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! [UID:DirectoryStats]
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Got signal: \(Signal.TREE_LOAD_STATE_UPDATED) with state=\(treeLoadState), status_msg='\(statusBarMsg)'")
@@ -560,8 +561,8 @@ class TreePanelController: TreePanelControllable {
 
   private func onDirStatsUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
     let statusBarMsg = try propDict.getString("status_msg")
-    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! Dictionary<GUID, DirectoryStats>
-    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! Dictionary<UID, DirectoryStats>
+    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! [GUID:DirectoryStats]
+    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! [UID:DirectoryStats]
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] Updating dir stats with status msg: \"\(statusBarMsg)\"")

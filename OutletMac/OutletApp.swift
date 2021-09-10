@@ -18,9 +18,10 @@ protocol OutletApp: HasLifecycle {
 
   var globalState: GlobalState { get }
 
+  var serialQueue: DispatchQueue { get }
+
   func grpcDidGoDown()
   func grpcDidGoUp()
-
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
 
@@ -79,7 +80,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private var _backend: OutletGRPCClient?
   private var _iconStore: IconStore? = nil
 
-  private let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
+  let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
+
+  private let tcDQ = DispatchQueue(label: "TreeControllerDict-SerialQueue")
+
   /**
    This should be the ONLY place where strong references to TreePanelControllables are stored.
    Everything else should be a weak ref. Thus, when deregisterTreePanelController() is called, the only ref
@@ -104,6 +108,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     // Enable detection of our custom queue, for debugging and assertions:
     DispatchQueue.registerDetection(of: self.serialQueue)
+    DispatchQueue.registerDetection(of: self.tcDQ)
 
     super.init()
   }
@@ -164,10 +169,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func shutdown() throws {
-    self.execSync {
+    self.tcDQ.sync {
       if self.wasShutdown {
         return
       }
+
       for (treeID, controller) in self.treeControllerDict {
         do {
           try controller.shutdown()
@@ -184,7 +190,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
   func grpcDidGoDown() {
     DispatchQueue.main.async {
-      NSLog("DEBUG [\(ID_APP)] Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
+      NSLog("DEBUG [\(ID_APP)] Entered grpcDidGoDown()")
 
       // Close all other windows beside the Connection Problem window, if they exist
       self.mainWindow?.closeWithoutAppShutdown()
@@ -196,9 +202,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       // Open Connection Problem window
       NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
       do {
-        self.connectionProblemWindow?.close()
         self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
+        NSLog("DEBUG [\(ID_APP)] Starting ConnectionProblem window")
         try self.connectionProblemWindow!.start()
+        NSLog("DEBUG [\(ID_APP)] Showing ConnectionProblem window")
         self.connectionProblemWindow!.showWindow()
       } catch {
         NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
@@ -311,24 +318,24 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func registerTreePanelController(_ treeID: TreeID, _ controller: TreePanelControllable) {
-    self.execAsync {
+    self.tcDQ.sync {
       NSLog("DEBUG [\(treeID)] Registering tree controller in frontend")
       self.treeControllerDict[treeID] = controller
     }
   }
 
   func deregisterTreePanelController(_ treeID: TreeID) {
-    self.execAsync {
+    self.tcDQ.sync {
       NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
       self.treeControllerDict.removeValue(forKey: treeID)
     }
   }
 
   func getTreePanelController(_ treeID: TreeID) -> TreePanelControllable? {
-    assert(DispatchQueue.isNotExecutingIn(self.serialQueue))
+    assert(DispatchQueue.isNotExecutingIn(self.tcDQ))
 
     var con: TreePanelControllable?
-    self.execSync {
+    self.tcDQ.sync {
       con = self.treeControllerDict[treeID]
     }
     return con
@@ -341,7 +348,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    Display error msg in dialog
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
-      DispatchQueue.main.async {
+      self.tcDQ.sync {
         if let problemWindow = self.connectionProblemWindow, problemWindow.isOpen {
           NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the Connection Problem window is open")
         } else if self.mainWindow == nil || !self.mainWindow!.isOpen {
@@ -405,10 +412,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
 
     DispatchQueue.main.async {
-      if self.mergePreviewWindow != nil && self.mergePreviewWindow!.isOpen {
-        NSLog("DEBUG [\(ID_APP)] Looks like there is an existing Merge Preview window open: closing it")
-        self.mergePreviewWindow!.close()
-      }
+      self.mergePreviewWindow?.close()
 
       do {
         self.mergePreviewWindow = MergePreviewWindow(self, con)
@@ -427,10 +431,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     assert(DispatchQueue.isExecutingIn(.main))
 
     do {
-      if let mainWindow = self.mainWindow, mainWindow.isOpen {
-        NSLog("DEBUG [\(ID_APP)] For some reason MainWindow was open. Closing it first.")
-        mainWindow.closeWithoutAppShutdown()
-      }
+      self.mainWindow?.closeWithoutAppShutdown()
 
       // FIXME: actually get the app to use these values
       var contentRect: NSRect? = nil

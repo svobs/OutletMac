@@ -97,10 +97,6 @@ class DispatchListener {
     self._dispatcher = dispatcher
   }
 
-  deinit {
-    unsubscribeAll()
-  }
-
   public func subscribe(signal: Signal, _ callback: @escaping SignalCallback, whitelistSenderID: SenderID? = nil, blacklistSenderID: SenderID? = nil) {
     let filterCriteria = SignalFilterCriteria(whitelistSenderID: whitelistSenderID, blacklistSenderID: blacklistSenderID)
     let sub = Subscription(callback, filterBy: filterCriteria)
@@ -114,7 +110,7 @@ class DispatchListener {
   public func unsubscribeAll() {
     // NOTE: this is called by deinit(), so we need to make this a sync call - otherwise we'll end up accessing deallocated vars and crash
     self._dispatcher.sendQueue.sync {
-      NSLog("DEBUG Unsubscribing from all signals for listenerID \(self._id)")
+      NSLog("DEBUG Unsubscribing from all (\(self._subscribedSignals.count)) signals for listenerID \(self._id)")
       for signal in self._subscribedSignals {
         self._dispatcher.unsubscribe(signal: signal, listenerID: self._id)
         self._subscribedSignals.remove(signal)

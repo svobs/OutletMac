@@ -7,6 +7,7 @@ import SwiftUI
 
 class ConnectionProblemWindow: AppWindow, ObservableObject {
     init(_ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
+        NSLog("DEBUG [ConnectionProblemWindow] Init")
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
         super.init(app, contentRect, styleMask: [.titled, .closable, .fullSizeContentView])
         self.center()
@@ -14,6 +15,7 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
 
         let content = ConnectionProblemContent(self.app, self, backendConnectionState)
         self.contentView = NSHostingView(rootView: content)
+        NSLog("DEBUG [ConnectionProblemWindow] Init done")
     }
 
     override var winID: String {

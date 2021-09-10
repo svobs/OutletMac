@@ -740,6 +740,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func reloadData() {
         assert(DispatchQueue.isExecutingIn(.main))
 
+        NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore")
         self.outlineView.reloadData()
     }
 

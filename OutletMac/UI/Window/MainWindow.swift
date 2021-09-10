@@ -63,25 +63,23 @@ class MainWindow: AppWindow, ObservableObject {
   override func shutdown() throws {
     try super.shutdown()  // disconnects listeners
 
-    self.app.execAsync {
-      do {
-        try self.conLeft?.shutdown()
-        try self.conRight?.shutdown()
-      } catch {
-        NSLog("ERROR [\(self.winID)] Failed to shut down tree controllers: \(error)")
-      }
+    do {
+      try self.conLeft?.shutdown()
+      try self.conRight?.shutdown()
+    } catch {
+      NSLog("ERROR [\(self.winID)] Failed to shut down tree controllers: \(error)")
+    }
 
-      if self.isShutdownAppOnClose {
-        NSLog("INFO  [\(self.winID)] Window closed by user: shutting down app")
-        do {
-          try self.app.shutdown()
-        } catch {
-          NSLog("ERROR [\(self.winID)] Failure during app shutdown: \(error)")
-        }
-      } else {
-        // closed by program, not user
-        NSLog("DEBUG [\(self.winID)] Closing window without shutting down")
+    if self.isShutdownAppOnClose {
+      NSLog("INFO  [\(self.winID)] Window closed by user: shutting down app")
+      do {
+        try self.app.shutdown()
+      } catch {
+        NSLog("ERROR [\(self.winID)] Failure during app shutdown: \(error)")
       }
+    } else {
+      // closed by program, not user
+      NSLog("DEBUG [\(self.winID)] Closing window without shutting down")
     }
   }
 

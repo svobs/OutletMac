@@ -18,18 +18,15 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
         super.close()
     }
 
+    // This only gets triggered if the OS ACTUALLY is closing the window, even if close() is called extraneously
     func windowWillClose(_ notification: Notification) {
         NSLog("DEBUG [\(self.winID)] windowWillClose() entered")
-        if windowIsOpen {
-            windowIsOpen = false
+        windowIsOpen = false
 
-            do {
-                try self.shutdown()
-            } catch {
-                NSLog("ERROR Failure during parentWindow close: \(error)")
-            }
-        } else {
-            NSLog("DEBUG [\(self.winID)] Window was already closed")
+        do {
+            try self.shutdown()
+        } catch {
+            NSLog("ERROR Failure during parentWindow close: \(error)")
         }
     }
 
@@ -71,7 +68,7 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
      */
     func shutdown() throws {
         NSLog("DEBUG [\(self.winID)] shutdown() called")
-        self.dispatchListener?.unsubscribeAll()
+        self.dispatchListener!.unsubscribeAll()
     }
 
     func showWindow() {
