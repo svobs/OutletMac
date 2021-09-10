@@ -238,25 +238,44 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-     Accept/deny selection
+     Filter out rows which should not be selected.
      From NSOutlineViewDelegate
+     Has better performance than shouldSelectItem()
     */
-    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        guard let guid = item as? GUID else {
-            NSLog("ERROR [\(treeID)] shouldSelectItem(): not a GUID: \(item)")
-            return false
+    func outlineView(_ outlineView: NSOutlineView, selectionIndexesForProposedSelection proposedSelectionIndexes: IndexSet) -> IndexSet {
+        var guidList: [GUID] = []
+        for index in proposedSelectionIndexes {
+            let item = outlineView.item(atRow: index)
+            if let guid = item as? GUID {
+                guidList.append(guid)
+            } else {
+                NSLog("ERROR [\(treeID)] selectionIndexesForProposedSelection(): not a GUID: \(item ?? "nil")")
+            }
         }
-        guard let sn = self.displayStore.getSN(guid) else {
-            NSLog("ERROR [\(treeID)] shouldSelectItem(): not found in DisplayStore: \(guid)")
-            return false
-        }
-
-        if sn.node.isEphemeral {
-            NSLog("DEBUG [\(treeID)] shouldSelectItem(): denying selection: item is ephemeral: \(guid)")
-            return false
-        }
-        return true
+        let filteredSet: Set<GUID> = self.displayStore.toFilteredSet(guidList)
+        return self.getIndexSetFor(filteredSet)
     }
+
+//    /**
+//     Accept/deny selection
+//     From NSOutlineViewDelegate
+//    */
+//    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
+//        guard let guid = item as? GUID else {
+//            NSLog("ERROR [\(treeID)] shouldSelectItem(): not a GUID: \(item)")
+//            return false
+//        }
+//        guard let sn = self.displayStore.getSN(guid) else {
+//            NSLog("ERROR [\(treeID)] shouldSelectItem(): not found in DisplayStore: \(guid)")
+//            return false
+//        }
+//
+//        if sn.node.isEphemeral {
+//            NSLog("DEBUG [\(treeID)] shouldSelectItem(): denying selection: item is ephemeral: \(guid)")
+//            return false
+//        }
+//        return true
+//    }
 
     /**
      Post Selection Change

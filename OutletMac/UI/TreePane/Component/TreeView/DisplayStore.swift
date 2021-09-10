@@ -295,6 +295,22 @@ class DisplayStore {
     return self.primaryDict[guid] ?? nil
   }
 
+  public func toFilteredSet(_ guidList: [GUID]) -> Set<GUID> {
+    var filteredSet: Set<GUID> = Set()
+    dq.sync {
+      for guid in guidList {
+        if let sn = self.getSN_NoLock(guid) {
+          if !sn.node.isEphemeral {
+            filteredSet.insert(guid)
+          }
+        } else {
+          NSLog("[\(self.treeID)] WARN  Could not find SN for GUID; ommitting: \(guid)")
+        }
+      }
+    }
+    return filteredSet
+  }
+
   /**
    Lookup func. Given a GUID, return its corresponding SPIDNodePair.
    */
