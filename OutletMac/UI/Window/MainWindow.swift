@@ -9,12 +9,12 @@ import SwiftUI
  Has two panes (Left and Right), each of which contain a TreeView and its associated panels
  */
 class MainWindow: AppWindow, ObservableObject {
-  private var conLeft: TreePanelController
-  private var conRight: TreePanelController
+  private weak var conLeft: TreePanelControllable!
+  private weak var conRight: TreePanelControllable!
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
-  private var isShutdownOnClose: Bool = true
+  private var isShutdownAppOnClose: Bool = true
 
   override var winID: String {
     get {
@@ -22,18 +22,13 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
-  init(_ app: OutletApp, _ contentRect: NSRect? = nil) throws {
-    // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
-    let treeLeft: DisplayTree = try app.backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-    let treeRight: DisplayTree = try app.backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-    self.conLeft = try app.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
-    self.conRight = try app.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
-    try self.conLeft.requestTreeLoad()
-    try self.conRight.requestTreeLoad()
-
+  init(_ app: OutletApp, _ contentRect: NSRect? = nil, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
     if let customContentRect = contentRect {
       self.contentRect = customContentRect
     }
+
+    self.conLeft = conLeft
+    self.conRight = conRight
 
     let style: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
     super.init(app, self.contentRect, styleMask: style)
@@ -56,12 +51,44 @@ class MainWindow: AppWindow, ObservableObject {
     dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
     dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
     dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, onEnableUIToggled)
+
+    // Request these AFTER we start listening for a response:
+    try self.conLeft.requestTreeLoad()  // async
+    try self.conRight.requestTreeLoad()  // async
   }
 
-  func closeWithoutShutdown() {
-    self.isShutdownOnClose = false
+  /**
+   This is called by the pre-close() listener
+   */
+  override func shutdown() throws {
+    try super.shutdown()  // disconnects listeners
+
+    self.app.execAsync {
+      do {
+        try self.conLeft?.shutdown()
+        try self.conRight?.shutdown()
+      } catch {
+        NSLog("ERROR [\(self.winID)] Failed to shut down tree controllers: \(error)")
+      }
+
+      if self.isShutdownAppOnClose {
+        NSLog("INFO  [\(self.winID)] Window closed by user: shutting down app")
+        do {
+          try self.app.shutdown()
+        } catch {
+          NSLog("ERROR [\(self.winID)] Failure during app shutdown: \(error)")
+        }
+      } else {
+        // closed by program, not user
+        NSLog("DEBUG [\(self.winID)] Closing window without shutting down")
+      }
+    }
+  }
+
+  func closeWithoutAppShutdown() {
+    self.isShutdownAppOnClose = false
     defer {
-      self.isShutdownOnClose = true
+      self.isShutdownAppOnClose = true
     }
     // See: windowWillClose() method below
     self.close()
@@ -153,32 +180,6 @@ class MainWindow: AppWindow, ObservableObject {
 //  @objc func windowDidChangeScreen(_ notification: Notification) {
 //    NSLog("WINDOW CHANGED SCREEN!!!!!")
 //  }
-
-  override func windowWillClose(_ notification: Notification) {
-    super.windowWillClose(_: notification)
-
-    self.app.execAsync {
-      do {
-        try self.conLeft.shutdown()
-        try self.conRight.shutdown()
-      } catch {
-        NSLog("ERROR [\(self.winID)] Failed to shut down tree controllers: \(error)")
-      }
-    }
-
-    if self.isShutdownOnClose {
-      NSLog("INFO  [\(self.winID)] Window closed by user: shutting down app")
-      do {
-        try self.app.shutdown()
-      } catch {
-        NSLog("ERROR [\(self.winID)] Failure during app shutdown: \(error)")
-      }
-    } else {
-      // closed by program, not user
-      NSLog("DEBUG [\(self.winID)] Closing window without shutting down")
-    }
-
-  }
 
   // Other
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼

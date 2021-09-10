@@ -9,18 +9,27 @@ import SwiftUI
  Abstract base class
  */
 class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
-    let app: OutletApp
+    weak var app: OutletApp!
     var dispatchListener: DispatchListener! = nil
     private var windowIsOpen = true
 
+    override func close() {
+        NSLog("DEBUG [\(self.winID)] close() entered")
+        super.close()
+    }
+
     func windowWillClose(_ notification: Notification) {
         NSLog("DEBUG [\(self.winID)] windowWillClose() entered")
-        windowIsOpen = false
+        if windowIsOpen {
+            windowIsOpen = false
 
-        do {
-            try self.shutdown()
-        } catch {
-            NSLog("ERROR Failure during parentWindow close: \(error)")
+            do {
+                try self.shutdown()
+            } catch {
+                NSLog("ERROR Failure during parentWindow close: \(error)")
+            }
+        } else {
+            NSLog("DEBUG [\(self.winID)] Window was already closed")
         }
     }
 
@@ -57,14 +66,17 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
         self.delegate = self
     }
 
-    // This is called by windowWillClose()
+    /**
+     This is called by windowWillClose()
+     */
     func shutdown() throws {
-        NSLog("DEBUG [\(self.winID)] Window shutdown() called")
-        self.dispatchListener.unsubscribeAll()
+        NSLog("DEBUG [\(self.winID)] shutdown() called")
+        self.dispatchListener?.unsubscribeAll()
     }
 
     func showWindow() {
         NSLog("DEBUG [\(self.winID)] showWindow() called")
+        assert(DispatchQueue.isExecutingIn(.main))
         self.makeKeyAndOrderFront(nil)
         self.windowIsOpen = true
     }

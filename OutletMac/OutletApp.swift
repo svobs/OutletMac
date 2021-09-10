@@ -80,6 +80,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private var _iconStore: IconStore? = nil
 
   private let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
+  /**
+   This should be the ONLY place where strong references to TreePanelControllables are stored.
+   Everything else should be a weak ref. Thus, when deregisterTreePanelController() is called, the only ref
+   is deleted.
+   */
   private var treeControllerDict: [String: TreePanelControllable] = [:]
 
   var backend: OutletBackend {
@@ -182,7 +187,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("DEBUG [\(ID_APP)] Executing grpcDidGoDown(): mainWindowIsNull = \(self.mainWindow == nil)")
 
       // Close all other windows beside the Connection Problem window, if they exist
-      self.mainWindow?.closeWithoutShutdown()
+      self.mainWindow?.closeWithoutAppShutdown()
       self.rootChooserWindow?.close()
       self.mergePreviewWindow?.close()
 
@@ -203,28 +208,24 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   func grpcDidGoUp() {
+    NSLog("DEBUG [\(ID_APP)] Entered grpcDidGoUp()")
     DispatchQueue.main.async {
       do {
-        try self.launchFrontend()
-        NSLog("DEBUG [\(ID_APP)] OutletMacApp start done")
+        try self.iconStore.start()
+        self.globalState.deviceList = try self.backend.getDeviceList()
+        self.globalState.isPlaying = try self.backend.getOpExecutionPlayState()
+
+        let screenSize = NSScreen.main?.frame.size ?? .zero
+        NSLog("DEBUG [\(ID_APP)] Screen size is \(screenSize.width)x\(screenSize.height)")
+
+        self.openMainWindow()
+
       } catch {
         NSLog("ERROR [\(ID_APP)] while launching frontend: \(error)")
         self.grpcDidGoDown()
       }
-    }
-  }
 
-  private func launchFrontend() throws {
-    // These make gRPC calls and will be the first thing to fail if the BE is not online
-    // (note: they will fail separately, since OutletGRPCClient operates on a separate thread)
-    NSLog("DEBUG [\(ID_APP)] Entered launchFrontend()")
-    try self.iconStore.start()
-
-    globalState.deviceList = try self.backend.getDeviceList()
-
-    globalState.isPlaying = try self.backend.getOpExecutionPlayState()
-
-    try self.openMainWindow()
+    } // END .main.async
   }
 
   public func sendEnableUISignal(enable: Bool) {
@@ -240,7 +241,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
-    NSLog("ERROR Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    NSLog("ERROR  Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
   }
 
@@ -304,21 +305,23 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
     let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowsMultipleSelection: allowsMultipleSelection)
 
+    self.registerTreePanelController(con.treeID, con)
     try con.start()
     return con
   }
 
   func registerTreePanelController(_ treeID: TreeID, _ controller: TreePanelControllable) {
-    assert(DispatchQueue.isExecutingIn(self.serialQueue))
-
-    self.treeControllerDict[treeID] = controller
+    self.execAsync {
+      NSLog("DEBUG [\(treeID)] Registering tree controller in frontend")
+      self.treeControllerDict[treeID] = controller
+    }
   }
 
   func deregisterTreePanelController(_ treeID: TreeID) {
-    assert(DispatchQueue.isExecutingIn(self.serialQueue))
-
-    NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
-    self.treeControllerDict.removeValue(forKey: treeID)
+    self.execAsync {
+      NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
+      self.treeControllerDict.removeValue(forKey: treeID)
+    }
   }
 
   func getTreePanelController(_ treeID: TreeID) -> TreePanelControllable? {
@@ -339,7 +342,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       DispatchQueue.main.async {
-        if self.connectionProblemWindow != nil && self.connectionProblemWindow!.isOpen {
+        if let problemWindow = self.connectionProblemWindow, problemWindow.isOpen {
           NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the Connection Problem window is open")
         } else if self.mainWindow == nil || !self.mainWindow!.isOpen {
           NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the main window is not open to display it")
@@ -370,22 +373,23 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       NSLog("ERROR [\(treeID)] Cannot open GDrive Chooser: could not find controller with this treeID!")
       return
     }
+
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
-    DispatchQueue.main.async {
-      if self.rootChooserWindow != nil && self.rootChooserWindow!.isOpen {
-        self.rootChooserWindow!.showWindow()
-        self.rootChooserWindow!.selectSPID(currentSN.spid)
-      } else {
-        do {
-          let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
-          let con = try self.buildController(tree, canChangeRoot: false, allowsMultipleSelection: false)
+    if let rootChooser = self.rootChooserWindow, rootChooser.isOpen {
+      DispatchQueue.main.async {
+        rootChooser.showWindow()
+        rootChooser.selectSPID(currentSN.spid)
+      }
+    } else {
+      do {
+        let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
+        let con = try self.buildController(tree, canChangeRoot: false, allowsMultipleSelection: false)
 
-          self.rootChooserWindow = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
-          try self.rootChooserWindow!.start()
-        } catch {
-          self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
-        }
+        self.rootChooserWindow = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
+        try self.rootChooserWindow!.start()
+      } catch {
+        self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
       }
     }
   }
@@ -418,31 +422,43 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   /**
    Display Merge Preview dialog
    */
-  private func openMainWindow() throws {
-    let screenSize = NSScreen.main?.frame.size ?? .zero
-    NSLog("DEBUG [\(ID_APP)] Screen size is \(screenSize.width)x\(screenSize.height)")
+  private func openMainWindow() {
+    NSLog("DEBUG [\(ID_APP)] Entered openMainWindow()")
+    assert(DispatchQueue.isExecutingIn(.main))
 
-    if mainWindow == nil {
-      NSLog("DEBUG [\(ID_APP)] Creating mainWindow")
-    } else if mainWindow!.isOpen {
-      NSLog("DEBUG [\(ID_APP)] openMainWindow(): For some reason MainWindow was open. Closing it first.")
-      mainWindow?.closeWithoutShutdown()
-    }
-
-    // FIXME: actually get the app to use these values
-    var contentRect: NSRect? = nil
     do {
-      contentRect = try self.loadMainWindowContentRectFromConfig(ID_MAIN_WINDOW)
+      if let mainWindow = self.mainWindow, mainWindow.isOpen {
+        NSLog("DEBUG [\(ID_APP)] For some reason MainWindow was open. Closing it first.")
+        mainWindow.closeWithoutAppShutdown()
+      }
+
+      // FIXME: actually get the app to use these values
+      var contentRect: NSRect? = nil
+      do {
+        contentRect = try self.loadMainWindowContentRectFromConfig(ID_MAIN_WINDOW)
+      } catch {
+        // recoverable error: just use defaults
+        NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
+      }
+
+      // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
+      let treeLeft: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
+      let treeRight: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+      let conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
+      let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
+
+      self.mainWindow = MainWindow(self, contentRect, conLeft: conLeft, conRight: conRight)
+      try self.mainWindow!.start()
+      self.mainWindow!.showWindow()
+
+      // Close Connection Problem window if it is open:
+      self.connectionProblemWindow?.close()
+
+      NSLog("DEBUG [\(ID_APP)] Done creating mainWindow")
     } catch {
-      // recoverable error: just use defaults
-      NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
+      NSLog("ERROR [\(ID_APP)] while opening main window: \(error)")
+      self.grpcDidGoDown()
     }
-
-    mainWindow = try MainWindow(self, contentRect)
-    mainWindow!.showWindow()
-
-    // Close Connection Problem window if it is open:
-    self.connectionProblemWindow?.close()
   }
 
   private func loadMainWindowContentRectFromConfig(_ winID: String) throws -> NSRect {

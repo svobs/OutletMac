@@ -400,6 +400,9 @@ class DisplayStore {
         let childList = self.parentChildListDict[parentGUID] ?? []
         if childIndex >= childList.count {
           if useParentIfIndexInvalid {
+            if TRACE_ENABLED {
+              NSLog("DEBUG [\(self.treeID)] DisplayStore.getChild(): index invalid: using parent (\(parentGUID))")
+            }
             sn = self.getSN_NoLock(parentGUID)
           } else {
             NSLog("ERROR [\(self.treeID)] DisplayStore.getChild(): Could not find child of parent GUID \(parentGUID) & index \(childIndex)")

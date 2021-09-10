@@ -6,16 +6,18 @@
 import SwiftUI
 
 class SingleTreePopUpWindow: AppWindow, ObservableObject {
-    let con: TreePanelControllable
+    private let _winID: String
+    weak var con: TreePanelControllable!
     let initialSelection: SPIDNodePair?
 
     override var winID: String {
         get {
-            self.con.treeID
+            _winID
         }
     }
 
     init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
+        self._winID = "\(con.treeID)-window"
         self.con = con
         self.initialSelection = initialSelection
         let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
@@ -23,9 +25,12 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
     }
 
     override func start() throws {
-        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.winID)
-        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.winID)
-        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.winID)
+        try super.start()
+
+        // Add extra listeners to some of the controller's signals
+        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
 
         // TODO: create & populate progress bar to show user that something is being done here
 
@@ -41,6 +46,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
     func selectSPID(_ spid: SPID) {
         // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
         // being hit
+        // FIXME: Need to add logic to expand ancestor nodes
         self.con.treeView!.selectSingleGUID(spid.guid)
     }
 

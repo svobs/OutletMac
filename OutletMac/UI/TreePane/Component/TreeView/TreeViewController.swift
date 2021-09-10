@@ -401,7 +401,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
             if dropTargetSN.node.isParentOf(srcSN.node) {
-                if TRACE_ENABLED {  // // this can get called a lot when user is hovering
+                if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering
                     NSLog("DEBUG [\(self.treeID)] Drop target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
                 }
                 return true
@@ -426,7 +426,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if item == nil {
             // Special handling for dropping at the very top: allow the insert bar to be shown
-            if TRACE_ENABLED {
+            if SUPER_DEBUG_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on subtree root")
             }
             // TODO: may want to change 'index' to 'NSOutlineViewDropOnItemIndex' in the future. Not sure which is more intuitive
@@ -438,12 +438,12 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         if index == NSOutlineViewDropOnItemIndex {
             // Possibility I: Dropping ON
-            if TRACE_ENABLED {
+            if SUPER_DEBUG_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering on GUID: \(dstGUID)")
             }
         } else {
             // Possibility II: Dropping BETWEEN
-            if TRACE_ENABLED {
+            if SUPER_DEBUG_ENABLED {
                 NSLog("DEBUG [\(treeID)] Validating drop: user is hovering at parent GUID: \(dstGUID) child index \(index)")
             }
 
@@ -454,7 +454,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 if rowIndex >= 0 {
                     if let item = outlineView.item(atRow: rowIndex) {
                         dstGUID = itemToGUID(item)
-                        if TRACE_ENABLED {
+                        if SUPER_DEBUG_ENABLED {
                             NSLog("DEBUG [\(treeID)] Validating drop: user is hovering over GUID: \(dstGUID)")
                         }
                     }

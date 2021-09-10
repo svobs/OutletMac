@@ -115,10 +115,6 @@ class TreePanelController: TreePanelControllable {
     treeActions.con = self
     contextMenu.con = self
 
-    self.app.execSync {
-      self.app.registerTreePanelController(self.treeID, self)
-    }
-
     self.subscribeToSignals(treeID)
 
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
@@ -182,7 +178,7 @@ class TreePanelController: TreePanelControllable {
     self.app.execAsync { [unowned self] in
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
-        // this calls to the backend to do the load, which will eventually (with luck) come back to call onLoadSubtreeDone()
+        // this calls to the backend to do the load, which will eventually (with luck) come back to call onTreeLoadStateUpdated()
         self.enableNodeUpdateSignals = false
         try self.backend.startSubtreeLoad(treeID: self.treeID)
       } catch {
@@ -502,7 +498,7 @@ class TreePanelController: TreePanelControllable {
 
   func reportError(_ title: String, _ errorMsg: String) {
     // See listener in OutletApp
-    NSLog("ERROR [\(self.treeID)] Reporting local error: title='\(title)' error='\(errorMsg)'")
+    NSLog("DEBUG [\(self.treeID)] Reporting local error: title='\(title)' error='\(errorMsg)'")
     self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
   }
 
@@ -535,12 +531,10 @@ class TreePanelController: TreePanelControllable {
 
       switch treeLoadState {
       case .LOAD_STARTED:
-        DispatchQueue.main.async {
-          self.enableNodeUpdateSignals = true
+        self.enableNodeUpdateSignals = true
 
-          if self.swiftTreeState.isManualLoadNeeded {
-            self.swiftTreeState.isManualLoadNeeded = false
-          }
+        if self.swiftTreeState.isManualLoadNeeded {
+          self.swiftTreeState.isManualLoadNeeded = false
         }
 
         self.populateTreeView()
