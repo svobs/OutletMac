@@ -24,6 +24,14 @@ class TreeContextMenu {
   }
 
   public func rebuildMenuFor(_ menu: NSMenu, _ clickedGUID: GUID, _ selectedGUIDs: Set<GUID>) {
+    guard let sn = self.con.displayStore.getSN(clickedGUID) else {
+      NSLog("ERROR [\(treeID)] Clicked GUID not found: \(clickedGUID)")
+      return
+    }
+    guard !sn.node.isEphemeral else {
+      NSLog("DEBUG [\(treeID)] Ignoring request to build context menu: node is ephemeral")
+      return
+    }
     let clickedOnSelection = selectedGUIDs.contains(clickedGUID)
     NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) isOnSelection=\(clickedOnSelection)")
 

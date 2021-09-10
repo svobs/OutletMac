@@ -238,6 +238,27 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
+     Accept/deny selection
+     From NSOutlineViewDelegate
+    */
+    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
+        guard let guid = item as? GUID else {
+            NSLog("ERROR [\(treeID)] shouldSelectItem(): not a GUID: \(item)")
+            return false
+        }
+        guard let sn = self.displayStore.getSN(guid) else {
+            NSLog("ERROR [\(treeID)] shouldSelectItem(): not found in DisplayStore: \(guid)")
+            return false
+        }
+
+        if sn.node.isEphemeral {
+            NSLog("DEBUG [\(treeID)] shouldSelectItem(): denying selection: item is ephemeral: \(guid)")
+            return false
+        }
+        return true
+    }
+
+    /**
      Post Selection Change
      From NSOutlineViewDelegate
     */
