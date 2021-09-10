@@ -192,25 +192,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     DispatchQueue.main.async {
       NSLog("DEBUG [\(ID_APP)] Entered grpcDidGoDown()")
 
-      // Close all other windows beside the Connection Problem window, if they exist
-      self.mainWindow?.closeWithoutAppShutdown()
-      self.rootChooserWindow?.close()
-      self.mergePreviewWindow?.close()
-
-      self.globalState.reset()
-
-      // Open Connection Problem window
-      NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
-      do {
-        self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
-        NSLog("DEBUG [\(ID_APP)] Starting ConnectionProblem window")
-        try self.connectionProblemWindow!.start()
-        NSLog("DEBUG [\(ID_APP)] Showing ConnectionProblem window")
-        self.connectionProblemWindow!.showWindow()
-      } catch {
-        NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
-        self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
-      }
+      self.openConnectionProblemWindow()
     }
   }
 
@@ -393,8 +375,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowsMultipleSelection: false)
 
-        self.rootChooserWindow = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
-        try self.rootChooserWindow!.start()
+        let window = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
+        try window.start()
+        window.showWindow()
+        self.rootChooserWindow = window
       } catch {
         self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
       }
@@ -415,8 +399,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       self.mergePreviewWindow?.close()
 
       do {
-        self.mergePreviewWindow = MergePreviewWindow(self, con)
-        try self.mergePreviewWindow!.start()
+        let window = MergePreviewWindow(self, con)
+        try window.start()
+        window.showWindow()
+        self.mergePreviewWindow = window
       } catch {
         self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
       }
@@ -424,15 +410,39 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   }
 
   /**
-   Display Merge Preview dialog
+   Display Connection Problem dialog
+   */
+  func openConnectionProblemWindow() {
+    assert(DispatchQueue.isExecutingIn(.main))
+
+    // Close all other windows beside the Connection Problem window, if they exist
+    self.mainWindow?.closeWithoutAppShutdown()
+    self.rootChooserWindow?.close()
+    self.mergePreviewWindow?.close()
+
+    self.globalState.reset()
+
+    // Open Connection Problem window
+    NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
+    do {
+      let window = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
+      try window.start()
+      window.showWindow()
+      self.connectionProblemWindow = window
+    } catch {
+      NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
+      self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
+    }
+  }
+
+  /**
+   Display main window
    */
   private func openMainWindow() {
     NSLog("DEBUG [\(ID_APP)] Entered openMainWindow()")
     assert(DispatchQueue.isExecutingIn(.main))
 
     do {
-      self.mainWindow?.closeWithoutAppShutdown()
-
       // FIXME: actually get the app to use these values
       var contentRect: NSRect? = nil
       do {
@@ -448,9 +458,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       let conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
       let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
 
-      self.mainWindow = MainWindow(self, contentRect, conLeft: conLeft, conRight: conRight)
-      try self.mainWindow!.start()
-      self.mainWindow!.showWindow()
+      self.mainWindow?.closeWithoutAppShutdown()
+
+      let window = MainWindow(self, contentRect, conLeft: conLeft, conRight: conRight)
+      try window.start()
+      window.showWindow()
+      self.mainWindow = window
 
       // Close Connection Problem window if it is open:
       self.connectionProblemWindow?.close()
