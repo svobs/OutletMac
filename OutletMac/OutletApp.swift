@@ -68,10 +68,14 @@ class AppMenu: NSMenu {
 }
 
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
+  // Windows which ARE reused:
+  var connectionProblemWindow: ConnectionProblemWindow! = nil
+  var mainWindow: MainWindow? = nil
+
+  // Windows which ARE NOT reused... TODO: test opening & closing these lots of times
   var rootChooserWindow: GDriveRootChooserWindow? = nil
   var mergePreviewWindow: MergePreviewWindow? = nil
-  var connectionProblemWindow: ConnectionProblemWindow? = nil
-  var mainWindow: MainWindow? = nil
+
   private var wasShutdown: Bool = false
 
   let globalState = GlobalState()
@@ -118,6 +122,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     // Subscribe to app-wide signals here
     dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
+    dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
     dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
     dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
@@ -160,6 +165,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
 
     self._backend = OutletGRPCClient(self, useFixedAddress: useFixedAddress, fixedHost: fixedHost, fixedPort: fixedPort)
     self._iconStore = IconStore(self.backend)
+
+    self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
 
     // show Connection Problem window right away, cuz it might take a while to connect.
     // TODO: add a delay or something prettier
@@ -258,6 +265,20 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     }
   }
 
+  private func afterMergeTreeGenerated(senderID: SenderID, propDict: PropDict) throws {
+    NSLog("DEBUG [\(ID_APP)] Got signal: \(Signal.GENERATE_MERGE_TREE_DONE)")
+    let newTree = try propDict.get("tree") as! DisplayTree
+    // Need to execute in a different queue, 'cuz buildController() makes a gRPC call, and we can't do that in a thread which came from gRPC
+    do {
+      // This will put the controller in the registry as a side effect
+      let _ = try self.buildController(newTree, canChangeRoot: false, allowsMultipleSelection: false)
+      // note: we can't send a controller directly to this method (cuz of @objc), so instead we put it in our controller registry and later look it up.
+      NSApp.sendAction(#selector(OutletMacApp.openMergePreview), to: nil, from: newTree.treeID)
+    } catch {
+      self.displayError("Failed to build merge tree", "\(error)")
+    }
+  }
+
   // NSApplicationDelegate methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -331,12 +352,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   func displayError(_ msg: String, _ secondaryMsg: String) {
       self.tcDQ.sync {
-        if let problemWindow = self.connectionProblemWindow, problemWindow.isOpen {
-          NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the Connection Problem window is open")
-        } else if self.mainWindow == nil || !self.mainWindow!.isOpen {
-          NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the main window is not open to display it")
-        } else {
+        if self._backend!.isConnected {
           self.globalState.showAlert(title: msg, msg: secondaryMsg)
+        } else {
+          NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the Connection Problem window is open")
         }
       }
   }
@@ -415,23 +434,28 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   func openConnectionProblemWindow() {
     assert(DispatchQueue.isExecutingIn(.main))
 
-    // Close all other windows beside the Connection Problem window, if they exist
-    self.mainWindow?.closeWithoutAppShutdown()
-    self.rootChooserWindow?.close()
-    self.mergePreviewWindow?.close()
-
     self.globalState.reset()
 
-    // Open Connection Problem window
-    NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
-    do {
-      let window = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
-      try window.start()
-      window.showWindow()
-      self.connectionProblemWindow = window
-    } catch {
-      NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
-      self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
+    self.tcDQ.sync {
+
+      NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
+      // Close all other windows beside the Connection Problem window, if they exist
+      self.mainWindow?.closeWithoutAppShutdown()
+      self.rootChooserWindow?.close()
+      self.mergePreviewWindow?.close()
+
+      // Open Connection Problem window
+      NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
+      do {
+        try self.connectionProblemWindow!.start()
+        DispatchQueue.main.async {
+          NSLog("DEBUG [\(ID_APP)] Calling ConnectionProblem.showWindow()")
+          self.connectionProblemWindow!.showWindow()
+        }
+      } catch {
+        NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
+        self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
+      }
     }
   }
 
@@ -440,16 +464,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
    */
   private func openMainWindow() {
     NSLog("DEBUG [\(ID_APP)] Entered openMainWindow()")
-    assert(DispatchQueue.isExecutingIn(.main))
 
     do {
-      // FIXME: actually get the app to use these values
-      var contentRect: NSRect? = nil
-      do {
-        contentRect = try self.loadMainWindowContentRectFromConfig(ID_MAIN_WINDOW)
-      } catch {
-        // recoverable error: just use defaults
-        NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
+      if self.mainWindow == nil {
+        // FIXME: actually get the app to use these values
+        var contentRect: NSRect? = nil
+        do {
+          contentRect = try self.loadMainWindowContentRectFromConfig(ID_MAIN_WINDOW)
+        } catch {
+          // recoverable error: just use defaults
+          NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
+        }
+        self.mainWindow = MainWindow(self, contentRect)
       }
 
       // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
@@ -458,15 +484,22 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       let conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
       let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
 
-      self.mainWindow?.closeWithoutAppShutdown()
+      self.tcDQ.sync {
+        self.mainWindow?.closeWithoutAppShutdown()
+        do {
+          self.mainWindow!.setControllers(left: conLeft, right: conRight)
+          try self.mainWindow!.start()
+          DispatchQueue.main.async {
+            NSLog("DEBUG [\(ID_APP)] Calling MainWindow.showWindow()")
+            self.mainWindow!.showWindow()
+          }
 
-      let window = MainWindow(self, contentRect, conLeft: conLeft, conRight: conRight)
-      try window.start()
-      window.showWindow()
-      self.mainWindow = window
-
-      // Close Connection Problem window if it is open:
-      self.connectionProblemWindow?.close()
+          // Close Connection Problem window if it is open:
+          self.connectionProblemWindow?.close()
+        } catch {
+          NSLog("ERROR [\(ID_APP)] while starting main window: \(error)")
+        }
+      }
 
       NSLog("DEBUG [\(ID_APP)] Done creating mainWindow")
     } catch {

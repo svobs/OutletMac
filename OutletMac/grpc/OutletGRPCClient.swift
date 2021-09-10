@@ -133,11 +133,13 @@ class OutletGRPCClient: OutletBackend {
                 leftGroup = true
                 group.leave()
               }
-              self.backendConnectionState.host = ipPort.ip
-              self.backendConnectionState.port = ipPort.port
+              DispatchQueue.main.sync {
+                self.backendConnectionState.host = ipPort.ip
+                self.backendConnectionState.port = ipPort.port
 
-              NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
-              discoverySucceeded = true
+                NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+                discoverySucceeded = true
+              }
             }
 
           }, onError: { error in

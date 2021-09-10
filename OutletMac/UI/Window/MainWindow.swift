@@ -9,8 +9,8 @@ import SwiftUI
  Has two panes (Left and Right), each of which contain a TreeView and its associated panels
  */
 class MainWindow: AppWindow, ObservableObject {
-  private weak var conLeft: TreePanelControllable!
-  private weak var conRight: TreePanelControllable!
+  private weak var conLeft: TreePanelControllable? = nil
+  private weak var conRight: TreePanelControllable? = nil
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
@@ -22,25 +22,31 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
-  init(_ app: OutletApp, _ contentRect: NSRect? = nil, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
+  init(_ app: OutletApp, _ contentRect: NSRect? = nil) {
     if let customContentRect = contentRect {
       self.contentRect = customContentRect
     }
-
-    self.conLeft = conLeft
-    self.conRight = conRight
 
     let style: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView]
     super.init(app, self.contentRect, styleMask: style)
     self.isReleasedWhenClosed = false  // i.e., don't crash when re-opening
     self.title = "OutletMac"
+  }
 
-    let contentView = MainContentView(app: app, conLeft: self.conLeft, conRight: self.conRight)
+  func setControllers(left: TreePanelControllable, right: TreePanelControllable) {
+    self.conLeft = left
+    self.conRight = right
+
+    let contentView = MainContentView(app: app, conLeft: left, conRight: right)
             .environmentObject(self.app.globalState)
     self.contentView = NSHostingView(rootView: contentView)
   }
 
   override func start() throws {
+    guard let left = self.conLeft, let right = self.conRight else {
+      throw OutletError.invalidState("Controllers not set!")
+    }
+
     try super.start()  // this creates the dispatchListener
 
     // These are close to being global, but , we listen for these here rather than in OutletApp
@@ -48,13 +54,13 @@ class MainWindow: AppWindow, ObservableObject {
     dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
     dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
     dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
-    dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
     dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
     dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, onEnableUIToggled)
 
     // Request these AFTER we start listening for a response:
-    try self.conLeft.requestTreeLoad()  // async
-    try self.conRight.requestTreeLoad()  // async
+    try left.requestTreeLoad()  // async
+    try right.requestTreeLoad()  // async
+    NSLog("DEBUG [\(self.winID)] Start done")
   }
 
   /**
@@ -96,10 +102,14 @@ class MainWindow: AppWindow, ObservableObject {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   private func afterDiffTreesDone(senderID: SenderID, propDict: PropDict) throws {
+    guard let left = self.conLeft, let right = self.conRight else {
+      NSLog("WARN  [\(self.winID)] Controllers not set: ignoring signal \(Signal.DIFF_TREES_DONE)")
+      return
+    }
     let leftTree = try propDict.get("tree_left") as! DisplayTree
     let rightTree = try propDict.get("tree_right") as! DisplayTree
-    try self.conLeft.updateDisplayTree(to: leftTree)
-    try self.conRight.updateDisplayTree(to: rightTree)
+    try left.updateDisplayTree(to: leftTree)
+    try right.updateDisplayTree(to: rightTree)
     // This will change the button bar:
     self.changeWindowMode(.DIFF)
     self.app.sendEnableUISignal(enable: true)
@@ -112,28 +122,18 @@ class MainWindow: AppWindow, ObservableObject {
   }
 
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {
+    guard let left = self.conLeft, let right = self.conRight else {
+      NSLog("WARN  [\(self.winID)] Controllers not set: ignoring signal \(Signal.DIFF_TREES_CANCELLED)")
+      return
+    }
     let leftTree = try propDict.get("tree_left") as! DisplayTree
     let rightTree = try propDict.get("tree_right") as! DisplayTree
-    try self.conLeft.updateDisplayTree(to: leftTree)
-    try self.conRight.updateDisplayTree(to: rightTree)
+    try left.updateDisplayTree(to: leftTree)
+    try right.updateDisplayTree(to: rightTree)
 
     // This will change the button bar:
     self.changeWindowMode(.BROWSING)
     self.app.sendEnableUISignal(enable: true)
-  }
-
-  private func afterMergeTreeGenerated(senderID: SenderID, propDict: PropDict) throws {
-    NSLog("DEBUG [\(self.winID)] Got signal: \(Signal.GENERATE_MERGE_TREE_DONE)")
-    let newTree = try propDict.get("tree") as! DisplayTree
-    // Need to execute in a different queue, 'cuz buildController() makes a gRPC call, and we can't do that in a thread which came from gRPC
-    do {
-      // This will put the controller in the registry as a side effect
-      let _ = try self.app.buildController(newTree, canChangeRoot: false, allowsMultipleSelection: false)
-      // note: we can't send a controller directly to this method (cuz of @objc), so instead we put it in our controller registry and later look it up.
-      NSApp.sendAction(#selector(OutletMacApp.openMergePreview), to: nil, from: newTree.treeID)
-    } catch {
-      self.app.displayError("Failed to build merge tree", "\(error)")
-    }
   }
 
   private func afterGenMergeTreeFailed(senderID: SenderID, propDict: PropDict) throws {

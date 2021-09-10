@@ -10,6 +10,7 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
         NSLog("DEBUG [ConnectionProblemWindow] Init")
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
         super.init(app, contentRect, styleMask: [.titled, .closable, .fullSizeContentView])
+        self.isReleasedWhenClosed = false  // make it reusable
         self.center()
         self.title = "Connection to Agent Failed"
 
@@ -23,6 +24,12 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
             "ConnectionProblemWindow"
         }
     }
+
+    override func start() throws {
+        try super.start()  // this creates the dispatchListener
+        NSLog("DEBUG [\(self.winID)] Start done")
+    }
+
 }
 
 struct ConnectionProblemContent: View {
