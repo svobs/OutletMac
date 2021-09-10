@@ -537,11 +537,12 @@ public struct Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response {
   public init() {}
 }
 
-/// nothing
 public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
+
+  public var isAccepted: Bool = false
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -2426,18 +2427,31 @@ extension Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response: SwiftProt
 
 extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".DragDrop_Response"
-  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "is_accepted"),
+  ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let _ = try decoder.nextFieldNumber() {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBoolField(value: &self.isAccepted) }()
+      default: break
+      }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.isAccepted != false {
+      try visitor.visitSingularBoolField(value: self.isAccepted, fieldNumber: 1)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response) -> Bool {
+    if lhs.isAccepted != rhs.isAccepted {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

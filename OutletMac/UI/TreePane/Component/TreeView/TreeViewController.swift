@@ -541,8 +541,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID)")
 
         do {
-            try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true, dstTreeID: treeID, dstGUID: dstGUID)
-            return true
+            return try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true,
+                    dstTreeID: treeID, dstGUID: dstGUID)
         } catch {
             self.con.reportException("Error: Drop Failed!", error)
             return false

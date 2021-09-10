@@ -539,7 +539,7 @@ class OutletGRPCClient: OutletBackend {
     return tree
   }
 
-  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID) throws {
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID) throws -> Bool {
     var request = Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request()
     request.srcTreeID = srcTreeID
     request.dstTreeID = dstTreeID
@@ -549,7 +549,8 @@ class OutletGRPCClient: OutletBackend {
     }
     request.isInto = isInto
 
-    let _ = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
+    let response = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
+    return response.isAccepted
   }
   
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs {
