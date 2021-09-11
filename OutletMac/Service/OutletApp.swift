@@ -41,35 +41,6 @@ protocol OutletApp: HasLifecycle {
   func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String)
 }
 
-// This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
-class AppMenu: NSMenu {
-  override init(title: String) {
-    super.init(title: title)
-
-    let appMenu = NSMenuItem()
-    appMenu.submenu = NSMenu()
-    let appName = ProcessInfo.processInfo.processName
-    appMenu.submenu?.addItem(NSMenuItem(title: "About \(appName)", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: ""))
-    appMenu.submenu?.addItem(NSMenuItem.separator())
-    let services = NSMenuItem(title: "Services", action: nil, keyEquivalent: "")
-    services.submenu =  NSMenu()
-    appMenu.submenu?.addItem(services)
-    appMenu.submenu?.addItem(NSMenuItem.separator())
-    appMenu.submenu?.addItem(NSMenuItem(title: "Hide \(appName)", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
-    let hideOthers = NSMenuItem(title: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
-    hideOthers.keyEquivalentModifierMask = [.command, .option]
-    appMenu.submenu?.addItem(hideOthers)
-    appMenu.submenu?.addItem(NSMenuItem(title: "Show All", action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: ""))
-    appMenu.submenu?.addItem(NSMenuItem.separator())
-    appMenu.submenu?.addItem(NSMenuItem(title: "Quit \(appName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-
-    items = [appMenu]
-  }
-  required init(coder: NSCoder) {
-    super.init(coder: coder)
-  }
-}
-
 class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
   // Windows which ARE reused:
   var connectionProblemWindow: ConnectionProblemWindow! = nil
@@ -90,6 +61,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
 
   private let tcDQ = DispatchQueue(label: "TreeControllerDict-SerialQueue")
+
+  private var eventMonitor: GlobalEventMonitor? = nil
 
   /**
    This should be the ONLY place where strong references to TreePanelControllables are stored.
@@ -130,6 +103,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
     dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+
+    self.eventMonitor =  GlobalEventMonitor(mask: [.leftMouseDown, .rightMouseDown], handler: self.mouseEventHandler)
+    self.eventMonitor!.start()
 
     var useFixedAddress: Bool = false
     var fixedHost: String? = nil
@@ -184,6 +160,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
         return
       }
 
+      self.eventMonitor?.stop()
+
       for (treeID, controller) in self.treeControllerDict {
         do {
           try controller.shutdown()
@@ -230,6 +208,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   public func sendEnableUISignal(enable: Bool) {
     self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": enable])
   }
+
+  func mouseEventHandler(_ event: NSEvent?) {
+    NSLog("INFO  Got event!")
+  }
+
 
   // SignalDispatcher callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
