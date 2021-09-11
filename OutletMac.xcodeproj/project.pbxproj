@@ -24,6 +24,7 @@
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
+		CDF2F615F9059EA67EB224BA /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */; };
 		CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB4729ECD01C785776D8 /* Backend.swift */; };
 		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */; };
 		CDF2F6F2A11F9845287633E7 /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */; };
@@ -46,7 +47,7 @@
 		CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */; };
 		CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */; };
 		CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */; };
-		CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F265942131BB8C84EB29 /* IconStore.swift */; };
+		CDF2FE0E82052AA7E1E36D2D /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB1106717FF3D9D70C9B /* IconStore.swift */; };
 		CDF2FE5D71C8C57D8A893F45 /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
@@ -62,7 +63,6 @@
 		D194BEFB25E8F83000B4827F /* LinkedList in Frameworks */ = {isa = PBXBuildFile; productRef = D194BEFA25E8F83000B4827F /* LinkedList */; };
 		D19B16B726158E610072F8A8 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19B16B626158E610072F8A8 /* Device.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
-		D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BAC55E25A193C800D951A2 /* OutletApp.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -79,7 +79,6 @@
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
 		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
-		CDF2F265942131BB8C84EB29 /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
 		CDF2F26A81EB1214E0F983EE /* AppWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppWindow.swift; sourceTree = "<group>"; };
 		CDF2F275262010959BE9CDA3 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
@@ -100,7 +99,9 @@
 		CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineViewFactory.swift; sourceTree = "<group>"; };
 		CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTreeState.swift; sourceTree = "<group>"; };
 		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooserWindow.swift; sourceTree = "<group>"; };
+		CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
 		CDF2FAC3B920540522051982 /* UnwrapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
+		CDF2FB1106717FF3D9D70C9B /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
 		CDF2FB2EA146750617D29EDD /* GlobalState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalState.swift; sourceTree = "<group>"; };
 		CDF2FB4729ECD01C785776D8 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
@@ -130,7 +131,6 @@
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
-		D1BAC55E25A193C800D951A2 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -178,7 +178,6 @@
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* Backend */,
-				D1BAC55E25A193C800D951A2 /* OutletApp.swift */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
@@ -230,6 +229,8 @@
 			children = (
 				CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */,
 				CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */,
+				CDF2FB1106717FF3D9D70C9B /* IconStore.swift */,
+				CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -340,7 +341,6 @@
 				CDF2FB2EA146750617D29EDD /* GlobalState.swift */,
 				CDF2FE3CBB814776E801E1E4 /* WindowState.swift */,
 				CDF2FFBCB0C091456F39F518 /* TreePane */,
-				CDF2F265942131BB8C84EB29 /* IconStore.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -466,7 +466,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1BAC56725A193C800D951A2 /* OutletApp.swift in Sources */,
 				D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */,
 				D19B16B726158E610072F8A8 /* Device.swift in Sources */,
 				D1767FD525BA3B3800B2A4F5 /* NodeIdentifierFactory.swift in Sources */,
@@ -510,7 +509,6 @@
 				CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */,
 				CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */,
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
-				CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */,
 				CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */,
 				CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */,
 				CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */,
@@ -524,6 +522,8 @@
 				CDF2F5121881F0828451D058 /* BonjourService.swift in Sources */,
 				CDF2FE5D71C8C57D8A893F45 /* SignalConstants.swift in Sources */,
 				CDF2F9FD8CDCFA9EFBAB5A9E /* Constants.swift in Sources */,
+				CDF2FE0E82052AA7E1E36D2D /* IconStore.swift in Sources */,
+				CDF2F615F9059EA67EB224BA /* OutletApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

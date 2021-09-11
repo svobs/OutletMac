@@ -12,10 +12,12 @@ import SwiftUI
  PROTOCOL OutletApp
  */
 protocol OutletApp: HasLifecycle {
+  // Services:
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
   var iconStore: IconStore { get }
 
+  // State:
   var globalState: GlobalState { get }
 
   // TODO: remove these and replace with specialized DQs
