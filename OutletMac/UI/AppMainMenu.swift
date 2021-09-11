@@ -18,6 +18,11 @@ class AppMainMenu: NSMenu {
     }
 
     private static func buildMainMenu() -> [NSMenuItem] {
+        return [buildAppMenu(), buildEditMenu()]
+
+    }
+
+    private static func buildAppMenu() -> NSMenuItem {
         let appMenu = NSMenuItem()
         appMenu.submenu = NSMenu()
         let appName = ProcessInfo.processInfo.processName
@@ -34,12 +39,13 @@ class AppMainMenu: NSMenu {
         appMenu.submenu?.addItem(NSMenuItem(title: "Show All", action: #selector(NSApplication.unhideAllApplications(_:)), keyEquivalent: ""))
         appMenu.submenu?.addItem(NSMenuItem.separator())
         appMenu.submenu?.addItem(NSMenuItem(title: "Quit \(appName)", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        return appMenu
+    }
 
+    private static func buildEditMenu() -> NSMenuItem {
         let editMenu = NSMenuItem()
         editMenu.title = "Edit"
         editMenu.submenu = NSMenu(title: "Edit")
-        editMenu.submenu?.addItem(NSMenuItem(title: "About \(appName)", action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: ""))
-        return [appMenu, editMenu]
-
+        return editMenu
     }
 }

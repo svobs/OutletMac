@@ -123,7 +123,9 @@ class GRPCClientBackend: OutletBackend {
 
       // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
       DispatchQueue.main.sync {
-        NSLog("DEBUG Entering new DispatchGroup")
+        if TRACE_ENABLED {
+          NSLog("DEBUG Entering new DispatchGroup")
+        }
         group.enter()
 
         // Do discovery all over again, in case the address has changed:
@@ -133,19 +135,18 @@ class GRPCClientBackend: OutletBackend {
               NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
               return
             }
-
             defer {
-              NSLog("DEBUG Leaving DispatchGroup")
+              if TRACE_ENABLED {
+                NSLog("DEBUG Leaving DispatchGroup")
+              }
               leftGroup = true
               group.leave()
             }
-            DispatchQueue.main.sync {
-              self.backendConnectionState.host = ipPort.ip
-              self.backendConnectionState.port = ipPort.port
+            self.backendConnectionState.host = ipPort.ip
+            self.backendConnectionState.port = ipPort.port
 
-              NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
-              discoverySucceeded = true
-            }
+            NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+            discoverySucceeded = true
           }
 
         }, onError: { error in
@@ -163,10 +164,9 @@ class GRPCClientBackend: OutletBackend {
         })
       }
 
-      // wait ...
+      // Wait until success or failure
       NSLog("DEBUG [SignalReceiverThread] Waiting for BonjourService service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
-      let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
-      if result == .timedOut {
+      if group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC) == .timedOut {
         NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
       } else {
         if discoverySucceeded {
@@ -176,6 +176,7 @@ class GRPCClientBackend: OutletBackend {
 
         NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
       }
+      // fall through
     }
 
     Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
