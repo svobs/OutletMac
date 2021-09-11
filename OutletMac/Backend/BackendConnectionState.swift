@@ -6,7 +6,7 @@
 import Foundation
 
 /**
- CLASS OutletGRPCClient
+ CLASS GRPCClientBackend
  */
 class BackendConnectionState: ObservableObject {
     @Published var host: String

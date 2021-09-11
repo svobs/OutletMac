@@ -1,5 +1,5 @@
 //
-//  OutletGRPCClient.swift
+//  GRPCClientBackend.swift
 //  
 //
 //  Created by Matthew Svoboda on 2021-01-11.
@@ -11,11 +11,11 @@ import Logging
 import NIO
 
 /**
- CLASS OutletGRPCClient
+ CLASS GRPCClientBackend
 
  Thin gRPC client to the backend service
  */
-class OutletGRPCClient: OutletBackend {
+class GRPCClientBackend: OutletBackend {
   var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
   let app: OutletApp
   let bonjourService = BonjourService()
@@ -42,11 +42,11 @@ class OutletGRPCClient: OutletBackend {
     self.fixedPort = fixedPort
     self.dispatchListener = app.dispatcher.createListener(ID_BACKEND_CLIENT)
     self.backendConnectionState = BackendConnectionState(host: DEFAULT_GRPC_SERVER_ADDRESS, port: DEFAULT_GRPC_SERVER_PORT)
-    self.stub = OutletGRPCClient.makeClientStub(backendConnectionState.host, backendConnectionState.port)
+    self.stub = GRPCClientBackend.makeClientStub(backendConnectionState.host, backendConnectionState.port)
   }
 
   func start() throws {
-    NSLog("DEBUG Starting OutletGRPCClient...")
+    NSLog("DEBUG Starting GRPCClientBackend...")
     grpcConverter.backend = self
     nodeIdentifierFactory.backend = self
 
@@ -94,7 +94,7 @@ class OutletGRPCClient: OutletBackend {
     }
 
     NSLog("DEBUG Making new gRPC client stub...")
-    self.stub = OutletGRPCClient.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
+    self.stub = GRPCClientBackend.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
   }
 
   @objc func runSignalReceiverThread() {

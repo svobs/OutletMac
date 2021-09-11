@@ -84,7 +84,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
   let globalState = GlobalState()
   let dispatcher = SignalDispatcher()
   let dispatchListener: DispatchListener
-  private var _backend: OutletGRPCClient?
+  private var _backend: GRPCClientBackend?
   private var _iconStore: IconStore? = nil
 
   let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
@@ -166,7 +166,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
       }
     }
 
-    self._backend = OutletGRPCClient(self, useFixedAddress: useFixedAddress, fixedHost: fixedHost, fixedPort: fixedPort)
+    self._backend = GRPCClientBackend(self, useFixedAddress: useFixedAddress, fixedHost: fixedHost, fixedPort: fixedPort)
     self._iconStore = IconStore(self.backend)
 
     self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
