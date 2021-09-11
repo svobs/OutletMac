@@ -76,6 +76,30 @@ enum WindowMode: Int {
 }
 
 /**
+ For drag & drop
+ */
+enum DragOperation: UInt32 {
+  case MOVE = 1
+  case COPY = 2
+  case LINK = 3
+  case DELETE = 4
+
+  func getNSDragOperation() -> NSDragOperation {
+    switch self {
+    case .MOVE:
+      return NSDragOperation.move
+    case .COPY:
+      return NSDragOperation.copy
+    case .LINK:
+      return NSDragOperation.link
+    case .DELETE:
+      return NSDragOperation.delete
+    }
+  }
+}
+
+
+/**
  ENUM IconNames
  
  Used for locating files in the filesystem.

@@ -441,6 +441,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request {
 
   public var isInto: Bool = false
 
+  public var dragOperation: UInt32 = 0
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -2155,6 +2157,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     3: .standard(proto: "src_guid_list"),
     4: .standard(proto: "dst_guid"),
     5: .standard(proto: "is_into"),
+    6: .standard(proto: "drag_operation"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2168,6 +2171,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.srcGuidList) }()
       case 4: try { try decoder.decodeSingularStringField(value: &self.dstGuid) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isInto) }()
+      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.dragOperation) }()
       default: break
       }
     }
@@ -2189,6 +2193,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     if self.isInto != false {
       try visitor.visitSingularBoolField(value: self.isInto, fieldNumber: 5)
     }
+    if self.dragOperation != 0 {
+      try visitor.visitSingularUInt32Field(value: self.dragOperation, fieldNumber: 6)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2198,6 +2205,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     if lhs.srcGuidList != rhs.srcGuidList {return false}
     if lhs.dstGuid != rhs.dstGuid {return false}
     if lhs.isInto != rhs.isInto {return false}
+    if lhs.dragOperation != rhs.dragOperation {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

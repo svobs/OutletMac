@@ -542,7 +542,8 @@ class OutletGRPCClient: OutletBackend {
     return tree
   }
 
-  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID) throws -> Bool {
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation)
+      throws -> Bool {
     var request = Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request()
     request.srcTreeID = srcTreeID
     request.dstTreeID = dstTreeID
@@ -551,6 +552,7 @@ class OutletGRPCClient: OutletBackend {
       request.srcGuidList.append(srcGUID)
     }
     request.isInto = isInto
+    request.dragOperation = dragOperation.rawValue
 
     let response = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
     return response.isAccepted

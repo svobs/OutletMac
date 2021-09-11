@@ -6,23 +6,6 @@
 import AppKit
 import LinkedList
 
-/**
- AppKit's NSDragOperation is rather difficult to work with, so here we are.
- */
-enum DragOperation: Int {
-    case MOVE = 1
-    case COPY = 2
-
-    func getNSDragOperation() -> NSDragOperation {
-        switch self {
-        case .MOVE:
-            return NSDragOperation.move
-        case .COPY:
-            return NSDragOperation.copy
-        }
-    }
-}
-
 /*
  TreeViewController: AppKit controller for TreeViewRepresentable.
 
@@ -405,23 +388,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return nil
     }
 
-
-    /**
-     Implement this method know when the dragging session is about to begin and to potentially modify the dragging session.
-     */
-//    func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, willBeginAt screenPoint: NSPoint, forItems draggedItems: [Any]) {
-//    }
-
-    /* Dragging Destination Support - Required for multi-image dragging. Implement this method to allow the table to update dragging items as they are dragged over the view. Typically this will involve calling [draggingInfo enumerateDraggingItemsWithOptions:forView:classes:searchOptions:usingBlock:] and setting the draggingItem's imageComponentsProvider to a proper image based on the content. For View Based TableViews, one can use NSTableCellView's -draggingImageComponents and -draggingImageFrame.
-     */
-//    func outlineView(_ outlineView: NSOutlineView, updateDraggingItemsForDrag draggingInfo: NSDraggingInfo) {
-//    }
-
     /**
      This is implemented to support dropping items onto the Trash icon in the Dock
      */
     func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
-        guard operation == .delete else {
+        guard operation == NSDragOperation.delete else {
             return
         }
 
@@ -432,19 +403,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("INFO  [\(treeID)] User dragged to Trash: \(guidList)")
         let nodeList = displayStore.getNodeList(guidList)
         self.con.treeActions.confirmAndDeleteSubtrees(nodeList)
-    }
-
-    private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
-        for srcSN in self.displayStore.getSNList(srcGUIDList) {
-            if dropTargetSN.node.isParentOf(srcSN.node) {
-                if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering
-                    NSLog("DEBUG [\(self.treeID)] Drop target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
-                }
-                return true
-            }
-        }
-
-        return false
     }
 
     /**
@@ -537,39 +495,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return dragOperation
     }
 
-    private func getSrcTreeID(from dragInfo: NSDraggingInfo) -> TreeID? {
-        if let dragSource = dragInfo.draggingSource {
-            if let srcOutlineView = dragSource as? NSOutlineView {
-                if let srcDelegate = srcOutlineView.delegate {
-                    if let srcTreeController = srcDelegate as? TreeViewController {
-                        return srcTreeController.treeID
-                    }
-                }
-            }
-        }
-        return nil
-    }
-
-    /**
-     If the dragOperation == .every, then it indicates the default drag operation. Otherwise it can be one of the allowed options
-     which the user may have activated (e.g., holding down the Option key changes to a COPY).
-     See: https://stackoverflow.com/questions/32408338/how-can-i-allow-moving-and-copying-by-dragging-rows-in-an-nstableview
-     */
-    func getDragOperation(_ info: NSDraggingInfo) -> DragOperation {
-        let dragOperation: NSDragOperation = info.draggingSourceOperationMask
-        let currentDefault = self.currentDefaultDragOperation.getNSDragOperation().rawValue
-
-        let dragMask = dragOperation.rawValue == NSDragOperation.every.rawValue ? currentDefault : dragOperation.rawValue
-        switch dragMask {
-        case NSDragOperation.copy.rawValue:
-            return .COPY
-        case NSDragOperation.move.rawValue:
-            return .MOVE
-        default:
-            fatalError("Drop failed: Unrecognized drag operation: \(dragOperation.rawValue)")
-        }
-    }
-
     /**
      Accept Drop: executes the drop
 
@@ -602,10 +527,61 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         do {
             return try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true,
-                    dstTreeID: treeID, dstGUID: dstGUID)
+                    dstTreeID: treeID, dstGUID: dstGUID, dragOperation: dragOperation)
         } catch {
             self.con.reportException("Error: Drop Failed!", error)
             return false
+        }
+    }
+
+    private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
+        for srcSN in self.displayStore.getSNList(srcGUIDList) {
+            if dropTargetSN.node.isParentOf(srcSN.node) {
+                if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering
+                    NSLog("DEBUG [\(self.treeID)] Drop target dir (\(dropTargetSN.spid)) is already parent of dragged node (\(srcSN.spid))")
+                }
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private func getSrcTreeID(from dragInfo: NSDraggingInfo) -> TreeID? {
+        if let dragSource = dragInfo.draggingSource {
+            if let srcOutlineView = dragSource as? NSOutlineView {
+                if let srcDelegate = srcOutlineView.delegate {
+                    if let srcTreeController = srcDelegate as? TreeViewController {
+                        return srcTreeController.treeID
+                    }
+                }
+            }
+        }
+        return nil
+    }
+
+    /**
+     If the dragOperation == .every, then it indicates the default drag operation. Otherwise it can be one of the allowed options
+     which the user may have activated (e.g., holding down the Option key changes to a COPY).
+     See: https://stackoverflow.com/questions/32408338/how-can-i-allow-moving-and-copying-by-dragging-rows-in-an-nstableview
+     */
+    private func getDragOperation(_ info: NSDraggingInfo) -> DragOperation {
+        let dragOperation: NSDragOperation = info.draggingSourceOperationMask
+        let currentDefault = self.currentDefaultDragOperation.getNSDragOperation().rawValue
+
+        let dragMask = dragOperation.rawValue == NSDragOperation.every.rawValue ? currentDefault : dragOperation.rawValue
+        switch dragMask {
+        case NSDragOperation.copy.rawValue:
+            return .COPY
+        case NSDragOperation.move.rawValue:
+            return .MOVE
+        case NSDragOperation.link.rawValue:
+            return .LINK
+        case NSDragOperation.delete.rawValue:
+            return .DELETE
+        default:
+            NSLog("WARN  [\(self.treeID)] Unrecognized drag operation: \(dragOperation.rawValue) (will return current default: \(currentDefault)")
+            return self.currentDefaultDragOperation
         }
     }
 
