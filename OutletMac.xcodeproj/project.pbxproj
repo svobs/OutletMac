@@ -15,19 +15,18 @@
 		CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */; };
 		CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB2EA146750617D29EDD /* GlobalState.swift */; };
 		CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */; };
-		CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */; };
 		CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */; };
 		CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */; };
 		CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F40499F9D376AD844203 /* DateUtil.swift */; };
 		CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */; };
-		CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */; };
 		CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */; };
+		CDF2F5121881F0828451D058 /* BonjourService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */; };
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
-		CDF2F5CE2C6D0C179C6EBB3E /* BonjourService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F189916C43043D64540F /* BonjourService.swift */; };
 		CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB4729ECD01C785776D8 /* Backend.swift */; };
 		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */; };
+		CDF2F6F2A11F9845287633E7 /* SignalDispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */; };
 		CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */; };
 		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
 		CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */; };
@@ -37,6 +36,7 @@
 		CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */; };
 		CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */; };
 		CDF2F9EB179BD47115578D6A /* CellFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F77AA899F692856B9A3D /* CellFactory.swift */; };
+		CDF2F9FD8CDCFA9EFBAB5A9E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F275262010959BE9CDA3 /* Constants.swift */; };
 		CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */; };
 		CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F81C318FC582AE23E023 /* IfView.swift */; };
 		CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F521214ABD01967F51E8 /* DisplayStore.swift */; };
@@ -47,6 +47,7 @@
 		CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */; };
 		CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */; };
 		CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F265942131BB8C84EB29 /* IconStore.swift */; };
+		CDF2FE5D71C8C57D8A893F45 /* SignalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
 		D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */; };
@@ -67,7 +68,6 @@
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
 		D1CDE56525E4A9DC003816CF /* outlet-icon-256.icns in Resources */ = {isa = PBXBuildFile; fileRef = D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */; };
 		D1D8711725F1F8D60072CB97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D8711625F1F8D60072CB97 /* main.swift */; };
-		D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3B25B54E73009498D8 /* Constants.swift */; };
 		D1F36C3F25B59153009498D8 /* LocalNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F36C3E25B59153009498D8 /* LocalNode.swift */; };
 /* End PBXBuildFile section */
 
@@ -78,20 +78,20 @@
 		CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
-		CDF2F189916C43043D64540F /* BonjourService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
 		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
 		CDF2F265942131BB8C84EB29 /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
 		CDF2F26A81EB1214E0F983EE /* AppWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppWindow.swift; sourceTree = "<group>"; };
+		CDF2F275262010959BE9CDA3 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		CDF2F40499F9D376AD844203 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
 		CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
 		CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
 		CDF2F521214ABD01967F51E8 /* DisplayStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayStore.swift; sourceTree = "<group>"; };
-		CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolbarButton.swift; sourceTree = "<group>"; };
 		CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendConnectionState.swift; sourceTree = "<group>"; };
 		CDF2F6EABEEFF996A1F3EDB0 /* MainWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
+		CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
 		CDF2F77AA899F692856B9A3D /* CellFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellFactory.swift; sourceTree = "<group>"; };
 		CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		CDF2F81C318FC582AE23E023 /* IfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IfView.swift; sourceTree = "<group>"; };
@@ -105,8 +105,9 @@
 		CDF2FB4729ECD01C785776D8 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
 		CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
+		CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
 		CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreviewWindow.swift; sourceTree = "<group>"; };
-		CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalConstants.swift; sourceTree = "<group>"; };
 		CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
 		CDF2FE3CBB814776E801E1E4 /* WindowState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowState.swift; sourceTree = "<group>"; };
@@ -135,7 +136,6 @@
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "outlet-icon-256.icns"; sourceTree = "<group>"; };
 		D1D8711625F1F8D60072CB97 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		D1F36C3B25B54E73009498D8 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D1F36C3E25B59153009498D8 /* LocalNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNode.swift; sourceTree = "<group>"; };
 		E31A382CA56AD9D67A485824 /* Pods-OutletMac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.debug.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -182,10 +182,9 @@
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
-				D1F36C3B25B54E73009498D8 /* Constants.swift */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
-				CDF2FCDDCFE5BFFDBDD633DD /* Support */,
-				CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */,
+				CDF2FCDDCFE5BFFDBDD633DD /* Common */,
+				CDF2F84959AF17A98CA69288 /* Service */,
 			);
 			path = OutletMac;
 			sourceTree = "<group>";
@@ -226,6 +225,15 @@
 			path = TreeView;
 			sourceTree = "<group>";
 		};
+		CDF2F84959AF17A98CA69288 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */,
+				CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 		CDF2FB4110AAC7565C7357F3 /* Component */ = {
 			isa = PBXGroup;
 			children = (
@@ -237,18 +245,18 @@
 			path = Component;
 			sourceTree = "<group>";
 		};
-		CDF2FCDDCFE5BFFDBDD633DD /* Support */ = {
+		CDF2FCDDCFE5BFFDBDD633DD /* Common */ = {
 			isa = PBXGroup;
 			children = (
 				CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */,
-				CDF2F189916C43043D64540F /* BonjourService.swift */,
 				CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */,
 				CDF2F40499F9D376AD844203 /* DateUtil.swift */,
 				CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */,
-				CDF2F5329D6A291CA22AE83C /* SignalDispatcher.swift */,
 				CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */,
+				CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */,
+				CDF2F275262010959BE9CDA3 /* Constants.swift */,
 			);
-			path = Support;
+			path = Common;
 			sourceTree = "<group>";
 		};
 		CDF2FD6DDB4704833FC99359 /* Window */ = {
@@ -468,7 +476,6 @@
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
-				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
 				D1767FD225BA3A8100B2A4F5 /* DisplayTree.swift in Sources */,
 				D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */,
@@ -505,17 +512,18 @@
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
 				CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */,
 				CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */,
-				CDF2F5CE2C6D0C179C6EBB3E /* BonjourService.swift in Sources */,
 				CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */,
 				CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */,
 				CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */,
-				CDF2F4B661E12361AB6CD742 /* SignalDispatcher.swift in Sources */,
 				CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */,
-				CDF2F32F1D4B82B10D00B33F /* SignalConstants.swift in Sources */,
 				CDF2F074C68FB2C637C8B552 /* MergePreviewWindow.swift in Sources */,
 				CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */,
 				CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */,
 				CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */,
+				CDF2F6F2A11F9845287633E7 /* SignalDispatcher.swift in Sources */,
+				CDF2F5121881F0828451D058 /* BonjourService.swift in Sources */,
+				CDF2FE5D71C8C57D8A893F45 /* SignalConstants.swift in Sources */,
+				CDF2F9FD8CDCFA9EFBAB5A9E /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
