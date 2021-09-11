@@ -14,6 +14,25 @@ class NodeIdentifierFactory {
     return backend.app.globalState.deviceList
   }
 
+  // TODO: this is TEMPORARY until we support multiple drives
+  func getDefaultLocalDeviceUID() throws -> UID {
+    var deviceUID: UID? = nil
+    for device in try self.getDeviceList() {
+      if device.treeType == .LOCAL_DISK {
+        if deviceUID != nil {
+          throw OutletError.invalidState("Multiple local disks found but this is not supported!")
+        } else {
+          deviceUID = device.uid
+        }
+      }
+    }
+    if deviceUID == nil {
+      throw OutletError.invalidState("No local disks found!")
+    } else {
+      return deviceUID!
+    }
+  }
+
   func getTreeType(for deviceUID: UID) throws -> TreeType {
     guard deviceUID != NULL_UID else {
       throw OutletError.invalidState("getTreeType(): deviceUID is null!")

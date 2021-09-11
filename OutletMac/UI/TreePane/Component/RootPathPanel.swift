@@ -46,25 +46,6 @@ struct RootPathPanel: View {
     return con.app.iconStore.getToolbarIcon(for: iconId).getImage()
   }
 
-  // TODO: this is TEMPORARY until we support multiple drives
-  func getDefaultLocalDeviceUID() throws -> UID {
-    var deviceUID: UID? = nil
-    for device in try self.con.backend.nodeIdentifierFactory.getDeviceList() {
-      if device.treeType == .LOCAL_DISK {
-        if deviceUID != nil {
-          throw OutletError.invalidState("Multiple local disks found but this is not supported!")
-        } else {
-          deviceUID = device.uid
-        }
-      }
-    }
-    if deviceUID == nil {
-      throw OutletError.invalidState("No local disks found!")
-    } else {
-      return deviceUID!
-    }
-  }
-
   func openRootSelectionDialog(_ device: Device) -> () -> () {
     if device.treeType == .LOCAL_DISK {
       return { doOpenFileDialog() }
@@ -82,7 +63,7 @@ struct RootPathPanel: View {
   func doOpenFileDialog() {
     let deviceUID: UID
     do {
-      deviceUID = try self.getDefaultLocalDeviceUID()
+      deviceUID = try self.con.app.backend.nodeIdentifierFactory.getDefaultLocalDeviceUID()
     } catch {
       self.con.reportError("Failed to open file dialog", "\(error)")
       return
@@ -91,9 +72,8 @@ struct RootPathPanel: View {
     let dialog = NSOpenPanel();
 
     dialog.title                   = "Choose a directory";  // Not shown in Mac OS Big Bug
-    if self.con.tree.treeType == .LOCAL_DISK {
+    if self.con.tree.rootDeviceUID == deviceUID {
       // Open to current directory by default (if available):
-      // TODO: only do this for this machine (need to check this somehow)
       dialog.directoryURL = URL(fileURLWithPath: self.con.tree.rootPath)
     }
     dialog.showsResizeIndicator    = true;
@@ -201,6 +181,5 @@ struct RootPathPanel: View {
            alignment: .topLeading)
     .padding(.top, V_PAD)
 
-//    .background(Color.blue)  // TODO
   }
 }
