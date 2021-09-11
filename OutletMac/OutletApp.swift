@@ -18,12 +18,13 @@ protocol OutletApp: HasLifecycle {
 
   var globalState: GlobalState { get }
 
+  // TODO: remove these and replace with specialized DQs
   var serialQueue: DispatchQueue { get }
+  func execAsync(_ workItem: @escaping NoArgVoidFunc)
+  func execSync(_ workItem: @escaping NoArgVoidFunc)
 
   func grpcDidGoDown()
   func grpcDidGoUp()
-  func execAsync(_ workItem: @escaping NoArgVoidFunc)
-  func execSync(_ workItem: @escaping NoArgVoidFunc)
 
   func displayError(_ msg: String, _ secondaryMsg: String)
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool

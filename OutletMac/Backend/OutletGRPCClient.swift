@@ -18,6 +18,7 @@ import NIO
 class OutletGRPCClient: OutletBackend {
   var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
   let app: OutletApp
+  let bonjourService = BonjourService()
   let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
   var grpcConverter = GRPCConverter()
@@ -98,86 +99,88 @@ class OutletGRPCClient: OutletBackend {
 
   @objc func runSignalReceiverThread() {
     NSLog("DEBUG [SignalReceiverThread] Starting thread")
-    NSLog("INFO  SignalReceiverThread: Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
-    let bonjour = Bonjour(self)
 
     while !self.wasShutdown {
+      self.locateBackendServer(onSuccess: self.receiveServerSignals)
+    }
+    NSLog("DEBUG [SignalReceiverThread] Thread shutting down")
+    self.bonjourService.stopDiscovery()
+  }
 
-      if useFixedAddress {
-        assert(fixedHost != nil && fixedPort != nil)
-        self.backendConnectionState.host = fixedHost!
-        self.backendConnectionState.port = fixedPort!
-        self.receiveServerSignals()
-      } else {
-        let group = DispatchGroup()
-        // Occasionally both success & failure handlers will be called in quick succession. In this case, we need to make sure we don't
-        // call group.leave() twice for the same group.enter(), cuz that will crash us:
-        var leftGroup = false
-        var discoverySucceeded = false
+  private func locateBackendServer(onSuccess onSuccessFunc: () -> ()) {
+    if useFixedAddress {
+      assert(fixedHost != nil && fixedPort != nil)
+      self.backendConnectionState.host = fixedHost!
+      self.backendConnectionState.port = fixedPort!
 
-        // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
-        DispatchQueue.main.sync {
-          NSLog("DEBUG Entering new DispatchGroup")
-          group.enter()
+      onSuccessFunc()
+    } else {
+      let group = DispatchGroup()
+      // Occasionally both success & failure handlers will be called in quick succession. In this case, we need to make sure we don't
+      // call group.leave() twice for the same group.enter(), cuz that will crash us:
+      var leftGroup = false
+      var discoverySucceeded = false
 
-          // Do discovery all over again, in case the address has changed:
-          bonjour.startDiscovery(onSuccess: { ipPort in
-            self.app.execAsync { [unowned self] in
-              if leftGroup {
-                NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
-                return
-              }
+      // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
+      DispatchQueue.main.sync {
+        NSLog("DEBUG Entering new DispatchGroup")
+        group.enter()
 
-              defer {
-                NSLog("DEBUG Leaving DispatchGroup")
-                leftGroup = true
-                group.leave()
-              }
-              DispatchQueue.main.sync {
-                self.backendConnectionState.host = ipPort.ip
-                self.backendConnectionState.port = ipPort.port
-
-                NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
-                discoverySucceeded = true
-              }
+        // Do discovery all over again, in case the address has changed:
+        self.bonjourService.startDiscovery(onSuccess: { ipPort in
+          self.app.execAsync { [unowned self] in
+            if leftGroup {
+              NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
+              return
             }
 
-          }, onError: { error in
-            self.app.execAsync { [unowned self] in
-              if leftGroup {
-                NSLog("DEBUG Already left DispatchGroup; ignoring error handler call")
-                return
-              }
-
-              NSLog("ERROR Failed to find server via Bonjour: \(error)")
-
+            defer {
+              NSLog("DEBUG Leaving DispatchGroup")
               leftGroup = true
               group.leave()
             }
-          })
-        }
+            DispatchQueue.main.sync {
+              self.backendConnectionState.host = ipPort.ip
+              self.backendConnectionState.port = ipPort.port
 
-        // wait ...
-        NSLog("DEBUG [SignalReceiverThread] Waiting for Bonjour service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
-        let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
-        if result == .timedOut {
-          NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-        } else {
-          if discoverySucceeded {
-            NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
-            self.receiveServerSignals()
+              NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+              discoverySucceeded = true
+            }
           }
 
-          NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-        }
+        }, onError: { error in
+          self.app.execAsync { [unowned self] in
+            if leftGroup {
+              NSLog("DEBUG Already left DispatchGroup; ignoring error handler call")
+              return
+            }
+
+            NSLog("ERROR Failed to find server via BonjourService: \(error)")
+
+            leftGroup = true
+            group.leave()
+          }
+        })
       }
 
-      Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
-      NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
-      self.backendConnectionState.conecutiveStreamFailCount += 1
+      // wait ...
+      NSLog("DEBUG [SignalReceiverThread] Waiting for BonjourService service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
+      let result: DispatchTimeoutResult = group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)
+      if result == .timedOut {
+        NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+      } else {
+        if discoverySucceeded {
+          NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
+          onSuccessFunc()
+        }
+
+        NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+      }
     }
-    NSLog("DEBUG [SignalReceiverThread] Thread shutting down")
-    bonjour.stopDiscovery()
+
+    Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
+    NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
+    self.backendConnectionState.conecutiveStreamFailCount += 1
   }
 
   // Signals

@@ -25,7 +25,8 @@
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
-		CDF2F5CE2C6D0C179C6EBB3E /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F189916C43043D64540F /* Bonjour.swift */; };
+		CDF2F5CE2C6D0C179C6EBB3E /* BonjourService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F189916C43043D64540F /* BonjourService.swift */; };
+		CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB4729ECD01C785776D8 /* Backend.swift */; };
 		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */; };
 		CDF2F70E4458597DBB546092 /* StringUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */; };
 		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
@@ -48,7 +49,6 @@
 		CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F265942131BB8C84EB29 /* IconStore.swift */; };
 		D138ADF225BE31FC00E4F9E4 /* ContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */; };
 		D138ADF525BE342000E4F9E4 /* UserOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADF425BE342000E4F9E4 /* UserOp.swift */; };
-		D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138ADFA25BEC35E00E4F9E4 /* Backend.swift */; };
 		D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */; };
 		D16839A525AD532800D76169 /* Outlet.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D168399F25AD532800D76169 /* Outlet.pb.swift */; };
 		D16839A925AD532800D76169 /* Node.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839A325AD532800D76169 /* Node.pb.swift */; };
@@ -78,7 +78,7 @@
 		CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
-		CDF2F189916C43043D64540F /* Bonjour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
+		CDF2F189916C43043D64540F /* BonjourService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
 		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
 		CDF2F265942131BB8C84EB29 /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
 		CDF2F26A81EB1214E0F983EE /* AppWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppWindow.swift; sourceTree = "<group>"; };
@@ -102,6 +102,7 @@
 		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooserWindow.swift; sourceTree = "<group>"; };
 		CDF2FAC3B920540522051982 /* UnwrapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		CDF2FB2EA146750617D29EDD /* GlobalState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalState.swift; sourceTree = "<group>"; };
+		CDF2FB4729ECD01C785776D8 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
 		CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
 		CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreviewWindow.swift; sourceTree = "<group>"; };
@@ -115,7 +116,6 @@
 		CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
 		D138ADF125BE31FC00E4F9E4 /* ContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerNode.swift; sourceTree = "<group>"; };
 		D138ADF425BE342000E4F9E4 /* UserOp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserOp.swift; sourceTree = "<group>"; };
-		D138ADFA25BEC35E00E4F9E4 /* Backend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCriteria.swift; sourceTree = "<group>"; };
 		D168399F25AD532800D76169 /* Outlet.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.pb.swift; sourceTree = "<group>"; };
 		D16839A125AD532800D76169 /* Outlet.grpc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Outlet.grpc.swift; sourceTree = "<group>"; };
@@ -177,13 +177,12 @@
 				D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */,
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
 				D1CB049C25B182A000556B28 /* Model */,
-				D168399E25AD532800D76169 /* grpc */,
+				D168399E25AD532800D76169 /* Backend */,
 				D1BAC55E25A193C800D951A2 /* OutletApp.swift */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
 				D1F36C3B25B54E73009498D8 /* Constants.swift */,
-				D138ADFA25BEC35E00E4F9E4 /* Backend.swift */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
 				CDF2FCDDCFE5BFFDBDD633DD /* Support */,
 				CDF2FC825C953E8C39AB75E1 /* SignalConstants.swift */,
@@ -242,7 +241,7 @@
 			isa = PBXGroup;
 			children = (
 				CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */,
-				CDF2F189916C43043D64540F /* Bonjour.swift */,
+				CDF2F189916C43043D64540F /* BonjourService.swift */,
 				CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */,
 				CDF2F40499F9D376AD844203 /* DateUtil.swift */,
 				CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */,
@@ -285,25 +284,26 @@
 			path = ViewMisc;
 			sourceTree = "<group>";
 		};
-		D168399E25AD532800D76169 /* grpc */ = {
+		D168399E25AD532800D76169 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
 				D16839AE25AD553A00D76169 /* OutletGRPCClient.swift */,
-				D16839AD25AD551100D76169 /* generated */,
+				D16839AD25AD551100D76169 /* Generated */,
 				D1CB04A025B1832E00556B28 /* GRPCConverter.swift */,
 				CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */,
+				CDF2FB4729ECD01C785776D8 /* Backend.swift */,
 			);
-			path = grpc;
+			path = Backend;
 			sourceTree = "<group>";
 		};
-		D16839AD25AD551100D76169 /* generated */ = {
+		D16839AD25AD551100D76169 /* Generated */ = {
 			isa = PBXGroup;
 			children = (
 				D168399F25AD532800D76169 /* Outlet.pb.swift */,
 				D16839A325AD532800D76169 /* Node.pb.swift */,
 				D16839A125AD532800D76169 /* Outlet.grpc.swift */,
 			);
-			path = generated;
+			path = Generated;
 			sourceTree = "<group>";
 		};
 		D1CB049C25B182A000556B28 /* Model */ = {
@@ -467,7 +467,6 @@
 				D138AE0125BFEF8600E4F9E4 /* FilterCriteria.swift in Sources */,
 				D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */,
 				D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */,
-				D138ADFB25BEC35E00E4F9E4 /* Backend.swift in Sources */,
 				D1D8711725F1F8D60072CB97 /* main.swift in Sources */,
 				D1F36C3C25B54E73009498D8 /* Constants.swift in Sources */,
 				D1CB04A425B184C100556B28 /* Node.swift in Sources */,
@@ -506,7 +505,7 @@
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
 				CDF2FDF43F695ED97B850360 /* IconStore.swift in Sources */,
 				CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */,
-				CDF2F5CE2C6D0C179C6EBB3E /* Bonjour.swift in Sources */,
+				CDF2F5CE2C6D0C179C6EBB3E /* BonjourService.swift in Sources */,
 				CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */,
 				CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */,
 				CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */,
@@ -516,6 +515,7 @@
 				CDF2F074C68FB2C637C8B552 /* MergePreviewWindow.swift in Sources */,
 				CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */,
 				CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */,
+				CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

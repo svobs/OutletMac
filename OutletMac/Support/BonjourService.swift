@@ -13,22 +13,15 @@ struct IPPort {
 typealias SuccessHandler<Result> = (_ result: Result) -> Void
 typealias ErrorHandler = (_ error: Error) -> Void
 
-class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
+class BonjourService: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
     // Local service browser
-    var browser: NetServiceBrowser?
+    private var browser: NetServiceBrowser?
 
     // Instance of the service that we're looking for
-    var service: NetService?
-
-    var grpcClient: OutletGRPCClient
+    private var service: NetService?
 
     private var successHandler: SuccessHandler<IPPort>? = nil
     private var errorHandler: ErrorHandler? = nil
-
-    init(_ client: OutletGRPCClient) {
-        self.grpcClient = client
-        super.init()
-    }
 
     func startDiscovery(onSuccess: @escaping SuccessHandler<IPPort>, onError: @escaping ErrorHandler) {
         stopDiscovery()
@@ -36,7 +29,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
         self.successHandler = onSuccess
         self.errorHandler = onError
 
-        NSLog("DEBUG [Bonjour] Starting discovery...")
+        NSLog("DEBUG [BonjourService] Starting discovery...")
         // Setup the browser
         browser = NetServiceBrowser()
 //        browser!.includesPeerToPeer = true
@@ -46,7 +39,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
     }
 
     func stopDiscovery() {
-        NSLog("DEBUG [Bonjour] Stopping discovery")
+        NSLog("DEBUG [BonjourService] Stopping discovery")
         // Make sure to reset the last known service if we want to run this a few times
         service = nil
         browser?.stop()
@@ -59,14 +52,14 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // WillSearch
     func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
-        NSLog("DEBUG [Bonjour] Search beginning")
+        NSLog("DEBUG [BonjourService] Search beginning")
     }
 
     // DidNotResolve
     func netService(_ sender: NetService, didNotResolve errorDict: [String : NSNumber]) {
-        NSLog("ERROR [Bonjour] Resolve error: (sender=\(sender)) errors=\(errorDict)")
+        NSLog("ERROR [BonjourService] Resolve error: (sender=\(sender)) errors=\(errorDict)")
         if let errorHandler = self.errorHandler {
-            errorHandler(OutletError.bonjourFailure(("ERROR [Bonjour] Resolve error: (sender=\(sender)) errors=\(errorDict)")))
+            errorHandler(OutletError.bonjourFailure(("ERROR [BonjourService] Resolve error: (sender=\(sender)) errors=\(errorDict)")))
         }
         stopDiscovery()
     }
@@ -81,12 +74,12 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // DidStopSearch
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
-        NSLog("DEBUG [Bonjour] Search stopped")
+        NSLog("DEBUG [BonjourService] Search stopped")
     }
 
     // DidFind
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind svc: NetService, moreComing: Bool) {
-        NSLog("INFO  [Bonjour] Discovered service: name='\(svc.name)' type='\(svc.type)' domain='\(svc.domain)'")
+        NSLog("INFO  [BonjourService] Discovered service: name='\(svc.name)' type='\(svc.type)' domain='\(svc.domain)'")
 
         // We dont want to discover more services, just need the first one
         if service != nil {
@@ -104,21 +97,21 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // DidFindDomain
     func netServiceBrowser(_ browser: NetServiceBrowser, didFindDomain domainString: String, moreComing: Bool) {
-        NSLog("DEBUG [Bonjour] found domain: \(domainString)")
+        NSLog("DEBUG [BonjourService] found domain: \(domainString)")
     }
 
     // DidRemoveDomain
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemoveDomain domainString: String, moreComing: Bool) {
-        NSLog("DEBUG [Bonjour] Domain removed: '\(domainString)'")
+        NSLog("DEBUG [BonjourService] Domain removed: '\(domainString)'")
     }
 
     // DidResolveAddress
     func netServiceDidResolveAddress(_ sender: NetService) {
-        NSLog("DEBUG [Bonjour] netServiceDidResolveAddress")
+        NSLog("DEBUG [BonjourService] netServiceDidResolveAddress")
 
         // Find the IPV4 address
         if let serviceIp = resolveIPv4(addresses: sender.addresses!) {
-            NSLog("DEBUG [Bonjour] Resolved service: ip=\(serviceIp) port=\(sender.port)")
+            NSLog("DEBUG [BonjourService] Resolved service: ip=\(serviceIp) port=\(sender.port)")
 
             let ipPort = IPPort(ip: serviceIp, port: sender.port)
 
@@ -126,7 +119,7 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
                 successHandler(ipPort)
             }
         } else {
-            NSLog("ERROR [Bonjour] Did not find IPv4 address")
+            NSLog("ERROR [BonjourService] Did not find IPv4 address")
             if let errorHandler = self.errorHandler {
                 errorHandler(OutletError.bonjourFailure("Could not resolve IPv4 address!"))
             }
@@ -136,25 +129,25 @@ class Bonjour: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // DidNotPublish
     func netService(_ sender: NetService, didNotPublish errorDict: [String : NSNumber]) {
-        NSLog("ERROR [Bonjour] DidNotPublish: \(errorDict)")
+        NSLog("ERROR [BonjourService] DidNotPublish: \(errorDict)")
         if let errorHandler = self.errorHandler {
-            errorHandler(OutletError.bonjourFailure("ERROR [Bonjour] DidNotPublish: \(errorDict)"))
+            errorHandler(OutletError.bonjourFailure("ERROR [BonjourService] DidNotPublish: \(errorDict)"))
         }
     }
 
     // WillPublish
     func netServiceWillPublish(_ sender: NetService) {
-        NSLog("DEBUG [Bonjour] Service will publish, apparently")
+        NSLog("DEBUG [BonjourService] Service will publish, apparently")
     }
 
     // DidPublish
     func netServiceDidPublish(_ sender: NetService) {
-        NSLog("DEBUG [Bonjour] netService published.")
+        NSLog("DEBUG [BonjourService] netService published.")
     }
 
     // DidStop
     func netServiceDidStop(_ sender: NetService) {
-        NSLog("DEBUG [Bonjour] netService stopped.")
+        NSLog("DEBUG [BonjourService] netService stopped.")
         stopDiscovery()
     }
 
