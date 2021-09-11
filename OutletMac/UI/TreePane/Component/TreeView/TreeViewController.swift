@@ -6,6 +6,23 @@
 import AppKit
 import LinkedList
 
+/**
+ AppKit's NSDragOperation is rather difficult to work with, so here we are.
+ */
+enum DragOperation: Int {
+    case MOVE = 1
+    case COPY = 2
+
+    func getNSDragOperation() -> NSDragOperation {
+        switch self {
+        case .MOVE:
+            return NSDragOperation.move
+        case .COPY:
+            return NSDragOperation.copy
+        }
+    }
+}
+
 /*
  TreeViewController: AppKit controller for TreeViewRepresentable.
 
@@ -17,7 +34,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     var con: TreePanelControllable! = nil
 
     private let outlineView = NSOutlineView()
-    private var dragOperation: NSDragOperation = .move
+    private var currentDefaultDragOperation: DragOperation = .MOVE
 
     var displayStore: DisplayStore {
         return self.con.displayStore
@@ -142,7 +159,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         outlineView.menu = self.initContextMenu()
 
         // Set allowable drag operations:
-        outlineView.setDraggingSourceOperationMask([.move, .copy, .delete], forLocal: false)
+        outlineView.setDraggingSourceOperationMask([.move, .copy], forLocal: false)
         // Set allowed pasteboard (drag) types (see NodePasteboardWriter class)
         outlineView.registerForDraggedTypes([.guid])
         outlineView.draggingDestinationFeedbackStyle = .regular
@@ -255,27 +272,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let filteredSet: Set<GUID> = self.displayStore.toFilteredSet(guidList)
         return self.getIndexSetFor(filteredSet)
     }
-
-//    /**
-//     Accept/deny selection
-//     From NSOutlineViewDelegate
-//    */
-//    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-//        guard let guid = item as? GUID else {
-//            NSLog("ERROR [\(treeID)] shouldSelectItem(): not a GUID: \(item)")
-//            return false
-//        }
-//        guard let sn = self.displayStore.getSN(guid) else {
-//            NSLog("ERROR [\(treeID)] shouldSelectItem(): not found in DisplayStore: \(guid)")
-//            return false
-//        }
-//
-//        if sn.node.isEphemeral {
-//            NSLog("DEBUG [\(treeID)] shouldSelectItem(): denying selection: item is ephemeral: \(guid)")
-//            return false
-//        }
-//        return true
-//    }
 
     /**
      Post Selection Change
@@ -464,6 +460,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return []
         }
 
+        let dragOperation = self.getDragOperation(info).getNSDragOperation()
+
         if item == nil {
             // Special handling for dropping at the very top: allow the insert bar to be shown
             if SUPER_DEBUG_ENABLED {
@@ -471,7 +469,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             }
             // TODO: may want to change 'index' to 'NSOutlineViewDropOnItemIndex' in the future. Not sure which is more intuitive
             outlineView.setDropItem(item, dropChildIndex: index)
-            return self.dragOperation
+            return dragOperation
         }
 
         var dstGUID: GUID = self.itemToGUID(item)
@@ -536,7 +534,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         // change the drop item. Always drop onto nodes directly,
         outlineView.setDropItem(dstGUID, dropChildIndex: NSOutlineViewDropOnItemIndex)
-        return self.dragOperation
+        return dragOperation
     }
 
     private func getSrcTreeID(from dragInfo: NSDraggingInfo) -> TreeID? {
@@ -550,6 +548,26 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             }
         }
         return nil
+    }
+
+    /**
+     If the dragOperation == .every, then it indicates the default drag operation. Otherwise it can be one of the allowed options
+     which the user may have activated (e.g., holding down the Option key changes to a COPY).
+     See: https://stackoverflow.com/questions/32408338/how-can-i-allow-moving-and-copying-by-dragging-rows-in-an-nstableview
+     */
+    func getDragOperation(_ info: NSDraggingInfo) -> DragOperation {
+        let dragOperation: NSDragOperation = info.draggingSourceOperationMask
+        let currentDefault = self.currentDefaultDragOperation.getNSDragOperation().rawValue
+
+        let dragMask = dragOperation.rawValue == NSDragOperation.every.rawValue ? currentDefault : dragOperation.rawValue
+        switch dragMask {
+        case NSDragOperation.copy.rawValue:
+            return .COPY
+        case NSDragOperation.move.rawValue:
+            return .MOVE
+        default:
+            fatalError("Drop failed: Unrecognized drag operation: \(dragOperation.rawValue)")
+        }
     }
 
     /**
@@ -578,7 +596,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return false
         }
         let dstGUID = dragTargetSN.spid.guid
-        NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID)")
+        let dragOperation = self.getDragOperation(info)
+
+        NSLog("DEBUG [\(treeID)] DROP (\(dragOperation)) onto \(dstGUID)")
 
         do {
             return try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true,
