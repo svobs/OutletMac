@@ -84,6 +84,7 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
     override func keyDown(with event: NSEvent) {
         // Pass all key events to the project model
         NSLog("DEBUG [\(self.winID)] KEY EVENT: \(event)")
+        super.keyDown(with: event)
         // Enable key events
         interpretKeyEvents([event])
         if event.keyCode == 13 {

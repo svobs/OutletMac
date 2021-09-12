@@ -27,9 +27,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         return con.treeID
     }
 
-    override func keyDown(with theEvent: NSEvent) {
+    override func keyDown(with event: NSEvent) {
+        super.keyDown(with: event)
         // Enable key events
-        interpretKeyEvents([theEvent])
+        interpretKeyEvents([event])
     }
 
     /**
