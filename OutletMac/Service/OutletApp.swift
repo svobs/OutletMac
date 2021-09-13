@@ -41,10 +41,11 @@ protocol OutletApp: HasLifecycle {
   func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String)
 }
 
-class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp {
+class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Windows which ARE reused:
   var connectionProblemWindow: ConnectionProblemWindow! = nil
   var mainWindow: MainWindow? = nil
+
 
   // Windows which ARE NOT reused... TODO: test opening & closing these lots of times
   var rootChooserWindow: GDriveRootChooserWindow? = nil
@@ -169,7 +170,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, NSWindowDelegate, OutletApp
           NSLog("ERROR [\(treeID)] Failed to shut down controller")
         }
       }
-      // Close the app when mainWindow is closed, Windoze-style
       NSApplication.shared.terminate(0)
 
       self.wasShutdown = true

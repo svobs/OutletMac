@@ -5,6 +5,8 @@
 //
 import SwiftUI
 
+let SHOW_TOOLBAR = false
+
 /**
  Has two panes (Left and Right), each of which contain a TreeView and its associated panels
  */
@@ -31,6 +33,10 @@ class MainWindow: AppWindow, ObservableObject {
     super.init(app, self.contentRect, styleMask: style)
     self.isReleasedWhenClosed = false  // i.e., don't crash when re-opening
     self.title = "OutletMac"
+    if SHOW_TOOLBAR {
+      self.toolbar = MainWindowToolbar(identifier: .init("Default"))
+    }
+
   }
 
   func setControllers(left: TreePanelControllable, right: TreePanelControllable) {
