@@ -210,7 +210,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   }
 
   func mouseEventHandler(_ event: NSEvent?) {
-    NSLog("INFO  Got event!")
+    if TRACE_ENABLED {
+      NSLog("DEBUG Got event!")
+    }
   }
 
 

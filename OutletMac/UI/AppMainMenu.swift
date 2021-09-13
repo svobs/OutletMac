@@ -47,6 +47,9 @@ class AppMainMenu: NSMenu {
         editMenu.title = "Edit"
         editMenu.submenu = NSMenu(title: "Edit")
 
+        let delete = NSMenuItem(title: "Delete", action: nil, keyEquivalent: "⌫")
+        delete.keyEquivalentModifierMask.remove(.command)
+
         editMenu.submenu?.items = [
             NSMenuItem(title: "Undo", action: #selector(UndoManager.undo), keyEquivalent: "z"),
             NSMenuItem(title: "Redo", action: #selector(UndoManager.redo), keyEquivalent: "Z"),
@@ -54,7 +57,7 @@ class AppMainMenu: NSMenu {
             NSMenuItem(title: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x"),
             NSMenuItem(title: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c"),
             NSMenuItem(title: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v"),
-            NSMenuItem(title: "Delete", action: nil, keyEquivalent: "⌫"),
+            delete,
             NSMenuItem.separator(),
             NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
             ]
@@ -65,7 +68,15 @@ class AppMainMenu: NSMenu {
     private static func buildViewMenu() -> NSMenuItem {
         let viewMenu = NSMenuItem()
         viewMenu.submenu = NSMenu(title: "View")
-        viewMenu.submenu?.items = []
+
+        let showToolbar = NSMenuItem(title: "Show Toolbar", action: #selector(NSWindow.toggleToolbarShown(_:)), keyEquivalent: "t")
+        showToolbar.keyEquivalentModifierMask = .command.union(.option)
+
+        viewMenu.submenu?.items = [
+            showToolbar,
+            NSMenuItem.separator(),
+            NSMenuItem(title: "Enter Full Screen", action: #selector(NSWindow.toggleFullScreen(_:)), keyEquivalent: "f"),
+    ]
         return viewMenu
     }
 
