@@ -326,7 +326,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             self.displayStore.putChildList(parentSN.spid.guid, childSNList)
             self.outlineView.reloadItem(parentGUID, reloadChildren: true)
         } catch OutletError.maxResultsExceeded(let actualCount) {
-            self.con.appendEphemeralNode(parentSN.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: true)
+            DispatchQueue.main.async {
+                self.con.appendEphemeralNode(parentSN.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: true)
+            }
         } catch {
             self.con.reportException("Failed to expand row", error)
         }

@@ -208,6 +208,11 @@ enum IconID: UInt32 {
 
   case ICON_LOADING = 50
 
+  case ICON_TO_ADD = 51
+  case ICON_TO_DELETE = 52
+  case ICON_TO_UPDATE = 53
+  case ICON_TO_MOVE = 54
+
   case BADGE_RM = 100
   case BADGE_MV_SRC = 101
   case BADGE_MV_DST = 102

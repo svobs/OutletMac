@@ -10,8 +10,8 @@
  */
 class ContainerNode: DirNode {
 
-  override public var description: String {
-    return "ContainerNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
+  override var description: String {
+    return "ContainerNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) name='\(name)'"
   }
 
   override var isContainerNode: Bool {
@@ -53,6 +53,11 @@ class CategoryNode: ContainerNode {
   override func isParentOf(_ otherNode: Node) -> Bool {
     return false
   }
+
+  override var description: String {
+    return "CategoryNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) opType=\(opType) name='\(name)'"
+  }
+
 }
 
 /**
@@ -87,5 +92,9 @@ class RootTypeNode: ContainerNode {
     get {
       true
     }
+  }
+
+  override var description: String {
+    return "RootTypeNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) name='\(name)'"
   }
 }

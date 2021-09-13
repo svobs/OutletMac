@@ -183,6 +183,8 @@ class GRPCConverter {
       case .nonexistentDirMeta(let metaGRPC):
         node = NonexistentDirNode(nodeIdentifier, metaGRPC.name)
       }
+
+      node.customIcon = IconID(rawValue: nodeGRPC.iconID)
     } else {
       throw OutletError.invalidState("gRPC Node is missing node_type!")
     }
@@ -192,11 +194,10 @@ class GRPCConverter {
 
       if node.isDir {
         let dirStatsStr = node.getDirStats() == nil ? "nil" : "\(node.getDirStats()!)"
-        NSLog("DEBUG DirNode \(node.nodeIdentifier) has DirStats: \(dirStatsStr), etc='\(node.etc)'")
+        let nodeClassName: String = String(describing: type(of: node))
+        NSLog("DEBUG \(nodeClassName) \(node.nodeIdentifier) has DirStats: \(dirStatsStr), etc='\(node.etc)'")
       }
     }
-
-    node.customIcon = IconID(rawValue: nodeGRPC.iconID)!
 
     return node
   }

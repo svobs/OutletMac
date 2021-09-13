@@ -14,7 +14,7 @@ class Node: CustomStringConvertible {
   var _icon: IconID?
   
   public var description: String {
-    return "Node(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed)"
+    return "Node(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon)"
   }
   
   var isFile: Bool {
@@ -315,6 +315,10 @@ class EphemeralNode: Node {
   func toSN() -> SPIDNodePair {
     return (self.nodeIdentifier as! SPID, self)
   }
+
+  override var description: String {
+    return "EphemeralNode(\(nodeIdentifier.description) parents=\(parentList) icon=\(icon) name='\(name)'"
+  }
 }
 
 class DirNode: Node {
@@ -336,6 +340,10 @@ class DirNode: Node {
 
   override func getDirStats() -> DirectoryStats? {
     return self._dirStats
+  }
+
+  override var description: String {
+    return "DirNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) name='\(name)'"
   }
 }
 

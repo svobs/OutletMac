@@ -150,25 +150,20 @@ class IconStore: HasLifecycle {
   }
 
   func getNodeIcon(_ node: Node, height: CGFloat) -> NSImage? {
-    var icon: NSImage
 
     let iconId = node.icon
     if TRACE_ENABLED {
       NSLog("DEBUG Getting nodeIcon for: \(iconId): \(node.nodeIdentifier)")
     }
-    let key: String
 
     if node.isEphemeral {
       let toolIcon = self.getToolbarIcon(for: iconId)
-      icon = (toolIcon as! NetworkImage).nsImage
-      key = makeGenericCacheKey(iconId)
+      return (toolIcon as! NetworkImage).nsImage
     } else if node.isDir {
-      icon = self.getIconForDirNode(node, height)
+      return self.getIconForDirNode(node, height)
     } else {
-      icon = self.getIconForFileNode(node, height)
+      return self.getIconForFileNode(node, height)
     }
-
-    return icon
   }
 
   private func getBestRepresentation(_ icon: NSImage, _ height: CGFloat) -> NSImage {
@@ -184,45 +179,8 @@ class IconStore: HasLifecycle {
   }
 
   private func getIconForDirNode(_ node: Node, _ height: CGFloat) -> NSImage {
-    let iconId = node.icon
-    var badge: IconID? = nil
-    // If dir, determine appropriate badge, if any
-    switch iconId {
-    case .ICON_DIR_MK:
-      badge = .BADGE_MKDIR
-      break
-    case .ICON_DIR_RM:
-      badge = .BADGE_RM
-      break
-    case .ICON_DIR_MV_SRC:
-      badge = .BADGE_MV_SRC
-      break
-    case .ICON_DIR_UP_SRC:
-      badge = .BADGE_UP_SRC
-      break
-    case .ICON_DIR_CP_SRC:
-      badge = .BADGE_CP_SRC
-      break
-    case .ICON_DIR_MV_DST:
-      badge = .BADGE_MV_DST
-      break
-    case .ICON_DIR_UP_DST:
-      badge = .BADGE_UP_DST
-      break
-    case .ICON_DIR_CP_DST:
-      badge = .BADGE_CP_DST
-      break
-    case .ICON_DIR_TRASHED:
-      badge = .BADGE_TRASHED
-      break
-    case .ICON_GENERIC_DIR:
-      // No badge
-      break
-    default:
-      break
-    }
-
-    let key: String = makeGenericCacheKey(iconId)
+    let iconID = node.icon
+    let key: String = makeTreeIconCacheKey(iconID)
 
     if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
       // Used cached icon if available
@@ -232,17 +190,60 @@ class IconStore: HasLifecycle {
       return cachedIcon
     } else {
       // build new icon
+
+      var badge: IconID? = nil
+      // If dir, determine appropriate badge, if any
+      switch iconID {
+      case .ICON_DIR_MK:
+        badge = .BADGE_MKDIR
+        break
+      case .ICON_DIR_RM:
+        badge = .BADGE_RM
+        break
+      case .ICON_DIR_MV_SRC:
+        badge = .BADGE_MV_SRC
+        break
+      case .ICON_DIR_UP_SRC:
+        badge = .BADGE_UP_SRC
+        break
+      case .ICON_DIR_CP_SRC:
+        badge = .BADGE_CP_SRC
+        break
+      case .ICON_DIR_MV_DST:
+        badge = .BADGE_MV_DST
+        break
+      case .ICON_DIR_UP_DST:
+        badge = .BADGE_UP_DST
+        break
+      case .ICON_DIR_CP_DST:
+        badge = .BADGE_CP_DST
+        break
+      case .ICON_DIR_TRASHED:
+        badge = .BADGE_TRASHED
+        break
+      case .ICON_GENERIC_DIR:
+        // No badge
+        break
+      default:
+        // create it from scratch then store in the toolbarIconCache
+        let imageContainer = self.makeNewImageContainer(for: iconID)
+        let nsImage = (imageContainer as! NetworkImage).nsImage
+        treeIconCache.setObject(nsImage, forKey: key as NSString)
+        return nsImage
+      }
+
       let baseIcon = NSWorkspace.shared.icon(for: .folder)
-      return buildAndCacheIcon(iconId, baseIcon, height, badge, key)
+
+      return buildAndCacheIcon(iconID, baseIcon, height, badge, key)
     }
   }
 
   private func getIconForFileNode(_ node: Node, _ height: CGFloat) -> NSImage {
-    let iconId = node.icon
+    let iconID = node.icon
     let isFile: Bool
     var badge: IconID? = nil
     // If file, determine appropriate badge, if any
-    switch iconId {
+    switch iconID {
     case .ICON_FILE_RM:
       badge = .BADGE_RM
       isFile = true
@@ -287,9 +288,9 @@ class IconStore: HasLifecycle {
 
     let key: String
     if isFile {
-      key = makeFileCacheKey(iconId, node)
+      key = makeFileCacheKey(iconID, node)
     } else {
-      key = makeGenericCacheKey(iconId)
+      key = makeTreeIconCacheKey(iconID)
     }
 
     // Now that we have derived the key for the file type, use cached value if available
@@ -309,15 +310,15 @@ class IconStore: HasLifecycle {
         baseIcon = NSWorkspace.shared.icon(forFileType: suffix)
       }
 
-      return buildAndCacheIcon(iconId, baseIcon, height, badge, key)
+      return buildAndCacheIcon(iconID, baseIcon, height, badge, key)
     }
   }
 
-  private func buildAndCacheIcon(_ iconId: IconID, _ baseIcon: NSImage, _ height: CGFloat, _ badge: IconID?, _ key: String)-> NSImage {
+  private func buildAndCacheIcon(_ iconID: IconID, _ baseIcon: NSImage, _ height: CGFloat, _ badge: IconID?, _ key: String)-> NSImage {
     let baseIcon = self.getBestRepresentation(baseIcon, height)
     let icon = self.addBadgeOverlay(src: baseIcon, badge: badge)
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG Storing icon=\(iconId) with badge=\(badge ?? IconID.NONE) for key: '\(key)'")
+      NSLog("DEBUG Storing icon=\(iconID) with badge=\(badge ?? IconID.NONE) for key: '\(key)'")
     }
     treeIconCache.setObject(icon, forKey: key as NSString)
     return icon
@@ -346,7 +347,7 @@ class IconStore: HasLifecycle {
   }
 
   func getToolbarIcon(for iconID: IconID) -> ImageContainer {
-    let key = NSNumber(integerLiteral: Int(iconID.rawValue))
+    let key = self.makeToolbarCacheKey(iconID)
 
     if let cachedIcon = toolbarIconCache.object(forKey: key) {
       return cachedIcon.imageProvider
@@ -357,14 +358,18 @@ class IconStore: HasLifecycle {
       return imageContainer
     }
   }
-
-  private func makeGenericCacheKey(_ iconId: IconID) -> String {
-    "\(iconId)"
+  
+  private func makeToolbarCacheKey(_ iconID: IconID) -> NSNumber {
+    return NSNumber(integerLiteral: Int(iconID.rawValue))
   }
 
-  private func makeFileCacheKey(_ iconId: IconID, _ node: Node) -> String {
+  private func makeTreeIconCacheKey(_ iconID: IconID) -> String {
+    "\(iconID)"
+  }
+
+  private func makeFileCacheKey(_ iconID: IconID, _ node: Node) -> String {
     let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
-    return "\(iconId):\(suffix)"
+    return "\(iconID):\(suffix)"
   }
 
   private func makeNewImageContainer(for iconID: IconID) -> ImageContainer {

@@ -311,7 +311,9 @@ class TreePanelController: TreePanelControllable {
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue
-          self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: false)
+          DispatchQueue.main.async {
+            self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: false)
+          }
         }
       }
     }
@@ -332,6 +334,8 @@ class TreePanelController: TreePanelControllable {
 
   // MUST RUN INSIDE MAIN DQ
   func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, _ iconID: IconID, reloadParent: Bool) {
+    assert(DispatchQueue.isExecutingIn(.main))
+
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID, iconID)
     let ephemeralSN = ephemeralNode.toSN()
     let parentGUID = parentSPID.guid
