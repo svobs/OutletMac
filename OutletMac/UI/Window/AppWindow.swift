@@ -88,7 +88,10 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
         // Enable key events
         interpretKeyEvents([event])
         if event.keyCode == 13 {
-            NSLog("DEBUG [\(self.winID)] ENTER KEY PRESSED!")
+            NSLog("DEBUG [\(self.winID)] Enter key pressed!")
+        } else if event.keyCode == 53 {
+            NSLog("DEBUG [\(self.winID)] Escape key pressed!")
+            self.app.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: self.winID)
         } else {
             NSLog("DEBUG [\(self.winID)] User pressed key: \(event.keyCode)")
         }

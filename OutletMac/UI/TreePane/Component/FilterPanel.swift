@@ -62,6 +62,9 @@ struct FilterPanel: View {
         } else {
           // This is ENTER key
         }
+      }).onExitCommand(perform: {
+        NSLog("DEBUG [\(self.con.treeID)] Filter onExitCommand() called!")
+        // TODO: collapse filter
       })
 
       // Show ancestors

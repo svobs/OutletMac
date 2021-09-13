@@ -18,7 +18,7 @@ class AppMainMenu: NSMenu {
     }
 
     private static func buildMainMenu() -> [NSMenuItem] {
-        return [buildAppMenu(), buildEditMenu()]
+        return [buildAppMenu(), buildEditMenu(), buildViewMenu(), buildWindowMenu()]
 
     }
 
@@ -60,5 +60,24 @@ class AppMainMenu: NSMenu {
             ]
 
         return editMenu
+    }
+
+    private static func buildViewMenu() -> NSMenuItem {
+        let viewMenu = NSMenuItem()
+        viewMenu.submenu = NSMenu(title: "View")
+        viewMenu.submenu?.items = []
+        return viewMenu
+    }
+
+    private static func buildWindowMenu() -> NSMenuItem {
+        let windowMenu = NSMenuItem()
+        windowMenu.submenu = NSMenu(title: "Window")
+        windowMenu.submenu?.items = [
+            NSMenuItem(title: "Minmize", action: #selector(NSWindow.miniaturize(_:)), keyEquivalent: "m"),
+            NSMenuItem(title: "Zoom", action: #selector(NSWindow.performZoom(_:)), keyEquivalent: ""),
+            NSMenuItem.separator(),
+            NSMenuItem(title: "Show All", action: #selector(NSApplication.arrangeInFront(_:)), keyEquivalent: "m")
+        ]
+        return windowMenu
     }
 }

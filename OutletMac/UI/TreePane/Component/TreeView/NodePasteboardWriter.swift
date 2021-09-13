@@ -11,24 +11,24 @@ extension NSPasteboard.PasteboardType {
 }
 
 class NodePasteboardWriter: NSObject, NSPasteboardWriting {
-    var guid: GUID
-//    var localFileURL: URL
+    var guidValue: GUID
+    var fileURLValue: String?
 
-    init(guid: GUID) {
-        self.guid = guid
+    init(guid: GUID, fileURL: String? = nil) {
+        self.guidValue = guid
+        self.fileURLValue = fileURL
     }
 
     func writableTypes(for pasteboard: NSPasteboard) -> [NSPasteboard.PasteboardType] {
-        return [.guid]
-        // TODO: support fileURL type for external drops
+        return [.guid, .fileURL]
     }
 
     func pasteboardPropertyList(forType type: NSPasteboard.PasteboardType) -> Any? {
         switch type {
         case .guid:
-            return guid
-//        case .fileURL:
-//            return localFileURL
+            return guidValue
+        case .fileURL:
+            return fileURLValue
         default:
             return nil
         }

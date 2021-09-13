@@ -28,9 +28,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     override func keyDown(with event: NSEvent) {
+        NSLog("DEBUG [\(self.treeID)] KEY EVENT: \(event)")
         super.keyDown(with: event)
         // Enable key events
         interpretKeyEvents([event])
+        if event.keyCode == 53 {
+            NSLog("DEBUG [\(self.treeID)] Escape key pressed!")
+            self.con.swiftTreeState.isEditingRoot = false
+        }
     }
 
     /**
@@ -381,8 +386,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 NSLog("DEBUG [\(treeID)] Denying drag for node (\(guid)) - it is display only")
                 return nil
             } else {
-                // NSString implements NSPasteboardWriting.
-                return NodePasteboardWriter(guid: guid)
+                let fileURL = sn.spid.treeType == .LOCAL_DISK ? sn.spid.getSinglePath() : nil
+                return NodePasteboardWriter(guid: guid, fileURL: fileURL)
             }
         }
 
@@ -573,12 +578,16 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let dragMask = dragOperation.rawValue == NSDragOperation.every.rawValue ? currentDefault : dragOperation.rawValue
         switch dragMask {
         case NSDragOperation.copy.rawValue:
+            // Option key held down:
             return .COPY
         case NSDragOperation.move.rawValue:
+            // Command key held down:
             return .MOVE
         case NSDragOperation.link.rawValue:
+            // Control key held down:
             return .LINK
         case NSDragOperation.delete.rawValue:
+            // When is this activated?
             return .DELETE
         default:
             NSLog("WARN  [\(self.treeID)] Unrecognized drag operation: \(dragOperation.rawValue) (will return current default: \(currentDefault)")

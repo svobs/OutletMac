@@ -230,7 +230,7 @@ struct MainContentView: View {
   var body: some View {
     let tapCancelEdit = TapGesture()
       .onEnded { _ in
-        NSLog("DEBUG [\(ID_MAIN_WINDOW)] Tapped!")
+        NSLog("DEBUG [\(ID_MAIN_WINDOW)] User tapped!")
         app.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
       }
 

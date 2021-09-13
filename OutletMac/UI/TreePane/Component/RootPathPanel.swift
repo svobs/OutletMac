@@ -140,6 +140,7 @@ struct RootPathPanel: View {
           // No op. Just override default
         })
         .onExitCommand {
+          // Escape key
           NSLog("[\(self.con.treeID)] DEBUG TextField got exit cmd")
           self.con.dispatcher.sendSignal(signal: .CANCEL_ALL_EDIT_ROOT, senderID: ID_MAIN_WINDOW)
         }
