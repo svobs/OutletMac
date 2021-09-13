@@ -5,8 +5,13 @@
 
 import Cocoa
 
-// This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
+/**
+ Official Apple docs: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MenuList/MenuList.html
+ This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
+ */
 class AppMainMenu: NSMenu {
+    public static let DIFF_TREES_BY_CONTENT: Selector = #selector(OutletMacApp.diffTreesByContent)
+
     override init(title: String) {
         super.init(title: title)
 
@@ -18,7 +23,9 @@ class AppMainMenu: NSMenu {
     }
 
     private static func buildMainMenu() -> [NSMenuItem] {
-        return [buildAppMenu(), buildEditMenu(), buildViewMenu(), buildWindowMenu()]
+        return [
+            buildAppMenu(), buildEditMenu(), buildToolsMenu(), buildViewMenu(), buildWindowMenu()
+        ]
 
     }
 
@@ -65,6 +72,19 @@ class AppMainMenu: NSMenu {
         return editMenu
     }
 
+    private static func buildToolsMenu() -> NSMenuItem {
+        let toolsMenu = NSMenuItem()
+        toolsMenu.submenu = NSMenu(title: "Tools")
+
+        let diffTreesByContent = NSMenuItem(title: "Diff Trees By Content", action: #selector(OutletMacApp.diffTreesByContent), keyEquivalent: "d")
+        diffTreesByContent.target = NSApplication.shared
+
+        toolsMenu.submenu?.items = [
+            NSMenuItem(title: "Diff Trees By Content", action: #selector(OutletMacApp.diffTreesByContent), keyEquivalent: "d"),
+        ]
+        return toolsMenu
+    }
+
     private static func buildViewMenu() -> NSMenuItem {
         let viewMenu = NSMenuItem()
         viewMenu.submenu = NSMenu(title: "View")
@@ -72,10 +92,14 @@ class AppMainMenu: NSMenu {
         let showToolbar = NSMenuItem(title: "Show Toolbar", action: #selector(NSWindow.toggleToolbarShown(_:)), keyEquivalent: "t")
         showToolbar.keyEquivalentModifierMask = .command.union(.option)
 
+        let toggleFullScreen =
+                NSMenuItem(title: "Enter Full Screen", action: #selector(NSWindow.toggleFullScreen(_:)), keyEquivalent: "f")
+        toggleFullScreen.keyEquivalentModifierMask = .command.union(.control)  // same as Google Chrome
+
         viewMenu.submenu?.items = [
             showToolbar,
             NSMenuItem.separator(),
-            NSMenuItem(title: "Enter Full Screen", action: #selector(NSWindow.toggleFullScreen(_:)), keyEquivalent: "f"),
+            toggleFullScreen,
     ]
         return viewMenu
     }

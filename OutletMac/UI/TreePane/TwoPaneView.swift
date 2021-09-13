@@ -26,6 +26,7 @@ struct TodoPlaceholder: View {
 
 /**
  STRUCT ButtonBar
+ TODO: convert to toolbar buttons & menu items, then delete
  */
 fileprivate struct ButtonBar: View {
   @EnvironmentObject var globalState: GlobalState
@@ -42,7 +43,9 @@ fileprivate struct ButtonBar: View {
   var body: some View {
     HStack {
       if globalState.mode == .BROWSING {
-        Button("Diff (content-first)", action: self.onDiffButtonClicked)
+        Button("Diff (content-first)", action: {
+          NSApp.sendAction(AppMainMenu.DIFF_TREES_BY_CONTENT, to: self.app, from: self)
+        })
                 .disabled(!self.globalState.isUIEnabled)
       } else if globalState.mode == .DIFF {
         Button("Merge...", action: self.onMergeButtonClicked)
@@ -59,35 +62,6 @@ fileprivate struct ButtonBar: View {
 
   // UI callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  func onDiffButtonClicked() {
-    if self.conLeft.treeLoadState != .COMPLETELY_LOADED {
-      self.conLeft.reportError("Cannot start diff", "Left tree is not finished loading")
-      return
-    }
-    if self.conRight.treeLoadState != .COMPLETELY_LOADED {
-      self.conRight.reportError("Cannot start diff", "Right tree is not finished loading")
-      return
-    }
-    if globalState.mode != .BROWSING {
-      self.conRight.reportError("Cannot start diff", "A diff is already in process, apparently (this is a bug)")
-      return
-    }
-
-    NSLog("DEBUG Diff btn clicked! Sending request to BE to diff trees '\(self.conLeft.treeID)' & '\(self.conRight.treeID)'")
-
-    // First disable UI
-    self.app.sendEnableUISignal(enable: false)
-
-    // Now ask BE to start the diff
-    do {
-      _ = try self.conLeft.backend.startDiffTrees(treeIDLeft: self.conLeft.treeID, treeIDRight: self.conRight.treeID)
-      //  We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
-    } catch {
-      NSLog("ERROR Failed to start tree diff: \(error)")
-      self.app.sendEnableUISignal(enable: true)
-    }
-  }
 
   func onMergeButtonClicked() {
     if self.globalState.mode != .DIFF {

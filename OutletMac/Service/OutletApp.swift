@@ -25,10 +25,12 @@ protocol OutletApp: HasLifecycle {
   func execAsync(_ workItem: @escaping NoArgVoidFunc)
   func execSync(_ workItem: @escaping NoArgVoidFunc)
 
+  func validateMenuItem(_ item: NSMenuItem) -> Bool
+  func diffTreesByContent()
+
   func grpcDidGoDown()
   func grpcDidGoUp()
 
-  func displayError(_ msg: String, _ secondaryMsg: String)
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 
   func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreePanelController
@@ -215,6 +217,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     }
   }
 
+  private func reportError(_ msg: String, _ secondaryMsg: String) {
+    NSLog("ERROR Error from OutletApp: msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    self.displayError(msg, secondaryMsg)
+  }
+
 
   // SignalDispatcher callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -283,14 +290,72 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Convenience methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  // TODO: Deprecate!
   func execAsync(_ workItem: @escaping NoArgVoidFunc) {
     self.serialQueue.async(execute: workItem)
   }
 
+  // TODO: Deprecate!
   func execSync(_ workItem: @escaping NoArgVoidFunc) {
     assert(DispatchQueue.isNotExecutingIn(self.serialQueue))
 
     self.serialQueue.sync(execute: workItem)
+  }
+
+  // Menu actions
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
+    if item.action == AppMainMenu.DIFF_TREES_BY_CONTENT {
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
+        NSLog("DEBUG [\(ID_APP)] DiffTreesByContent menu item enabled")
+        return true
+      }
+      NSLog("DEBUG [\(ID_APP)] DiffTreesByContent menu item disabled")
+    }
+    return false
+  }
+
+  @objc func diffTreesByContent() {
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(ID_APP)] Entered diffTreesByContent()")
+    }
+
+    guard let conLeft = self.getTreePanelController(ID_LEFT_TREE) else {
+      self.reportError("Cannot diff", "Internal error: no controller for \(ID_LEFT_TREE) found!")
+      return
+    }
+    guard let conRight = self.getTreePanelController(ID_RIGHT_TREE) else {
+      self.reportError("Cannot diff", "Internal error: no controller for \(ID_RIGHT_TREE) found!")
+      return
+    }
+    guard globalState.mode == .BROWSING else {
+      self.reportError("Cannot start diff", "A diff is already in process, apparently (this is probably a bug)")
+      return
+    }
+
+//    if conLeft.treeLoadState != .COMPLETELY_LOADED {
+//      self.reportError("Cannot start diff", "Left tree is not finished loading")
+//      return
+//    }
+//    if conRight.treeLoadState != .COMPLETELY_LOADED {
+//      self.reportError("Cannot start diff", "Right tree is not finished loading")
+//      return
+//    }
+
+    NSLog("DEBUG [\(ID_APP)] Sending request to BE to diff trees '\(conLeft.treeID)' & '\(conRight.treeID)'")
+
+    // First disable UI
+    self.sendEnableUISignal(enable: false)
+
+    // Now ask BE to start the diff
+    do {
+      _ = try self.backend.startDiffTrees(treeIDLeft: conLeft.treeID, treeIDRight: conRight.treeID)
+      //  We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
+    } catch {
+      NSLog("ERROR \(ID_APP)] Failed to start tree diff: \(error)")
+      self.sendEnableUISignal(enable: true)
+    }
   }
 
   // TreePanelController registry
@@ -338,7 +403,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   /**
    Display error msg in dialog
    */
-  func displayError(_ msg: String, _ secondaryMsg: String) {
+  private func displayError(_ msg: String, _ secondaryMsg: String) {
       self.tcDQ.sync {
         if self._backend!.isConnected {
           self.globalState.showAlert(title: msg, msg: secondaryMsg)
