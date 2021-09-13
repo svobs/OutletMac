@@ -46,12 +46,16 @@ fileprivate struct ButtonBar: View {
         Button("Diff (content-first)", action: {
           NSApp.sendAction(AppMainMenu.DIFF_TREES_BY_CONTENT, to: self.app, from: self)
         })
-                .disabled(!self.globalState.isUIEnabled)
+          .disabled(!self.globalState.isUIEnabled)
       } else if globalState.mode == .DIFF {
-        Button("Merge...", action: self.onMergeButtonClicked)
-                .disabled(!self.globalState.isUIEnabled)
-        Button("Cancel Diff", action: self.onCancelDiffButtonClicked)
-                .disabled(!self.globalState.isUIEnabled)
+        Button("Merge...", action: {
+          NSApp.sendAction(AppMainMenu.MERGE_CHANGES, to: self.app, from: self)
+        })
+          .disabled(!self.globalState.isUIEnabled)
+        Button("Cancel Diff", action: {
+          NSApp.sendAction(AppMainMenu.CANCEL_DIFF, to: self.app, from: self)
+        })
+          .disabled(!self.globalState.isUIEnabled)
       }
       PlayPauseToggleButton(app.iconStore, conLeft.dispatcher)
       Spacer()
@@ -60,44 +64,6 @@ fileprivate struct ButtonBar: View {
     .buttonStyle(BorderedButtonStyle())
   }
 
-  // UI callbacks
-  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  func onMergeButtonClicked() {
-    if self.globalState.mode != .DIFF {
-      self.conLeft.reportError("Cannot merge changes", "A diff is not currently in progress")
-      return
-    }
-    do {
-      let selectedChangeListLeft = try self.conLeft.generateCheckedRowList()
-      let selectedChangeListRight = try self.conRight.generateCheckedRowList()
-
-      let guidListLeft: [GUID] = selectedChangeListLeft.map({ $0.spid.guid })
-      let guidListRight: [GUID] = selectedChangeListRight.map({ $0.spid.guid })
-      if SUPER_DEBUG_ENABLED {
-        NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
-        NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
-      }
-
-      self.app.sendEnableUISignal(enable: false)
-
-      try self.app.backend.generateMergeTree(treeIDLeft: self.conLeft.treeID, treeIDRight: self.conRight.treeID,
-                                             selectedChangeListLeft: guidListLeft, selectedChangeListRight: guidListRight)
-
-    } catch {
-      self.conLeft.reportException("Failed to generate merge preview", error)
-      self.app.sendEnableUISignal(enable: true)
-    }
-  }
-
-  func onCancelDiffButtonClicked() {
-    if self.globalState.mode != .DIFF {
-      self.conLeft.reportError("Cannot cancel diff", "A diff is not currently in progress")
-      return
-    }
-    NSLog("DEBUG CancelDiff btn clicked! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
-    self.conLeft.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_MAIN_WINDOW)
-  }
 }
 
 /**

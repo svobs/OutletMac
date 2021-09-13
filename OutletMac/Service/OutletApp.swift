@@ -222,6 +222,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.displayError(msg, secondaryMsg)
   }
 
+  private func reportException(_ title: String, _ error: Error) {
+    let errorMsg: String = "\(error)"
+    reportError(title, errorMsg)
+  }
+
 
   // SignalDispatcher callbacks
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
@@ -305,6 +310,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Menu actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  /**
+   Called by certain menu items, when they are drawn, to determine if they should be enabled.
+    - Returns: true if the given menu item should be enabled, false if it should be disabled
+   */
   @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
     if item.action == AppMainMenu.DIFF_TREES_BY_CONTENT {
       if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
@@ -312,10 +321,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         return true
       }
       NSLog("DEBUG [\(ID_APP)] DiffTreesByContent menu item disabled")
+    } else if item.action == AppMainMenu.MERGE_CHANGES {
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+        NSLog("DEBUG [\(ID_APP)] MergeChanges menu item enabled")
+        return true
+      }
+      NSLog("DEBUG [\(ID_APP)] MergeChanges menu item disabled")
+    } else if item.action == AppMainMenu.CANCEL_DIFF {
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+        NSLog("DEBUG [\(ID_APP)] CancelDiff menu item enabled")
+        return true
+      }
+      NSLog("DEBUG [\(ID_APP)] CancelDiff menu item disabled")
     }
     return false
   }
 
+  /**
+   Diff Trees By Content
+   */
   @objc func diffTreesByContent() {
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG [\(ID_APP)] Entered diffTreesByContent()")
@@ -334,6 +358,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       return
     }
 
+    // TODO: will this work if not loaded?
 //    if conLeft.treeLoadState != .COMPLETELY_LOADED {
 //      self.reportError("Cannot start diff", "Left tree is not finished loading")
 //      return
@@ -356,6 +381,57 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       NSLog("ERROR \(ID_APP)] Failed to start tree diff: \(error)")
       self.sendEnableUISignal(enable: true)
     }
+  }
+
+  /**
+   Merge Changes
+   */
+  @objc func mergeDiffChanges() {
+    guard self.globalState.mode == .DIFF else {
+      self.reportError("Cannot merge changes", "A diff is not currently in progress")
+      return
+    }
+
+    guard let conLeft = self.getTreePanelController(ID_LEFT_TREE) else {
+      self.reportError("Cannot merge", "Internal error: no controller for \(ID_LEFT_TREE) found!")
+      return
+    }
+    guard let conRight = self.getTreePanelController(ID_RIGHT_TREE) else {
+      self.reportError("Cannot merge", "Internal error: no controller for \(ID_RIGHT_TREE) found!")
+      return
+    }
+    do {
+      let selectedChangeListLeft = try conLeft.generateCheckedRowList()
+      let selectedChangeListRight = try conRight.generateCheckedRowList()
+
+      let guidListLeft: [GUID] = selectedChangeListLeft.map({ $0.spid.guid })
+      let guidListRight: [GUID] = selectedChangeListRight.map({ $0.spid.guid })
+      if SUPER_DEBUG_ENABLED {
+        NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
+        NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
+      }
+
+      self.sendEnableUISignal(enable: false)
+
+      try self.backend.generateMergeTree(treeIDLeft: conLeft.treeID, treeIDRight: conRight.treeID,
+              selectedChangeListLeft: guidListLeft, selectedChangeListRight: guidListRight)
+
+    } catch {
+      self.reportException("Failed to generate merge preview", error)
+      self.sendEnableUISignal(enable: true)
+    }
+  }
+
+  /**
+   Cancel Diff
+   */
+  @objc func cancelDiff() {
+    if self.globalState.mode != .DIFF {
+      self.reportError("Cannot cancel diff", "A diff is not currently in progress")
+      return
+    }
+    NSLog("DEBUG CancelDiff activated! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
+    self.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_APP)
   }
 
   // TreePanelController registry

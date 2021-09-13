@@ -11,6 +11,8 @@ import Cocoa
  */
 class AppMainMenu: NSMenu {
     public static let DIFF_TREES_BY_CONTENT: Selector = #selector(OutletMacApp.diffTreesByContent)
+    public static let MERGE_CHANGES: Selector = #selector(OutletMacApp.mergeDiffChanges)
+    public static let CANCEL_DIFF: Selector = #selector(OutletMacApp.cancelDiff)
 
     override init(title: String) {
         super.init(title: title)
@@ -76,7 +78,7 @@ class AppMainMenu: NSMenu {
         let toolsMenu = NSMenuItem()
         toolsMenu.submenu = NSMenu(title: "Tools")
 
-        let diffTreesByContent = NSMenuItem(title: "Diff Trees By Content", action: #selector(OutletMacApp.diffTreesByContent), keyEquivalent: "d")
+        let diffTreesByContent = NSMenuItem(title: "Diff Trees By Content", action: AppMainMenu.DIFF_TREES_BY_CONTENT, keyEquivalent: "d")
         diffTreesByContent.target = NSApplication.shared
 
         toolsMenu.submenu?.items = [
