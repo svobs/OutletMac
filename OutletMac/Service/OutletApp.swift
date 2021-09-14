@@ -48,7 +48,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   var connectionProblemWindow: ConnectionProblemWindow! = nil
   var mainWindow: MainWindow? = nil
 
-
   // Windows which ARE NOT reused... TODO: test opening & closing these lots of times
   var rootChooserWindow: GDriveRootChooserWindow? = nil
   var mergePreviewWindow: MergePreviewWindow? = nil
@@ -282,6 +281,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // NSApplicationDelegate methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+    return true
+  }
+
   func applicationDidFinishLaunching(_ notification: Notification) {
     do {
       try self.start()
@@ -309,6 +312,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 
   // Menu actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+  @objc func toolbarPickerDidSelectItem(_ sender: Any) {
+    if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
+      NSLog("INFO  [\(ID_APP)] item group selected index: \(toolbarItemGroup.selectedIndex)")
+    }
+  }
 
   /**
    Called by certain menu items, when they are drawn, to determine if they should be enabled.
@@ -569,7 +577,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 
       NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
       // Close all other windows beside the Connection Problem window, if they exist
-      self.mainWindow?.closeWithoutAppShutdown()
+      self.mainWindow?.close()
       self.rootChooserWindow?.close()
       self.mergePreviewWindow?.close()
 
@@ -614,7 +622,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
 
       self.tcDQ.sync {
-        self.mainWindow?.closeWithoutAppShutdown()
+        self.mainWindow?.close()
         do {
           self.mainWindow!.setControllers(left: conLeft, right: conRight)
           try self.mainWindow!.start()

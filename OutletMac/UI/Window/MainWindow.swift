@@ -16,8 +16,6 @@ class MainWindow: AppWindow, ObservableObject {
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
-  private var isShutdownAppOnClose: Bool = true
-
   override var winID: String {
     get {
       ID_MAIN_WINDOW
@@ -81,27 +79,6 @@ class MainWindow: AppWindow, ObservableObject {
     } catch {
       NSLog("ERROR [\(self.winID)] Failed to shut down tree controllers: \(error)")
     }
-
-    if self.isShutdownAppOnClose {
-      NSLog("INFO  [\(self.winID)] Window closed by user: shutting down app")
-      do {
-        try self.app.shutdown()
-      } catch {
-        NSLog("ERROR [\(self.winID)] Failure during app shutdown: \(error)")
-      }
-    } else {
-      // closed by program, not user
-      NSLog("DEBUG [\(self.winID)] Closing window without shutting down")
-    }
-  }
-
-  func closeWithoutAppShutdown() {
-    self.isShutdownAppOnClose = false
-    defer {
-      self.isShutdownAppOnClose = true
-    }
-    // See: windowWillClose() method below
-    self.close()
   }
 
   // SignalDispatcher callbacks
