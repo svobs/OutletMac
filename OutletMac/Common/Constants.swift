@@ -240,8 +240,17 @@ enum IconID: UInt32 {
   }
 
   func isToolbarIcon() -> Bool {
-    // TODO: implement IconID.isToolbarIcon and IconID.isTreeIcon
-    return true
+    // TODO: implement IconID.isToolbarIcon
+    switch self {
+    case .ICON_TO_ADD, .ICON_TO_DELETE, .ICON_TO_UPDATE, .ICON_TO_MOVE, .ICON_LOADING:
+      return false
+    default:
+      return true
+    }
+  }
+
+  func isNodeIcon() -> Bool {
+    return !self.isToolbarIcon()
   }
 
   /**

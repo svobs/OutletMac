@@ -14,6 +14,7 @@ import SwiftUI
  */
 protocol ImageContainer {
   func getImage() -> Image
+  func getNSImage() -> NSImage
 
   var isGrayscale: Bool { get }
 
@@ -21,7 +22,18 @@ protocol ImageContainer {
   var height: CGFloat { get }
 }
 
+fileprivate func makeErrorImage(iconSize: CGFloat) -> ImageContainer {
+  return SystemImage(width: iconSize, height: iconSize, systemImageName: ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME)
+}
+
+fileprivate func makeErrorNSImage(width: CGFloat, height: CGFloat) -> NSImage {
+  let nsImage = NSImage(systemSymbolName: ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME, accessibilityDescription: nil)!
+  nsImage.size = NSSize(width: width, height: height)
+  return nsImage
+}
+
 fileprivate class LocalImage: ImageContainer {
+
   let width: CGFloat
   let height: CGFloat
   let imageName: String
@@ -38,6 +50,11 @@ fileprivate class LocalImage: ImageContainer {
     self.height = height
     self.imageName = imageName
     self.font = font
+  }
+
+  func getNSImage() -> NSImage {
+    NSLog("ERROR getNSImage() should not be called for LocalImage (name='\(imageName)'); returning error image instead")
+    return makeErrorNSImage(width: self.width, height: self.height)
   }
 
   func getImage() -> Image {
@@ -71,6 +88,15 @@ fileprivate class SystemImage: ImageContainer {
     self.font = font
   }
 
+  func getNSImage() -> NSImage {
+    if let nsImage = NSImage(systemSymbolName: self.systemImageName, accessibilityDescription: nil) {
+      nsImage.size = NSSize(width: height, height: height)
+      return nsImage
+    } else {
+      return makeErrorNSImage(width: self.width, height: self.height)
+    }
+  }
+
   func getImage() -> Image {
     return Image(systemName: self.systemImageName)
       .renderingMode(.template)
@@ -99,6 +125,10 @@ fileprivate class NetworkImage: ImageContainer {
     self.nsImage = nsImage
   }
 
+  func getNSImage() -> NSImage {
+    return nsImage
+  }
+
   func getImage() -> Image {
     return Image(nsImage: self.nsImage)
   }
@@ -124,13 +154,13 @@ fileprivate class ImageContainerWrapper {
 class IconStore: HasLifecycle {
 
   let backend: OutletBackend
-  var treeIconSize: CGFloat = (CGFloat)(DEFAULT_ICON_SIZE)
+  var nodeIconSize: CGFloat = (CGFloat)(DEFAULT_ICON_SIZE)
   var toolbarIconSize: CGFloat = (CGFloat)(DEFAULT_ICON_SIZE)
   var useNativeToolbarIcons: Bool = true
-  var useNativeTreeIcons: Bool = true
+  var useNativeNodeIcons: Bool = true
 
   private let toolbarIconCache = NSCache<NSNumber, ImageContainerWrapper>()
-  private let treeIconCache = NSCache<NSString, NSImage>()
+  private let nodeIconCache = NSCache<NSString, NSImage>()
 
   init(_ backend: OutletBackend) {
     self.backend = backend
@@ -138,27 +168,28 @@ class IconStore: HasLifecycle {
 
   func start() throws {
     NSLog("DEBUG IconStore starting: getting config values from gRPC")
-    self.treeIconSize = (CGFloat)(try self.backend.getIntConfig(CFG_KEY_TREE_ICON_SIZE, defaultVal: DEFAULT_ICON_SIZE))
+    self.nodeIconSize = (CGFloat)(try self.backend.getIntConfig(CFG_KEY_TREE_ICON_SIZE, defaultVal: DEFAULT_ICON_SIZE))
     self.toolbarIconSize = (CGFloat)(try self.backend.getIntConfig(CFG_KEY_TOOLBAR_ICON_SIZE, defaultVal: DEFAULT_ICON_SIZE))
     self.useNativeToolbarIcons = try self.backend.getBoolConfig(CFG_KEY_USE_NATIVE_TOOLBAR_ICONS, defaultVal: useNativeToolbarIcons)
-    self.useNativeTreeIcons = try self.backend.getBoolConfig(CFG_KEY_USE_NATIVE_TREE_ICONS, defaultVal: useNativeTreeIcons)
-    NSLog("DEBUG IconStore: treeIconSize=\(self.treeIconSize) toolbarIconSize=\(self.toolbarIconSize) useNativeToolbarIcons = \(self.useNativeToolbarIcons) useNativeTreeIcons = \(self.useNativeTreeIcons)")
+    self.useNativeNodeIcons = try self.backend.getBoolConfig(CFG_KEY_USE_NATIVE_TREE_ICONS, defaultVal: useNativeNodeIcons)
+    NSLog("DEBUG IconStore: nodeIconSize=\(self.nodeIconSize) toolbarIconSize=\(self.toolbarIconSize) useNativeToolbarIcons = \(self.useNativeToolbarIcons) useNativeNodeIcons = \(self.useNativeNodeIcons)")
   }
 
   func shutdown() throws {
     toolbarIconCache.removeAllObjects()
+    nodeIconCache.removeAllObjects()
   }
 
   func getNodeIcon(_ node: Node, height: CGFloat) -> NSImage? {
-
     let iconId = node.icon
     if TRACE_ENABLED {
       NSLog("DEBUG Getting nodeIcon for: \(iconId): \(node.nodeIdentifier)")
     }
 
     if node.isEphemeral {
+      // FIXME: should not be getting toolbar icon here
       let toolIcon = self.getToolbarIcon(for: iconId)
-      return (toolIcon as! NetworkImage).nsImage
+      return toolIcon.getNSImage()
     } else if node.isDir {
       return self.getIconForDirNode(node, height)
     } else {
@@ -180,127 +211,117 @@ class IconStore: HasLifecycle {
 
   private func getIconForDirNode(_ node: Node, _ height: CGFloat) -> NSImage {
     let iconID = node.icon
-    let key: String = makeTreeIconCacheKey(iconID)
+    let key: String = makeSimpleIconCacheKey(iconID)
 
-    if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+    if let cachedIcon = nodeIconCache.object(forKey: key as NSString) {
       // Used cached icon if available
       if TRACE_ENABLED {
         NSLog("DEBUG Returning cached icon for (dir) key '\(key)'")
       }
       return cachedIcon
-    } else {
-      // build new icon
-
-      var badge: IconID? = nil
-      // If dir, determine appropriate badge, if any
-      switch iconID {
-      case .ICON_DIR_MK:
-        badge = .BADGE_MKDIR
-        break
-      case .ICON_DIR_RM:
-        badge = .BADGE_RM
-        break
-      case .ICON_DIR_MV_SRC:
-        badge = .BADGE_MV_SRC
-        break
-      case .ICON_DIR_UP_SRC:
-        badge = .BADGE_UP_SRC
-        break
-      case .ICON_DIR_CP_SRC:
-        badge = .BADGE_CP_SRC
-        break
-      case .ICON_DIR_MV_DST:
-        badge = .BADGE_MV_DST
-        break
-      case .ICON_DIR_UP_DST:
-        badge = .BADGE_UP_DST
-        break
-      case .ICON_DIR_CP_DST:
-        badge = .BADGE_CP_DST
-        break
-      case .ICON_DIR_TRASHED:
-        badge = .BADGE_TRASHED
-        break
-      case .ICON_GENERIC_DIR:
-        // No badge
-        break
-      default:
-        // create it from scratch then store in the toolbarIconCache
-        let imageContainer = self.makeNewImageContainer(for: iconID)
-        let nsImage = (imageContainer as! NetworkImage).nsImage
-        treeIconCache.setObject(nsImage, forKey: key as NSString)
-        return nsImage
-      }
-
-      let baseIcon = NSWorkspace.shared.icon(for: .folder)
-
-      return buildAndCacheIcon(iconID, baseIcon, height, badge, key)
     }
+
+    // else build new icon
+
+    var badge: IconID? = nil
+    // If dir, determine appropriate badge, if any
+    switch iconID {
+    case .ICON_DIR_MK:
+      badge = .BADGE_MKDIR
+      break
+    case .ICON_DIR_RM:
+      badge = .BADGE_RM
+      break
+    case .ICON_DIR_MV_SRC:
+      badge = .BADGE_MV_SRC
+      break
+    case .ICON_DIR_UP_SRC:
+      badge = .BADGE_UP_SRC
+      break
+    case .ICON_DIR_CP_SRC:
+      badge = .BADGE_CP_SRC
+      break
+    case .ICON_DIR_MV_DST:
+      badge = .BADGE_MV_DST
+      break
+    case .ICON_DIR_UP_DST:
+      badge = .BADGE_UP_DST
+      break
+    case .ICON_DIR_CP_DST:
+      badge = .BADGE_CP_DST
+      break
+    case .ICON_DIR_TRASHED:
+      badge = .BADGE_TRASHED
+      break
+    case .ICON_GENERIC_DIR:
+      // No badge
+      break
+    default:
+      // create it from scratch then store in the toolbarIconCache
+      assert(!iconID.isToolbarIcon(), "Expected to not be a toolbar icon: \(iconID)")
+      let imageContainer = self.makeNewImageContainer(for: iconID)
+      let nsImage = imageContainer.getNSImage()
+      nodeIconCache.setObject(nsImage, forKey: key as NSString)
+      return nsImage
+    }
+
+    let baseIcon = NSWorkspace.shared.icon(for: .folder)
+
+    return buildAndCacheMacIcon(iconID, baseIcon, height, badge, key)
   }
 
   private func getIconForFileNode(_ node: Node, _ height: CGFloat) -> NSImage {
     let iconID = node.icon
-    let isFile: Bool
-    var badge: IconID? = nil
-    // If file, determine appropriate badge, if any
-    switch iconID {
-    case .ICON_FILE_RM:
-      badge = .BADGE_RM
-      isFile = true
-      break
-    case .ICON_FILE_MV_SRC:
-      badge = .BADGE_MV_SRC
-      isFile = true
-      break
-    case .ICON_FILE_UP_SRC:
-      badge = .BADGE_UP_SRC
-      isFile = true
-      break
-    case .ICON_FILE_CP_SRC:
-      badge = .BADGE_CP_SRC
-      isFile = true
-      break
-    case .ICON_FILE_MV_DST:
-      badge = .BADGE_MV_DST
-      isFile = true
-      break
-    case .ICON_FILE_UP_DST:
-      badge = .BADGE_UP_DST
-      isFile = true
-      break
-    case .ICON_FILE_CP_DST:
-      badge = .BADGE_CP_DST
-      isFile = true
-      break
-    case .ICON_FILE_TRASHED:
-      badge = .BADGE_TRASHED
-      isFile = true
-      break
-    case .ICON_GENERIC_FILE:
-      // No badge
-      isFile = true
-      break
-
-    default:
-      isFile = false
-      break
-    }
-
-    let key: String
-    if isFile {
-      key = makeFileCacheKey(iconID, node)
-    } else {
-      key = makeTreeIconCacheKey(iconID)
-    }
+    let key: String = makeFileIconCacheKey(iconID, node)
 
     // Now that we have derived the key for the file type, use cached value if available
-    if let cachedIcon = treeIconCache.object(forKey: key as NSString) {
+    if let cachedIcon = nodeIconCache.object(forKey: key as NSString) {
       if TRACE_ENABLED {
         NSLog("DEBUG Returning cached icon for (file) key '\(key)'")
       }
       return cachedIcon
     } else {
       // build new icon
+
+      var badge: IconID? = nil
+      // If file, determine appropriate badge, if any
+      switch iconID {
+      case .ICON_FILE_RM:
+        badge = .BADGE_RM
+        break
+      case .ICON_FILE_MV_SRC:
+        badge = .BADGE_MV_SRC
+        break
+      case .ICON_FILE_UP_SRC:
+        badge = .BADGE_UP_SRC
+        break
+      case .ICON_FILE_CP_SRC:
+        badge = .BADGE_CP_SRC
+        break
+      case .ICON_FILE_MV_DST:
+        badge = .BADGE_MV_DST
+        break
+      case .ICON_FILE_UP_DST:
+        badge = .BADGE_UP_DST
+        break
+      case .ICON_FILE_CP_DST:
+        badge = .BADGE_CP_DST
+        break
+      case .ICON_FILE_TRASHED:
+        badge = .BADGE_TRASHED
+        break
+      case .ICON_GENERIC_FILE:
+        // No badge
+        break
+      default:
+        // not a file?
+        assert(!iconID.isToolbarIcon(), "Expected to not be a toolbar icon: \(iconID)")
+        let imageContainer = self.makeNewImageContainer(for: iconID)
+        let nsImage = imageContainer.getNSImage()
+        nodeIconCache.setObject(nsImage, forKey: key as NSString)
+        return nsImage
+      }
+
       var baseIcon: NSImage
       // Get icon for suffix
       let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
@@ -310,17 +331,17 @@ class IconStore: HasLifecycle {
         baseIcon = NSWorkspace.shared.icon(forFileType: suffix)
       }
 
-      return buildAndCacheIcon(iconID, baseIcon, height, badge, key)
+      return buildAndCacheMacIcon(iconID, baseIcon, height, badge, key)
     }
   }
 
-  private func buildAndCacheIcon(_ iconID: IconID, _ baseIcon: NSImage, _ height: CGFloat, _ badge: IconID?, _ key: String)-> NSImage {
+  private func buildAndCacheMacIcon(_ iconID: IconID, _ baseIcon: NSImage, _ height: CGFloat, _ badge: IconID?, _ key: String)-> NSImage {
     let baseIcon = self.getBestRepresentation(baseIcon, height)
     let icon = self.addBadgeOverlay(src: baseIcon, badge: badge)
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG Storing icon=\(iconID) with badge=\(badge ?? IconID.NONE) for key: '\(key)'")
     }
-    treeIconCache.setObject(icon, forKey: key as NSString)
+    nodeIconCache.setObject(icon, forKey: key as NSString)
     return icon
   }
 
@@ -363,11 +384,11 @@ class IconStore: HasLifecycle {
     return NSNumber(integerLiteral: Int(iconID.rawValue))
   }
 
-  private func makeTreeIconCacheKey(_ iconID: IconID) -> String {
+  private func makeSimpleIconCacheKey(_ iconID: IconID) -> String {
     "\(iconID)"
   }
 
-  private func makeFileCacheKey(_ iconID: IconID, _ node: Node) -> String {
+  private func makeFileIconCacheKey(_ iconID: IconID, _ node: Node) -> String {
     let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
     return "\(iconID):\(suffix)"
   }
@@ -375,13 +396,15 @@ class IconStore: HasLifecycle {
   private func makeNewImageContainer(for iconID: IconID) -> ImageContainer {
     let iconSize: CGFloat
     if iconID.isToolbarIcon() {
+      // Toolbar icon
       iconSize = toolbarIconSize
 
       if self.useNativeToolbarIcons {
         return SystemImage(width: iconSize, height: iconSize, systemImageName: iconID.systemImageName())
       }
     } else {
-      iconSize = treeIconSize
+      // Node icon
+      iconSize = nodeIconSize
     }
 
     do {
@@ -389,15 +412,12 @@ class IconStore: HasLifecycle {
         return NetworkImage(width: iconSize, height: iconSize, nsImage: nsImage)
       } else {
         NSLog("ERROR Server returned nil for image ID \(iconID)")
-        return self.makeErrorImage(iconSize: iconSize)
+        return makeErrorImage(iconSize: iconSize)
       }
     } catch {
       NSLog("ERROR Failed to load image ID \(iconID) from server: \(error)")
-      return self.makeErrorImage(iconSize: iconSize)
+      return makeErrorImage(iconSize: iconSize)
     }
   }
 
-  private func makeErrorImage(iconSize: CGFloat) -> ImageContainer {
-    return SystemImage(width: iconSize, height: iconSize, systemImageName: ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME)
-  }
 }
