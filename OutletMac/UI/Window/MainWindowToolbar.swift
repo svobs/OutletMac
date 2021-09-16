@@ -5,6 +5,11 @@
 
 import Cocoa
 
+extension NSImage.Name {
+    static let modeCopy = NSImage.Name("ModeCopy")
+    static let modeMove = NSImage.Name("ModeMove")
+}
+
 extension NSToolbar.Identifier {
     static let mainWindowToolbarIdentifier = NSToolbar.Identifier("MainWindowToolbar")
 }
@@ -34,6 +39,8 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     }
 
     let isBordered: Bool = true
+    let modeCopyImage = NSImage(named: .modeCopy)!
+    let modeMoveImage = NSImage(named: .modeMove)!
 
     let actionsMenu: NSMenu = {
         var menu = NSMenu(title: "")
@@ -70,13 +77,13 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
                  willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
 
         if  itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
-            let titles = ["Copy", "Move"]
-//            let images: [NSImage] = []  FIXME: swap 'titles' with images. Need to populate
+            let titleList = ["Copy", "Move"]
+            let imageList: [NSImage] = [modeCopyImage, modeMoveImage]
 
             // This will either be a segmented control or a drop down depending on your available space.
             // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
             // which in this app, this method is in AppDelegate. Neat!
-            let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, titles: titles, selectionMode: .selectOne, labels: titles,
+            let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
                     target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
 
             toolbarItem.label = "Drag Mode"
