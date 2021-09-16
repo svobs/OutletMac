@@ -314,7 +314,15 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
   @objc func toolbarPickerDidSelectItem(_ sender: Any) {
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
-      NSLog("INFO  [\(ID_APP)] item group selected index: \(toolbarItemGroup.selectedIndex)")
+      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
+        guard toolbarItemGroup.selectedIndex < MainWindowToolbar.DRAG_MODE_LIST.count else {
+          reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
+          return
+        }
+        let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
+        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation)")
+        self.globalState.currentDefaultDragOperation = newDragMode.dragOperation
+      }
     }
   }
 

@@ -23,6 +23,9 @@ class GlobalState: ObservableObject {
 
     @Published var isUIEnabled: Bool = true
 
+    // Not published, but this is the most logical place to store it:
+    var currentDefaultDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
+
     /**
      This method will cause an alert to be displayed in the MainContentView.
      */

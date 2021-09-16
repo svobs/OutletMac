@@ -98,6 +98,7 @@ enum DragOperation: UInt32 {
   }
 }
 
+let INITIAL_DEFAULT_DRAG_OP = DragOperation.COPY
 
 /**
  ENUM IconNames

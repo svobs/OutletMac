@@ -24,11 +24,28 @@ extension NSToolbarItem.Identifier {
     static let toolPickerItem = NSToolbarItem.Identifier("ToolPickerItemGroup")
 }
 
+class DragMode {
+    init(_ dragOperation: DragOperation, _ title: String, _ image: NSImage) {
+        self.dragOperation = dragOperation
+        self.title = title
+        self.image = image
+    }
+
+    let dragOperation: DragOperation
+    let title: String
+    let image: NSImage
+}
+
 /**
  See doc: https://developer.apple.com/documentation/appkit/touch_bar/integrating_a_toolbar_and_touch_bar_into_your_app
  See example: https://github.com/marioaguzman/toolbar/blob/master/Toolbar/MainWindowController.swift
  */
 class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
+    static let DRAG_MODE_LIST = [
+        DragMode(.COPY, "Copy", NSImage(named: .modeCopy)!),
+        DragMode(.MOVE, "Move", NSImage(named: .modeMove)!)
+        ]
+
     override init(identifier: NSToolbar.Identifier) {
         super.init(identifier: identifier)
         self.delegate = self
@@ -39,8 +56,6 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     }
 
     let isBordered: Bool = true
-    let modeCopyImage = NSImage(named: .modeCopy)!
-    let modeMoveImage = NSImage(named: .modeMove)!
 
     let actionsMenu: NSMenu = {
         var menu = NSMenu(title: "")
@@ -77,8 +92,13 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
                  willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
 
         if  itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
-            let titleList = ["Copy", "Move"]
-            let imageList: [NSImage] = [modeCopyImage, modeMoveImage]
+            var titleList: [String] = []
+            var imageList: [NSImage] = []
+
+            for dragMode in MainWindowToolbar.DRAG_MODE_LIST {
+                titleList.append(dragMode.title)
+                imageList.append(dragMode.image)
+            }
 
             // This will either be a segmented control or a drop down depending on your available space.
             // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
@@ -88,8 +108,8 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
 
             toolbarItem.label = "Drag Mode"
             toolbarItem.paletteLabel = "Drag Mode"
-            toolbarItem.toolTip = "Change the selected drag mode"
-            toolbarItem.selectedIndex = 0
+            toolbarItem.toolTip = "Set the default mode for Drag & Drop (Copy or Move)"
+            toolbarItem.selectedIndex = 0  // TODO: remember this
             return toolbarItem
         }
 

@@ -17,7 +17,6 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     var con: TreePanelControllable! = nil
 
     private let outlineView = NSOutlineView()
-    private var currentDefaultDragOperation: DragOperation = .MOVE
 
     var displayStore: DisplayStore {
         return self.con.displayStore
@@ -382,6 +381,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             NSLog("DEBUG [\(treeID)] Denying drag: UI is disabled")
             return nil
         }
+        // FIXME: handle drag for all types of trees (e.g. MergePreviewTree)
         let guid: GUID = self.itemToGUID(item)
         if let sn = self.displayStore.getSN(guid) {
             if sn.node.isDisplayOnly {
@@ -401,6 +401,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      */
     func outlineView(_ outlineView: NSOutlineView, draggingSession session: NSDraggingSession, endedAt screenPoint: NSPoint, operation: NSDragOperation) {
         guard operation == NSDragOperation.delete else {
+            return
+        }
+
+        if !self.con.app.globalState.isUIEnabled {
+            NSLog("DEBUG [\(treeID)] Denying drop to trash: UI is disabled")
             return
         }
 
@@ -574,8 +579,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      See: https://stackoverflow.com/questions/32408338/how-can-i-allow-moving-and-copying-by-dragging-rows-in-an-nstableview
      */
     private func getDragOperation(_ info: NSDraggingInfo) -> DragOperation {
+        let currentDefaultOperation = self.con.app.globalState.currentDefaultDragOperation
         let dragOperation: NSDragOperation = info.draggingSourceOperationMask
-        let currentDefault = self.currentDefaultDragOperation.getNSDragOperation().rawValue
+
+        let currentDefault = currentDefaultOperation.getNSDragOperation().rawValue
 
         let dragMask = dragOperation.rawValue == NSDragOperation.every.rawValue ? currentDefault : dragOperation.rawValue
         switch dragMask {
@@ -593,7 +600,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return .DELETE
         default:
             NSLog("WARN  [\(self.treeID)] Unrecognized drag operation: \(dragOperation.rawValue) (will return current default: \(currentDefault)")
-            return self.currentDefaultDragOperation
+            return currentDefaultOperation
         }
     }
 
