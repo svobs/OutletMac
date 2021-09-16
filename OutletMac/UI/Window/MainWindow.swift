@@ -161,17 +161,24 @@ class MainWindow: AppWindow, ObservableObject {
   }
 
   override func flagsChanged(with event: NSEvent) {
-    if event.keyCode == 58 {  // Option key
-      let isDepressed = event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue > 0
-      let modifierDragMode: DragOperation?
-      if isDepressed {
-        modifierDragMode = .COPY
-      } else {
+    NSLog("INFO  [\(self.winID)] flagsChanged: \(event)")
+    var modifierDragMode: DragOperation?
+    if event.keyCode == 55 || event.keyCode == 58 {  // either Command or Option key
+      let isCommandKeyDepressed = event.modifierFlags.rawValue & NSEvent.ModifierFlags.command.rawValue > 0
+      let isOptionKeyDepressed = event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue > 0
+
+      if isCommandKeyDepressed && isOptionKeyDepressed {
         modifierDragMode = nil
+      } else if isCommandKeyDepressed {
+        modifierDragMode = .MOVE
+      } else if isOptionKeyDepressed {
+        modifierDragMode = .COPY
       }
+
       self.app.globalState.modifierKeyDragOperation = modifierDragMode
       let newMode = self.app.globalState.getCurrentDefaultDragOperation()
-      NSLog("INFO  [\(self.winID)] OptionKeyPressed=\(isDepressed) NewMode=\(newMode)")
+      let modDragMode: String = modifierDragMode == nil ? "null" : "\(modifierDragMode!)"
+      NSLog("INFO  [\(self.winID)] CmdKeyPressed=\(isCommandKeyDepressed) OptionKeyPressed=\(isOptionKeyDepressed) ModDragMode=\(modDragMode) NewDragMode=\(newMode)")
       if let toolbar = self.toolbar as? MainWindowToolbar {
         toolbar.setDragMode(newMode)
       }

@@ -30,6 +30,7 @@ class GlobalState: ObservableObject {
 
     // Not published, but this is the most logical place to store it:
     var lastClickedDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
+    // FIXME: this doesn't get set during a drag; only before it
     var modifierKeyDragOperation: DragOperation? = nil
 
     func getCurrentDefaultDragOperation() -> DragOperation {
