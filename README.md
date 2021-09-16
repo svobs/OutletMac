@@ -11,5 +11,6 @@
 	Afterwards look in: './Pods/gRPC-Swift-Plugins/' for 'protoc-gen-swift' and 'protoc-gen-grpc-swift'
 
 ## TODO
-- connection hang causes Connection Problem View to fail to open?
+- Add Drag & Drop support to/from Finder, etc.
+- Test Drag & Drop of all node types
 - need to implement timeout for grpc requests

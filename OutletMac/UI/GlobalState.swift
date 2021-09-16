@@ -9,11 +9,9 @@ import SwiftUI
  The EnvironmentObject containing shared state for all UI components in the app
  */
 class GlobalState: ObservableObject {
-    @Published var isPlaying = false
+    @Published var isBackendOpExecutorRunning = false
 
     @Published var deviceList: [Device] = []
-
-    @Published var mode: WindowMode = .BROWSING
 
     // Alert stuff:
     @Published var showingAlert = false
@@ -21,7 +19,14 @@ class GlobalState: ObservableObject {
     @Published var alertMsg: String = "An unknown error occurred" // placeholder msg
     @Published var dismissButtonText: String = "Dismiss" // placeholder msg
 
+    // These are really window-specific:
+
+    /*
+     If false, disable filter controls, drag & drop
+     */
     @Published var isUIEnabled: Bool = true
+
+    @Published var mode: WindowMode = .BROWSING
 
     // Not published, but this is the most logical place to store it:
     var currentDefaultDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP

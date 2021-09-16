@@ -16,11 +16,7 @@ extension NSToolbar.Identifier {
 
 extension NSToolbarItem.Identifier {
     static let toolbarItemMoreInfo = NSToolbarItem.Identifier("ToolbarMoreInfoItem")
-
-    /// Example of `NSMenuToolbarItem`
     static let toolbarMoreActions = NSToolbarItem.Identifier("ToolbarMoreActionsItem")
-
-    /// Example of `NSToolbarItemGroup`
     static let toolPickerItem = NSToolbarItem.Identifier("ToolPickerItemGroup")
 }
 
@@ -104,7 +100,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
             // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
             // which in this app, this method is in AppDelegate. Neat!
             let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
-                    target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
+                    target: nil, action: Selector(("toolPickerDidSelectItem:")) )
 
             toolbarItem.label = "Drag Mode"
             toolbarItem.paletteLabel = "Drag Mode"
@@ -132,12 +128,42 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return nil
     }
 
-    func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
-        if  item.itemIdentifier == NSToolbarItem.Identifier.toolbarMoreActions {
-            return true
+    func getItemIfVisible(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem? {
+        guard let visibleItems = self.visibleItems else {
+            NSLog("DEBUG getItemIfVisible(): no items visible")
+            return nil
         }
-        // TODO
-        return true
+
+        for item in visibleItems {
+            if item.itemIdentifier == itemIdentifier {
+                return item
+            }
+        }
+        return nil
     }
 
+    func setDragMode(_ dragMode: DragOperation) {
+        guard dragMode == .MOVE || dragMode == .COPY else {
+            NSLog("ERROR selectDragMode(): invalid: \(dragMode)")
+            return
+        }
+
+        if let dragModeItem = self.getItemIfVisible(NSToolbarItem.Identifier.toolPickerItem) {
+            if let itemGroup = dragModeItem as? NSToolbarItemGroup {
+                var index = 0
+                for mode in MainWindowToolbar.DRAG_MODE_LIST {
+                    if mode.dragOperation == dragMode {
+                        NSLog("DEBUG selectDragMode(): selecting index: \(index)")
+                        itemGroup.setSelected(true, at: index)
+                        // This will not fire listeners however. We need to fire manually
+                        // FIXME: this always sends the prev value
+                        NSApp.sendAction(#selector(OutletMacApp.toolPickerDidSelectItem(_:)), to: nil, from: itemGroup)
+
+                        return
+                    }
+                    index += 1
+                }
+            }
+        }
+    }
 }

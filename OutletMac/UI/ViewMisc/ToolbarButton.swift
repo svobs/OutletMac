@@ -147,7 +147,7 @@ struct PlayPauseToggleButton: View {
   }
 
   private func toggleValue() {
-    if self.globalState.isPlaying {
+    if self.globalState.isBackendOpExecutorRunning {
       NSLog("INFO  Play/Pause btn clicked! Sending signal \(Signal.PAUSE_OP_EXECUTION)")
       dispatcher.sendSignal(signal: .PAUSE_OP_EXECUTION, senderID: ID_MAIN_WINDOW)
     } else {
@@ -158,7 +158,7 @@ struct PlayPauseToggleButton: View {
 
   var body: some View {
     Button(action: toggleValue) {
-      if globalState.isPlaying {
+      if globalState.isBackendOpExecutorRunning {
         UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PAUSE))
       } else {
         UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PLAY))

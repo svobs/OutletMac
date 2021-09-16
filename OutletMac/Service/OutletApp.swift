@@ -106,7 +106,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
-    self.eventMonitor =  GlobalEventMonitor(mask: [.leftMouseDown, .rightMouseDown], handler: self.mouseEventHandler)
+    let eventMask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .flagsChanged]
+    self.eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
     self.eventMonitor!.start()
 
     var useFixedAddress: Bool = false
@@ -191,7 +192,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       do {
         try self.iconStore.start()
         self.globalState.deviceList = try self.backend.getDeviceList()
-        self.globalState.isPlaying = try self.backend.getOpExecutionPlayState()
+        self.globalState.isBackendOpExecutorRunning = try self.backend.getOpExecutionPlayState()
 
         let screenSize = NSScreen.main?.frame.size ?? .zero
         NSLog("DEBUG [\(ID_APP)] Screen size is \(screenSize.width)x\(screenSize.height)")
@@ -210,9 +211,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": enable])
   }
 
-  func mouseEventHandler(_ event: NSEvent?) {
+  func onGlobalEvent(_ event: NSEvent?) {
     if TRACE_ENABLED {
-      NSLog("DEBUG Got event!")
+      NSLog("DEBUG Got global event: \(event == nil ? "null" : "\(event!)")")
     }
   }
 
@@ -243,7 +244,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {
     let isEnabled = try propDict.getBool("is_enabled")
     DispatchQueue.main.async {
-      self.globalState.isPlaying = isEnabled
+      self.globalState.isBackendOpExecutorRunning = isEnabled
     }
   }
 
@@ -310,9 +311,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.serialQueue.sync(execute: workItem)
   }
 
-  // Menu actions
+  // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  @objc func toolbarPickerDidSelectItem(_ sender: Any) {
+  /**
+    Called by the tool picker in the toolbar
+   */
+  @objc func toolPickerDidSelectItem(_ sender: Any) {
+    NSLog("DEBUG [\(ID_APP)] toolPickerDidSelectItem() entered")
+
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
       if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
         guard toolbarItemGroup.selectedIndex < MainWindowToolbar.DRAG_MODE_LIST.count else {
@@ -320,37 +326,46 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
           return
         }
         let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
-        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation)")
+        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation) (index \(toolbarItemGroup.selectedIndex))")
         self.globalState.currentDefaultDragOperation = newDragMode.dragOperation
       }
     }
   }
+
+//  @objc func setDragMode(_ sender: Any) {
+//    let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
+//    NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation)")
+//    self.globalState.currentDefaultDragOperation = newDragMode.dragOperation
+//  }
 
   /**
    Called by certain menu items, when they are drawn, to determine if they should be enabled.
     - Returns: true if the given menu item should be enabled, false if it should be disabled
    */
   @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
-    if item.action == AppMainMenu.DIFF_TREES_BY_CONTENT {
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
-        NSLog("DEBUG [\(ID_APP)] DiffTreesByContent menu item enabled")
-        return true
-      }
-      NSLog("DEBUG [\(ID_APP)] DiffTreesByContent menu item disabled")
-    } else if item.action == AppMainMenu.MERGE_CHANGES {
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-        NSLog("DEBUG [\(ID_APP)] MergeChanges menu item enabled")
-        return true
-      }
-      NSLog("DEBUG [\(ID_APP)] MergeChanges menu item disabled")
-    } else if item.action == AppMainMenu.CANCEL_DIFF {
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-        NSLog("DEBUG [\(ID_APP)] CancelDiff menu item enabled")
-        return true
-      }
-      NSLog("DEBUG [\(ID_APP)] CancelDiff menu item disabled")
+    guard let action = item.action else {
+      return true
     }
-    return false
+    var isEnabled = false
+    switch action {
+    case AppMainMenu.DIFF_TREES_BY_CONTENT:
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
+        isEnabled = true
+      }
+    case AppMainMenu.MERGE_CHANGES:
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+        isEnabled = true
+      }
+    case AppMainMenu.CANCEL_DIFF:
+      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+        isEnabled = true
+      }
+    default:
+      NSLog("ERROR [\(ID_APP)] validateMenuItem(): unrecognized action: \(action)")
+      return false
+    }
+    NSLog("DEBUG [\(ID_APP)] validateMenuItem(): item \(action) enabled=\(isEnabled)")
+    return isEnabled
   }
 
   /**

@@ -158,6 +158,21 @@ class MainWindow: AppWindow, ObservableObject {
     self.winCoordsTimer.reschedule()
   }
 
+  override func flagsChanged(with event: NSEvent) {
+    if event.keyCode == 58 {  // Option key
+      let isDepressed = event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue > 0
+      NSLog("INFO  [\(self.winID)] OPTION KEY PRESSED: \(isDepressed) \(event)")
+      let toolbar = self.toolbar as! MainWindowToolbar
+      if isDepressed {
+        toolbar.setDragMode(.COPY)
+      } else {
+        toolbar.setDragMode(.MOVE)
+      }
+//      let dragMode = (isDepressed ? DragOperation.COPY : DragOperation.MOVE)
+
+    }
+  }
+
 //  @objc func windowDidChangeScreen(_ notification: Notification) {
 //    NSLog("WINDOW CHANGED SCREEN!!!!!")
 //  }
