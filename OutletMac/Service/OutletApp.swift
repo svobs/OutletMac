@@ -320,23 +320,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     NSLog("DEBUG [\(ID_APP)] toolPickerDidSelectItem() entered")
 
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
-      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
+      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.dragModePickerItem {
         guard toolbarItemGroup.selectedIndex < MainWindowToolbar.DRAG_MODE_LIST.count else {
           reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
           return
         }
         let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
         NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.currentDefaultDragOperation = newDragMode.dragOperation
+        self.globalState.lastClickedDragOperation = newDragMode.dragOperation
       }
     }
   }
-
-//  @objc func setDragMode(_ sender: Any) {
-//    let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
-//    NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation)")
-//    self.globalState.currentDefaultDragOperation = newDragMode.dragOperation
-//  }
 
   /**
    Called by certain menu items, when they are drawn, to determine if they should be enabled.

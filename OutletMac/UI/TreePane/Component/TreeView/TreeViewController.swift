@@ -579,7 +579,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      See: https://stackoverflow.com/questions/32408338/how-can-i-allow-moving-and-copying-by-dragging-rows-in-an-nstableview
      */
     private func getDragOperation(_ info: NSDraggingInfo) -> DragOperation {
-        let currentDefaultOperation = self.con.app.globalState.currentDefaultDragOperation
+        let currentDefaultOperation = self.con.app.globalState.getCurrentDefaultDragOperation()
         let dragOperation: NSDragOperation = info.draggingSourceOperationMask
 
         let currentDefault = currentDefaultOperation.getNSDragOperation().rawValue

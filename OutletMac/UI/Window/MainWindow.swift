@@ -31,7 +31,9 @@ class MainWindow: AppWindow, ObservableObject {
     super.init(app, self.contentRect, styleMask: style)
     self.isReleasedWhenClosed = false  // i.e., don't crash when re-opening
     self.title = "OutletMac"
-    self.toolbar = MainWindowToolbar(identifier: .init("Default"))
+    let toolbar = MainWindowToolbar(identifier: .init("Default"))
+    self.toolbar = toolbar
+    toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())  // bring UI up to sync with state
     if !SHOW_TOOLBAR_ON_START {
       self.toggleToolbarShown(self)
     }
@@ -161,15 +163,18 @@ class MainWindow: AppWindow, ObservableObject {
   override func flagsChanged(with event: NSEvent) {
     if event.keyCode == 58 {  // Option key
       let isDepressed = event.modifierFlags.rawValue & NSEvent.ModifierFlags.option.rawValue > 0
-      NSLog("INFO  [\(self.winID)] OPTION KEY PRESSED: \(isDepressed) \(event)")
-      let toolbar = self.toolbar as! MainWindowToolbar
+      let modifierDragMode: DragOperation?
       if isDepressed {
-        toolbar.setDragMode(.COPY)
+        modifierDragMode = .COPY
       } else {
-        toolbar.setDragMode(.MOVE)
+        modifierDragMode = nil
       }
-//      let dragMode = (isDepressed ? DragOperation.COPY : DragOperation.MOVE)
-
+      self.app.globalState.modifierKeyDragOperation = modifierDragMode
+      let newMode = self.app.globalState.getCurrentDefaultDragOperation()
+      NSLog("INFO  [\(self.winID)] OptionKeyPressed=\(isDepressed) NewMode=\(newMode)")
+      if let toolbar = self.toolbar as? MainWindowToolbar {
+        toolbar.setDragMode(newMode)
+      }
     }
   }
 

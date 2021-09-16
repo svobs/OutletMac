@@ -29,7 +29,16 @@ class GlobalState: ObservableObject {
     @Published var mode: WindowMode = .BROWSING
 
     // Not published, but this is the most logical place to store it:
-    var currentDefaultDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
+    var lastClickedDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
+    var modifierKeyDragOperation: DragOperation? = nil
+
+    func getCurrentDefaultDragOperation() -> DragOperation {
+        if let modifierKeyDragOperation = self.modifierKeyDragOperation {
+            return modifierKeyDragOperation
+        } else {
+            return lastClickedDragOperation
+        }
+    }
 
     /**
      This method will cause an alert to be displayed in the MainContentView.

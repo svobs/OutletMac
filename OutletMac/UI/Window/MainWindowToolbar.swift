@@ -17,7 +17,7 @@ extension NSToolbar.Identifier {
 extension NSToolbarItem.Identifier {
     static let toolbarItemMoreInfo = NSToolbarItem.Identifier("ToolbarMoreInfoItem")
     static let toolbarMoreActions = NSToolbarItem.Identifier("ToolbarMoreActionsItem")
-    static let toolPickerItem = NSToolbarItem.Identifier("ToolPickerItemGroup")
+    static let dragModePickerItem = NSToolbarItem.Identifier("DragModePickerItemGroup")
 }
 
 class DragMode {
@@ -71,14 +71,14 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
      Tell MacOS which items are allowed in this toolbar, for customization.
      */
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [.toolPickerItem, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want to allow
+        return [.dragModePickerItem, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want to allow
     }
 
     /**
      Tell MacOS which items to display when the app is launched for the first time.
      */
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [.toolPickerItem, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want as default
+        return [.dragModePickerItem, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want as default
     }
 
     /**
@@ -87,7 +87,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
                  willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
 
-        if  itemIdentifier == NSToolbarItem.Identifier.toolPickerItem {
+        if  itemIdentifier == NSToolbarItem.Identifier.dragModePickerItem {
             var titleList: [String] = []
             var imageList: [NSImage] = []
 
@@ -105,7 +105,6 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
             toolbarItem.label = "Drag Mode"
             toolbarItem.paletteLabel = "Drag Mode"
             toolbarItem.toolTip = "Set the default mode for Drag & Drop (Copy or Move)"
-            toolbarItem.selectedIndex = 0  // TODO: remember this
             return toolbarItem
         }
 
@@ -142,26 +141,29 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return nil
     }
 
-    func setDragMode(_ dragMode: DragOperation) {
-        guard dragMode == .MOVE || dragMode == .COPY else {
-            NSLog("ERROR selectDragMode(): invalid: \(dragMode)")
+    private static func indexForDragOperation(_ dragOperation: DragOperation) -> Int? {
+        var index = 0
+        for mode in MainWindowToolbar.DRAG_MODE_LIST {
+            if mode.dragOperation == dragOperation {
+                return index
+            }
+            index += 1
+        }
+        return nil
+    }
+
+    func setDragMode(_ dragOperation: DragOperation) {
+        guard dragOperation == .MOVE || dragOperation == .COPY else {
+            NSLog("ERROR selectDragMode(): invalid: \(dragOperation)")
             return
         }
 
-        if let dragModeItem = self.getItemIfVisible(NSToolbarItem.Identifier.toolPickerItem) {
+        if let dragModeItem = self.getItemIfVisible(NSToolbarItem.Identifier.dragModePickerItem) {
             if let itemGroup = dragModeItem as? NSToolbarItemGroup {
-                var index = 0
-                for mode in MainWindowToolbar.DRAG_MODE_LIST {
-                    if mode.dragOperation == dragMode {
-                        NSLog("DEBUG selectDragMode(): selecting index: \(index)")
-                        itemGroup.setSelected(true, at: index)
-                        // This will not fire listeners however. We need to fire manually
-                        // FIXME: this always sends the prev value
-                        NSApp.sendAction(#selector(OutletMacApp.toolPickerDidSelectItem(_:)), to: nil, from: itemGroup)
-
-                        return
-                    }
-                    index += 1
+                if let index = MainWindowToolbar.indexForDragOperation(dragOperation) {
+                    NSLog("DEBUG selectDragMode(): selecting index: \(index)")
+                    // This will not fire listeners however. We should have set those values elsewhere.
+                    itemGroup.setSelected(true, at: index)
                 }
             }
         }
