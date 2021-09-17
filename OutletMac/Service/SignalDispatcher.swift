@@ -177,7 +177,7 @@ class SignalDispatcher {
   fileprivate var signalListenerDict = [Signal: [ListenerID: Subscription]]()
 
   public func createListener(_ id: ListenerID) -> DispatchListener {
-    NSLog("DEBUG Creating DispatchListener: \(id)")
+    NSLog("DEBUG Creating DispatchListener: '\(id)'")
     let listener = DispatchListener(id, self)
     return listener
   }

@@ -107,7 +107,7 @@ class BonjourService: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // DidResolveAddress
     func netServiceDidResolveAddress(_ sender: NetService) {
-        NSLog("DEBUG [BonjourService] netServiceDidResolveAddress")
+        NSLog("DEBUG [BonjourService] netServiceDidResolveAddress() entered")
 
         // Find the IPV4 address
         if let serviceIp = resolveIPv4(addresses: sender.addresses!) {
@@ -142,12 +142,12 @@ class BonjourService: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
 
     // DidPublish
     func netServiceDidPublish(_ sender: NetService) {
-        NSLog("DEBUG [BonjourService] netService published.")
+        NSLog("DEBUG [BonjourService] NetService published")
     }
 
     // DidStop
     func netServiceDidStop(_ sender: NetService) {
-        NSLog("DEBUG [BonjourService] netService stopped.")
+        NSLog("DEBUG [BonjourService] NetService stopped")
         stopDiscovery()
     }
 

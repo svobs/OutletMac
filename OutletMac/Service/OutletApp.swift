@@ -154,7 +154,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     // TODO: add a delay or something prettier
     self.grpcDidGoDown()
     try! self.backend.start()  // should not throw errors
-    NSLog("INFO  Backend started")
+    NSLog("INFO  [\(ID_APP)] Backend started")
   }
 
   func shutdown() throws {
@@ -211,7 +211,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.dispatcher.sendSignal(signal: .TOGGLE_UI_ENABLEMENT, senderID: ID_MAIN_WINDOW, ["enable": enable])
   }
 
-  func onGlobalEvent(_ event: NSEvent?) {
+  private func onGlobalEvent(_ event: NSEvent?) {
     if TRACE_ENABLED {
       NSLog("DEBUG Got global event: \(event == nil ? "null" : "\(event!)")")
     }

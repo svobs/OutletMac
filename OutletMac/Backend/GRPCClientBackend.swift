@@ -109,14 +109,14 @@ class GRPCClientBackend: OutletBackend {
 
   private func locateBackendServer(onSuccess onSuccessFunc: () -> ()) {
     let group = DispatchGroup()
-    var discoverySucceeded = false
+    group.enter()
+    var discoverySucceeded: Bool = false
     if useFixedAddress {
       assert(fixedHost != nil && fixedPort != nil)
       DispatchQueue.main.async {
         if SUPER_DEBUG_ENABLED {
           NSLog("DEBUG Entering new DispatchGroup")
         }
-        group.enter()
         self.backendConnectionState.host = self.fixedHost!
         self.backendConnectionState.port = self.fixedPort!
         discoverySucceeded = true
@@ -136,7 +136,6 @@ class GRPCClientBackend: OutletBackend {
         if SUPER_DEBUG_ENABLED {
           NSLog("DEBUG Entering new DispatchGroup")
         }
-        group.enter()
 
         // Do discovery all over again, in case the address has changed:
         self.bonjourService.startDiscovery(onSuccess: { ipPort in
@@ -184,6 +183,8 @@ class GRPCClientBackend: OutletBackend {
       if discoverySucceeded {
         NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
         onSuccessFunc()
+      } else {
+        NSLog("INFO  [SignalReceiverThread] Discovery failed")
       }
 
       NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
