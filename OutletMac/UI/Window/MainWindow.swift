@@ -177,8 +177,7 @@ class MainWindow: AppWindow, ObservableObject {
 
       self.app.globalState.modifierKeyDragOperation = modifierDragMode
       let newMode = self.app.globalState.getCurrentDefaultDragOperation()
-      let modDragMode: String = modifierDragMode == nil ? "null" : "\(modifierDragMode!)"
-      NSLog("INFO  [\(self.winID)] CmdKeyPressed=\(isCommandKeyDepressed) OptionKeyPressed=\(isOptionKeyDepressed) ModDragMode=\(modDragMode) NewDragMode=\(newMode)")
+      NSLog("INFO  [\(self.winID)] CmdKeyPressed=\(isCommandKeyDepressed) OptionKeyPressed=\(isOptionKeyDepressed) ModDragMode=\(String(modifierDragMode)) NewDragMode=\(newMode)")
       if let toolbar = self.toolbar as? MainWindowToolbar {
         toolbar.setDragMode(newMode)
       }

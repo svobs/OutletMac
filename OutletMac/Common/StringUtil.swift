@@ -63,4 +63,10 @@ extension String {
     guard let range = self.range(of: target) else { return self }
     return self.replacingCharacters(in: range, with: replacement)
   }
+
+
+  init(_ optionalObj: Any?) {
+    self.init(optionalObj == nil ? "null" : "\(optionalObj!)")
+  }
+
 }

@@ -108,35 +108,45 @@ class GRPCClientBackend: OutletBackend {
   }
 
   private func locateBackendServer(onSuccess onSuccessFunc: () -> ()) {
+    let group = DispatchGroup()
+    var discoverySucceeded = false
     if useFixedAddress {
       assert(fixedHost != nil && fixedPort != nil)
-      self.backendConnectionState.host = fixedHost!
-      self.backendConnectionState.port = fixedPort!
+      DispatchQueue.main.async {
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG Entering new DispatchGroup")
+        }
+        group.enter()
+        self.backendConnectionState.host = self.fixedHost!
+        self.backendConnectionState.port = self.fixedPort!
+        discoverySucceeded = true
 
-      onSuccessFunc()
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG Leaving DispatchGroup")
+        }
+        group.leave()
+      }
     } else {
-      let group = DispatchGroup()
       // Occasionally both success & failure handlers will be called in quick succession. In this case, we need to make sure we don't
       // call group.leave() twice for the same group.enter(), cuz that will crash us:
       var leftGroup = false
-      var discoverySucceeded = false
 
       // IMPORTANT: this needs to be kicked off on the main thread or else it will silently fail to discover services!
-      DispatchQueue.main.sync {
-        if TRACE_ENABLED {
+      DispatchQueue.main.async {
+        if SUPER_DEBUG_ENABLED {
           NSLog("DEBUG Entering new DispatchGroup")
         }
         group.enter()
 
         // Do discovery all over again, in case the address has changed:
         self.bonjourService.startDiscovery(onSuccess: { ipPort in
-          self.app.execAsync { [unowned self] in
+          DispatchQueue.main.async {
             if leftGroup {
               NSLog("DEBUG Already left DispatchGroup; ignoring success handler call")
               return
             }
             defer {
-              if TRACE_ENABLED {
+              if SUPER_DEBUG_ENABLED {
                 NSLog("DEBUG Leaving DispatchGroup")
               }
               leftGroup = true
@@ -150,7 +160,7 @@ class GRPCClientBackend: OutletBackend {
           }
 
         }, onError: { error in
-          self.app.execAsync { [unowned self] in
+          DispatchQueue.main.async {
             if leftGroup {
               NSLog("DEBUG Already left DispatchGroup; ignoring error handler call")
               return
@@ -163,20 +173,20 @@ class GRPCClientBackend: OutletBackend {
           }
         })
       }
-
-      // Wait until success or failure
-      NSLog("DEBUG [SignalReceiverThread] Waiting for BonjourService service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
-      if group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC) == .timedOut {
-        NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-      } else {
-        if discoverySucceeded {
-          NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
-          onSuccessFunc()
-        }
-
-        NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
-      }
       // fall through
+    }
+
+    // Wait until success or failure
+    NSLog("DEBUG [SignalReceiverThread] Waiting for BonjourService service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
+    if group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC) == .timedOut {
+      NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
+    } else {
+      if discoverySucceeded {
+        NSLog("DEBUG [SignalReceiverThread] Discovery succeeded. Connecting to server")
+        onSuccessFunc()
+      }
+
+      NSLog("INFO  [SignalReceiverThread] Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
     }
 
     Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
