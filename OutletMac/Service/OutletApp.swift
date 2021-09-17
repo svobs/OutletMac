@@ -271,9 +271,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     // Need to execute in a different queue, 'cuz buildController() makes a gRPC call, and we can't do that in a thread which came from gRPC
     do {
       // This will put the controller in the registry as a side effect
-      let _ = try self.buildController(newTree, canChangeRoot: false, allowsMultipleSelection: false)
-      // note: we can't send a controller directly to this method (cuz of @objc), so instead we put it in our controller registry and later look it up.
-      NSApp.sendAction(#selector(OutletMacApp.openMergePreview), to: nil, from: newTree.treeID)
+      let con = try self.buildController(newTree, canChangeRoot: false, allowsMultipleSelection: false)
+
+      DispatchQueue.main.async {
+        self.openMergePreview(con)
+      }
     } catch {
       self.displayError("Failed to build merge tree", "\(error)")
     }
@@ -561,24 +563,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   /**
    Display Merge Preview dialog
    */
-  @objc func openMergePreview(_ treeID: TreeID) {
-    // note: we can't send a controller directly to this method (cuz of @objc), so instead we look it up in our controller registry.
-    guard let con = self.getTreePanelController(treeID) else {
-      NSLog("ERROR [\(treeID)] Cannot open Merge Preview: could not find controller with this treeID!")
-      return
-    }
+  func openMergePreview(_ con: TreePanelControllable) {
+    assert(DispatchQueue.isExecutingIn(.main))
 
-    DispatchQueue.main.async {
-      self.mergePreviewWindow?.close()
+    self.mergePreviewWindow?.close()
 
-      do {
-        let window = MergePreviewWindow(self, con)
-        try window.start()
-        window.showWindow()
-        self.mergePreviewWindow = window
-      } catch {
-        self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
-      }
+    do {
+      let window = MergePreviewWindow(self, con)
+      try window.start()
+      window.showWindow()
+      self.mergePreviewWindow = window
+    } catch {
+      self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
     }
   }
 
@@ -590,26 +586,21 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 
     self.globalState.reset()
 
-    self.tcDQ.sync {
+    NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
+    // Close all other windows beside the Connection Problem window, if they exist
+    self.mainWindow?.close()
+    self.rootChooserWindow?.close()
+    self.mergePreviewWindow?.close()
 
-      NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
-      // Close all other windows beside the Connection Problem window, if they exist
-      self.mainWindow?.close()
-      self.rootChooserWindow?.close()
-      self.mergePreviewWindow?.close()
-
-      // Open Connection Problem window
-      NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
-      do {
-        try self.connectionProblemWindow!.start()
-        DispatchQueue.main.async {
-          NSLog("DEBUG [\(ID_APP)] Calling ConnectionProblem.showWindow()")
-          self.connectionProblemWindow!.showWindow()
-        }
-      } catch {
-        NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
-        self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
-      }
+    // Open Connection Problem window
+    NSLog("INFO  [\(ID_APP)] Showing ConnectionProblem window")
+    do {
+      try self.connectionProblemWindow!.start()
+      NSLog("DEBUG [\(ID_APP)] Calling ConnectionProblem.showWindow()")
+      self.connectionProblemWindow!.showWindow()
+    } catch {
+      NSLog("ERROR [\(ID_APP)] Failed to open ConnectionProblem window: \(error)")
+      self.displayError("Failed to open Connecting window!", "An unexpected error occurred: \(error)")
     }
   }
 
@@ -618,6 +609,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
    */
   private func openMainWindow() {
     NSLog("DEBUG [\(ID_APP)] Entered openMainWindow()")
+    assert(DispatchQueue.isExecutingIn(.main))
 
     do {
       if self.mainWindow == nil {

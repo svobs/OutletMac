@@ -51,7 +51,11 @@ extension DispatchQueue {
     static var currentQueueLabel: String? { current?.label }
     static var current: DispatchQueue? { getSpecific(key: key)?.queue }
 
+    /**
+     USE THIS instead of "dispatchPrecondition(condition: .onQueue(...))": this will at least show an error msg
+     */
     static func isExecutingIn(_ dq: DispatchQueue) -> Bool {
+
         let isExpected = DispatchQueue.current == dq
         if !isExpected {
             NSLog("ERROR We are in the wrong queue: '\(DispatchQueue.currentQueueLabel ?? "nil")' (expected: \(dq.label))")
