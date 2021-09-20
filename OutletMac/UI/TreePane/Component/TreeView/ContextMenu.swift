@@ -23,7 +23,7 @@ class TreeContextMenu {
     return con.treeID
   }
 
-  public func rebuildMenuFor(_ menu: NSMenu, _ clickedGUID: GUID, _ selectedGUIDs: Set<GUID>) {
+  func rebuildMenuFor(_ menu: NSMenu, _ clickedGUID: GUID, _ selectedGUIDs: Set<GUID>) {
     guard let sn = self.con.displayStore.getSN(clickedGUID) else {
       NSLog("ERROR [\(treeID)] Clicked GUID not found: \(clickedGUID)")
       return

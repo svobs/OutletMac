@@ -835,280 +835,253 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
 
   /// Determines, calls and returns the appropriate request handler, depending on the request's method.
   /// Returns nil for methods not handled by this service.
-  public func handleMethod(
-    _ methodName: Substring,
-    callHandlerContext: CallHandlerContext
-  ) -> GRPCCallHandler? {
-    switch methodName {
+  public func handle(
+    method name: Substring,
+    context: CallHandlerContext
+  ) -> GRPCServerHandlerProtocol? {
+    switch name {
     case "subscribe_to_signals":
-      return CallHandlerFactory.makeServerStreaming(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makesubscribe_to_signalsInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.subscribe_to_signals(request: request, context: context)
-        }
-      }
+      return ServerStreamingServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_SignalMsg>(),
+        interceptors: self.interceptors?.makesubscribe_to_signalsInterceptors() ?? [],
+        userFunction: self.subscribe_to_signals(request:context:)
+      )
 
     case "send_signal":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makesend_signalInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.send_signal(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_SignalMsg>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_SendSignalResponse>(),
+        interceptors: self.interceptors?.makesend_signalInterceptors() ?? [],
+        userFunction: self.send_signal(request:context:)
+      )
 
     case "get_config":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_configInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_config(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetConfig_Response>(),
+        interceptors: self.interceptors?.makeget_configInterceptors() ?? [],
+        userFunction: self.get_config(request:context:)
+      )
 
     case "put_config":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeput_configInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.put_config(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_PutConfig_Response>(),
+        interceptors: self.interceptors?.makeput_configInterceptors() ?? [],
+        userFunction: self.put_config(request:context:)
+      )
 
     case "get_icon":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_iconInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_icon(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response>(),
+        interceptors: self.interceptors?.makeget_iconInterceptors() ?? [],
+        userFunction: self.get_icon(request:context:)
+      )
 
     case "get_device_list":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_device_listInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_device_list(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Response>(),
+        interceptors: self.interceptors?.makeget_device_listInterceptors() ?? [],
+        userFunction: self.get_device_list(request:context:)
+      )
 
     case "get_child_list_for_spid":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_child_list_for_spidInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_child_list_for_spid(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetChildList_Response>(),
+        interceptors: self.interceptors?.makeget_child_list_for_spidInterceptors() ?? [],
+        userFunction: self.get_child_list_for_spid(request:context:)
+      )
 
     case "get_ancestor_list_for_spid":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_ancestor_list_for_spidInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_ancestor_list_for_spid(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Response>(),
+        interceptors: self.interceptors?.makeget_ancestor_list_for_spidInterceptors() ?? [],
+        userFunction: self.get_ancestor_list_for_spid(request:context:)
+      )
 
     case "get_rows_of_interest":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_rows_of_interestInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_rows_of_interest(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Response>(),
+        interceptors: self.interceptors?.makeget_rows_of_interestInterceptors() ?? [],
+        userFunction: self.get_rows_of_interest(request:context:)
+      )
 
     case "set_selected_row_set":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeset_selected_row_setInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.set_selected_row_set(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Response>(),
+        interceptors: self.interceptors?.makeset_selected_row_setInterceptors() ?? [],
+        userFunction: self.set_selected_row_set(request:context:)
+      )
 
     case "remove_expanded_row":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeremove_expanded_rowInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.remove_expanded_row(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Response>(),
+        interceptors: self.interceptors?.makeremove_expanded_rowInterceptors() ?? [],
+        userFunction: self.remove_expanded_row(request:context:)
+      )
 
     case "get_filter":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_filterInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_filter(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>(),
+        interceptors: self.interceptors?.makeget_filterInterceptors() ?? [],
+        userFunction: self.get_filter(request:context:)
+      )
 
     case "update_filter":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.update_filter(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>(),
+        interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? [],
+        userFunction: self.update_filter(request:context:)
+      )
 
     case "request_display_tree":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makerequest_display_treeInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.request_display_tree(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>(),
+        interceptors: self.interceptors?.makerequest_display_treeInterceptors() ?? [],
+        userFunction: self.request_display_tree(request:context:)
+      )
 
     case "start_subtree_load":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makestart_subtree_loadInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.start_subtree_load(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response>(),
+        interceptors: self.interceptors?.makestart_subtree_loadInterceptors() ?? [],
+        userFunction: self.start_subtree_load(request:context:)
+      )
 
     case "refresh_subtree":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makerefresh_subtreeInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.refresh_subtree(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_Empty>(),
+        interceptors: self.interceptors?.makerefresh_subtreeInterceptors() ?? [],
+        userFunction: self.refresh_subtree(request:context:)
+      )
 
     case "get_next_uid":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_next_uidInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_next_uid(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Response>(),
+        interceptors: self.interceptors?.makeget_next_uidInterceptors() ?? [],
+        userFunction: self.get_next_uid(request:context:)
+      )
 
     case "get_node_for_uid":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_node_for_uidInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_node_for_uid(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response>(),
+        interceptors: self.interceptors?.makeget_node_for_uidInterceptors() ?? [],
+        userFunction: self.get_node_for_uid(request:context:)
+      )
 
     case "get_uid_for_local_path":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_uid_for_local_pathInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_uid_for_local_path(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Response>(),
+        interceptors: self.interceptors?.makeget_uid_for_local_pathInterceptors() ?? [],
+        userFunction: self.get_uid_for_local_path(request:context:)
+      )
 
     case "get_sn_for":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_sn_forInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_sn_for(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response>(),
+        interceptors: self.interceptors?.makeget_sn_forInterceptors() ?? [],
+        userFunction: self.get_sn_for(request:context:)
+      )
 
     case "start_diff_trees":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makestart_diff_treesInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.start_diff_trees(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Response>(),
+        interceptors: self.interceptors?.makestart_diff_treesInterceptors() ?? [],
+        userFunction: self.start_diff_trees(request:context:)
+      )
 
     case "generate_merge_tree":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makegenerate_merge_treeInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.generate_merge_tree(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_Empty>(),
+        interceptors: self.interceptors?.makegenerate_merge_treeInterceptors() ?? [],
+        userFunction: self.generate_merge_tree(request:context:)
+      )
 
     case "drop_dragged_nodes":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makedrop_dragged_nodesInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.drop_dragged_nodes(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_DragDrop_Response>(),
+        interceptors: self.interceptors?.makedrop_dragged_nodesInterceptors() ?? [],
+        userFunction: self.drop_dragged_nodes(request:context:)
+      )
 
     case "delete_subtree":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makedelete_subtreeInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.delete_subtree(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_Empty>(),
+        interceptors: self.interceptors?.makedelete_subtreeInterceptors() ?? [],
+        userFunction: self.delete_subtree(request:context:)
+      )
 
     case "get_last_pending_op_for_node":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_last_pending_op_for_nodeInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_last_pending_op_for_node(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response>(),
+        interceptors: self.interceptors?.makeget_last_pending_op_for_nodeInterceptors() ?? [],
+        userFunction: self.get_last_pending_op_for_node(request:context:)
+      )
 
     case "download_file_from_gdrive":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makedownload_file_from_gdriveInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.download_file_from_gdrive(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_Empty>(),
+        interceptors: self.interceptors?.makedownload_file_from_gdriveInterceptors() ?? [],
+        userFunction: self.download_file_from_gdrive(request:context:)
+      )
 
     case "get_op_exec_play_state":
-      return CallHandlerFactory.makeUnary(
-        callHandlerContext: callHandlerContext,
-        interceptors: self.interceptors?.makeget_op_exec_play_stateInterceptors() ?? []
-      ) { context in
-        return { request in
-          self.get_op_exec_play_state(request: request, context: context)
-        }
-      }
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_PlayState>(),
+        interceptors: self.interceptors?.makeget_op_exec_play_stateInterceptors() ?? [],
+        userFunction: self.get_op_exec_play_state(request:context:)
+      )
 
     default:
       return nil

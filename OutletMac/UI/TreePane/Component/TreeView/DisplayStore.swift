@@ -207,7 +207,9 @@ class DisplayStore {
         self.parentChildListDict[parentGUID] = [childGUID]
       }
 
-      NSLog("DEBUG Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID])")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG DisplayStore.putSN(): Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID] ?? [])")
+      }
 
       // Child -> Parent
       self.childParentDict[childGUID] = parentGUID

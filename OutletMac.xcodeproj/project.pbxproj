@@ -405,7 +405,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */,
+				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -734,7 +734,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */ = {
+		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Wildchild9/LinkedList.git";
 			requirement = {
@@ -747,7 +747,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D194BEFA25E8F83000B4827F /* LinkedList */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */;
+			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */;
 			productName = LinkedList;
 		};
 /* End XCSwiftPackageProductDependency section */

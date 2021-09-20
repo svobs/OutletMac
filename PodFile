@@ -1,8 +1,8 @@
 use_frameworks!
 workspace 'OutletMac'
 target 'OutletMac' do
-	platform :osx, '10.15'
-    pod 'SwiftProtobuf', '~> 1.14'
-	pod 'gRPC-Swift', '~> 1.0.0-alpha.22'
-	pod 'gRPC-Swift-Plugins', '~> 1.0.0-alpha.22'
+	platform :osx, '11.3'
+    pod 'SwiftProtobuf', '~> 1.17'
+	pod 'gRPC-Swift', '~> 1.4'
+	pod 'gRPC-Swift-Plugins', '~> 1.4'
 end
