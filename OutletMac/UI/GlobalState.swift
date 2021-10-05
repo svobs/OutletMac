@@ -34,7 +34,7 @@ class GlobalState: ObservableObject {
     var modifierKeyDragOperation: DragOperation? = nil
 
     var currentDirConflictPolicy: DirConflictPolicy = .MERGE
-    var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_NEWER_VER
+    var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_DIFFERENT
 
     func getCurrentDefaultDragOperation() -> DragOperation {
         if let modifierKeyDragOperation = self.modifierKeyDragOperation {

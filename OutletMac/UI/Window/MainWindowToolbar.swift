@@ -46,18 +46,21 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
 
     // FIXME: add new icons for all of these!
     static let DIR_CONFLICT_POLICY_LIST: [PickerItem<DirConflictPolicy>] = [
-        PickerItem<DirConflictPolicy>(.PROMPT, "Prompt", NSImage(named: .modeCopy)!),
-        PickerItem<DirConflictPolicy>(.SKIP, "Skip", NSImage(named: .modeMove)!),
-        PickerItem<DirConflictPolicy>(.REPLACE, "Replace", NSImage(named: .modeMove)!),
-        PickerItem<DirConflictPolicy>(.MERGE, "Merge", NSImage(named: .modeMove)!)
+        PickerItem<DirConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .modeCopy)!),
+        PickerItem<DirConflictPolicy>(.SKIP, "Skip folder", NSImage(named: .modeMove)!),
+        PickerItem<DirConflictPolicy>(.REPLACE, "Replace entire folder", NSImage(named: .modeMove)!),
+        PickerItem<DirConflictPolicy>(.RENAME, "Keep both folders", NSImage(named: .modeMove)!),
+        PickerItem<DirConflictPolicy>(.MERGE, "Merge folders", NSImage(named: .modeMove)!)
     ]
 
     // FIXME: add new icons for all of these!
     static let FILE_CONFLICT_POLICY_LIST: [PickerItem<FileConflictPolicy>] = [
-        PickerItem<FileConflictPolicy>(.PROMPT, "Prompt", NSImage(named: .modeCopy)!),
+        PickerItem<FileConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .modeCopy)!),
         PickerItem<FileConflictPolicy>(.SKIP, "Skip", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.REPLACE_IF_NEWER_VER, "Replace", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.RENAME_IF_NEWER_VER, "Rename (AKA keep both)", NSImage(named: .modeMove)!)
+        PickerItem<FileConflictPolicy>(.REPLACE_ALWAYS, "Always overwrite destination file", NSImage(named: .modeMove)!),
+        PickerItem<FileConflictPolicy>(.REPLACE_IF_OLDER_AND_DIFFERENT, "Overwrite destination file if it is older and different", NSImage(named: .modeMove)!),
+        PickerItem<FileConflictPolicy>(.RENAME_ALWAYS, "Keep both always (even if they are identical)", NSImage(named: .modeMove)!),
+        PickerItem<FileConflictPolicy>(.RENAME_IF_DIFFERENT, "Keep both if different (& skip if identical)", NSImage(named: .modeMove)!)
     ]
 
     override init(identifier: NSToolbar.Identifier) {
