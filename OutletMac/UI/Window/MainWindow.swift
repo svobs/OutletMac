@@ -33,7 +33,13 @@ class MainWindow: AppWindow, ObservableObject {
     self.title = "OutletMac"
     let toolbar = MainWindowToolbar(identifier: .init("Default"))
     self.toolbar = toolbar
-    toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())  // bring UI up to sync with state
+
+    // bring UI up to sync with state:
+    toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())
+    toolbar.setToolbarSelection(.dirConflictPolicyPicker, self.app.globalState.currentDirConflictPolicy, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST)
+    toolbar.setToolbarSelection(.fileConflictPolicyPicker, self.app.globalState.currentFileConflictPolicy, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST)
+
+
     if !SHOW_TOOLBAR_ON_START {
       self.toggleToolbarShown(self)
     }

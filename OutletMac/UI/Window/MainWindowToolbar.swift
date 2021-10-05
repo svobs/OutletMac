@@ -8,6 +8,19 @@ import Cocoa
 extension NSImage.Name {
     static let modeCopy = NSImage.Name("ModeCopy")
     static let modeMove = NSImage.Name("ModeMove")
+
+    static let promptUser = NSImage.Name("PromptUser")
+
+    static let skipFolder = NSImage.Name("Folder-Skip")
+    static let replaceFolder = NSImage.Name("Folder-Replace")
+    static let keepBothFolders = NSImage.Name("Folder-KeepBoth")
+    static let mergeFolders = NSImage.Name("Folder-Merge")
+
+    static let skipFile = NSImage.Name("File-Skip")
+    static let replaceFileAlways = NSImage.Name("File-ReplaceAlways")
+    static let replaceOldFileWithNewOnly = NSImage.Name("File-ReplaceOldWithNewOnly")
+    static let keepBothFiles = NSImage.Name("File-KeepBoth")
+    static let keepBothFilesIfDifferent = NSImage.Name("File-KeepBothIfDifferent")
 }
 
 extension NSToolbar.Identifier {
@@ -44,23 +57,21 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         PickerItem<DragOperation>(.MOVE, "Move", NSImage(named: .modeMove)!)
         ]
 
-    // FIXME: add new icons for all of these!
     static let DIR_CONFLICT_POLICY_LIST: [PickerItem<DirConflictPolicy>] = [
-        PickerItem<DirConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .modeCopy)!),
-        PickerItem<DirConflictPolicy>(.SKIP, "Skip folder", NSImage(named: .modeMove)!),
-        PickerItem<DirConflictPolicy>(.REPLACE, "Replace entire folder", NSImage(named: .modeMove)!),
-        PickerItem<DirConflictPolicy>(.RENAME, "Keep both folders", NSImage(named: .modeMove)!),
-        PickerItem<DirConflictPolicy>(.MERGE, "Merge folders", NSImage(named: .modeMove)!)
+        PickerItem<DirConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .promptUser)!),
+        PickerItem<DirConflictPolicy>(.SKIP, "Skip folder", NSImage(named: .skipFolder)!),
+        PickerItem<DirConflictPolicy>(.REPLACE, "Replace folder", NSImage(named: .replaceFolder)!),
+        PickerItem<DirConflictPolicy>(.RENAME, "Keep both folders", NSImage(named: .keepBothFolders)!),
+        PickerItem<DirConflictPolicy>(.MERGE, "Merge", NSImage(named: .mergeFolders)!)
     ]
 
-    // FIXME: add new icons for all of these!
     static let FILE_CONFLICT_POLICY_LIST: [PickerItem<FileConflictPolicy>] = [
-        PickerItem<FileConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .modeCopy)!),
-        PickerItem<FileConflictPolicy>(.SKIP, "Skip", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.REPLACE_ALWAYS, "Always overwrite destination file", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.REPLACE_IF_OLDER_AND_DIFFERENT, "Overwrite destination file if it is older and different", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.RENAME_ALWAYS, "Keep both always (even if they are identical)", NSImage(named: .modeMove)!),
-        PickerItem<FileConflictPolicy>(.RENAME_IF_DIFFERENT, "Keep both if different (& skip if identical)", NSImage(named: .modeMove)!)
+        PickerItem<FileConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .promptUser)!),
+        PickerItem<FileConflictPolicy>(.SKIP, "Skip file", NSImage(named: .skipFile)!),
+        PickerItem<FileConflictPolicy>(.REPLACE_ALWAYS, "Overwrite always", NSImage(named: .replaceFileAlways)!),
+        PickerItem<FileConflictPolicy>(.REPLACE_IF_OLDER_AND_DIFFERENT, "Overwrite old with new only", NSImage(named: .replaceOldFileWithNewOnly)!),
+        PickerItem<FileConflictPolicy>(.RENAME_ALWAYS, "Keep both always", NSImage(named: .keepBothFiles)!),
+        PickerItem<FileConflictPolicy>(.RENAME_IF_DIFFERENT, "Keep both only if different", NSImage(named: .modeMove)!)
     ]
 
     override init(identifier: NSToolbar.Identifier) {
@@ -92,14 +103,14 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
      Tell MacOS which items are allowed in this toolbar, for customization.
      */
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want to allow
+        return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker, .flexibleSpace, .space, .toolbarMoreActions]
     }
 
     /**
      Tell MacOS which items to display when the app is launched for the first time.
      */
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker, .flexibleSpace, .space, .toolbarMoreActions] // Whatever items you want as default
+        return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker, .flexibleSpace, .space, .toolbarMoreActions]
     }
 
     /**
@@ -110,19 +121,16 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
 
         if  itemIdentifier == NSToolbarItem.Identifier.dragModePicker {
             return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.DRAG_MODE_LIST,
-                    actionSelectorName: "dragModePickerDidSelectItem:",
                     groupLabel: "Drag Mode", toolTip: "Set the default mode for Drag & Drop (Copy or Move)")
         }
 
         if  itemIdentifier == NSToolbarItem.Identifier.dirConflictPolicyPicker {
             return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST,
-                    actionSelectorName: "dirConflictPolicyPickerDidSelectItem:",
                     groupLabel: "Folder Conflict Policy", toolTip: "When moving or copying: what to do when the destination already contains a folder with the same name as a folder being copied")
         }
 
         if  itemIdentifier == NSToolbarItem.Identifier.fileConflictPolicyPicker {
             return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST,
-                    actionSelectorName: "fileConflictPolicyPickerDidSelectItem:",
                     groupLabel: "File Conflict Policy", toolTip: "When moving or copying: what to do when the destination already contains a file with the same name as a file being copied")
         }
 
@@ -146,7 +154,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     }
 
     private func createSingleSelectionPickerGroup<ItemValue>(_ itemIdentifier: NSToolbarItem.Identifier, _ pickerItemList: [PickerItem<ItemValue>],
-                                                  actionSelectorName: String, groupLabel: String, toolTip: String) -> NSToolbarItemGroup {
+                                                             groupLabel: String, toolTip: String) -> NSToolbarItemGroup {
 
         var titleList: [String] = []
         var imageList: [NSImage] = []
@@ -160,7 +168,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
         let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
-                target: nil, action: Selector((actionSelectorName)) )
+                target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
 
         toolbarItem.label = groupLabel
         toolbarItem.paletteLabel = groupLabel
@@ -182,10 +190,10 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return nil
     }
 
-    private static func indexForDragOperation(_ dragOperation: DragOperation) -> Int? {
+    private static func indexForPickerValue<PickerValue>(_ pickerValue: PickerValue, _ pickerItemList: [PickerItem<PickerValue>]) -> Int? {
         var index = 0
-        for mode in MainWindowToolbar.DRAG_MODE_LIST {
-            if mode.value == dragOperation {
+        for mode in pickerItemList {
+            if mode.value == pickerValue {
                 return index
             }
             index += 1
@@ -199,10 +207,15 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
             return
         }
 
-        if let dragModeItem = self.getItemIfVisible(NSToolbarItem.Identifier.dragModePicker) {
+        self.setToolbarSelection(.dragModePicker, dragOperation, MainWindowToolbar.DRAG_MODE_LIST)
+    }
+
+    func setToolbarSelection<PickerValue>(_ toolbarIdentifier: NSToolbarItem.Identifier, _ pickerValue: PickerValue, _ pickerItemList: [PickerItem<PickerValue>]) {
+
+        if let dragModeItem = self.getItemIfVisible(toolbarIdentifier) {
             if let itemGroup = dragModeItem as? NSToolbarItemGroup {
-                if let index = MainWindowToolbar.indexForDragOperation(dragOperation) {
-                    NSLog("DEBUG selectDragMode(): selecting index: \(index)")
+                if let index = MainWindowToolbar.indexForPickerValue(pickerValue, pickerItemList) {
+                    NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for identifier \(toolbarIdentifier)")
                     // This will not fire listeners however. We should have set those values elsewhere.
                     itemGroup.setSelected(true, at: index)
                 }

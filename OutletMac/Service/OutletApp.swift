@@ -316,22 +316,41 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
   /**
-    Called by the drag mode picker in the toolbar
+    Called when a user clicks on a picker in the toolbar
    */
-  @objc func dragModePickerDidSelectItem(_ sender: Any) {
-    NSLog("DEBUG [\(ID_APP)] dragModePickerDidSelectItem() entered")
+  @objc func toolbarPickerDidSelectItem(_ sender: Any) {
+    NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem() entered")
 
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
-      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.dragModePicker {
-        guard toolbarItemGroup.selectedIndex < MainWindowToolbar.DRAG_MODE_LIST.count else {
-          reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
-          return
+      NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): identifier = \(toolbarItemGroup.itemIdentifier)")
+
+      if toolbarItemGroup.itemIdentifier == .dragModePicker {
+        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DRAG_MODE_LIST) {
+          NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
+          self.globalState.lastClickedDragOperation = newValue
         }
-        let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
-        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.value) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.lastClickedDragOperation = newDragMode.value
+
+      } else if toolbarItemGroup.itemIdentifier == .dirConflictPolicyPicker {
+        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST) {
+          NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
+          self.globalState.currentDirConflictPolicy = newValue
+        }
+
+      } else if toolbarItemGroup.itemIdentifier == .fileConflictPolicyPicker {
+        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST) {
+          NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
+          self.globalState.currentFileConflictPolicy = newValue
+        }
       }
     }
+  }
+
+  private func getValueFromIndex<PickerValue>(_ selectedIndex: Int, _ pickerList: [PickerItem<PickerValue>]) -> PickerValue? {
+    guard selectedIndex < pickerList.count else {
+      reportError("Could not select option", "Invalid toolbar index: \(selectedIndex)")
+      return nil
+    }
+    return pickerList[selectedIndex].value
   }
 
   /**
