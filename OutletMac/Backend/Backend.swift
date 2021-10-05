@@ -39,7 +39,7 @@ protocol OutletBackend: HasLifecycle {
   func createExistingDisplayTree(treeID: TreeID, treeDisplayMode: TreeDisplayMode) throws -> DisplayTree?
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree?
   
-  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation)
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation, dirConflictPolicy: DirConflictPolicy, fileConflictPolicy: FileConflictPolicy)
     throws -> Bool
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws
@@ -189,7 +189,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation)
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation, dirConflictPolicy: DirConflictPolicy, fileConflictPolicy: FileConflictPolicy)
       throws -> Bool {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }

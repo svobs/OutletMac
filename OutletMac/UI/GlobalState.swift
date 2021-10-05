@@ -28,10 +28,13 @@ class GlobalState: ObservableObject {
 
     @Published var mode: WindowMode = .BROWSING
 
-    // Not published, but this is the most logical place to store it:
+    // Not published, but this is the most logical place to store these:
     var lastClickedDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
-    // FIXME: this doesn't get set during a drag; only before it
+    // FIXME: bug: this doesn't get changed during a drag; it's frozen when the drag starts
     var modifierKeyDragOperation: DragOperation? = nil
+
+    var currentDirConflictPolicy: DirConflictPolicy = .MERGE
+    var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_NEWER_VER
 
     func getCurrentDefaultDragOperation() -> DragOperation {
         if let modifierKeyDragOperation = self.modifierKeyDragOperation {

@@ -316,20 +316,20 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
   /**
-    Called by the tool picker in the toolbar
+    Called by the drag mode picker in the toolbar
    */
-  @objc func toolPickerDidSelectItem(_ sender: Any) {
-    NSLog("DEBUG [\(ID_APP)] toolPickerDidSelectItem() entered")
+  @objc func dragModePickerDidSelectItem(_ sender: Any) {
+    NSLog("DEBUG [\(ID_APP)] dragModePickerDidSelectItem() entered")
 
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
-      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.dragModePickerItem {
+      if toolbarItemGroup.itemIdentifier == NSToolbarItem.Identifier.dragModePicker {
         guard toolbarItemGroup.selectedIndex < MainWindowToolbar.DRAG_MODE_LIST.count else {
           reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
           return
         }
         let newDragMode = MainWindowToolbar.DRAG_MODE_LIST[toolbarItemGroup.selectedIndex]
-        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.dragOperation) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.lastClickedDragOperation = newDragMode.dragOperation
+        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newDragMode.value) (index \(toolbarItemGroup.selectedIndex))")
+        self.globalState.lastClickedDragOperation = newDragMode.value
       }
     }
   }

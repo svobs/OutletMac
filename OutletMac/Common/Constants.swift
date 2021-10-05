@@ -98,6 +98,31 @@ enum DragOperation: UInt32 {
   }
 }
 
+/**
+  For operations where the src dir and dst dir have same name but different content.
+  This determines the operations which are created at the time of drop.
+ */
+enum DirConflictPolicy: UInt32 {
+  case PROMPT = 1
+  case SKIP = 2
+  case REPLACE = 3
+  case MERGE = 4
+}
+
+/**
+  For operations where the src file and dst file has same same name but different content.
+  This determines the operations which are created at the time of drop.
+ */
+enum FileConflictPolicy: UInt32 {
+  case PROMPT = 1
+  case SKIP = 2
+  case REPLACE_ALWAYS = 10
+  case REPLACE_IF_NEWER_VER = 11
+  case RENAME_ALWAYS = 20
+  case RENAME_IF_NEWER_VER = 21
+}
+
+
 let INITIAL_DEFAULT_DRAG_OP = DragOperation.COPY
 
 /**

@@ -535,12 +535,14 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
         let dstGUID = dragTargetSN.spid.guid
         let dragOperation = self.getDragOperation(info)
+        let dirConflictPolicy = self.con.app.globalState.currentDirConflictPolicy
+        let fileConflictPolicy = self.con.app.globalState.currentFileConflictPolicy
 
-        NSLog("DEBUG [\(treeID)] DROP (\(dragOperation)) onto \(dstGUID)")
+        NSLog("DEBUG [\(treeID)] DROP onto \(dstGUID) (DragOp=\(dragOperation) DirPolicy=\(dirConflictPolicy) FilePolicy=\(fileConflictPolicy))")
 
         do {
             return try self.con.backend.dropDraggedNodes(srcTreeID: srcTreeID, srcGUIDList: srcGUIDList, isInto: true,
-                    dstTreeID: treeID, dstGUID: dstGUID, dragOperation: dragOperation)
+                    dstTreeID: treeID, dstGUID: dstGUID, dragOperation: dragOperation, dirConflictPolicy: dirConflictPolicy, fileConflictPolicy: fileConflictPolicy)
         } catch {
             self.con.reportException("Error: Drop Failed!", error)
             return false

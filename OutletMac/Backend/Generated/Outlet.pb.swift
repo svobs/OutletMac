@@ -443,6 +443,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request {
 
   public var dragOperation: UInt32 = 0
 
+  public var dirConflictPolicy: UInt32 = 0
+
+  public var fileConflictPolicy: UInt32 = 0
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -2158,6 +2162,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     4: .standard(proto: "dst_guid"),
     5: .standard(proto: "is_into"),
     6: .standard(proto: "drag_operation"),
+    7: .standard(proto: "dir_conflict_policy"),
+    8: .standard(proto: "file_conflict_policy"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2172,6 +2178,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
       case 4: try { try decoder.decodeSingularStringField(value: &self.dstGuid) }()
       case 5: try { try decoder.decodeSingularBoolField(value: &self.isInto) }()
       case 6: try { try decoder.decodeSingularUInt32Field(value: &self.dragOperation) }()
+      case 7: try { try decoder.decodeSingularUInt32Field(value: &self.dirConflictPolicy) }()
+      case 8: try { try decoder.decodeSingularUInt32Field(value: &self.fileConflictPolicy) }()
       default: break
       }
     }
@@ -2196,6 +2204,12 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     if self.dragOperation != 0 {
       try visitor.visitSingularUInt32Field(value: self.dragOperation, fieldNumber: 6)
     }
+    if self.dirConflictPolicy != 0 {
+      try visitor.visitSingularUInt32Field(value: self.dirConflictPolicy, fieldNumber: 7)
+    }
+    if self.fileConflictPolicy != 0 {
+      try visitor.visitSingularUInt32Field(value: self.fileConflictPolicy, fieldNumber: 8)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2206,6 +2220,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request: SwiftProtobuf.Me
     if lhs.dstGuid != rhs.dstGuid {return false}
     if lhs.isInto != rhs.isInto {return false}
     if lhs.dragOperation != rhs.dragOperation {return false}
+    if lhs.dirConflictPolicy != rhs.dirConflictPolicy {return false}
+    if lhs.fileConflictPolicy != rhs.fileConflictPolicy {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

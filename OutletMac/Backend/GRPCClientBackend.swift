@@ -429,7 +429,7 @@ class GRPCClientBackend: OutletBackend {
     }
     return deviceList
   }
-  
+
   func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool = false, maxResults: UInt32?) throws -> [SPIDNodePair] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request()
     if treeID != nil {
@@ -502,7 +502,7 @@ class GRPCClientBackend: OutletBackend {
     let request = DisplayTreeRequest(treeID: treeID, returnAsync: false, isStartup: isStartup, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
     return try self.requestDisplayTree(request)
   }
-  
+
   func createDisplayTreeFromSPID(treeID: TreeID, spid: SinglePathNodeIdentifier) throws -> DisplayTree? {
     // Note: this shouldn't actually return anything, as returnAsync==true
     let request = DisplayTreeRequest(treeID: treeID, returnAsync: true, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
@@ -554,7 +554,7 @@ class GRPCClientBackend: OutletBackend {
     return tree
   }
 
-  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation)
+  func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation, dirConflictPolicy: DirConflictPolicy, fileConflictPolicy: FileConflictPolicy)
       throws -> Bool {
     var request = Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request()
     request.srcTreeID = srcTreeID
@@ -565,6 +565,8 @@ class GRPCClientBackend: OutletBackend {
     }
     request.isInto = isInto
     request.dragOperation = dragOperation.rawValue
+    request.dirConflictPolicy = dirConflictPolicy.rawValue
+    request.fileConflictPolicy = fileConflictPolicy.rawValue
 
     let response = try self.callAndTranslateErrors(self.stub.drop_dragged_nodes(request), "dropDraggedNodes")
     return response.isAccepted
