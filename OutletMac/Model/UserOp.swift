@@ -7,20 +7,22 @@
 
 enum UserOpType: UInt32 {
   case RM = 1  // Remove src node
-  case CP = 2  // Copy content of src node to dst node
+  case UNLINK = 2  // Will (a) just remove from parent, for GDrive nodes, or (b) unlink shortcuts/links, if those type
   case MKDIR = 3 // Make dir represented by src node
-  case MV = 4 // Equivalent to CP followed by RM: copy src node to dst node, then delete src node
-  case UP = 5 // Essentially equivalent to CP, but intention is different. Copy content of src node to dst node, overwriting the contents of dst
+  case CP = 4  // Copy content of src node to dst node (where dst node does not currently exist)
+  case CP_ONTO = 5 // Copy content of src node to existing dst node, overwriting the previous contents of dst
+  case MV = 6 // Equivalent to CP followed by RM: copy src node to dst node, then delete src node
+  case MV_ONTO = 7 // Copy content of src node to dst node, overwriting the contents of dst, then delete src
   
   static let DISPLAYED_USER_OP_TYPES: [UserOpType: String] = [
     UserOpType.CP: "To Add",
     UserOpType.RM: "To Delete",
-    UserOpType.UP: "To Update",
+    UserOpType.CP_ONTO: "To Update",
     UserOpType.MV: "To Move"
   ]
 
   func hasDst() -> Bool {
-    return self == .CP || self == .MV || self == .UP
+    return self == .CP || self == .MV || self == .CP_ONTO || self == .MV_ONTO
   }
 }
 
