@@ -194,15 +194,9 @@ class DisplayStore {
 
       // Parent -> Child
       if var existingParentChildList = self.parentChildListDict[parentGUID] {
-        // TODO: this may get slow for very large directories...
-        for (index, existing) in existingParentChildList.enumerated() {
-          if existing == childGUID {
-            // found: replace existing
-            existingParentChildList[index] = childGUID
-            break
-          }
-        }
-        self.parentChildListDict[parentGUID] = existingParentChildList
+        self.addChildToList(&existingParentChildList, childGUID)
+        // Even if the child already existed, the update to it may have changed its spot in the list. Need to resort:
+        self.parentChildListDict[parentGUID] = self.sortDirContents(existingParentChildList)
       } else {
         self.parentChildListDict[parentGUID] = [childGUID]
       }
@@ -216,6 +210,18 @@ class DisplayStore {
     }
 
     return wasPresent
+  }
+
+  private func addChildToList(_ childList: inout [GUID], _ newChildGUID: GUID) {
+    // TODO: will this get slow for very large directories?
+    for (index, existingGUID) in childList.enumerated() {
+      if existingGUID == newChildGUID {
+        // found: replace existing
+        childList[index] = newChildGUID
+        return
+      }
+    }
+    childList.append(newChildGUID)
   }
 
   // "Remove" operations
