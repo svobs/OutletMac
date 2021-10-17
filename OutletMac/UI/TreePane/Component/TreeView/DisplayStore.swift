@@ -178,7 +178,29 @@ class DisplayStore {
       }
     }
 
-    self.parentChildListDict[parentGUID] = self.sortDirContents(snList: childSNList).map { $0.spid.guid }
+    let childSNListSorted = self.sortDirContents(snList: childSNList)
+
+    // Remove stale nodes
+    if let existingChildGUIDList = self.parentChildListDict[parentGUID] {
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): found existing children: \(existingChildGUIDList)")
+      }
+      for existingChildGUID in existingChildGUIDList {
+        var isStillPresent = false
+        for newChildSN in childSNListSorted {
+          if newChildSN.spid.guid == existingChildGUID {
+            isStillPresent = true
+            break
+          }
+        }
+        if !isStillPresent {
+          NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): child was orphaned; removing: \(parentGUID)")
+          _ = self.removeSN_NoLock(existingChildGUID)
+        }
+      }
+    }
+
+    self.parentChildListDict[parentGUID] = childSNListSorted.map { $0.spid.guid }
 
     NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
   }

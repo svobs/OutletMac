@@ -226,17 +226,17 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         guard let identifier = tableColumn?.identifier else { return nil }
 
         guard let guid = item as? GUID else {
-            NSLog("ERROR [\(treeID)] viewForTableColumn(): not a GUID: \(item)")
+            NSLog("ERROR [\(treeID)] viewForTableColumn(): Not a GUID: \(item)")
             return nil
         }
 
         if guid == self.con.tree.rootSPID.guid {
-            NSLog("ERROR [\(treeID)] Should not be creating a row for the root GUID!")
+            NSLog("ERROR [\(treeID)] viewForTableColumn(): Should not be creating a row for the root GUID!")
             return nil
         }
 
         if TRACE_ENABLED {
-            NSLog("DEBUG [\(treeID)] Cell requested for GUID: \(guid)")
+            NSLog("DEBUG [\(treeID)] viewForTableColumn(): Cell requested for GUID: \(guid)")
         }
 
         return CellFactory.upsertCellToOutlineView(self, outlineView, identifier, guid)
@@ -711,8 +711,15 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         let indexSet = self.getIndexSetFor(guidSet)
-        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): selecting \(indexSet.count) rows")
+        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): resolved \(guidSet).count) GUIDs into \(indexSet.count) rows")
+
         if !indexSet.isEmpty {
+            if SUPER_DEBUG_ENABLED {
+                NSLog("DEBUG [\(self.treeID)] selectGUIDList(): selecting \(indexSet.count) rows: \(guidSet)")
+            } else {
+                NSLog("DEBUG [\(self.treeID)] selectGUIDList(): selecting \(indexSet.count) rows")
+            }
+
             self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
         }
     }
