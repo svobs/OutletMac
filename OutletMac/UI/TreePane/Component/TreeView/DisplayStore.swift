@@ -169,6 +169,9 @@ class DisplayStore {
 
     for childSN in childSNList {
       let childGUID = childSN.spid.guid
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): storing child: \(childGUID)")
+      }
       self.primaryDict[childGUID] = childSN
       self.childParentDict[childGUID] = parentGUID
 
@@ -183,7 +186,7 @@ class DisplayStore {
     // Remove stale nodes
     if let existingChildGUIDList = self.parentChildListDict[parentGUID] {
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): found existing children: \(existingChildGUIDList)")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): found existing children for \(parentGUID): \(existingChildGUIDList)")
       }
       for existingChildGUID in existingChildGUIDList {
         var isStillPresent = false
@@ -198,6 +201,8 @@ class DisplayStore {
           _ = self.removeSN_NoLock(existingChildGUID)
         }
       }
+    } else if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): no existing children for parent \(parentGUID)")
     }
 
     self.parentChildListDict[parentGUID] = childSNListSorted.map { $0.spid.guid }
@@ -216,7 +221,7 @@ class DisplayStore {
 
       // Parent -> Child
       if var existingParentChildList = self.parentChildListDict[parentGUID] {
-        self.addChildToList(&existingParentChildList, childGUID)
+        self.upsertChildToList(&existingParentChildList, childGUID)
         // Even if the child already existed, the update to it may have changed its spot in the list. Need to resort:
         self.parentChildListDict[parentGUID] = self.sortDirContents(existingParentChildList)
       } else {
@@ -234,7 +239,7 @@ class DisplayStore {
     return wasPresent
   }
 
-  private func addChildToList(_ childList: inout [GUID], _ newChildGUID: GUID) {
+  private func upsertChildToList(_ childList: inout [GUID], _ newChildGUID: GUID) {
     // TODO: will this get slow for very large directories?
     for (index, existingGUID) in childList.enumerated() {
       if existingGUID == newChildGUID {

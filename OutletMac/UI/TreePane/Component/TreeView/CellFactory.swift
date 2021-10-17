@@ -62,7 +62,7 @@ class CellFactory {
                                       _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
 
     guard let sn = tvc.displayStore.getSN(guid) else {
-      NSLog("ERROR [\(tvc.treeID)] viewForTableColumn(): node not found with GUID: \(guid)")
+      NSLog("ERROR [\(tvc.treeID)] viewForTableColumn(): node not found in DisplayStore with GUID: \(guid)")
       return nil
     }
 

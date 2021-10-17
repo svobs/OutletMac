@@ -159,6 +159,9 @@ class IconStore: HasLifecycle {
   var useNativeToolbarIcons: Bool = true
   var useNativeNodeIcons: Bool = true
 
+  private let dq = DispatchQueue(label: "IconStore-SerialQueue") // custom dispatch queues are serial by default
+
+  // These are thread-safe classes. However, we need the DQ above to guarantee atomicity
   private let toolbarIconCache = NSCache<NSNumber, ImageContainerWrapper>()
   private let nodeIconCache = NSCache<NSString, NSImage>()
 
@@ -190,10 +193,16 @@ class IconStore: HasLifecycle {
       // FIXME: should not be getting toolbar icon here
       let toolIcon = self.getToolbarIcon(for: iconId)
       return toolIcon.getNSImage()
-    } else if node.isDir {
-      return self.getIconForDirNode(node, height)
     } else {
-      return self.getIconForFileNode(node, height)
+      var icon: NSImage? = nil
+      self.dq.sync {
+        if node.isDir {
+          icon = self.getIconForDirNode(node, height)
+        } else {
+          icon = self.getIconForFileNode(node, height)
+        }
+      }
+      return icon
     }
   }
 
@@ -368,16 +377,21 @@ class IconStore: HasLifecycle {
   }
 
   func getToolbarIcon(for iconID: IconID) -> ImageContainer {
+    NSLog("DEBUG getToolbarIcon(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+
     let key = self.makeToolbarCacheKey(iconID)
 
-    if let cachedIcon = toolbarIconCache.object(forKey: key) {
-      return cachedIcon.imageProvider
-    } else {
+    var imageContainer: ImageContainer! = nil
+    self.dq.sync {
+      if let cachedIcon = toolbarIconCache.object(forKey: key) {
+        imageContainer = cachedIcon.imageProvider
+      } else {
         // create it from scratch then store in the toolbarIconCache
-      let imageContainer = self.makeNewImageContainer(for: iconID)
-      toolbarIconCache.setObject(ImageContainerWrapper(imageContainer), forKey: key)
-      return imageContainer
+        imageContainer = self.makeNewImageContainer(for: iconID)
+        toolbarIconCache.setObject(ImageContainerWrapper(imageContainer), forKey: key)
+      }
     }
+    return imageContainer
   }
   
   private func makeToolbarCacheKey(_ iconID: IconID) -> NSNumber {
