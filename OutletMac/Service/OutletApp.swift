@@ -163,6 +163,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         return
       }
 
+      NSLog("INFO  [\(ID_APP)] OutletMacApp shutting down")
+
       self.eventMonitor?.stop()
 
       for (treeID, controller) in self.treeControllerDict {

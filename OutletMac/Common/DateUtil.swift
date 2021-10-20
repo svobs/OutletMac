@@ -24,11 +24,11 @@ class DateUtil {
   }
 
   static func formatTS(_ timestamp_millis: UInt64?) -> String {
-    if timestamp_millis == nil {
+    guard let timestamp_millis = timestamp_millis else {
       return ""
     }
 
-    let unixTimestamp = Double(timestamp_millis!) / 1000.0
+    let unixTimestamp = Double(timestamp_millis) / 1000.0
     let date = Date(timeIntervalSince1970: unixTimestamp)
     return dateFormatter.string(from: date)
   }

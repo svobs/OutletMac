@@ -141,9 +141,14 @@ struct PlayPauseToggleButton: View {
   let iconStore: IconStore
   let dispatcher: SignalDispatcher
 
+  let iconPause: ImageContainer
+  let iconPlay: ImageContainer
+
   init(_ iconStore: IconStore, _ dispatcher: SignalDispatcher) {
     self.iconStore = iconStore
     self.dispatcher = dispatcher
+    self.iconPause = iconStore.getToolbarIcon(for: .ICON_PAUSE)
+    self.iconPlay = iconStore.getToolbarIcon(for: .ICON_PLAY)
   }
 
   private func toggleValue() {
@@ -159,9 +164,9 @@ struct PlayPauseToggleButton: View {
   var body: some View {
     Button(action: toggleValue) {
       if globalState.isBackendOpExecutorRunning {
-        UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PAUSE))
+        UnselectedToolbarIcon(self.iconPause)
       } else {
-        UnselectedToolbarIcon(iconStore.getToolbarIcon(for: .ICON_PLAY))
+        UnselectedToolbarIcon(self.iconPlay)
       }
     }
     .buttonStyle(PlainButtonStyle())

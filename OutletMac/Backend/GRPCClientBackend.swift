@@ -23,11 +23,14 @@ class GRPCClientBackend: OutletBackend {
   let dispatchListener: DispatchListener
   var grpcConverter = GRPCConverter()
   var nodeIdentifierFactory = NodeIdentifierFactory()
-  var signalReceiverThread: Thread?
-  var wasShutdown = false
-  var useFixedAddress: Bool = false
-  var fixedHost: String? = nil
-  var fixedPort: Int? = nil
+  private var signalReceiverThread: Thread?
+  private var wasShutdown = false
+  private var useFixedAddress: Bool = false
+  private var fixedHost: String? = nil
+  private var fixedPort: Int? = nil
+  private var tryLocalHostOnFailure = true
+
+  private let dqGRPC = DispatchQueue(label: "GRPC-SerialQueue") // custom dispatch queues are serial by default
 
   var isConnected: Bool {
     get {
@@ -101,7 +104,7 @@ class GRPCClientBackend: OutletBackend {
     NSLog("DEBUG [SignalReceiverThread] Starting thread")
 
     while !self.wasShutdown {
-      self.locateBackendServer(onSuccess: self.receiveServerSignals)
+      self.locateBackendServer(onSuccess: self.openGRPCConnection)
     }
     NSLog("DEBUG [SignalReceiverThread] Thread shutting down")
     self.bonjourService.stopDiscovery()
@@ -119,6 +122,7 @@ class GRPCClientBackend: OutletBackend {
         }
         self.backendConnectionState.host = self.fixedHost!
         self.backendConnectionState.port = self.fixedPort!
+        self.tryLocalHostOnFailure = true
         discoverySucceeded = true
 
         if SUPER_DEBUG_ENABLED {
@@ -154,7 +158,7 @@ class GRPCClientBackend: OutletBackend {
             self.backendConnectionState.host = ipPort.ip
             self.backendConnectionState.port = ipPort.port
 
-            NSLog("INFO  Found server: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+            NSLog("INFO  Found server via Bonjour: \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
             discoverySucceeded = true
           }
 
@@ -211,6 +215,17 @@ class GRPCClientBackend: OutletBackend {
     _ = self.stub.send_signal(signalMsg)
   }
 
+  func openGRPCConnection() {
+    self.receiveServerSignals()
+    if self.tryLocalHostOnFailure {
+      NSLog("DEBUG Attempting reconnect with localhost, port \(self.backendConnectionState.port)")
+      DispatchQueue.main.sync {
+        self.backendConnectionState.host = "127.0.0.1"
+      }
+      self.receiveServerSignals()
+    }
+  }
+
   /**
    Receives signals from the gRPC server and forwards them throughout the app via the app's Dispatcher.
    This will return only if there's an error (usually connection lost):
@@ -220,9 +235,11 @@ class GRPCClientBackend: OutletBackend {
     self.replaceStub()
 
     NSLog("DEBUG Subscribing to server signals...")
+    NSLog("DEBUG receiveServerSignals(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+
     let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
-      // Got new signal (implicitly this means the connection is back up)
+      // This is fired each time we get a new signal (implicitly this means the connection is back up)
 
       if TRACE_ENABLED {
         NSLog("DEBUG Got new signal: \(signalGRPC.sigInt)")
@@ -237,15 +254,19 @@ class GRPCClientBackend: OutletBackend {
       }
     }
 
+    /*
+     NOTE: this is called when the request returns. But we are using the open request as a stream with no end, so if we get a request returning
+     it always indicates either a server shutdown or a failure of some kind.
+     */
     call.status.whenSuccess { status in
-      // Yes, it says "whenSuccess" above, but this is actually always a failure of some kind.
-
       if status.code == .ok {
-        // this should never happen if the server was properly written
+        // this should only happen if the server needs to restart.
         NSLog("INFO  Server closed signal subscription")
       } else if status.code == .unavailable {
         if SUPER_DEBUG_ENABLED {
-          NSLog("ERROR ReceiveSignals(): Server unavailable: \(status)")
+          NSLog("INFO ReceiveSignals(: \(status)")
+        } else {
+          NSLog("IMFO ReceiveSignals(): Server unavailable: \(self.backendConnectionState.host), port \(self.backendConnectionState.port)")
         }
       } else {
         NSLog("ERROR ReceiveSignals(): received error: \(status)")
@@ -779,7 +800,9 @@ class GRPCClientBackend: OutletBackend {
 
   private func grpcConnectionDown() {
     if self.isConnected {
-      self.backendConnectionState.isConnected = false
+      DispatchQueue.main.async {
+        self.backendConnectionState.isConnected = false
+      }
       NSLog("INFO  gRPC connection is DOWN!")
       self.app.grpcDidGoDown()
     }
@@ -787,10 +810,13 @@ class GRPCClientBackend: OutletBackend {
 
   private func grpcConnectionRestored() {
     if !self.isConnected {
-      self.backendConnectionState.isConnected = true
-      NSLog("INFO  gRPC connection is UP!")
-      self.backendConnectionState.conecutiveStreamFailCount = 0  // reset failure count
-      self.app.grpcDidGoUp()
+      DispatchQueue.main.async {
+        self.tryLocalHostOnFailure = false
+        self.backendConnectionState.isConnected = true
+        NSLog("INFO  gRPC connection is UP!")
+        self.backendConnectionState.conecutiveStreamFailCount = 0  // reset failure count
+        self.app.grpcDidGoUp()
+      }
     }
   }
 

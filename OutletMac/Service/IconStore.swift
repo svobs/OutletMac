@@ -391,6 +391,9 @@ class IconStore: HasLifecycle {
         toolbarIconCache.setObject(ImageContainerWrapper(imageContainer), forKey: key)
       }
     }
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG getToolbarIcon(): Returning toolbar icon for key '\(key)'")
+    }
     return imageContainer
   }
   

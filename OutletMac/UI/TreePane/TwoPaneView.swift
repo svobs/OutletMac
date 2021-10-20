@@ -38,6 +38,7 @@ fileprivate struct ButtonBar: View {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
+    NSLog("INFO  DONE loading ButtonBar")
   }
 
   var body: some View {
@@ -160,11 +161,15 @@ struct TwoPaneView: View {
     .onPreferenceChange(MyHeightPreferenceKey.self) { key in
       var totalHeight: CGFloat = 0
       for (name, height0) in key.col0 {
-        let height1 = key.col1[name]!
+        if SUPER_DEBUG_ENABLED {
+          NSLog("DEBUG TwoPaneView sizes: \(key.col0), \(key.col1)")
+        }
+        let height1 = key.col1[name] ?? 0
         totalHeight += max(height0, height1)
       }
-//      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(globalState.windowHeight))")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG TwoPaneView TotalHeight: \(totalHeight) (subtract from \(self.windowState.windowHeight))")
+      }
       self.windowState.nonTreeViewHeight = totalHeight
     }
   }

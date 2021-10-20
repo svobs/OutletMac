@@ -68,8 +68,10 @@ struct SinglePaneView: View {
       for height0 in key.col0.values {
         totalHeight += height0
       }
-//      NSLog("SIZES: \(key.col0), \(key.col1)")
-//      NSLog("TOTAL HEIGHT: \(totalHeight) (subtract from \(globalState.windowHeight))")
+      if SUPER_DEBUG_ENABLED {
+        NSLog("DEBUG SinglePaneView sizes: \(key.col0), \(key.col1)")
+        NSLog("DEBUG SinglePaneView TotalHeight: \(totalHeight) (subtract from \(self.windowState.windowHeight))")
+      }
       self.windowState.nonTreeViewHeight = totalHeight
     }
   }
