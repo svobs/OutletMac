@@ -799,22 +799,33 @@ class GRPCClientBackend: OutletBackend {
   }
 
   private func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
-    NSLog("DEBUG callAndTranslateErrors(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
-
     if !self.isConnected {
       throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: client not connected!")
     } else {
-
-      do {
-        NSLog("INFO  Calling gRPC: \(rpcName)")
-        return try call.response.wait()
-      } catch is NIOConnectionError {
-        self.grpcConnectionDown()
-        throw OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
-      } catch {
-        // General failure. Maybe server internal error, or bad data, or something else
-        throw OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+      if SUPER_DEBUG_ENABLED {
+        // We should avoid seeing the main queue show up here, as much as possible
+        NSLog("DEBUG callAndTranslateErrors(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
       }
+
+      var exception: OutletError? = nil
+      var response: Res? = nil
+      // Run all calls inside a serial dispatch queue.
+      self.dqGRPC.sync {
+        do {
+          NSLog("INFO  Calling gRPC: \(rpcName)")
+          response = try call.response.wait()
+        } catch is NIOConnectionError {
+          self.grpcConnectionDown()
+          exception = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
+        } catch {
+          // General failure. Maybe server internal error, or bad data, or something else
+          exception = OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+        }
+      }
+      if let thrownException = exception {
+        throw thrownException
+      }
+      return response!
     }
   }
 

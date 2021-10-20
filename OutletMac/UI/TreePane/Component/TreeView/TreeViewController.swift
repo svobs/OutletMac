@@ -269,13 +269,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let guidSet: Set<GUID> = self.getSelectedGUIDs()
         NSLog("DEBUG [\(treeID)] User selected GUIDs: \(guidSet)")
 
-        self.con.app.execAsync { [unowned self] in
-            do {
-                try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
-            } catch {
-                // Not a serious error: don't show to user
-                NSLog("Failed to report node selection: \(error)")
-            }
+        do {
+            try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
+        } catch {
+            // Not a serious error: don't show to user
+            NSLog("Failed to report node selection: \(error)")
         }
 
         var snList: [SPIDNodePair] = []

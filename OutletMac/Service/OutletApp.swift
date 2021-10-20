@@ -20,11 +20,6 @@ protocol OutletApp: HasLifecycle {
   // State:
   var globalState: GlobalState { get }
 
-  // TODO: remove these and replace with specialized DQs
-  var serialQueue: DispatchQueue { get }
-  func execAsync(_ workItem: @escaping NoArgVoidFunc)
-  func execSync(_ workItem: @escaping NoArgVoidFunc)
-
   func validateMenuItem(_ item: NSMenuItem) -> Bool
   func diffTreesByContent()
 
@@ -36,6 +31,7 @@ protocol OutletApp: HasLifecycle {
   func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreePanelController
   func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
   func deregisterTreePanelController(_ treeID: TreeID)
+  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreePanelControllable)
   func getTreePanelController(_ treeID: String) -> TreePanelControllable?
 
   func sendEnableUISignal(enable: Bool)
@@ -59,8 +55,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   let dispatchListener: DispatchListener
   private var _backend: GRPCClientBackend?
   private var _iconStore: IconStore? = nil
-
-  let serialQueue = DispatchQueue(label: "App-SerialQueue") // custom dispatch queues are serial by default
 
   private let tcDQ = DispatchQueue(label: "TreeControllerDict-SerialQueue")
 
@@ -89,7 +83,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.dispatchListener = self.dispatcher.createListener(ID_APP)
 
     // Enable detection of our custom queue, for debugging and assertions:
-    DispatchQueue.registerDetection(of: self.serialQueue)
     DispatchQueue.registerDetection(of: self.tcDQ)
 
     super.init()
@@ -252,9 +245,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   }
 
   private func onTreePanelControllerDeregistered(senderID: SenderID, propDict: PropDict) throws {
-    self.execSync {
-      self.deregisterTreePanelController(senderID)
-    }
+    self.deregisterTreePanelController(senderID)
   }
 
   private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
@@ -299,21 +290,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     } catch {
       fatalError("OutletApp.start() failed with unexpected error: \(error)")
     }
-  }
-
-  // Convenience methods
-  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  // TODO: Deprecate!
-  func execAsync(_ workItem: @escaping NoArgVoidFunc) {
-    self.serialQueue.async(execute: workItem)
-  }
-
-  // TODO: Deprecate!
-  func execSync(_ workItem: @escaping NoArgVoidFunc) {
-    assert(DispatchQueue.isNotExecutingIn(self.serialQueue))
-
-    self.serialQueue.sync(execute: workItem)
   }
 
   // Menu/Toolbar actions
@@ -509,6 +485,15 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.tcDQ.sync {
       NSLog("DEBUG [\(treeID)] Deregistering tree controller in frontend")
       self.treeControllerDict.removeValue(forKey: treeID)
+    }
+  }
+
+  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreePanelControllable) {
+    self.tcDQ.sync {
+      NSLog("DEBUG [\(oldTreeID)] Deregistering tree controller in frontend")
+      self.treeControllerDict.removeValue(forKey: oldTreeID)
+      NSLog("DEBUG [\(newTreeID)] Registering tree controller in frontend")
+      self.treeControllerDict[newTreeID] = controller
     }
   }
 

@@ -42,11 +42,9 @@ class TreeActions {
       return
     }
 
-    self.con.app.execAsync {
-      let node = sender.nodeList[0]
-      let url = URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
-      NSWorkspace.shared.activateFileViewerSelecting([url])
-    }
+    let node = sender.nodeList[0]
+    let url = URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
+    NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
   @objc public func downloadFromGDrive(_ sender: MenuItemWithNodeList) {
@@ -76,16 +74,14 @@ class TreeActions {
 
     let spid = sender.snList[0].spid
 
-    self.con.app.execAsync {
-      NSLog("DEBUG goIntoDir(): \(spid)")
+    NSLog("DEBUG goIntoDir(): \(spid)")
 
-      self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
+    self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
 
-      do {
-        let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: spid)
-      } catch {
-        self.con.reportException("Failed to change tree root directory", error)
-      }
+    do {
+      let _ = try self.con.app.backend.createDisplayTreeFromSPID(treeID: self.treeID, spid: spid)
+    } catch {
+      self.con.reportException("Failed to change tree root directory", error)
     }
   }
 
@@ -118,22 +114,18 @@ class TreeActions {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   public func downloadFileFromGDrive(_ node: Node) {
-    self.con.app.execAsync {
-      do {
-        NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
-        try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
-      } catch {
-        self.con.reportException("Failed to download file from Google Drive", error)
-      }
+    do {
+      NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
+      try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
+    } catch {
+      self.con.reportException("Failed to download file from Google Drive", error)
     }
   }
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {
-    self.con.app.execAsync {
-      // FIXME: need permissions
-      let url = URL(fileURLWithPath: fullPath)
-      NSWorkspace.shared.open(url)
-    }
+    // FIXME: need permissions
+    let url = URL(fileURLWithPath: fullPath)
+    NSWorkspace.shared.open(url)
   }
 
   public func confirmAndDeleteSubtrees(_ nodeList: [Node]) {

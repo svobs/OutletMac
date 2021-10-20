@@ -99,6 +99,8 @@ class TreePanelController: TreePanelControllable {
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
 
+  private let dq = DispatchQueue(label: "TreePanelController-SerialQueue") // custom dispatch queues are serial by default
+
   init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws {
     self.app = app
     self.tree = tree
@@ -151,12 +153,11 @@ class TreePanelController: TreePanelControllable {
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
-    self.app.execSync {
+    self.dq.sync {
       if newTree.treeID != self.tree.treeID {
         NSLog("INFO  [\(self.treeID)] Changing treeID to \(newTree.treeID)")
         self.treeView = nil
-        self.app.deregisterTreePanelController(self.tree.treeID)
-        self.app.registerTreePanelController(newTree.treeID, self)
+        self.app.reregisterTreePanelController(oldTreeID: self.tree.treeID, newTreeID: newTree.treeID, self)
         self.reattachListeners(newTree.treeID)
       }
       self.tree = newTree
@@ -175,7 +176,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   func requestTreeLoad() throws {
-    self.app.execAsync { [unowned self] in
+    self.dq.async {
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
         // this calls to the backend to do the load, which will eventually (with luck) come back to call onTreeLoadStateUpdated()
@@ -230,7 +231,7 @@ class TreePanelController: TreePanelControllable {
    Executes async in App-SerialQueue, to ensure serial execution. This will catch and report exceptions.
    */
   private func populateTreeView() {
-    self.app.execAsync { [unowned self] in
+    self.dq.async {
       do {
         try self.populateTreeView_inner()
       } catch {
@@ -675,7 +676,7 @@ class TreePanelController: TreePanelControllable {
   }
 
   private func fireFilterTimer() {
-    self.app.execAsync { [unowned self] in
+    self.dq.async {
 
       NSLog("DEBUG [\(self.treeID)] Firing timer to update filter via BE")
 
