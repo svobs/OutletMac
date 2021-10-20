@@ -107,8 +107,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
 
     let eventMask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .flagsChanged]
-    self.eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
-    self.eventMonitor!.start()
+    let eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
+    eventMonitor.start()
+    self.eventMonitor = eventMonitor
 
     var useFixedAddress: Bool = false
     var fixedHost: String? = nil

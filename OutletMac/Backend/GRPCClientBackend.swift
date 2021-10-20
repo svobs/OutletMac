@@ -28,7 +28,7 @@ class GRPCClientBackend: OutletBackend {
   private var useFixedAddress: Bool = false
   private var fixedHost: String? = nil
   private var fixedPort: Int? = nil
-  private var tryLocalHostOnFailure = true
+  private var tryLocalHostFirst = true
 
   private let dqGRPC = DispatchQueue(label: "GRPC-SerialQueue") // custom dispatch queues are serial by default
 
@@ -61,8 +61,9 @@ class GRPCClientBackend: OutletBackend {
     connectAndForwardSignal(.EXIT_DIFF_MODE)
 
     // This thread will also handle the discovery:
-    self.signalReceiverThread = Thread(target: self, selector: #selector(self.runSignalReceiverThread), object: nil)
-    self.signalReceiverThread!.start()
+    let thread = Thread(target: self, selector: #selector(self.runSignalReceiverThread), object: nil)
+    self.signalReceiverThread = thread
+    thread.start()
   }
   
   func shutdown() throws {
@@ -122,7 +123,6 @@ class GRPCClientBackend: OutletBackend {
         }
         self.backendConnectionState.host = self.fixedHost!
         self.backendConnectionState.port = self.fixedPort!
-        self.tryLocalHostOnFailure = true
         discoverySucceeded = true
 
         if SUPER_DEBUG_ENABLED {
@@ -155,6 +155,7 @@ class GRPCClientBackend: OutletBackend {
               leftGroup = true
               group.leave()
             }
+            self.tryLocalHostFirst = true
             self.backendConnectionState.host = ipPort.ip
             self.backendConnectionState.port = ipPort.port
 
@@ -196,7 +197,10 @@ class GRPCClientBackend: OutletBackend {
 
     Thread.sleep(forTimeInterval: SIGNAL_THREAD_SLEEP_PERIOD_SEC)
     NSLog("DEBUG [SignalReceiverThread] Looping (count: \(self.backendConnectionState.conecutiveStreamFailCount))")
-    self.backendConnectionState.conecutiveStreamFailCount += 1
+
+    DispatchQueue.main.sync {
+      self.backendConnectionState.conecutiveStreamFailCount += 1
+    }
   }
 
   // Signals
@@ -216,14 +220,16 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func openGRPCConnection() {
-    self.receiveServerSignals()
-    if self.tryLocalHostOnFailure {
-      NSLog("DEBUG Attempting reconnect with localhost, port \(self.backendConnectionState.port)")
+    if self.tryLocalHostFirst {
+      NSLog("INFO  Attempting connect with localhost, port \(self.backendConnectionState.port)")
       DispatchQueue.main.sync {
         self.backendConnectionState.host = "127.0.0.1"
       }
       self.receiveServerSignals()
     }
+
+    NSLog("INFO  Attempting connect with \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+    self.receiveServerSignals()
   }
 
   /**
@@ -248,7 +254,11 @@ class GRPCClientBackend: OutletBackend {
       do {
         try self.relaySignalLocally(signalGRPC)
       } catch {
-        let signal = Signal(rawValue: signalGRPC.sigInt)!
+        guard let signal = Signal(rawValue: signalGRPC.sigInt) else {
+          NSLog("ERROR Could not resolve Signal from int value: \(signalGRPC.sigInt)")
+          NSLog("ERROR While relaying received signal: \(error)")
+          return
+        }
         NSLog("ERROR While relaying received signal \(signal): \(error)")
         self.reportError("While relaying received signal \(signal)", "\(error)")
       }
@@ -275,14 +285,20 @@ class GRPCClientBackend: OutletBackend {
     }
 
     // Wait for the call to end. It will only end if an error occurred (see call.status.whenSuccess above)
-    _ = try! call.status.wait()
+    do {
+      _ = try call.status.wait()
+    } catch {
+      NSLog("ERROR ReceiveSignals(): signal receive call ended with exception: \(error)")
+    }
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG receiveServerSignals() returning")
     }
   }
 
   private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) throws {
-    let signal = Signal(rawValue: signalGRPC.sigInt)!
+    guard let signal = Signal(rawValue: signalGRPC.sigInt) else {
+      fatalError("Could not resolve Signal from int value: \(signalGRPC.sigInt)")
+    }
     NSLog("DEBUG GRPCClient: got signal from backend via gRPC: \(signal) with sender: \(signalGRPC.sender)")
     var argDict: [String: Any] = [:]
 
@@ -405,8 +421,8 @@ class GRPCClientBackend: OutletBackend {
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request()
     request.fullPath = fullPath
-    if uidSuggestion != nil {
-      request.uidSuggestion = uidSuggestion!
+    if let uidSuggestion = uidSuggestion {
+      request.uidSuggestion = uidSuggestion
     }
     let response = try self.callAndTranslateErrors(self.stub.get_uid_for_local_path(request), "getUIDForLocalPath")
 
@@ -445,7 +461,9 @@ class GRPCClientBackend: OutletBackend {
     let response = try self.callAndTranslateErrors(self.stub.get_device_list(request), "getDeviceList")
 
     for deviceGRPC in response.deviceList {
-      let treeType: TreeType = TreeType(rawValue: deviceGRPC.treeType)!
+      guard let treeType: TreeType = TreeType(rawValue: deviceGRPC.treeType) else {
+        fatalError("Could not resolve TreeType from int value: \(deviceGRPC.treeType)")
+      }
       deviceList.append(Device(device_uid: deviceGRPC.deviceUid, long_device_id: deviceGRPC.longDeviceID, treeType: treeType, friendlyName: deviceGRPC.friendlyName))
     }
     return deviceList
@@ -453,8 +471,8 @@ class GRPCClientBackend: OutletBackend {
 
   func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool = false, maxResults: UInt32?) throws -> [SPIDNodePair] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request()
-    if treeID != nil {
-      request.treeID = treeID!
+    if let treeID = treeID {
+      request.treeID = treeID
     }
     request.parentSpid = try self.grpcConverter.nodeIdentifierToGRPC(parentSPID)
     request.isExpandingParent = isExpandingParent
@@ -555,24 +573,22 @@ class GRPCClientBackend: OutletBackend {
     requestGRPC.treeID = request.treeID
     requestGRPC.returnAsync = request.returnAsync
     requestGRPC.userPath = request.userPath ?? ""
-    if request.spid != nil {
-      requestGRPC.spid = try self.grpcConverter.nodeIdentifierToGRPC(request.spid!)
+    if let spid = request.spid {
+      requestGRPC.spid = try self.grpcConverter.nodeIdentifierToGRPC(spid)
     }
     requestGRPC.treeDisplayMode = request.treeDisplayMode.rawValue
 
     let response = try self.callAndTranslateErrors(self.stub.request_display_tree(requestGRPC), "requestDisplayTree")
 
-    let tree: DisplayTree?
     if response.hasDisplayTreeUiState {
       let state = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-      tree = state.toDisplayTree(backend: self)
-      NSLog("Returning DisplayTree: \(tree!)")
+      let tree = state.toDisplayTree(backend: self)
+      NSLog("Returning DisplayTree: \(tree)")
+      return tree
     } else {
-      tree = nil
       NSLog("Returning DisplayTree==null")
+      return nil
     }
-
-    return tree
   }
 
   func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation, dirConflictPolicy: DirConflictPolicy, fileConflictPolicy: FileConflictPolicy)
@@ -641,7 +657,9 @@ class GRPCClientBackend: OutletBackend {
     } else {
       dstNode = nil
     }
-    let opType = UserOpType(rawValue: response.userOp.opType)!
+    guard let opType = UserOpType(rawValue: response.userOp.opType) else {
+      fatalError("Could not resolve UserOpType from int value: \(response.userOp.opType)")
+    }
 
     return UserOp(opUID: response.userOp.opUid, batchUID: response.userOp.batchUid, opType: opType, srcNode: srcNode, dstNode: dstNode)
   }
@@ -699,34 +717,36 @@ class GRPCClientBackend: OutletBackend {
       NSLog("DEBUG getIntConfig entered")
     }
     let defaultValStr: String?
-    if defaultVal == nil {
-      defaultValStr = nil
+    if let defaultVal = defaultVal {
+      defaultValStr = String(defaultVal)
     } else {
-      defaultValStr = String(defaultVal!)
+      defaultValStr = nil
     }
     let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
-    let configValInt = Int(configVal)
-    if configValInt == nil {
+    guard let configValInt = Int(configVal) else {
       throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
-    } else {
-      NSLog("DEBUG getIntConfig returning: \(configValInt!)")
-      return configValInt!
     }
+
+    NSLog("DEBUG getIntConfig returning: \(configValInt)")
+    return configValInt
   }
 
   func getBoolConfig(_ configKey: String, defaultVal: Bool? = nil) throws -> Bool {
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG getBoolConfig entered")
     }
-    let defaultValStr: String? = (defaultVal == nil) ? nil : String(defaultVal!)
-    let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
-    let configValBool = Bool(configVal.lowercased())
-    if configValBool == nil {
-      throw OutletError.invalidState("Failed to parse value '\(configVal)' as bool for key '\(configKey)'")
+    let defaultValStr: String?
+    if let defaultVal = defaultVal {
+      defaultValStr = String(defaultVal)
     } else {
-      NSLog("DEBUG getBoolConfig returning: \(configValBool!)")
-      return configValBool!
+      defaultValStr = nil
     }
+    let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
+    guard let configValBool = Bool(configVal.lowercased()) else {
+      throw OutletError.invalidState("Failed to parse value '\(configVal)' as bool for key '\(configKey)'")
+    }
+    NSLog("DEBUG getBoolConfig returning: \(configValBool)")
+    return configValBool
   }
 
   func putConfig(_ configKey: String, _ configVal: String) throws {
@@ -811,7 +831,7 @@ class GRPCClientBackend: OutletBackend {
   private func grpcConnectionRestored() {
     if !self.isConnected {
       DispatchQueue.main.async {
-        self.tryLocalHostOnFailure = false
+        self.tryLocalHostFirst = false
         self.backendConnectionState.isConnected = true
         NSLog("INFO  gRPC connection is UP!")
         self.backendConnectionState.conecutiveStreamFailCount = 0  // reset failure count
