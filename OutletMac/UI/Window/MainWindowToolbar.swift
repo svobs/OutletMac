@@ -176,13 +176,10 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return toolbarItem
     }
 
-    func getItemIfVisible(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem? {
-        guard let visibleItems = self.visibleItems else {
-            NSLog("DEBUG getItemIfVisible(): no items visible")
-            return nil
-        }
+    func getItemForIdentifier(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem? {
+        assert(self.items.count > 0, "No items in toolbar!")
 
-        for item in visibleItems {
+        for item in self.items {
             if item.itemIdentifier == itemIdentifier {
                 return item
             }
@@ -211,11 +208,12 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     }
 
     func setToolbarSelection<PickerValue>(_ toolbarIdentifier: NSToolbarItem.Identifier, _ pickerValue: PickerValue, _ pickerItemList: [PickerItem<PickerValue>]) {
+        NSLog("DEBUG Entered setToolbarSelection(): identifier='\(toolbarIdentifier.rawValue)', pickerValue=\(pickerValue)")
 
-        if let dragModeItem = self.getItemIfVisible(toolbarIdentifier) {
+        if let dragModeItem = self.getItemForIdentifier(toolbarIdentifier) {
             if let itemGroup = dragModeItem as? NSToolbarItemGroup {
                 if let index = MainWindowToolbar.indexForPickerValue(pickerValue, pickerItemList) {
-                    NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for identifier \(toolbarIdentifier)")
+                    NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for identifier '\(toolbarIdentifier.rawValue)'")
                     // This will not fire listeners however. We should have set those values elsewhere.
                     itemGroup.setSelected(true, at: index)
                 }

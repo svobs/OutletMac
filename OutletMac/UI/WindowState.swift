@@ -11,8 +11,14 @@ class WindowState: ObservableObject {
     @Published var nonTreeViewHeight: CGFloat = 0
 
     func getTreeViewHeight() -> CGFloat {
-//    NSLog("DEBUG getTreeViewHeight(): \(self.windowHeight) - \(self.nonTreeViewHeight)")
-        return self.windowHeight - self.nonTreeViewHeight
+        var treeViewHeight = self.windowHeight - self.nonTreeViewHeight
+        if SUPER_DEBUG_ENABLED {
+            NSLog("DEBUG getTreeViewHeight(): calculated height is \(treeViewHeight)")
+        }
+        if treeViewHeight < 0 {
+            treeViewHeight = 0
+        }
+        return treeViewHeight
     }
 
 }

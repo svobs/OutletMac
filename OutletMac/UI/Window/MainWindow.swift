@@ -41,6 +41,7 @@ class MainWindow: AppWindow, ObservableObject {
 
 
     if !SHOW_TOOLBAR_ON_START {
+      NSLog("DEBUG [\(self.winID)] Init: Hiding toolbar")
       self.toggleToolbarShown(self)
     }
   }
