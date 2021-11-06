@@ -92,6 +92,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     NSLog("DEBUG [\(ID_APP)] OutletMacApp starting: CurrentDispatchQueue='\(DispatchQueue.currentQueueLabel ?? "nil")'")
 
     // Subscribe to app-wide signals here
+    dispatchListener.subscribe(signal: .DEVICE_UPSERTED, onDeviceUpserted)
     dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
     dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_DONE, afterMergeTreeGenerated)
     dispatchListener.subscribe(signal: .OP_EXECUTION_PLAY_STATE_CHANGED, onOpExecutionPlayStateChanged)
@@ -250,6 +251,21 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 
   private func shutdownApp(senderID: SenderID, propDict: PropDict) throws {
     try self.shutdown()
+  }
+
+  private func onDeviceUpserted(senderID: SenderID, propDict: PropDict) throws {
+    let upsertedDevice = try propDict.get("device") as! Device
+    NSLog("DEBUG [\(ID_APP)] Got signal: \(Signal.DEVICE_UPSERTED) with device: \(upsertedDevice). Will refresh cached device list")
+
+    DispatchQueue.main.async {
+      // Just update all devices rather than bother with complex logic. Very infrequent, and inexpensive
+      do {
+        self.globalState.deviceList = try self.backend.getDeviceList()
+      } catch {
+        NSLog("ERROR [\(ID_APP)] while launching frontend: \(error)")
+        self.grpcDidGoDown()
+      }
+    }
   }
 
   private func afterDiffExited(senderID: SenderID, propDict: PropDict) throws {

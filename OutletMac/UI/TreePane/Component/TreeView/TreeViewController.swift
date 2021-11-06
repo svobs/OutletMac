@@ -708,8 +708,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
+        NSLog("DEBUG [\(self.treeID)] Selecting GUIDs: \(guidSet)")
         let indexSet = self.getIndexSetFor(guidSet)
-        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): resolved \(guidSet).count) GUIDs into \(indexSet.count) rows")
+        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): resolved \(guidSet.count) GUIDs into \(indexSet.count) rows")
 
         if !indexSet.isEmpty {
             if SUPER_DEBUG_ENABLED {

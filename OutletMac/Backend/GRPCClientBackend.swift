@@ -337,6 +337,8 @@ class GRPCClientBackend: OutletBackend {
         argDict["filename"] = signalGRPC.downloadMsg.filename
       case .STATS_UPDATED:
         try self.convertStatsAndStatus(statsUpdate: signalGRPC.statsUpdate, argDict: &argDict)
+      case .DEVICE_UPSERTED:
+        argDict["device"] = try self.grpcConverter.deviceFromGRPC(signalGRPC.device)
       default:
         break
     }
@@ -461,10 +463,7 @@ class GRPCClientBackend: OutletBackend {
     let response = try self.callAndTranslateErrors(self.stub.get_device_list(request), "getDeviceList")
 
     for deviceGRPC in response.deviceList {
-      guard let treeType: TreeType = TreeType(rawValue: deviceGRPC.treeType) else {
-        fatalError("Could not resolve TreeType from int value: \(deviceGRPC.treeType)")
-      }
-      deviceList.append(Device(device_uid: deviceGRPC.deviceUid, long_device_id: deviceGRPC.longDeviceID, treeType: treeType, friendlyName: deviceGRPC.friendlyName))
+      deviceList.append(try self.grpcConverter.deviceFromGRPC(deviceGRPC))
     }
     return deviceList
   }
