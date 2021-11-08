@@ -433,12 +433,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       return
     }
 
-    guard let conLeft = self.getTreePanelController(ID_LEFT_TREE) else {
-      self.reportError("Cannot merge", "Internal error: no controller for \(ID_LEFT_TREE) found!")
+    guard let conLeft = self.mainWindow?.conLeft else {
+      self.reportError("Cannot merge", "Internal error: controller for left tree not found in main window!")
       return
     }
-    guard let conRight = self.getTreePanelController(ID_RIGHT_TREE) else {
-      self.reportError("Cannot merge", "Internal error: no controller for \(ID_RIGHT_TREE) found!")
+    guard let conRight = self.mainWindow?.conRight else {
+      self.reportError("Cannot merge", "Internal error: controller for right tree not found in main window!")
       return
     }
     do {

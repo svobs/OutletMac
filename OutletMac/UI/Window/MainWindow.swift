@@ -11,8 +11,8 @@ let SHOW_TOOLBAR_ON_START = true
  Has two panes (Left and Right), each of which contain a TreeView and its associated panels
  */
 class MainWindow: AppWindow, ObservableObject {
-  private weak var conLeft: TreePanelControllable? = nil
-  private weak var conRight: TreePanelControllable? = nil
+  weak var conLeft: TreePanelControllable? = nil
+  weak var conRight: TreePanelControllable? = nil
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
