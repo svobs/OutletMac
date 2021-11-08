@@ -211,6 +211,7 @@ enum IconID: UInt32 {
   case ICON_DIR_CP_DST = 18
   case ICON_DIR_TRASHED = 19
 
+  // toolbar icons:
   case ICON_ALERT = 20
   case ICON_WINDOW = 21
   case ICON_REFRESH = 22
@@ -228,6 +229,7 @@ enum IconID: UInt32 {
   case ICON_LOCAL_DISK_WINDOWS = 33
   case ICON_GDRIVE = 34
 
+  // toolbar icons:
   case BTN_FOLDER_TREE = 40
   case BTN_LOCAL_DISK_LINUX = 41
   case BTN_LOCAL_DISK_MACOS = 42
@@ -268,13 +270,11 @@ enum IconID: UInt32 {
   }
 
   func isToolbarIcon() -> Bool {
-    // TODO: implement IconID.isToolbarIcon
-    switch self {
-    case .ICON_TO_ADD, .ICON_TO_DELETE, .ICON_TO_UPDATE, .ICON_TO_MOVE, .ICON_LOADING:
-      return false
-    default:
+    if (self.rawValue >= IconID.ICON_ALERT.rawValue && self.rawValue <= IconID.ICON_IS_NOT_TRASHED.rawValue) ||
+               (self.rawValue >= IconID.BTN_FOLDER_TREE.rawValue && self.rawValue <= IconID.BTN_GDRIVE.rawValue) {
       return true
     }
+    return false
   }
 
   func isNodeIcon() -> Bool {

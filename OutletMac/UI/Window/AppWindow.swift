@@ -50,7 +50,7 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
         super.init(
                 contentRect: contentRect,
                 styleMask: style,
-                backing: .buffered, defer: false)
+                backing: .buffered, defer: true)
         // this will override x & y from content rect
 
     }
