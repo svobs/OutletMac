@@ -56,6 +56,7 @@ struct MergePreviewContent: View {
                 Spacer()
                 Button("Cancel", action: {
                     NSLog("DEBUG [\(self.parentWindow.winID)] Cancel button was clicked")
+                    self.parentWindow.app.sendEnableUISignal(enable: true)
                     self.parentWindow.close()
                 })
                         .keyboardShortcut(.cancelAction)

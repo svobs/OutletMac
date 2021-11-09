@@ -288,6 +288,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       }
     } catch {
       self.displayError("Failed to build merge tree", "\(error)")
+      self.sendEnableUISignal(enable: true)
     }
   }
 
