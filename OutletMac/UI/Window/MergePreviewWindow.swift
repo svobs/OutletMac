@@ -9,17 +9,16 @@ import SwiftUI
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
 class MergePreviewWindow: SingleTreePopUpWindow {
-    override init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
-        super.init(app, con, initialSelection: initialSelection)
-        assert(con.treeID == ID_MERGE_TREE)
+    override init(_ app: OutletApp, treeID: TreeID) {
+        super.init(app, treeID: treeID)
         self.center()
+        self.isReleasedWhenClosed = false  // make it reusable
         self.title = "Confirm Merge"
 
         let content = MergePreviewContent(self)
                 .environmentObject(self.app.globalState)
         self.contentView = NSHostingView(rootView: content)
     }
-
 }
 
 /**
@@ -35,7 +34,7 @@ struct MergePreviewContent: View {
 
     func doMerge() {
         NSLog("DEBUG [\(self.parentWindow.winID)] OK btn clicked! Sending signal: '\(Signal.COMPLETE_MERGE)'")
-        self.parentWindow.con.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
+        self.parentWindow.con!.dispatcher.sendSignal(signal: .COMPLETE_MERGE, senderID: ID_MERGE_TREE)
 
         // BE will notify the app on success or failure, and it will decide whether to close this window.
     }
@@ -43,7 +42,7 @@ struct MergePreviewContent: View {
     var body: some View {
         VStack {
             GeometryReader { geo in
-                SinglePaneView(self.parentWindow.app, self.parentWindow.con, self.windowState)
+                SinglePaneView(self.parentWindow.app, self.parentWindow.con!, self.windowState)
                         .frame(minWidth: 400, maxWidth: .infinity, minHeight: 400, maxHeight: .infinity, alignment: .topLeading)
                         .contentShape(Rectangle()) // taps should be detected in the whole window
                         .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))

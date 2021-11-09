@@ -7,8 +7,8 @@ import SwiftUI
 
 class SingleTreePopUpWindow: AppWindow, ObservableObject {
     private let _winID: String
-    weak var con: TreePanelControllable!
-    let initialSelection: SPIDNodePair?
+    weak var con: TreePanelControllable? = nil
+    var initialSelection: SPIDNodePair? = nil
 
     override var winID: String {
         get {
@@ -16,38 +16,44 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
         }
     }
 
-    init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
-        self._winID = "\(con.treeID)-window"
-        self.con = con
-        self.initialSelection = initialSelection
+    init(_ app: OutletApp, treeID: TreeID) {
+        self._winID = "\(treeID)-window"
         let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
         super.init(app, contentRect, styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView])
     }
 
+    func setController(_ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
+        self.con = con
+        self.initialSelection = initialSelection
+    }
+
     override func start() throws {
+        guard let _ = self.con else {
+            throw OutletError.invalidState("Controller not set!")
+        }
         try super.start()
 
         // Add extra listeners to some of the controller's signals
-        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.con.treeID)
-        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con.treeID)
-        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_LOAD_STATE_UPDATED, self.onTreeLoadStateUpdated, whitelistSenderID: self.con!.treeID)
+        self.dispatchListener.subscribe(signal: .POPULATE_UI_TREE_DONE, self.onPopulateTreeDone, whitelistSenderID: self.con!.treeID)
+        self.dispatchListener.subscribe(signal: .TREE_SELECTION_CHANGED, self.onSelectionChanged, whitelistSenderID: self.con!.treeID)
 
         // TODO: create & populate progress bar to show user that something is being done here
 
-        try self.con.requestTreeLoad()
+        try self.con!.requestTreeLoad()
     }
 
     // This is called by windowWillClose()
     override func shutdown() throws {
         try super.shutdown()
-        try self.con.shutdown()
+        try self.con?.shutdown()
     }
 
     func selectSPID(_ spid: SPID) {
         // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
         // being hit
         // FIXME: Need to add logic to expand ancestor nodes
-        self.con.treeView!.selectSingleGUID(spid.guid)
+        self.con?.treeView!.selectSingleGUID(spid.guid)
     }
 
     // DispatchListener callbacks

@@ -43,9 +43,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   // Windows which ARE reused:
   var connectionProblemWindow: ConnectionProblemWindow! = nil
   var mainWindow: MainWindow? = nil
-
-  // Windows which ARE NOT reused... TODO: test opening & closing these lots of times
-  var rootChooserWindow: GDriveRootChooserWindow? = nil
+  var gdriveRootChooserWindow: GDriveRootChooserWindow? = nil
   var mergePreviewWindow: MergePreviewWindow? = nil
 
   private var wasShutdown: Bool = false
@@ -564,23 +562,23 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
 
     let currentSN: SPIDNodePair = sourceCon.tree.rootSN
 
-    if let rootChooser = self.rootChooserWindow, rootChooser.isOpen {
-      DispatchQueue.main.async {
-        rootChooser.showWindow()
-        rootChooser.selectSPID(currentSN.spid)
-      }
-    } else {
+    DispatchQueue.main.async {
       do {
         let tree: DisplayTree = try self.backend.createDisplayTreeForGDriveSelect(deviceUID: deviceUID)!
         let con = try self.buildController(tree, canChangeRoot: false, allowsMultipleSelection: false)
 
-        let window = GDriveRootChooserWindow(self, con, initialSelection: currentSN, targetTreeID: treeID)
-        try window.start()
-        window.showWindow()
-        self.rootChooserWindow = window
+        if let gdriveRootChooser = self.gdriveRootChooserWindow {
+          gdriveRootChooser.close()
+        } else {
+            self.gdriveRootChooserWindow = GDriveRootChooserWindow(self, con.treeID, targetTreeID: treeID)
+        }
+
+        self.gdriveRootChooserWindow!.setController(con, initialSelection: currentSN)
+        try self.gdriveRootChooserWindow!.start()
       } catch {
-        self.displayError("Error opening Google Drive root chooser", "An unexpected error occurred: \(error)")
+        self.displayError("Error opening Google Drive root chooser window", "An unexpected error occurred: \(error)")
       }
+
     }
   }
 
@@ -590,13 +588,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   func openMergePreview(_ con: TreePanelControllable) {
     assert(DispatchQueue.isExecutingIn(.main))
 
-    self.mergePreviewWindow?.close()
-
     do {
-      let window = MergePreviewWindow(self, con)
-      try window.start()
-      window.showWindow()
-      self.mergePreviewWindow = window
+      if self.mergePreviewWindow == nil {
+        self.mergePreviewWindow = MergePreviewWindow(self, treeID: con.treeID)
+      } else {
+        self.mergePreviewWindow?.close()
+      }
+      self.mergePreviewWindow!.setController(con)
+      try self.mergePreviewWindow!.start()
     } catch {
       self.displayError("Error opening Merge Preview", "An unexpected error occurred: \(error)")
     }
@@ -613,7 +612,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
     // Close all other windows beside the Connection Problem window, if they exist
     self.mainWindow?.close()
-    self.rootChooserWindow?.close()
+    self.gdriveRootChooserWindow?.close()
     self.mergePreviewWindow?.close()
 
     // Open Connection Problem window
@@ -646,6 +645,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
           NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
         }
         self.mainWindow = MainWindow(self, contentRect)
+      } else {
+        self.mainWindow?.close()
       }
 
       // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
@@ -655,17 +656,16 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
 
       self.tcDQ.sync {
-        self.mainWindow?.close()
         do {
           self.mainWindow!.setControllers(left: conLeft, right: conRight)
           try self.mainWindow!.start()
           DispatchQueue.main.async {
             NSLog("DEBUG [\(ID_APP)] Calling MainWindow.showWindow()")
             self.mainWindow!.showWindow()
-          }
 
-          // Close Connection Problem window if it is open:
-          self.connectionProblemWindow?.close()
+            // Close Connection Problem window if it is open:
+            self.connectionProblemWindow?.close()
+          }
         } catch {
           NSLog("ERROR [\(ID_APP)] while starting main window: \(error)")
         }

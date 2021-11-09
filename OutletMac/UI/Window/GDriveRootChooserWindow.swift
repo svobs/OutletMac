@@ -20,14 +20,21 @@ class ChooserState: ObservableObject {
  */
 class GDriveRootChooserWindow: SingleTreePopUpWindow {
   var chooserState: ChooserState = ChooserState()
+  let targetTreeID: TreeID
 
-  init(_ app: OutletApp, _ con: TreePanelControllable, initialSelection: SPIDNodePair, targetTreeID: TreeID) {
-    super.init(app, con, initialSelection: initialSelection)
-    assert(con.treeID == ID_GDRIVE_DIR_SELECT)
+  init(_ app: OutletApp, _ treeID: TreeID, targetTreeID: TreeID) {
+    self.targetTreeID = targetTreeID
+    assert(treeID == ID_GDRIVE_DIR_SELECT)
+    super.init(app, treeID: treeID)
     self.center()
+    self.isReleasedWhenClosed = false  // make it reusable
     self.title = "Google Drive Root Chooser"
     // this will override the content rect and save the window size & location between launches, BUT it is also very buggy!
 //    window.setFrameAutosaveName(window.title)
+  }
+
+  override func setController(_ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
+    super.setController(con, initialSelection: initialSelection)
     let content = GDriveRootChooserContent(targetTreeID, self, self.chooserState)
             .environmentObject(self.app.globalState)
     self.contentView = NSHostingView(rootView: content)
@@ -58,7 +65,7 @@ struct GDriveRootChooserContent: View {
 
   var con: TreePanelControllable {
     get {
-      return self.parentWindow.con
+      return self.parentWindow.con!
     }
   }
 
