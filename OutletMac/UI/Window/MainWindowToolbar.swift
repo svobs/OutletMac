@@ -114,6 +114,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     }
 
     /**
+     willBeInsertedIntoToolbar:
      Create a new NSToolbarItem instance and set its attributes based on the provided item identifier.
      */
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
@@ -168,7 +169,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
         let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
-                target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
+                target: nil, action: Selector("toolbarPickerDidSelectItem:") )
 
         toolbarItem.label = groupLabel
         toolbarItem.paletteLabel = groupLabel

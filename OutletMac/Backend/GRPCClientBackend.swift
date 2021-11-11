@@ -82,20 +82,24 @@ class GRPCClientBackend: OutletBackend {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
     let channel = ClientConnection.insecure(group: group)
-            .withConnectionTimeout(minimum: TimeAmount.seconds(3))
-            .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(1))
+            .withConnectionTimeout(minimum: TimeAmount.seconds(GRPC_CONNECTION_TIMEOUT_SEC))
+            .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(GRPC_MAX_CONNECTION_RETRIES))
             .connect(host: host, port: port)
 
     return Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel)
   }
 
-  func replaceStub() {
+  func closeChannel() {
     do {
       NSLog("DEBUG Closing gRPC channel")
       try self.stub.channel.close().wait()
     } catch {
       NSLog("ERROR While closing client gRPC channel: \(error)")
     }
+  }
+
+  func replaceStub() {
+    self.closeChannel()
 
     NSLog("DEBUG Making new gRPC client stub...")
     self.stub = GRPCClientBackend.makeClientStub(self.backendConnectionState.host, self.backendConnectionState.port)
@@ -112,6 +116,8 @@ class GRPCClientBackend: OutletBackend {
   }
 
   private func locateBackendServer(onSuccess onSuccessFunc: () -> ()) {
+    NSLog("DEBUG [SignalReceiverThread] Locating backend server (useFixedAddress=\(useFixedAddress))")
+
     let group = DispatchGroup()
     group.enter()
     var discoverySucceeded: Bool = false
@@ -220,6 +226,8 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func openGRPCConnection() {
+    let host = self.backendConnectionState.host
+    // FiXME: this "tryLocalHostFirst" is a junk solution - need to detect server name for localhost and compare IPs instead
     if self.tryLocalHostFirst {
       NSLog("INFO  Attempting connect with localhost, port \(self.backendConnectionState.port)")
       DispatchQueue.main.sync {
@@ -228,6 +236,9 @@ class GRPCClientBackend: OutletBackend {
       self.receiveServerSignals()
     }
 
+    DispatchQueue.main.sync {
+      self.backendConnectionState.host = host
+    }
     NSLog("INFO  Attempting connect with \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
     self.receiveServerSignals()
   }
@@ -271,17 +282,13 @@ class GRPCClientBackend: OutletBackend {
     call.status.whenSuccess { status in
       if status.code == .ok {
         // this should only happen if the server needs to restart.
-        NSLog("INFO  Server closed signal subscription")
+        NSLog("INFO   ReceiveSignals(): Server closed signal subscription")
       } else if status.code == .unavailable {
-        if SUPER_DEBUG_ENABLED {
-          NSLog("INFO ReceiveSignals(: \(status)")
-        } else {
-          NSLog("IMFO ReceiveSignals(): Server unavailable: \(self.backendConnectionState.host), port \(self.backendConnectionState.port)")
-        }
+        NSLog("IMFO ReceiveSignals(): Server unavailable (status: \(status)) - closing connection to \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
       } else {
         NSLog("ERROR ReceiveSignals(): received error: \(status)")
       }
-      self.grpcConnectionDown()
+      self.app.grpcDidGoDown()
     }
 
     // Wait for the call to end. It will only end if an error occurred (see call.status.whenSuccess above)
@@ -814,7 +821,7 @@ class GRPCClientBackend: OutletBackend {
           NSLog("INFO  Calling gRPC: \(rpcName)")
           response = try call.response.wait()
         } catch is NIOConnectionError {
-          self.grpcConnectionDown()
+          self.app.grpcDidGoDown()
           exception = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
         } catch {
           // General failure. Maybe server internal error, or bad data, or something else
@@ -828,22 +835,24 @@ class GRPCClientBackend: OutletBackend {
     }
   }
 
-  private func grpcConnectionDown() {
+  /** DO NOT call this method directly. Call self.app.grpcDidGoDown(), which will call this.
+   */
+  func grpcConnectionDown() {
     if self.isConnected {
+      NSLog("INFO  gRPC connection is DOWN!")
       DispatchQueue.main.async {
         self.backendConnectionState.isConnected = false
       }
-      NSLog("INFO  gRPC connection is DOWN!")
-      self.app.grpcDidGoDown()
+      self.closeChannel()  // If we got a watchdog timeout, we need to close the channel from our end, to un-hang the SignalReceiverThread
     }
   }
 
   private func grpcConnectionRestored() {
     if !self.isConnected {
       DispatchQueue.main.async {
+        NSLog("INFO  gRPC connection is UP!")
         self.tryLocalHostFirst = false
         self.backendConnectionState.isConnected = true
-        NSLog("INFO  gRPC connection is UP!")
         self.backendConnectionState.conecutiveStreamFailCount = 0  // reset failure count
         self.app.grpcDidGoUp()
       }

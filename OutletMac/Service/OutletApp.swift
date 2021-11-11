@@ -176,11 +176,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   func grpcDidGoDown() {
     DispatchQueue.main.async {
       NSLog("DEBUG [\(ID_APP)] Entered grpcDidGoDown()")
-
+      self._backend!.grpcConnectionDown()
       self.openConnectionProblemWindow()
     }
   }
 
+  // This should only be called by GRPCClientBackend, when it is indeed back up.
   func grpcDidGoUp() {
     NSLog("DEBUG [\(ID_APP)] Entered grpcDidGoUp()")
     DispatchQueue.main.async {
