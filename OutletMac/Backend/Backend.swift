@@ -15,6 +15,7 @@ protocol OutletBackend: HasLifecycle {
   func getConfigList(_ configKeyList: [String]) throws -> [String: String]
   func putConfigList(_ configDict: [String: String]) throws
   func getIntConfig(_ configKey: String, defaultVal: Int?) throws -> Int
+  func getUInt32Config(_ configKey: String, defaultVal: UInt32?) throws -> UInt32
   func getBoolConfig(_ configKey: String, defaultVal: Bool?) throws -> Bool
   func getIcon(_ iconID: IconID) throws -> NSImage?
   
@@ -62,6 +63,10 @@ extension OutletBackend {
 
   func getIntConfig(_ configKey: String) throws -> Int {
     return try getIntConfig(configKey, defaultVal: nil)
+  }
+
+  func getUInt32Config(_ configKey: String) throws -> UInt32 {
+    return try getUInt32Config(configKey, defaultVal: nil)
   }
 
   func getBoolConfig(_ configKey: String) throws -> Bool {

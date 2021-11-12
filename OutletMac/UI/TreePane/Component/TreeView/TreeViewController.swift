@@ -243,7 +243,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-     Filter out rows which should not be selected.
+     Filter out rows which should not be selected (e.g., ephemeral nodes).
      From NSOutlineViewDelegate
      Has better performance than shouldSelectItem()
     */
@@ -548,6 +548,10 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     private func isDroppingOnSelf(_ srcGUIDList: [GUID], _ dropTargetSN: SPIDNodePair) -> Bool {
+        if SUPER_DEBUG_ENABLED {
+            NSLog("DEBUG [\(self.treeID)] isDroppingOnSelf: checking srcList (\(srcGUIDList)) against drop target (\(dropTargetSN.spid))")
+        }
+        // It's ok if some of these don't resolve. We'll do more complex validation on the backend.
         for srcSN in self.displayStore.getSNList(srcGUIDList) {
             if dropTargetSN.node.isParentOf(srcSN.node) {
                 if SUPER_DEBUG_ENABLED {  // // this can get called a lot when user is hovering

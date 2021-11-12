@@ -339,7 +339,7 @@ class DisplayStore {
             filteredSet.insert(guid)
           }
         } else {
-          NSLog("[\(self.treeID)] WARN  Could not find SN for GUID; ommitting: \(guid)")
+          NSLog("[\(self.treeID)] WARN  toFilteredSet(): Could not find SN for GUID; ommitting: \(guid)")
         }
       }
     }
@@ -367,7 +367,7 @@ class DisplayStore {
         if let sn = self.getSN_NoLock(guid) {
           snList.append(sn)
         } else {
-          NSLog("[\(self.treeID)] WARN  Could not find SN for GUID; ommitting: \(guid)")
+          NSLog("[\(self.treeID)] WARN  getSNList(): Could not find SN for GUID; ommitting: \(guid)")
         }
       }
     }

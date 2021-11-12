@@ -16,6 +16,12 @@ let TRACE_ENABLED: Bool = false // TODO: externalize this
 
 let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
 
+// Config keys
+
+let DRAG_MODE_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).drag_mode"
+let DIR_CONFLICT_POLICY_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).dir_conflict_policy"
+let FILE_CONFLICT_POLICY_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).file_conflict_policy"
+
 // --- FRONT END ONLY ---
 
 let APP_NAME = "Outlet"
@@ -97,8 +103,6 @@ enum DragOperation: UInt32 {
     }
   }
 }
-
-let INITIAL_DEFAULT_DRAG_OP = DragOperation.COPY
 
 /**
   For operations where the src dir and dst dir have same name but different content.
@@ -330,6 +334,7 @@ let ICON_DEFAULT_ERROR_SYSTEM_IMAGE_NAME = "multiply.circle.fill"
 
 let ROOT_PATH = "/"
 
+// See: https://github.com/grpc/grpc/blob/master/doc/keepalive.md
 let GRPC_CONNECTION_TIMEOUT_SEC: Int64 = 20
 let GRPC_MAX_CONNECTION_RETRIES: Int = 3
 

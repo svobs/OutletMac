@@ -190,6 +190,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         self.globalState.deviceList = try self.backend.getDeviceList()
         self.globalState.isBackendOpExecutorRunning = try self.backend.getOpExecutionPlayState()
 
+        self.globalState.currentDragOperation = DragOperation(rawValue: try self.backend.getUInt32Config(DRAG_MODE_CONFIG_PATH))!
+        self.globalState.currentDirConflictPolicy = DirConflictPolicy(rawValue: try self.backend.getUInt32Config(DIR_CONFLICT_POLICY_CONFIG_PATH))!
+        self.globalState.currentFileConflictPolicy = FileConflictPolicy(rawValue: try self.backend.getUInt32Config(FILE_CONFLICT_POLICY_CONFIG_PATH))!
+
         let screenSize = NSScreen.main?.frame.size ?? .zero
         NSLog("DEBUG [\(ID_APP)] Screen size is \(screenSize.width)x\(screenSize.height)")
 
@@ -322,19 +326,34 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       if toolbarItemGroup.itemIdentifier == .dragModePicker {
         if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DRAG_MODE_LIST) {
           NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
-          self.globalState.lastClickedDragOperation = newValue
+          self.globalState.currentDragOperation = newValue
+          do {
+            try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newValue.rawValue))
+          } catch {
+            self.reportException("Failed to save new drag mode", error)
+          }
         }
 
       } else if toolbarItemGroup.itemIdentifier == .dirConflictPolicyPicker {
         if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST) {
           NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
           self.globalState.currentDirConflictPolicy = newValue
+          do {
+            try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newValue.rawValue))
+          } catch {
+            self.reportException("Failed to save new dir conflict policy", error)
+          }
         }
 
       } else if toolbarItemGroup.itemIdentifier == .fileConflictPolicyPicker {
         if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST) {
           NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
           self.globalState.currentFileConflictPolicy = newValue
+          do {
+            try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newValue.rawValue))
+          } catch {
+            self.reportException("Failed to save new file conflict policy", error)
+          }
         }
       }
     }

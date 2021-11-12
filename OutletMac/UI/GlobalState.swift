@@ -28,19 +28,24 @@ class GlobalState: ObservableObject {
 
     @Published var mode: WindowMode = .BROWSING
 
-    // Not published, but this is the most logical place to store these:
-    var lastClickedDragOperation: DragOperation = INITIAL_DEFAULT_DRAG_OP
+    // --------------------------------------------------------------------------------------------
+    // Not published, but this is the most logical place to store these. These will be updated from the backend values at startup, and
+    // the backend will be notified every time they're changed
+
+    // This is the value set in the toolbar/menu, but can be overridden by modifierKeyDragOperation
+    var currentDragOperation: DragOperation = .COPY
     // FIXME: bug: this doesn't get changed during a drag; it's frozen when the drag starts
     var modifierKeyDragOperation: DragOperation? = nil
 
     var currentDirConflictPolicy: DirConflictPolicy = .MERGE
     var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_DIFFERENT
+    // --------------------------------------------------------------------------------------------
 
     func getCurrentDefaultDragOperation() -> DragOperation {
         if let modifierKeyDragOperation = self.modifierKeyDragOperation {
             return modifierKeyDragOperation
         } else {
-            return lastClickedDragOperation
+            return currentDragOperation
         }
     }
 

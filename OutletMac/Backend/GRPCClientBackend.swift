@@ -717,7 +717,26 @@ class GRPCClientBackend: OutletBackend {
       return response.configList[0].val
     }
   }
-  
+
+  func getUInt32Config(_ configKey: String, defaultVal: UInt32? = nil) throws -> UInt32 {
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG getUInt32Config entered")
+    }
+    let defaultValStr: String?
+    if let defaultVal = defaultVal {
+      defaultValStr = String(defaultVal)
+    } else {
+      defaultValStr = nil
+    }
+    let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
+    guard let configValUInt32 = UInt32(configVal) else {
+      throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
+    }
+
+    NSLog("DEBUG getUInt32Config returning: \(configValUInt32)")
+    return configValUInt32
+  }
+
   func getIntConfig(_ configKey: String, defaultVal: Int? = nil) throws -> Int {
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG getIntConfig entered")
