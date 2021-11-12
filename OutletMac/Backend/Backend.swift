@@ -115,6 +115,10 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
+  func getUInt32Config(_ configKey: String, defaultVal: UInt32?) throws -> UInt32 {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
   func getBoolConfig(_ configKey: String, defaultVal: Bool?) throws -> Bool {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }

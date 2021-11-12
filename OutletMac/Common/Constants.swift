@@ -18,9 +18,9 @@ let GRPC_CHANGE_TREE_NO_OP: UInt32 = 9
 
 // Config keys
 
-let DRAG_MODE_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).drag_mode"
-let DIR_CONFLICT_POLICY_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).dir_conflict_policy"
-let FILE_CONFLICT_POLICY_CONFIG_PATH = "ui_state.\(ID_MAIN_WINDOW).file_conflict_policy"
+let DRAG_MODE_CONFIG_PATH: String = "ui_state.\(ID_MAIN_WINDOW).drag_mode"
+let DIR_CONFLICT_POLICY_CONFIG_PATH: String = "ui_state.\(ID_MAIN_WINDOW).dir_conflict_policy"
+let FILE_CONFLICT_POLICY_CONFIG_PATH: String = "ui_state.\(ID_MAIN_WINDOW).file_conflict_policy"
 
 // --- FRONT END ONLY ---
 

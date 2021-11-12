@@ -711,10 +711,20 @@ class GRPCClientBackend: OutletBackend {
 
     let response = try self.callAndTranslateErrors(self.stub.get_config(request), "getConfig")
     if response.configList.count != 1 {
-      throw OutletError.invalidState("RPC 'getFilterCriteria' failed: got more than one value for config list")
+      throw OutletError.invalidState("RPC 'getConfig' failed: got more than one value for config list")
     } else {
       assert(response.configList[0].key == configKey, "getConfig(): response key (\(response.configList[0].key)) != expected (\(configKey))")
-      return response.configList[0].val
+      let val = response.configList[0].val
+      // remember, gRPC will never return nil; it will return empty string
+      if val == "" {
+        if let defaultVal = defaultVal {
+          return defaultVal
+        } else {
+          throw OutletError.invalidState("RPC 'getConfig' failed: no default value supplied but got nil value for key '\(configKey)'")
+        }
+      } else {
+        return val
+      }
     }
   }
 
@@ -730,7 +740,7 @@ class GRPCClientBackend: OutletBackend {
     }
     let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
     guard let configValUInt32 = UInt32(configVal) else {
-      throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
+      throw OutletError.invalidState("Failed to parse value \"\(configVal)\" as UInt32 for key \"\(configKey)\"")
     }
 
     NSLog("DEBUG getUInt32Config returning: \(configValUInt32)")
@@ -749,7 +759,7 @@ class GRPCClientBackend: OutletBackend {
     }
     let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
     guard let configValInt = Int(configVal) else {
-      throw OutletError.invalidState("Failed to parse value '\(configVal)' as int for key '\(configKey)'")
+      throw OutletError.invalidState("Failed to parse value \"\(configVal)\" as Int for key \"\(configKey)\"")
     }
 
     NSLog("DEBUG getIntConfig returning: \(configValInt)")
@@ -768,7 +778,7 @@ class GRPCClientBackend: OutletBackend {
     }
     let configVal: String = try self.getConfig(configKey, defaultVal: defaultValStr)
     guard let configValBool = Bool(configVal.lowercased()) else {
-      throw OutletError.invalidState("Failed to parse value '\(configVal)' as bool for key '\(configKey)'")
+      throw OutletError.invalidState("Failed to parse value \"\(configVal)\" as Bool for key \"\(configKey)\"")
     }
     NSLog("DEBUG getBoolConfig returning: \(configValBool)")
     return configValBool
@@ -841,10 +851,10 @@ class GRPCClientBackend: OutletBackend {
           response = try call.response.wait()
         } catch is NIOConnectionError {
           self.app.grpcDidGoDown()
-          exception = OutletError.grpcConnectionDown("RPC '\(rpcName)' failed: connection refused")
+          exception = OutletError.grpcConnectionDown("RPC \"\(rpcName)\" failed: connection refused")
         } catch {
           // General failure. Maybe server internal error, or bad data, or something else
-          exception = OutletError.grpcFailure("RPC '\(rpcName)' failed: \(error)")
+          exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(error)")
         }
       }
       if let thrownException = exception {

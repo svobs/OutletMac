@@ -190,9 +190,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         self.globalState.deviceList = try self.backend.getDeviceList()
         self.globalState.isBackendOpExecutorRunning = try self.backend.getOpExecutionPlayState()
 
-        self.globalState.currentDragOperation = DragOperation(rawValue: try self.backend.getUInt32Config(DRAG_MODE_CONFIG_PATH))!
-        self.globalState.currentDirConflictPolicy = DirConflictPolicy(rawValue: try self.backend.getUInt32Config(DIR_CONFLICT_POLICY_CONFIG_PATH))!
-        self.globalState.currentFileConflictPolicy = FileConflictPolicy(rawValue: try self.backend.getUInt32Config(FILE_CONFLICT_POLICY_CONFIG_PATH))!
+        self.globalState.currentDragOperation = DragOperation(rawValue: try self.backend.getUInt32Config(DRAG_MODE_CONFIG_PATH,
+                defaultVal: self.globalState.currentDragOperation.rawValue))!
+        self.globalState.currentDirConflictPolicy = DirConflictPolicy(rawValue: try self.backend.getUInt32Config(DIR_CONFLICT_POLICY_CONFIG_PATH,
+                defaultVal: self.globalState.currentDirConflictPolicy.rawValue))!
+        self.globalState.currentFileConflictPolicy = FileConflictPolicy(rawValue: try self.backend.getUInt32Config(FILE_CONFLICT_POLICY_CONFIG_PATH,
+                defaultVal: self.globalState.currentFileConflictPolicy.rawValue))!
 
         let screenSize = NSScreen.main?.frame.size ?? .zero
         NSLog("DEBUG [\(ID_APP)] Screen size is \(screenSize.width)x\(screenSize.height)")
