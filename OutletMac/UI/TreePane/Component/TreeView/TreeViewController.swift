@@ -16,6 +16,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     // Cannot override init(), but this must be set manually before loadView() is called
     var con: TreePanelControllable! = nil
 
+    private var guidSelectedSet: Set<GUID> = []
+
     private let outlineView = NSOutlineView()
 
     var displayStore: DisplayStore {
@@ -268,6 +270,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func outlineViewSelectionDidChange(_ notification: Notification) {
         let guidSet: Set<GUID> = self.getSelectedGUIDs()
         NSLog("DEBUG [\(treeID)] User selected GUIDs: \(guidSet)")
+        self.guidSelectedSet = guidSet
 
         do {
             try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
@@ -708,7 +711,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     func selectGUIDList(_ guidSet: Set<GUID>) {
         assert(DispatchQueue.isExecutingIn(.main))
 
-        guard guidSet.count > 0 else {
+        self.guidSelectedSet = guidSet
+
+        if guidSet.count == 0 {
             return
         }
 
@@ -809,6 +814,8 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
         NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore")
         self.outlineView.reloadData()
+        // The previous line can wipe out our selection. Try to restore it:
+        self.selectGUIDList(self.guidSelectedSet)
     }
 
     // Context Menu
