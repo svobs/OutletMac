@@ -218,12 +218,12 @@ class TreePanelController: TreePanelControllable {
    NOTE: Executes SYNC in DispatchQueue, NOT async. Need to make sure this executes prior to whatever replaces it!
    */
   func clearTreeAndDisplayMsg(_ msg: String, _ iconID: IconID) {
-    assert(DispatchQueue.isNotExecutingIn(.main))
-
-    DispatchQueue.main.sync {
-      NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
-      self.clearModelAndTreeView()
-      self.appendEphemeralNode(self.tree.rootSPID, msg, iconID, reloadParent: true)
+    self.dq.async {
+      DispatchQueue.main.sync {
+        NSLog("DEBUG [\(self.treeID)] Clearing tree and displaying msg: '\(msg)'")
+        self.clearModelAndTreeView()
+        self.appendEphemeralNode(self.tree.rootSPID, msg, iconID, reloadParent: true)
+      }
     }
   }
 
@@ -231,6 +231,10 @@ class TreePanelController: TreePanelControllable {
    Executes async in App-SerialQueue, to ensure serial execution. This will catch and report exceptions.
    */
   private func populateTreeView() {
+
+    NSLog("DEBUG [\(treeID)] populateTreeView(): clearing tree and displaying loading msg")
+    clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
+
     self.dq.async {
       do {
         try self.populateTreeView_inner()
@@ -256,9 +260,6 @@ class TreePanelController: TreePanelControllable {
     }
 
     let populateStartTimeMS = DispatchTime.now()
-
-    NSLog("DEBUG [\(treeID)] populateTreeView(): clearing tree and displaying loading msg")
-    clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
 
     let rows: RowsOfInterest
     do {
@@ -288,6 +289,7 @@ class TreePanelController: TreePanelControllable {
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): Max results exceeded (actualCount=\(actualCount)")
       self.clearTreeAndDisplayMsg("ERROR: too many items to display (\(actualCount))", .ICON_ALERT)
       return
     }
