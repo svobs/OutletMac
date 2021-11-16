@@ -179,6 +179,9 @@ class TreePanelController: TreePanelControllable {
     self.dq.async {
       do {
         NSLog("INFO [\(self.treeID)] Requesting start subtree load")
+
+        self.clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
+
         // this calls to the backend to do the load, which will eventually (with luck) come back to call onTreeLoadStateUpdated()
         self.enableNodeUpdateSignals = false
         try self.backend.startSubtreeLoad(treeID: self.treeID)

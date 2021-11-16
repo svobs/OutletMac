@@ -20,10 +20,8 @@ class ChooserState: ObservableObject {
  */
 class GDriveRootChooserWindow: SingleTreePopUpWindow {
   var chooserState: ChooserState = ChooserState()
-  let targetTreeID: TreeID
 
-  init(_ app: OutletApp, _ treeID: TreeID, targetTreeID: TreeID) {
-    self.targetTreeID = targetTreeID
+  init(_ app: OutletApp, _ treeID: TreeID) {
     assert(treeID == ID_GDRIVE_DIR_SELECT)
     super.init(app, treeID: treeID)
     self.center()
@@ -33,7 +31,7 @@ class GDriveRootChooserWindow: SingleTreePopUpWindow {
 //    window.setFrameAutosaveName(window.title)
   }
 
-  override func setController(_ con: TreePanelControllable, initialSelection: SPIDNodePair?) {
+  func setController(_ con: TreePanelControllable, initialSelection: SPIDNodePair?, targetTreeID: TreeID) {
     super.setController(con, initialSelection: initialSelection)
     let content = GDriveRootChooserContent(targetTreeID, self, self.chooserState)
             .environmentObject(self.app.globalState)

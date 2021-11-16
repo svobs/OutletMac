@@ -593,10 +593,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         if let gdriveRootChooser = self.gdriveRootChooserWindow {
           gdriveRootChooser.close()
         } else {
-            self.gdriveRootChooserWindow = GDriveRootChooserWindow(self, con.treeID, targetTreeID: treeID)
+            self.gdriveRootChooserWindow = GDriveRootChooserWindow(self, con.treeID)
         }
 
-        self.gdriveRootChooserWindow!.setController(con, initialSelection: currentSN)
+        self.gdriveRootChooserWindow!.setController(con, initialSelection: currentSN, targetTreeID: treeID)
         try self.gdriveRootChooserWindow!.start()
       } catch {
         self.displayError("Error opening Google Drive root chooser window", "An unexpected error occurred: \(error)")
