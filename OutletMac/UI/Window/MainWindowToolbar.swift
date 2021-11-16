@@ -106,6 +106,10 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker, .flexibleSpace, .space, .toolbarMoreActions]
     }
 
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        return [.dragModePicker, .dirConflictPolicyPicker, .fileConflictPolicyPicker]
+    }
+
     /**
      Tell MacOS which items to display when the app is launched for the first time.
      */
