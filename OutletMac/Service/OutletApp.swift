@@ -240,7 +240,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   private func onErrorOccurred(senderID: SenderID, propDict: PropDict) throws {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
-    NSLog("ERROR  Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    NSLog("ERROR Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
   }
 
@@ -554,7 +554,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   private func displayError(_ msg: String, _ secondaryMsg: String) {
       self.tcDQ.sync {
         if self._backend!.isConnected {
-          self.globalState.showAlert(title: msg, msg: secondaryMsg)
+          DispatchQueue.main.async {
+            self.globalState.showAlert(title: msg, msg: secondaryMsg)
+          }
         } else {
           NSLog("INFO  [\(ID_APP)] Will not display error alert ('\(msg)'): the Connection Problem window is open")
         }

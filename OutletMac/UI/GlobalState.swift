@@ -54,6 +54,7 @@ class GlobalState: ObservableObject {
      */
     func showAlert(title: String, msg: String, dismissButtonText: String = "Dismiss") {
         NSLog("DEBUG Showing alert with title='\(title)', msg='\(msg)'")
+        assert(DispatchQueue.isExecutingIn(.main))
         if self.showingAlert && self.alertTitle == title && self.alertMsg == msg && self.dismissButtonText == dismissButtonText {
             NSLog("DEBUG Already showing identical alert; ignoring")
         } else {
@@ -66,13 +67,15 @@ class GlobalState: ObservableObject {
 
     func reset() {
         NSLog("DEBUG Resetting globalState")
-        isUIEnabled = true
+        assert(DispatchQueue.isExecutingIn(.main))
         mode = .BROWSING
         dismissAlert()
+        isUIEnabled = true
     }
 
     func dismissAlert() {
         NSLog("DEBUG Dismissing alert")
+        assert(DispatchQueue.isExecutingIn(.main))
         self.showingAlert = false
         self.alertMsg = ""
         self.alertTitle = "Alert"
