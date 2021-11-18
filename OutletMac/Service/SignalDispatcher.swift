@@ -37,22 +37,19 @@ class PropDict {
     }
   }
 
-  func getArray(_ key: String) throws -> [Any] {
-    let configVal: Any? = self._propertyDict[key]
-    if configVal == nil {
+  private func getConverted<ValType>(_ key: String) throws -> ValType {
+    guard let val = self._propertyDict[key] else {
       throw OutletError.invalidState("No value for key '\(key)'")
-    } else {
-      return configVal as! [Any]
     }
+    return val as! ValType
+  }
+
+  func getArray(_ key: String) throws -> [Any] {
+    return try self.getConverted(key)
   }
 
   func getString(_ key: String) throws -> String {
-    let configVal: Any? = self._propertyDict[key]
-    if configVal == nil {
-      throw OutletError.invalidState("No value for key '\(key)'")
-    } else {
-      return configVal! as! String
-    }
+    return try self.getConverted(key)
   }
 
   func getInt(_ key: String) throws -> Int {
@@ -62,7 +59,7 @@ class PropDict {
     } else if let strVal = val as? String {
       let intVal = Int(strVal)
       if intVal == nil {
-        throw OutletError.invalidState("Failed to parse value '\(strVal)' as Bool for key '\(key)'")
+        throw OutletError.invalidState("Failed to parse value '\(strVal)' as Int for key '\(key)'")
       }
       return intVal!
     }
@@ -82,6 +79,21 @@ class PropDict {
     }
     throw OutletError.invalidState("Invalid type for value '\(val)' (expected Bool) for key '\(key)'")
   }
+
+  func getUInt32(_ key: String) throws -> UInt32 {
+    let val: Any = try self.get(key)
+    if let convertedVal = val as? UInt32 {
+      return convertedVal
+    } else if let strVal = val as? String {
+      let convertedVal = UInt32(strVal)
+      if convertedVal == nil {
+        throw OutletError.invalidState("Failed to parse value '\(strVal)' as UInt32 for key '\(key)'")
+      }
+      return convertedVal!
+    }
+    throw OutletError.invalidState("Invalid type for value '\(val)' (expected UInt32) for key '\(key)'")
+  }
+
 }
 
 /**

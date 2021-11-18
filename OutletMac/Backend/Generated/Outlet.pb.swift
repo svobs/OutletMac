@@ -668,6 +668,36 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData {
   fileprivate var _subtreeRootSpid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_BatchFailed {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var batchUid: UInt32 = 0
+
+  public var msg: String = String()
+
+  public var secondaryMsg: String = String()
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var batchUid: UInt32 = 0
+
+  public var errorHandlingStrategy: UInt32 = 0
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -778,6 +808,24 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .subtree(newValue)}
   }
 
+  /// for BATCH_FAILED
+  public var batchFailed: Outlet_Backend_Agent_Grpc_Generated_BatchFailed {
+    get {
+      if case .batchFailed(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_BatchFailed()
+    }
+    set {signalData = .batchFailed(newValue)}
+  }
+
+  /// for HANDLE_BATCH_FAILED
+  public var handleBatchFailed: Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed {
+    get {
+      if case .handleBatchFailed(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed()
+    }
+    set {signalData = .handleBatchFailed(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -796,6 +844,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case dualDisplayTree(Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree)
     /// for SUBTREE_NODES_CHANGED
     case subtree(Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData)
+    /// for BATCH_FAILED
+    case batchFailed(Outlet_Backend_Agent_Grpc_Generated_BatchFailed)
+    /// for HANDLE_BATCH_FAILED
+    case handleBatchFailed(Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -849,6 +901,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
       }()
       case (.subtree, .subtree): return {
         guard case .subtree(let l) = lhs, case .subtree(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.batchFailed, .batchFailed): return {
+        guard case .batchFailed(let l) = lhs, case .batchFailed(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.handleBatchFailed, .handleBatchFailed): return {
+        guard case .handleBatchFailed(let l) = lhs, case .handleBatchFailed(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -2683,6 +2743,88 @@ extension Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData: SwiftProtobuf.M
   }
 }
 
+extension Outlet_Backend_Agent_Grpc_Generated_BatchFailed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".BatchFailed"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "batch_uid"),
+    2: .same(proto: "msg"),
+    3: .standard(proto: "secondary_msg"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.batchUid) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.msg) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.secondaryMsg) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.batchUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.batchUid, fieldNumber: 1)
+    }
+    if !self.msg.isEmpty {
+      try visitor.visitSingularStringField(value: self.msg, fieldNumber: 2)
+    }
+    if !self.secondaryMsg.isEmpty {
+      try visitor.visitSingularStringField(value: self.secondaryMsg, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_BatchFailed, rhs: Outlet_Backend_Agent_Grpc_Generated_BatchFailed) -> Bool {
+    if lhs.batchUid != rhs.batchUid {return false}
+    if lhs.msg != rhs.msg {return false}
+    if lhs.secondaryMsg != rhs.secondaryMsg {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".HandleBatchFailed"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "batch_uid"),
+    2: .standard(proto: "error_handling_strategy"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.batchUid) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.errorHandlingStrategy) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.batchUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.batchUid, fieldNumber: 1)
+    }
+    if self.errorHandlingStrategy != 0 {
+      try visitor.visitSingularUInt32Field(value: self.errorHandlingStrategy, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed, rhs: Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed) -> Bool {
+    if lhs.batchUid != rhs.batchUid {return false}
+    if lhs.errorHandlingStrategy != rhs.errorHandlingStrategy {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -2700,6 +2842,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     20: .same(proto: "device"),
     21: .standard(proto: "dual_display_tree"),
     22: .same(proto: "subtree"),
+    23: .standard(proto: "batch_failed"),
+    24: .standard(proto: "handle_batch_failed"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2818,6 +2962,24 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .subtree(v)}
       }()
+      case 23: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_BatchFailed?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .batchFailed(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .batchFailed(v)}
+      }()
+      case 24: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .handleBatchFailed(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .handleBatchFailed(v)}
+      }()
       default: break
       }
     }
@@ -2881,6 +3043,14 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     case .subtree?: try {
       guard case .subtree(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 22)
+    }()
+    case .batchFailed?: try {
+      guard case .batchFailed(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 23)
+    }()
+    case .handleBatchFailed?: try {
+      guard case .handleBatchFailed(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 24)
     }()
     case nil: break
     }

@@ -97,6 +97,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     dispatchListener.subscribe(signal: .DEREGISTER_DISPLAY_TREE, onTreePanelControllerDeregistered)
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
+    dispatchListener.subscribe(signal: .BATCH_FAILED, onBatchFailed)
 
     let eventMask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .flagsChanged]
     let eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
@@ -241,6 +242,14 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
     NSLog("ERROR Received error signal from '\(senderID)': msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    self.displayError(msg, secondaryMsg)
+  }
+
+  private func onBatchFailed(senderID: SenderID, propDict: PropDict) throws {
+    let batchUID = try propDict.getUInt32("batch_uid")
+    let msg = try propDict.getString("msg")
+    let secondaryMsg = try propDict.getString("secondary_msg")
+    NSLog("ERROR Received BatchFailed signal from '\(senderID)': batchUID='\(batchUID)' msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
   }
 

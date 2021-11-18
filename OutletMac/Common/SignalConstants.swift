@@ -76,6 +76,9 @@ enum Signal: UInt32 {
   case RESUME_OP_EXECUTION = 91
   case OP_EXECUTION_PLAY_STATE_CHANGED = 92
 
+  case BATCH_FAILED = 93  // Server informs that a batch failed
+  case HANDLE_BATCH_FAILED = 94  // User response from client
+
   // --- Progress bar ---
   case START_PROGRESS_INDETERMINATE = 100
   case START_PROGRESS = 101

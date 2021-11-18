@@ -130,6 +130,15 @@ enum FileConflictPolicy: UInt32 {
   case RENAME_IF_DIFFERENT = 22
 }
 
+/**
+ For batch failures
+ */
+enum ErrorHandlingStrategy: UInt32 {
+  case PROMPT = 1
+  case PAUSE_EXECUTION = 2
+  case CANCEL_BATCH = 3
+  case CANCEL_FAILED_OPS_AND_DEPENDENTS = 4
+}
 
 /**
  ENUM IconNames

@@ -60,6 +60,8 @@ class GRPCClientBackend: OutletBackend {
     connectAndForwardSignal(.DEREGISTER_DISPLAY_TREE)
     connectAndForwardSignal(.EXIT_DIFF_MODE)
 
+    connectAndForwardBatchFailedSignal()
+
     // This thread will also handle the discovery:
     let thread = Thread(target: self, selector: #selector(self.runSignalReceiverThread), object: nil)
     self.signalReceiverThread = thread
@@ -212,6 +214,16 @@ class GRPCClientBackend: OutletBackend {
   // Signals
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  private func connectAndForwardBatchFailedSignal() {
+    let signal =  Signal.HANDLE_BATCH_FAILED
+    self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
+      var signalMsg = self.createSignalMsg(signal, senderID)
+      signalMsg.handleBatchFailed.batchUid = try propDict.getUInt32("batch_uid")
+      signalMsg.handleBatchFailed.errorHandlingStrategy = (try propDict.get("error_handling_strategy") as! ErrorHandlingStrategy).rawValue
+      _ = self.stub.send_signal(signalMsg)
+    }
+  }
+
   private func connectAndForwardSignal(_ signal: Signal) {
     self.dispatchListener.subscribe(signal: signal) { (senderID, propDict) in
       self.sendSignalToServer(signal, senderID)
@@ -219,10 +231,15 @@ class GRPCClientBackend: OutletBackend {
   }
 
   private func sendSignalToServer(_ signal: Signal, _ senderID: SenderID, _ propDict: PropDict? = nil) {
+    let signalMsg = self.createSignalMsg(signal, senderID)
+    _ = self.stub.send_signal(signalMsg)
+  }
+
+  private func createSignalMsg(_ signal: Signal, _ senderID: SenderID) -> Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     var signalMsg = Outlet_Backend_Agent_Grpc_Generated_SignalMsg()
     signalMsg.sigInt = signal.rawValue
     signalMsg.sender = senderID
-    _ = self.stub.send_signal(signalMsg)
+    return signalMsg
   }
 
   func openGRPCConnection() {
@@ -346,6 +363,10 @@ class GRPCClientBackend: OutletBackend {
         try self.convertStatsAndStatus(statsUpdate: signalGRPC.statsUpdate, argDict: &argDict)
       case .DEVICE_UPSERTED:
         argDict["device"] = try self.grpcConverter.deviceFromGRPC(signalGRPC.device)
+      case .BATCH_FAILED:
+        argDict["batch_uid"] = signalGRPC.batchFailed.batchUid
+        argDict["msg"] = signalGRPC.batchFailed.msg
+        argDict["secondary_msg"] = signalGRPC.batchFailed.secondaryMsg
       default:
         break
     }
