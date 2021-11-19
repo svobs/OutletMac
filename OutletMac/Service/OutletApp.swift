@@ -249,8 +249,34 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     let batchUID = try propDict.getUInt32("batch_uid")
     let msg = try propDict.getString("msg")
     let secondaryMsg = try propDict.getString("secondary_msg")
-    NSLog("ERROR Received BatchFailed signal from '\(senderID)': batchUID='\(batchUID)' msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
-    self.displayError(msg, secondaryMsg)
+    NSLog("INFO  Received BatchFailed signal from '\(senderID)': batchUID='\(batchUID)' msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
+    DispatchQueue.main.async {
+      let alert = NSAlert()
+      alert.messageText = "Failed to submit batch \(batchUID):\n\"\(msg)\""
+      alert.informativeText = "\(secondaryMsg)\n\nHow would you like to proceed?"
+      alert.addButton(withTitle: "Cancel Batch")
+      alert.addButton(withTitle: "Try Batch Again")
+      alert.addButton(withTitle: "Pause Batch Intake")
+      alert.alertStyle = .warning
+      let response = alert.runModal()
+
+      let strategy: ErrorHandlingStrategy
+      switch response {
+      case NSApplication.ModalResponse.alertFirstButtonReturn:
+        strategy = .CANCEL_BATCH
+        NSLog("INFO  User chose to cancel batch (failed batch_uid='\(batchUID)')")
+      case NSApplication.ModalResponse.alertSecondButtonReturn:
+        strategy = .PROMPT
+        NSLog("INFO  User chose to retry batch (failed batch_uid='\(batchUID)')")
+      case NSApplication.ModalResponse.alertThirdButtonReturn:
+        NSLog("INFO  User chose to pause batch intake (failed batch_uid='\(batchUID)')")
+        return
+      default:
+        fatalError("Unknown response from Failed Batch alert!")
+      }
+
+      self.dispatcher.sendSignal(signal: .HANDLE_BATCH_FAILED, senderID: ID_APP, ["batch_uid": batchUID, "error_handling_strategy": strategy])
+    }
   }
 
   private func onOpExecutionPlayStateChanged(senderID: SenderID, propDict: PropDict) throws {

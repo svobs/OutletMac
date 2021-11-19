@@ -135,7 +135,7 @@ enum FileConflictPolicy: UInt32 {
  */
 enum ErrorHandlingStrategy: UInt32 {
   case PROMPT = 1
-  case PAUSE_EXECUTION = 2
+  case PAUSE_EXECUTION = 2  // TODO: maybe delete
   case CANCEL_BATCH = 3
   case CANCEL_FAILED_OPS_AND_DEPENDENTS = 4
 }
