@@ -168,6 +168,7 @@ enum IconNames: String {
   case ICON_DIR_UP_DST = "dir-up-dst"
   case ICON_DIR_CP_DST = "dir-cp-dst"
   case ICON_DIR_TRASHED = "dir-trashed"
+  case ICON_DIR_PENDING_DOWNSTREAM_OP = "dir-pending-downstream-op"
 
   // Various icon names:
   case ICON_ALERT = "alert"
@@ -223,6 +224,7 @@ enum IconID: UInt32 {
   case ICON_DIR_UP_DST = 17
   case ICON_DIR_CP_DST = 18
   case ICON_DIR_TRASHED = 19
+  case ICON_DIR_PENDING_DOWNSTREAM_OP = 130
 
   // toolbar icons:
   case ICON_ALERT = 20

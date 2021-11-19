@@ -299,9 +299,9 @@ class GRPCClientBackend: OutletBackend {
     call.status.whenSuccess { status in
       if status.code == .ok {
         // this should only happen if the server needs to restart.
-        NSLog("INFO   ReceiveSignals(): Server closed signal subscription")
+        NSLog("INFO  ReceiveSignals(): Server closed signal subscription")
       } else if status.code == .unavailable {
-        NSLog("IMFO ReceiveSignals(): Server unavailable (status: \(status)) - closing connection to \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
+        NSLog("IMFO  ReceiveSignals(): Server unavailable (status: \(status)) - closing connection to \(self.backendConnectionState.host):\(self.backendConnectionState.port)")
       } else {
         NSLog("ERROR ReceiveSignals(): received error: \(status)")
       }

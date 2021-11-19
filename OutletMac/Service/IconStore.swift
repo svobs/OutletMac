@@ -237,31 +237,24 @@ class IconStore: HasLifecycle {
     switch iconID {
     case .ICON_DIR_MK:
       badge = .BADGE_MKDIR
-      break
     case .ICON_DIR_RM:
       badge = .BADGE_RM
-      break
     case .ICON_DIR_MV_SRC:
       badge = .BADGE_MV_SRC
-      break
     case .ICON_DIR_UP_SRC:
       badge = .BADGE_UP_SRC
-      break
     case .ICON_DIR_CP_SRC:
       badge = .BADGE_CP_SRC
-      break
     case .ICON_DIR_MV_DST:
       badge = .BADGE_MV_DST
-      break
     case .ICON_DIR_UP_DST:
       badge = .BADGE_UP_DST
-      break
     case .ICON_DIR_CP_DST:
       badge = .BADGE_CP_DST
-      break
     case .ICON_DIR_TRASHED:
       badge = .BADGE_TRASHED
-      break
+    case .ICON_DIR_PENDING_DOWNSTREAM_OP:
+      badge = .BADGE_REFRESH
     case .ICON_GENERIC_DIR:
       // No badge
       break
@@ -297,28 +290,20 @@ class IconStore: HasLifecycle {
       switch iconID {
       case .ICON_FILE_RM:
         badge = .BADGE_RM
-        break
       case .ICON_FILE_MV_SRC:
         badge = .BADGE_MV_SRC
-        break
       case .ICON_FILE_UP_SRC:
         badge = .BADGE_UP_SRC
-        break
       case .ICON_FILE_CP_SRC:
         badge = .BADGE_CP_SRC
-        break
       case .ICON_FILE_MV_DST:
         badge = .BADGE_MV_DST
-        break
       case .ICON_FILE_UP_DST:
         badge = .BADGE_UP_DST
-        break
       case .ICON_FILE_CP_DST:
         badge = .BADGE_CP_DST
-        break
       case .ICON_FILE_TRASHED:
         badge = .BADGE_TRASHED
-        break
       case .ICON_GENERIC_FILE:
         // No badge
         break
