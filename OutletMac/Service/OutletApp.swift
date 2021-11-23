@@ -245,6 +245,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.displayError(msg, secondaryMsg)
   }
 
+  private func handleBatchFailedModalResponse(_ response: NSApplication.ModalResponse, batchUID: UID) {
+    let strategy: ErrorHandlingStrategy
+    switch response {
+    case NSApplication.ModalResponse.alertFirstButtonReturn:
+      strategy = .CANCEL_BATCH
+      NSLog("INFO  User chose to cancel batch (failed batch_uid='\(batchUID)')")
+    case NSApplication.ModalResponse.alertSecondButtonReturn:
+      strategy = .PROMPT
+      NSLog("INFO  User chose to retry batch (failed batch_uid='\(batchUID)')")
+    case NSApplication.ModalResponse.alertThirdButtonReturn:
+      NSLog("INFO  User chose to pause batch intake (failed batch_uid='\(batchUID)')")
+      return
+    default:
+      fatalError("Unknown response from Failed Batch alert!")
+    }
+
+    self.dispatcher.sendSignal(signal: .HANDLE_BATCH_FAILED, senderID: ID_APP, ["batch_uid": batchUID, "error_handling_strategy": strategy])
+  }
+
   private func onBatchFailed(senderID: SenderID, propDict: PropDict) throws {
     let batchUID = try propDict.getUInt32("batch_uid")
     let msg = try propDict.getString("msg")
@@ -258,24 +277,16 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       alert.addButton(withTitle: "Try Batch Again")
       alert.addButton(withTitle: "Pause Batch Intake")
       alert.alertStyle = .warning
-      let response = alert.runModal()
-
-      let strategy: ErrorHandlingStrategy
-      switch response {
-      case NSApplication.ModalResponse.alertFirstButtonReturn:
-        strategy = .CANCEL_BATCH
-        NSLog("INFO  User chose to cancel batch (failed batch_uid='\(batchUID)')")
-      case NSApplication.ModalResponse.alertSecondButtonReturn:
-        strategy = .PROMPT
-        NSLog("INFO  User chose to retry batch (failed batch_uid='\(batchUID)')")
-      case NSApplication.ModalResponse.alertThirdButtonReturn:
-        NSLog("INFO  User chose to pause batch intake (failed batch_uid='\(batchUID)')")
-        return
-      default:
-        fatalError("Unknown response from Failed Batch alert!")
+      if let window = self.mainWindow, window.isOpen {
+        // run attached to main window, if available
+        alert.beginSheetModal(for: window, completionHandler: { response in
+          self.handleBatchFailedModalResponse(response, batchUID: batchUID)
+        })
+      } else {
+        // just run a modal dialog if no window
+        let response = alert.runModal()
+        self.handleBatchFailedModalResponse(response, batchUID: batchUID)
       }
-
-      self.dispatcher.sendSignal(signal: .HANDLE_BATCH_FAILED, senderID: ID_APP, ["batch_uid": batchUID, "error_handling_strategy": strategy])
     }
   }
 
