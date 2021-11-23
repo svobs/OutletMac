@@ -254,7 +254,7 @@ class IconStore: HasLifecycle {
     case .ICON_DIR_TRASHED:
       badge = .BADGE_TRASHED
     case .ICON_DIR_PENDING_DOWNSTREAM_OP:
-      badge = .BADGE_REFRESH
+      badge = .BADGE_PENDING_DOWNSTREAM_OP
     case .ICON_GENERIC_DIR:
       // No badge
       break
