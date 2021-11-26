@@ -224,7 +224,6 @@ enum IconID: UInt32 {
   case ICON_DIR_UP_DST = 17
   case ICON_DIR_CP_DST = 18
   case ICON_DIR_TRASHED = 19
-  case ICON_DIR_PENDING_DOWNSTREAM_OP = 130
 
   // toolbar icons:
   case ICON_ALERT = 20
@@ -271,10 +270,15 @@ enum IconID: UInt32 {
   case BADGE_CANCEL = 109
   case BADGE_REFRESH = 110
   case BADGE_PENDING_DOWNSTREAM_OP = 111
+  case BADGE_ERROR = 112
 
   case BADGE_LINUX = 120
   case BADGE_MACOS = 121
   case BADGE_WINDOWS = 122
+
+  case ICON_DIR_PENDING_DOWNSTREAM_OP = 130
+  case ICON_FILE_ERROR = 131
+  case ICON_DIR_ERROR = 132
 
   func isAnimated() -> Bool {
     switch self {
