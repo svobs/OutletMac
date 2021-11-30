@@ -140,59 +140,6 @@ enum ErrorHandlingStrategy: UInt32 {
   case CANCEL_FAILED_OPS_AND_DEPENDENTS = 4
 }
 
-/**
- ENUM IconNames
- 
- Used for locating files in the filesystem.
- */
-enum IconNames: String {
-  // File icon names:
-  case ICON_GENERIC_FILE = "backend/store/local"
-  case ICON_FILE_RM = "file-rm"
-  case ICON_FILE_MV_SRC = "file-mv-src"
-  case ICON_FILE_UP_SRC = "file-up-src"
-  case ICON_FILE_CP_SRC = "file-cp-src"
-  case ICON_FILE_MV_DST = "file-mv-dst"
-  case ICON_FILE_UP_DST = "file-up-dst"
-  case ICON_FILE_CP_DST = "file-cp-dst"
-  case ICON_FILE_TRASHED = "file-trashed"
-
-  // Dir icon names:
-  case ICON_GENERIC_DIR = "dir"
-  case ICON_DIR_MK = "dir-mk"
-  case ICON_DIR_RM = "dir-rm"
-  case ICON_DIR_MV_SRC = "dir-mv-src"
-  case ICON_DIR_UP_SRC = "dir-up-src"
-  case ICON_DIR_CP_SRC = "dir-cp-src"
-  case ICON_DIR_MV_DST = "dir-mv-dst"
-  case ICON_DIR_UP_DST = "dir-up-dst"
-  case ICON_DIR_CP_DST = "dir-cp-dst"
-  case ICON_DIR_TRASHED = "dir-trashed"
-  case ICON_DIR_PENDING_DOWNSTREAM_OP = "dir-pending-downstream-op"
-
-  // Various icon names:
-  case ICON_ALERT = "alert"
-  case ICON_WINDOW = "win"
-  case ICON_REFRESH = "refresh"
-  case ICON_FOLDER_TREE = "folder-tree"
-  case ICON_MATCH_CASE = "match-case"
-  case ICON_IS_SHARED = "is-shared"
-  case ICON_IS_NOT_SHARED = "is-not-shared"
-  case ICON_IS_TRASHED = "is-trashed"
-  case ICON_IS_NOT_TRASHED = "is-not-trashed"
-  case ICON_PLAY = "play"
-  case ICON_PAUSE = "pause"
-
-  // Root icon names:
-  case ICON_GDRIVE = "gdrive"
-  case ICON_LOCAL_DISK_LINUX = "localdisk-linux"
-
-  case BTN_GDRIVE = "gdrive-btn"
-  case BTN_LOCAL_DISK_LINUX = "localdisk-linux-btn"
-
-  case ICON_LOADING = "loading"
-}
-
 // --- FE + BE SHARED ---
 
 /**
@@ -271,6 +218,7 @@ enum IconID: UInt32 {
   case BADGE_REFRESH = 110
   case BADGE_PENDING_DOWNSTREAM_OP = 111
   case BADGE_ERROR = 112
+  case BADGE_WARNING = 113
 
   case BADGE_LINUX = 120
   case BADGE_MACOS = 121
@@ -279,6 +227,8 @@ enum IconID: UInt32 {
   case ICON_DIR_PENDING_DOWNSTREAM_OP = 130
   case ICON_FILE_ERROR = 131
   case ICON_DIR_ERROR = 132
+  case ICON_FILE_WARNING = 133
+  case ICON_DIR_WARNING = 134
 
   func isAnimated() -> Bool {
     switch self {
