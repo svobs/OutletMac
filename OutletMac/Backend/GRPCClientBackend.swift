@@ -345,6 +345,12 @@ class GRPCClientBackend: OutletBackend {
         argDict["is_enabled"] = signalGRPC.playState.isEnabled
       case .TOGGLE_UI_ENABLEMENT:
         argDict["enable"] = signalGRPC.uiEnablement.enable
+      case .SET_SELECTED_ROWS:
+        var guidSet = Set<GUID>()
+        for guid in signalGRPC.guidSet.guidSet {
+          guidSet.insert(guid)
+        }
+        argDict["selected_rows"] = guidSet
       case .ERROR_OCCURRED:
         argDict["msg"] = signalGRPC.errorOccurred.msg
         argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg

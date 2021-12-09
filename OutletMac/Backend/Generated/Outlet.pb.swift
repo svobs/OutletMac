@@ -698,6 +698,18 @@ public struct Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed {
   public init() {}
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_GUIDSet {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var guidSet: [String] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -826,6 +838,15 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     set {signalData = .handleBatchFailed(newValue)}
   }
 
+  /// for SET_SELECTED_ROWS
+  public var guidSet: Outlet_Backend_Agent_Grpc_Generated_GUIDSet {
+    get {
+      if case .guidSet(let v)? = signalData {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_GUIDSet()
+    }
+    set {signalData = .guidSet(newValue)}
+  }
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public enum OneOf_SignalData: Equatable {
@@ -848,6 +869,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
     case batchFailed(Outlet_Backend_Agent_Grpc_Generated_BatchFailed)
     /// for HANDLE_BATCH_FAILED
     case handleBatchFailed(Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed)
+    /// for SET_SELECTED_ROWS
+    case guidSet(Outlet_Backend_Agent_Grpc_Generated_GUIDSet)
 
   #if !swift(>=4.1)
     public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData, rhs: Outlet_Backend_Agent_Grpc_Generated_SignalMsg.OneOf_SignalData) -> Bool {
@@ -909,6 +932,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
       }()
       case (.handleBatchFailed, .handleBatchFailed): return {
         guard case .handleBatchFailed(let l) = lhs, case .handleBatchFailed(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.guidSet, .guidSet): return {
+        guard case .guidSet(let l) = lhs, case .guidSet(let r) = rhs else { preconditionFailure() }
         return l == r
       }()
       default: return false
@@ -2825,6 +2852,38 @@ extension Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed: SwiftProtobuf.M
   }
 }
 
+extension Outlet_Backend_Agent_Grpc_Generated_GUIDSet: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GUIDSet"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "guid_set"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedStringField(value: &self.guidSet) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.guidSet.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.guidSet, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GUIDSet, rhs: Outlet_Backend_Agent_Grpc_Generated_GUIDSet) -> Bool {
+    if lhs.guidSet != rhs.guidSet {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".SignalMsg"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
@@ -2844,6 +2903,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     22: .same(proto: "subtree"),
     23: .standard(proto: "batch_failed"),
     24: .standard(proto: "handle_batch_failed"),
+    25: .standard(proto: "guid_set"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -2980,6 +3040,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
         try decoder.decodeSingularMessageField(value: &v)
         if let v = v {self.signalData = .handleBatchFailed(v)}
       }()
+      case 25: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_GUIDSet?
+        if let current = self.signalData {
+          try decoder.handleConflictingOneOf()
+          if case .guidSet(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {self.signalData = .guidSet(v)}
+      }()
       default: break
       }
     }
@@ -3051,6 +3120,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
     case .handleBatchFailed?: try {
       guard case .handleBatchFailed(let v)? = self.signalData else { preconditionFailure() }
       try visitor.visitSingularMessageField(value: v, fieldNumber: 24)
+    }()
+    case .guidSet?: try {
+      guard case .guidSet(let v)? = self.signalData else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
     }()
     case nil: break
     }

@@ -69,6 +69,9 @@ enum Signal: UInt32 {
 
   case TREE_SELECTION_CHANGED = 70
 
+  /** Sent from backend to FE, telling it to change the selected rows of the given tree */
+  case SET_SELECTED_ROWS = 71
+
   /** All components should listen for this */
   case TOGGLE_UI_ENABLEMENT = 80
 

@@ -149,6 +149,7 @@ class TreePanelController: TreePanelControllable {
     self.dispatchListener.subscribe(signal: .SUBTREE_NODES_CHANGED, self.onSubtreeNodesChanged, whitelistSenderID: treeID)
 
     self.dispatchListener.subscribe(signal: .DOWNLOAD_FROM_GDRIVE_DONE, self.onGDriveDownloadDone, whitelistSenderID: treeID)
+    self.dispatchListener.subscribe(signal: .SET_SELECTED_ROWS, self.onSetSelectedRows, whitelistSenderID: treeID)
   }
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {
@@ -668,6 +669,11 @@ class TreePanelController: TreePanelControllable {
 
     NSLog("DEBUG [\(treeID)] GDrive download complete: opening local file with default app: \(filename)")
     self.treeActions.openLocalFileWithDefaultApp(filename)
+  }
+
+  private func onSetSelectedRows(_ senderID: SenderID, _ propDict: PropDict) throws {
+    let selectedRows = try propDict.get("selected_rows") as! Set<GUID>
+    self.treeView!.selectGUIDList(selectedRows)
   }
 
   // Other callbacks
