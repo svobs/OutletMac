@@ -34,15 +34,20 @@ class MainWindow: AppWindow, ObservableObject {
     let toolbar = MainWindowToolbar(identifier: .init("Default"))
     self.toolbar = toolbar
 
-    // bring UI up to sync with state:
-    toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())
-    toolbar.setToolbarSelection(.dirConflictPolicyPicker, self.app.globalState.currentDirConflictPolicy, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST)
-    toolbar.setToolbarSelection(.fileConflictPolicyPicker, self.app.globalState.currentFileConflictPolicy, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST)
-
+    self.updateToolbarSelections()
 
     if !SHOW_TOOLBAR_ON_START {
       NSLog("DEBUG [\(self.winID)] Init: Hiding toolbar")
       self.toggleToolbarShown(self)
+    }
+  }
+
+  func updateToolbarSelections() {
+    if let toolbar = self.toolbar as? MainWindowToolbar {
+      // bring UI up to sync with state:
+      toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())
+      toolbar.setToolbarSelection(.dirConflictPolicyPicker, self.app.globalState.currentDirConflictPolicy, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST)
+      toolbar.setToolbarSelection(.fileConflictPolicyPicker, self.app.globalState.currentFileConflictPolicy, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST)
     }
   }
 
@@ -69,6 +74,8 @@ class MainWindow: AppWindow, ObservableObject {
     dispatchListener.subscribe(signal: .DIFF_TREES_CANCELLED, afterDiffExited)
     dispatchListener.subscribe(signal: .GENERATE_MERGE_TREE_FAILED, afterGenMergeTreeFailed)
     dispatchListener.subscribe(signal: .TOGGLE_UI_ENABLEMENT, onEnableUIToggled)
+
+    self.updateToolbarSelections()
 
     // Request these AFTER we start listening for a response:
     try left.requestTreeLoad()  // async
