@@ -372,48 +372,48 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
       NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): identifier = \(toolbarItemGroup.itemIdentifier)")
 
-      if toolbarItemGroup.itemIdentifier == .dragModePicker {
-        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DRAG_MODE_LIST) {
-          NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
-          self.globalState.currentDragOperation = newValue
-          do {
-            try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newValue.rawValue))
-          } catch {
-            self.reportException("Failed to save new drag mode", error)
-          }
+      let newValue: PickerItemValue
+      do {
+        guard let val = try MainWindowToolbar.getValueFromIndex(toolbarItemGroup.selectedIndex, toolbarItemGroup.itemIdentifier) else {
+          return
+        }
+        newValue = val
+      } catch OutletError.invalidArgument {
+        reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
+        return
+      } catch {
+        reportError("Could not select option", "Unexpected error: \(error)")
+        return
+      }
+
+      switch newValue {
+      case PickerItemValue.DragMode(let selection):
+        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selection) (index \(toolbarItemGroup.selectedIndex))")
+        self.globalState.currentDragOperation = selection
+        do {
+          try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(selection.rawValue))
+        } catch {
+          self.reportException("Failed to save new drag mode", error)
+        }
+      case PickerItemValue.DirPolicy(let selection):
+        NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selection) (index \(toolbarItemGroup.selectedIndex))")
+        self.globalState.currentDirConflictPolicy = selection
+        do {
+          try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(selection.rawValue))
+        } catch {
+          self.reportException("Failed to save new dir conflict policy", error)
         }
 
-      } else if toolbarItemGroup.itemIdentifier == .dirConflictPolicyPicker {
-        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST) {
-          NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
-          self.globalState.currentDirConflictPolicy = newValue
-          do {
-            try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newValue.rawValue))
-          } catch {
-            self.reportException("Failed to save new dir conflict policy", error)
-          }
-        }
-
-      } else if toolbarItemGroup.itemIdentifier == .fileConflictPolicyPicker {
-        if let newValue = self.getValueFromIndex(toolbarItemGroup.selectedIndex, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST) {
-          NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(newValue) (index \(toolbarItemGroup.selectedIndex))")
-          self.globalState.currentFileConflictPolicy = newValue
-          do {
-            try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newValue.rawValue))
-          } catch {
-            self.reportException("Failed to save new file conflict policy", error)
-          }
+      case PickerItemValue.FilePolicy(let selection):
+        NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selection) (index \(toolbarItemGroup.selectedIndex))")
+        self.globalState.currentFileConflictPolicy = selection
+        do {
+          try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(selection.rawValue))
+        } catch {
+          self.reportException("Failed to save new file conflict policy", error)
         }
       }
     }
-  }
-
-  private func getValueFromIndex<PickerValue>(_ selectedIndex: Int, _ pickerList: [PickerItem<PickerValue>]) -> PickerValue? {
-    guard selectedIndex < pickerList.count else {
-      reportError("Could not select option", "Invalid toolbar index: \(selectedIndex)")
-      return nil
-    }
-    return pickerList[selectedIndex].value
   }
 
   /**

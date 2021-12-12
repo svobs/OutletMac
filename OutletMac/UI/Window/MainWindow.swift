@@ -46,8 +46,8 @@ class MainWindow: AppWindow, ObservableObject {
     if let toolbar = self.toolbar as? MainWindowToolbar {
       // bring UI up to sync with state:
       toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())
-      toolbar.setToolbarSelection(.dirConflictPolicyPicker, self.app.globalState.currentDirConflictPolicy, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST)
-      toolbar.setToolbarSelection(.fileConflictPolicyPicker, self.app.globalState.currentFileConflictPolicy, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST)
+      toolbar.setToolbarSelection(.dirConflictPolicyPicker, .DirPolicy(self.app.globalState.currentDirConflictPolicy))
+      toolbar.setToolbarSelection(.fileConflictPolicyPicker, .FilePolicy(self.app.globalState.currentFileConflictPolicy))
     }
   }
 

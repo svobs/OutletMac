@@ -35,16 +35,44 @@ extension NSToolbarItem.Identifier {
     static let fileConflictPolicyPicker = NSToolbarItem.Identifier("FileConflictPolicyPicker-ItemGroup")
 }
 
-class PickerItem<Value> where Value : Hashable {
-    init(_ value: Value, _ title: String, _ image: NSImage) {
+enum PickerItemValue: Equatable {
+    case DragMode(DragOperation)
+    case DirPolicy(DirConflictPolicy)
+    case FilePolicy(FileConflictPolicy)
+}
+
+private class PickerItem {
+    init(_ value: PickerItemValue, _ title: String, _ image: NSImage) {
         self.value = value
         self.title = title
         self.image = image
     }
 
-    let value: Value
+    let value: PickerItemValue
     let title: String
     let image: NSImage
+}
+
+private class PickerGroup: Hashable {
+    static func ==(lhs: PickerGroup, rhs: PickerGroup) -> Bool {
+        // We are really just implementing Hashable to make the compiler happy, but this field should be enough to be unique for our purposes
+        return lhs.groupLabel == rhs.groupLabel
+    }
+
+    func hash(into hasher: inout Hasher) {
+        // ditto as above
+        hasher.combine(groupLabel)
+    }
+
+    init(_ itemList: [PickerItem], groupLabel: String, tooltipTemplate: String) {
+        self.itemList = itemList
+        self.groupLabel = groupLabel
+        self.tooltipTemplate = tooltipTemplate
+    }
+
+    let itemList: [PickerItem]
+    let groupLabel: String
+    let tooltipTemplate: String
 }
 
 /**
@@ -52,27 +80,55 @@ class PickerItem<Value> where Value : Hashable {
  See example: https://github.com/marioaguzman/toolbar/blob/master/Toolbar/MainWindowController.swift
  */
 class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
-    static let DRAG_MODE_LIST: [PickerItem<DragOperation>] = [
-        PickerItem<DragOperation>(.COPY, "Copy", NSImage(named: .modeCopy)!),
-        PickerItem<DragOperation>(.MOVE, "Move", NSImage(named: .modeMove)!)
-        ]
+    private static let dragModeGroup = PickerGroup(
+            [
+                PickerItem(.DragMode(.COPY), "Copy", NSImage(named: .modeCopy)!),
+                PickerItem(.DragMode(.MOVE), "Move", NSImage(named: .modeMove)!)
+            ],
+            groupLabel: "Drag Mode",
+            tooltipTemplate: "Set the default mode for Drag & Drop (Copy or Move)")
 
-    static let DIR_CONFLICT_POLICY_LIST: [PickerItem<DirConflictPolicy>] = [
-        PickerItem<DirConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .promptUser)!),
-        PickerItem<DirConflictPolicy>(.SKIP, "Skip folder", NSImage(named: .skipFolder)!),
-        PickerItem<DirConflictPolicy>(.REPLACE, "Replace folder", NSImage(named: .replaceFolder)!),
-        PickerItem<DirConflictPolicy>(.RENAME, "Keep both folders", NSImage(named: .keepBothFolders)!),
-        PickerItem<DirConflictPolicy>(.MERGE, "Merge", NSImage(named: .mergeFolders)!)
+    private static let dirConflictPolicyGroup = PickerGroup(
+            [
+                PickerItem(.DirPolicy(.PROMPT), "Prompt user", NSImage(named: .promptUser)!),
+                PickerItem(.DirPolicy(.SKIP), "Skip folder", NSImage(named: .skipFolder)!),
+                PickerItem(.DirPolicy(.REPLACE), "Replace folder", NSImage(named: .replaceFolder)!),
+                PickerItem(.DirPolicy(.RENAME), "Keep both folders", NSImage(named: .keepBothFolders)!),
+                PickerItem(.DirPolicy(.MERGE), "Merge", NSImage(named: .mergeFolders)!)
+            ],
+            groupLabel: "Folder Conflict Policy",
+            tooltipTemplate: "When moving or copying: what to do when the destination already contains a folder with the same name as a folder being copied")
+
+    private static let fileConflictPolicyGroup = PickerGroup(
+            [
+                PickerItem(.FilePolicy(.PROMPT), "Prompt user", NSImage(named: .promptUser)!),
+                PickerItem(.FilePolicy(.SKIP), "Skip file", NSImage(named: .skipFile)!),
+                PickerItem(.FilePolicy(.REPLACE_ALWAYS), "Overwrite always", NSImage(named: .replaceFileAlways)!),
+                PickerItem(.FilePolicy(.REPLACE_IF_OLDER_AND_DIFFERENT), "Overwrite old with new only", NSImage(named: .replaceOldFileWithNewOnly)!),
+                PickerItem(.FilePolicy(.RENAME_ALWAYS), "Keep both always", NSImage(named: .keepBothFiles)!),
+                PickerItem(.FilePolicy(.RENAME_IF_DIFFERENT), "Keep both only if different", NSImage(named: .modeMove)!)
+            ],
+            groupLabel: "File Conflict Policy",
+            tooltipTemplate: "When moving or copying: what to do when the destination already contains a file with the same name as a file being copied")
+
+    private static let groupMap: [NSToolbarItem.Identifier : PickerGroup] = [
+        NSToolbarItem.Identifier.dragModePicker: dragModeGroup,
+        NSToolbarItem.Identifier.dirConflictPolicyPicker: dirConflictPolicyGroup,
+        NSToolbarItem.Identifier.fileConflictPolicyPicker: fileConflictPolicyGroup
     ]
 
-    static let FILE_CONFLICT_POLICY_LIST: [PickerItem<FileConflictPolicy>] = [
-        PickerItem<FileConflictPolicy>(.PROMPT, "Prompt user", NSImage(named: .promptUser)!),
-        PickerItem<FileConflictPolicy>(.SKIP, "Skip file", NSImage(named: .skipFile)!),
-        PickerItem<FileConflictPolicy>(.REPLACE_ALWAYS, "Overwrite always", NSImage(named: .replaceFileAlways)!),
-        PickerItem<FileConflictPolicy>(.REPLACE_IF_OLDER_AND_DIFFERENT, "Overwrite old with new only", NSImage(named: .replaceOldFileWithNewOnly)!),
-        PickerItem<FileConflictPolicy>(.RENAME_ALWAYS, "Keep both always", NSImage(named: .keepBothFiles)!),
-        PickerItem<FileConflictPolicy>(.RENAME_IF_DIFFERENT, "Keep both only if different", NSImage(named: .modeMove)!)
-    ]
+    private static func getGroup(_ identifier: NSToolbarItem.Identifier) -> PickerGroup {
+        if let group = MainWindowToolbar.groupMap[identifier] {
+            return group
+        } else {
+            fatalError("Identifier does not correspond to a picker group: \(identifier)")
+        }
+    }
+
+//    static let DIR_CONFLICT_POLICY_LIST: [PickerItem<DirConflictPolicy>] = [
+//    ]
+//
+//    static let FILE_CONFLICT_POLICY_LIST: [PickerItem<FileConflictPolicy>] = [
 
     override init(identifier: NSToolbar.Identifier) {
         super.init(identifier: identifier)
@@ -124,19 +180,8 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
                  willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
 
-        if  itemIdentifier == NSToolbarItem.Identifier.dragModePicker {
-            return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.DRAG_MODE_LIST,
-                    groupLabel: "Drag Mode", toolTip: "Set the default mode for Drag & Drop (Copy or Move)")
-        }
-
-        if  itemIdentifier == NSToolbarItem.Identifier.dirConflictPolicyPicker {
-            return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.DIR_CONFLICT_POLICY_LIST,
-                    groupLabel: "Folder Conflict Policy", toolTip: "When moving or copying: what to do when the destination already contains a folder with the same name as a folder being copied")
-        }
-
-        if  itemIdentifier == NSToolbarItem.Identifier.fileConflictPolicyPicker {
-            return self.createSingleSelectionPickerGroup(itemIdentifier, MainWindowToolbar.FILE_CONFLICT_POLICY_LIST,
-                    groupLabel: "File Conflict Policy", toolTip: "When moving or copying: what to do when the destination already contains a file with the same name as a file being copied")
+        if let group = MainWindowToolbar.groupMap[itemIdentifier] {
+            return self.createSingleSelectionPickerGroup(itemIdentifier, group)
         }
 
         if  itemIdentifier == NSToolbarItem.Identifier.toolbarMoreActions {
@@ -158,13 +203,12 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return nil
     }
 
-    private func createSingleSelectionPickerGroup<ItemValue>(_ itemIdentifier: NSToolbarItem.Identifier, _ pickerItemList: [PickerItem<ItemValue>],
-                                                             groupLabel: String, toolTip: String) -> NSToolbarItemGroup {
+    private func createSingleSelectionPickerGroup(_ itemIdentifier: NSToolbarItem.Identifier, _ group: PickerGroup) -> NSToolbarItemGroup {
 
         var titleList: [String] = []
         var imageList: [NSImage] = []
 
-        for item in pickerItemList {
+        for item in group.itemList {
             titleList.append(item.title)
             imageList.append(item.image)
         }
@@ -175,9 +219,9 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
                 target: nil, action: Selector("toolbarPickerDidSelectItem:") )
 
-        toolbarItem.label = groupLabel
-        toolbarItem.paletteLabel = groupLabel
-        toolbarItem.toolTip = toolTip
+        toolbarItem.label = group.groupLabel
+        toolbarItem.paletteLabel = group.groupLabel
+        toolbarItem.toolTip = group.tooltipTemplate // TODO: display current value using template
         return toolbarItem
     }
 
@@ -192,10 +236,10 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         return nil
     }
 
-    private static func indexForPickerValue<PickerValue>(_ pickerValue: PickerValue, _ pickerItemList: [PickerItem<PickerValue>]) -> Int? {
+    private static func indexForPickerValue(_ pickerValue: PickerItemValue, _ pickerItemList: [PickerItem]) -> Int? {
         var index = 0
-        for mode in pickerItemList {
-            if mode.value == pickerValue {
+        for item in pickerItemList {
+            if item.value == pickerValue {
                 return index
             }
             index += 1
@@ -209,20 +253,32 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
             return
         }
 
-        self.setToolbarSelection(.dragModePicker, dragOperation, MainWindowToolbar.DRAG_MODE_LIST)
+        self.setToolbarSelection(.dragModePicker, .DragMode(dragOperation))
     }
 
-    func setToolbarSelection<PickerValue>(_ toolbarIdentifier: NSToolbarItem.Identifier, _ pickerValue: PickerValue, _ pickerItemList: [PickerItem<PickerValue>]) {
-        NSLog("DEBUG Entered setToolbarSelection(): identifier='\(toolbarIdentifier.rawValue)', pickerValue=\(pickerValue)")
+    func setToolbarSelection(_ toolbarIdentifier: NSToolbarItem.Identifier, _ pickerItemValue: PickerItemValue) {
+        NSLog("DEBUG Entered setToolbarSelection(): identifier='\(toolbarIdentifier.rawValue)', pickerItemValue=\(pickerItemValue)")
 
-        if let dragModeItem = self.getItemForIdentifier(toolbarIdentifier) {
-            if let itemGroup = dragModeItem as? NSToolbarItemGroup {
-                if let index = MainWindowToolbar.indexForPickerValue(pickerValue, pickerItemList) {
+        if let item = self.getItemForIdentifier(toolbarIdentifier) {
+            let group = MainWindowToolbar.getGroup(toolbarIdentifier)
+            if let itemGroup = item as? NSToolbarItemGroup {
+                if let index = MainWindowToolbar.indexForPickerValue(pickerItemValue, group.itemList) {
                     NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for identifier '\(toolbarIdentifier.rawValue)'")
                     // This will not fire listeners however. We should have set those values elsewhere.
                     itemGroup.setSelected(true, at: index)
+                    let pickerItem = group.itemList[index]
+                    itemGroup.toolTip = group.tooltipTemplate //+ "\n\n(current value: \(String(pickerItem.title)))"  // TODO: this doesn't update
                 }
             }
         }
     }
+
+    static func getValueFromIndex(_ selectedIndex: Int, _ groupIdentifier: NSToolbarItem.Identifier) throws -> PickerItemValue? {
+        let pickerList = MainWindowToolbar.getGroup(groupIdentifier).itemList
+        guard selectedIndex < pickerList.count else {
+            throw OutletError.invalidArgument("Index \(selectedIndex) is invalid for group \(groupIdentifier)")
+        }
+        return pickerList[selectedIndex].value
+    }
+
 }
