@@ -126,25 +126,31 @@ class TreeContextMenu {
     let op: UserOp? = try self.con.backend.getLastPendingOp(deviceUID: sn.node.deviceUID, nodeUID: sn.node.uid)
     let singlePath = sn.spid.getSinglePath()
 
-    if op != nil && op!.hasDst() {
-      NSLog("DEBUG [\(treeID)] Building context menu items for src-dst op: \(op!)")
+    if let op = op {
+      let item = NSMenuItem(title: "Pending Operation: \(op.opType) (OpUID: \(op.opUID), BatchUID: \(op.batchUID)))", action: nil, keyEquivalent: "")
+      menu.addItem(item)
+    }
+
+    if let op = op, op.hasDst() {
+      NSLog("DEBUG [\(treeID)] Building context menu items for src-dst op: \(op)")
 
       // Split into separate entries for src and dst.
 
       // (1/2) Source node:
       let srcPath: String
-      if op!.srcNode.uid == sn.node.uid {
+      if op.srcNode.uid == sn.node.uid {
         srcPath = singlePath
       } else {
-        srcPath = op!.srcNode.firstPath
+        srcPath = op.srcNode.firstPath
       }
-      let srcItem = self.buildFullPathDisplayItem(preamble: "Src: ", op!.srcNode, singlePath: srcPath)
+
+      let srcItem = self.buildFullPathDisplayItem(preamble: "Src: ", op.srcNode, singlePath: srcPath)
       menu.addItem(srcItem)
 
-      if op!.srcNode.isLive {
+      if op.srcNode.isLive {
         let srcSubmenu = NSMenu()
         menu.setSubmenu(srcSubmenu, for: srcItem)
-        try self.buildMenuItemsForSingleNode(srcSubmenu, op!.srcNode, srcPath)
+        try self.buildMenuItemsForSingleNode(srcSubmenu, op.srcNode, srcPath)
       } else {
         srcItem.isEnabled = false
       }
@@ -153,25 +159,25 @@ class TreeContextMenu {
 
       // (1/2) Destination node:
       let dstPath: String
-      if op!.dstNode!.uid == sn.node.uid {
+      if op.dstNode!.uid == sn.node.uid {
         dstPath = singlePath
       } else {
-        dstPath = op!.dstNode!.firstPath
+        dstPath = op.dstNode!.firstPath
       }
-      let dstItem = self.buildFullPathDisplayItem(preamble: "Dst: ", op!.dstNode!, singlePath: dstPath)
+      let dstItem = self.buildFullPathDisplayItem(preamble: "Dst: ", op.dstNode!, singlePath: dstPath)
       menu.addItem(dstItem)
 
-      if op!.dstNode!.isLive {
+      if op.dstNode!.isLive {
         let dstSubmenu = NSMenu()
         menu.setSubmenu(dstSubmenu, for: dstItem)
-        try self.buildMenuItemsForSingleNode(dstSubmenu, op!.dstNode!, dstPath)
+        try self.buildMenuItemsForSingleNode(dstSubmenu, op.dstNode!, dstPath)
       } else {
         dstItem.isEnabled = false
       }
 
       menu.addItem(NSMenuItem.separator())
-
     } else {
+      // Forget about op; just use whatever node we found:
       let item = self.buildFullPathDisplayItem(sn.node, singlePath: sn.spid.getSinglePath())
       item.isEnabled = false
       menu.addItem(item)

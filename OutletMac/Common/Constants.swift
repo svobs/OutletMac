@@ -131,13 +131,13 @@ enum FileConflictPolicy: UInt32 {
 }
 
 /**
- For batch failures
+ For batch or single op failures
  */
 enum ErrorHandlingStrategy: UInt32 {
   case PROMPT = 1
-  case PAUSE_EXECUTION = 2  // TODO: maybe delete
-  case CANCEL_BATCH = 3
-  case CANCEL_FAILED_OPS_AND_DEPENDENTS = 4
+  case CANCEL_BATCH = 2
+  case CANCEL_FAILED_OPS_AND_ALL_DESCENDANT_OPS = 3
+  case CANCEL_FAILED_OPS_ONLY = 4
 }
 
 // --- FE + BE SHARED ---

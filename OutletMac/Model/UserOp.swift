@@ -29,9 +29,11 @@ enum UserOpType: UInt32 {
 enum UserOpStatus: UInt32 {
   case NOT_STARTED = 1
   case EXECUTING = 2
-  case STOPPED_ON_ERROR = 8
-  case COMPLETED_NO_OP = 9
+  case BLOCKED_BY_ERROR = 3
+  case STOPPED_ON_ERROR = 4
+
   case COMPLETED_OK = 10
+  case COMPLETED_NO_OP = 11
 }
 
 class UserOp: CustomStringConvertible {
