@@ -1113,6 +1113,50 @@ public struct Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response {
   public init() {}
 }
 
+public struct Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var treeID: String = String()
+
+  public var identifierList: [Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var menuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var itemType: UInt32 = 0
+
+  public var title: String = String()
+
+  public var actionID: UInt32 = 0
+
+  public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
 public struct Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -3498,6 +3542,126 @@ extension Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response: SwiftPr
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Response) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetContextMenu_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "tree_id"),
+    2: .standard(proto: "identifier_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.identifierList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
+    }
+    if !self.identifierList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.identifierList, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request) -> Bool {
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs.identifierList != rhs.identifierList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".GetContextMenu_Response"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "menu_item_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.menuItemList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.menuItemList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.menuItemList, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response) -> Bool {
+    if lhs.menuItemList != rhs.menuItemList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".TreeContextMenuItem"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "item_type"),
+    2: .same(proto: "title"),
+    3: .standard(proto: "action_id"),
+    4: .standard(proto: "submenu_item_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.itemType) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.title) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.actionID) }()
+      case 4: try { try decoder.decodeRepeatedMessageField(value: &self.submenuItemList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.itemType != 0 {
+      try visitor.visitSingularUInt32Field(value: self.itemType, fieldNumber: 1)
+    }
+    if !self.title.isEmpty {
+      try visitor.visitSingularStringField(value: self.title, fieldNumber: 2)
+    }
+    if self.actionID != 0 {
+      try visitor.visitSingularUInt32Field(value: self.actionID, fieldNumber: 3)
+    }
+    if !self.submenuItemList.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.submenuItemList, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) -> Bool {
+    if lhs.itemType != rhs.itemType {return false}
+    if lhs.title != rhs.title {return false}
+    if lhs.actionID != rhs.actionID {return false}
+    if lhs.submenuItemList != rhs.submenuItemList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

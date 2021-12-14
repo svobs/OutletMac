@@ -564,6 +564,17 @@ class GRPCClientBackend: OutletBackend {
     let _ = try self.callAndTranslateErrors(self.stub.remove_expanded_row(request), "removeExpandedRow")
   }
 
+  func getContextMenu(treeID: TreeID, _ identifierList: [NodeIdentifier]) throws -> [ContextMenuItem] {
+    var request = Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request()
+    request.treeID = treeID
+    for nodeIdentifier in identifierList {
+      request.identifierList.append(try self.grpcConverter.nodeIdentifierToGRPC(nodeIdentifier))
+    }
+
+    let response = try self.callAndTranslateErrors(self.stub.get_context_menu(request), "getContextMenu")
+    return try self.grpcConverter.menuItemListFromGRPC(response.menuItemList)
+  }
+
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree? {
     let spid = self.nodeIdentifierFactory.getRootConstantGDriveSPID(deviceUID)
     let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)
@@ -859,6 +870,8 @@ class GRPCClientBackend: OutletBackend {
       return nil
     }
   }
+
+
 
   private func callAndTranslateErrors<Req, Res>(_ call: UnaryCall<Req, Res>, _ rpcName: String) throws -> Res {
     if !self.isConnected {

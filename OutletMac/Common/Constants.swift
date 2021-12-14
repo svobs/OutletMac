@@ -140,6 +140,15 @@ enum ErrorHandlingStrategy: UInt32 {
   case CANCEL_FAILED_OPS_ONLY = 4
 }
 
+/**
+ For tree context menus: see gRPC TreeContextMenuItem
+ */
+enum MenuItemType: UInt32 {
+  case NORMAL = 1
+  case SEPARATOR = 2
+  case DISABLED = 3
+}
+
 // --- FE + BE SHARED ---
 
 /**

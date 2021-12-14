@@ -17,6 +17,13 @@ class TreeActions {
   // Context Menu Actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  // For dynamic menus provided by the backend. Uses the actionID to determine what to do (either local action or call into the backend)
+  @objc public func executeMenuAction(_ sender: GeneratedMenuItem) {
+
+    // TODO!
+  }
+
+
   @objc public func expandAll(_ sender: MenuItemWithSNList) {
     guard sender.snList.count > 0 else {
       return

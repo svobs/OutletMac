@@ -365,4 +365,27 @@ class GRPCConverter {
     return DisplayTreeUiState(treeID: grpc.treeID, rootSN: rootSn, rootExists: grpc.rootExists, offendingPath: grpc.offendingPath,
             needsManualLoad: grpc.needsManualLoad, treeDisplayMode: treeDisplayMode, hasCheckboxes: grpc.hasCheckboxes_p)
   }
+
+  // Tree Context Menu
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
+  func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem]) throws -> [ContextMenuItem] {
+    var menuItemList: [ContextMenuItem] = []
+
+    for grpcItem in grpcList {
+      menuItemList.append(try self.menuItemFromGRPC(grpcItem))
+    }
+    return menuItemList
+  }
+
+  func menuItemFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) throws -> ContextMenuItem {
+    guard let itemType = MenuItemType.init(rawValue: grpc.itemType) else {
+      throw OutletError.invalidState("Bad value received from gRPC: MenuItemType (\(grpc.itemType)) is invalid!")
+    }
+    let item = ContextMenuItem(itemType: itemType, title: grpc.title, actionID: grpc.actionID)
+    for submenuItem in grpc.submenuItemList {
+      item.submenuItemList.append(try self.menuItemFromGRPC(submenuItem))
+    }
+    return item
+  }
 }

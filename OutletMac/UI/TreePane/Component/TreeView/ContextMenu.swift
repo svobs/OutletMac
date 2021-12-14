@@ -15,6 +15,21 @@ class MenuItemWithNodeList: NSMenuItem {
   var nodeList: [Node] = []
 }
 
+class GeneratedMenuItem: NSMenuItem {
+  var snList: [SPIDNodePair]
+  var menuItemMeta: ContextMenuItem // provided by the backend
+
+  public init(_ snList: [SPIDNodePair], _ menuItemMeta: ContextMenuItem, action selector: Selector?) {
+    self.snList = snList
+    self.menuItemMeta = menuItemMeta
+    super.init(title: menuItemMeta.title, action: selector, keyEquivalent: "")
+  }
+
+  required init(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
+
 
 class TreeContextMenu {
   weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
@@ -24,32 +39,51 @@ class TreeContextMenu {
   }
 
   func rebuildMenuFor(_ menu: NSMenu, _ clickedGUID: GUID, _ selectedGUIDs: Set<GUID>) {
-    guard let sn = self.con.displayStore.getSN(clickedGUID) else {
+    guard let snClicked = self.con.displayStore.getSN(clickedGUID) else {
       NSLog("ERROR [\(treeID)] Clicked GUID not found: \(clickedGUID)")
       return
     }
-    guard !sn.node.isEphemeral else {
-      NSLog("DEBUG [\(treeID)] Ignoring request to build context menu: node is ephemeral")
+    guard !snClicked.node.isEphemeral else {
+      NSLog("DEBUG [\(treeID)] Ignoring request to build context menu: clicked node is ephemeral")
       return
     }
     let clickedOnSelection = selectedGUIDs.contains(clickedGUID)
-    NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) isOnSelection=\(clickedOnSelection)")
+    NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) selectedItems=\(selectedGUIDs.count) isOnSelection=\(clickedOnSelection)")
 
     menu.removeAllItems()
 
+    var snList: [SPIDNodePair] = []
     if clickedOnSelection && selectedGUIDs.count > 1 {
       // User right-clicked on selection -> apply context menu to all selected items:
-      do {
-        try self.buildContextMenuMultiple(menu, selectedGUIDs)
-      } catch {
-        self.con.reportError("Failed to build context menu", "While loading GUIDs: \(selectedGUIDs): \(error)")
+      for guid in selectedGUIDs {
+        if let sn = self.con.displayStore.getSN(guid) {
+          snList.append(sn)
+        }
       }
+      assert(snList.count == selectedGUIDs.count, "SNList size (\(snList.count)) does not match selected GUID count (\(selectedGUIDs.count))")
+
     } else {
-      // Singular item, or singular selection (equivalent logic)
-      do {
-        try self.buildContextMenuSingle(menu, clickedGUID)
-      } catch {
-        self.con.reportError("Failed to build context menu", "While loading GUID: \(clickedGUID): \(error)")
+      snList.append(snClicked)
+    }
+
+    do {
+      let menuItemList: [ContextMenuItem] = try self.con.backend.getContextMenu(treeID: self.treeID, snList.map { sn in sn.spid })
+      buildMenuFromMeta(menuItemList, menu: menu, snList)
+    } catch {
+      self.con.reportError("Failed to build context menu", "\(error)")
+    }
+  }
+
+  private func buildMenuFromMeta(_ itemMetaList: [ContextMenuItem], menu: NSMenu, _ snList: [SPIDNodePair]) {
+    for itemMeta in itemMetaList {
+      let item = GeneratedMenuItem(snList, itemMeta, action: #selector(self.con.treeActions.executeMenuAction(_:)))
+      item.target = self.con.treeActions
+      menu.addItem(item)
+
+      if itemMeta.submenuItemList.count > 0 {
+        let submenu = NSMenu()
+        menu.setSubmenu(submenu, for: item)
+        buildMenuFromMeta(itemMeta.submenuItemList, menu: submenu, snList)
       }
     }
   }
@@ -58,12 +92,12 @@ class TreeContextMenu {
    Builds a context menu for multiple selected items.
   */
   private func buildContextMenuMultiple(_ menu: NSMenu, _ targetGUIDSet: Set<GUID>) throws {
+
+    // TODO: deprecate
+
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG Building context menu items for multiple selection of \(targetGUIDSet.count) items")
     }
-    let item = NSMenuItem(title: "\(targetGUIDSet.count) items selected", action: nil, keyEquivalent: "")
-    item.isEnabled = false
-    menu.addItem(item)
 
     var snList: [SPIDNodePair] = []
     for guid in targetGUIDSet {
@@ -73,6 +107,9 @@ class TreeContextMenu {
     }
     assert(snList.count == targetGUIDSet.count, "SNList size (\(snList.count)) does not match GUID count (\(targetGUIDSet.count))")
 
+    let item = NSMenuItem(title: "\(targetGUIDSet.count) items selected", action: nil, keyEquivalent: "")
+    item.isEnabled = false
+    menu.addItem(item)
 
     if self.con.tree.hasCheckboxes {
       var item = MenuItemWithSNList(title: "Check All", action: #selector(self.con.treeActions.checkAll(_:)), keyEquivalent: "")
@@ -117,7 +154,20 @@ class TreeContextMenu {
   /**
    Builds a context menu for a single item.
   */
+  // TODO: remove this
   private func buildContextMenuSingle(_ menu: NSMenu, _ targetGUID: GUID) throws {
+    guard let sn = self.con.displayStore.getSN(targetGUID) else {
+      NSLog("ERROR [\(treeID)] Clicked GUID not found: \(targetGUID)")
+      return
+    }
+
+    let menuItemList: [ContextMenuItem] = try self.con.backend.getContextMenu(treeID: self.treeID, [sn.spid])
+    buildMenuFromMeta(menuItemList, menu: menu, [sn])
+  }
+
+
+  // TODO: remove this
+  private func oldJunkNoLongerUsed(_ menu: NSMenu, _ targetGUID: GUID) throws {
     guard let sn = self.con.displayStore.getSN(targetGUID) else {
       NSLog("ERROR [\(treeID)] Clicked GUID not found: \(targetGUID)")
       return
@@ -203,6 +253,7 @@ class TreeContextMenu {
     }
   }
 
+  // TODO: remove this
   private func buildFullPathDisplayItem(preamble: String = "", _ node: Node, singlePath: String) -> NSMenuItem {
     let displayPath: String
     displayPath = "\(preamble)\(singlePath)"
@@ -211,6 +262,7 @@ class TreeContextMenu {
     return item
   }
 
+  // TODO: remove this
   private func buildMenuItemsForSingleNode(_ menu: NSMenu, _ node: Node, _ singlePath: String) throws {
     NSLog("DEBUG [\(treeID)] Building context menu for node: \(node), singlePath: '\(singlePath)'")
 

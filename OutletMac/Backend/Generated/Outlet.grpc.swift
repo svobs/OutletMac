@@ -96,6 +96,11 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
 
+  func get_context_menu(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request,
+    callOptions: CallOptions?
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>
+
   func request_display_tree(
     _ request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request,
     callOptions: CallOptions?
@@ -409,6 +414,24 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     )
   }
 
+  /// Unary call to get_context_menu
+  ///
+  /// - Parameters:
+  ///   - request: Request to send to get_context_menu.
+  ///   - callOptions: Call options.
+  /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
+  public func get_context_menu(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request,
+    callOptions: CallOptions? = nil
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response> {
+    return self.makeUnaryCall(
+      path: "/outlet.backend.agent.grpc.generated.Outlet/get_context_menu",
+      request: request,
+      callOptions: callOptions ?? self.defaultCallOptions,
+      interceptors: self.interceptors?.makeget_context_menuInterceptors() ?? []
+    )
+  }
+
   /// Unary call to request_display_tree
   ///
   /// - Parameters:
@@ -703,6 +726,9 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
   /// - Returns: Interceptors to use when invoking 'update_filter'.
   func makeupdate_filterInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
 
+  /// - Returns: Interceptors to use when invoking 'get_context_menu'.
+  func makeget_context_menuInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>]
+
   /// - Returns: Interceptors to use when invoking 'request_display_tree'.
   func makerequest_display_treeInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>]
 
@@ -800,6 +826,8 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerP
   func get_filter(request: Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response>
 
   func update_filter(request: Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>
+
+  func get_context_menu(request: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>
 
   func request_display_tree(request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -955,6 +983,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
         responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>(),
         interceptors: self.interceptors?.makeupdate_filterInterceptors() ?? [],
         userFunction: self.update_filter(request:context:)
+      )
+
+    case "get_context_menu":
+      return UnaryServerHandler(
+        context: context,
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>(),
+        interceptors: self.interceptors?.makeget_context_menuInterceptors() ?? [],
+        userFunction: self.get_context_menu(request:context:)
       )
 
     case "request_display_tree":
@@ -1142,6 +1179,10 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   /// - Returns: Interceptors to use when handling 'update_filter'.
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeupdate_filterInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request, Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Response>]
+
+  /// - Returns: Interceptors to use when handling 'get_context_menu'.
+  ///   Defaults to calling `self.makeInterceptors()`.
+  func makeget_context_menuInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree'.
   ///   Defaults to calling `self.makeInterceptors()`.

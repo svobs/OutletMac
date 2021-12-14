@@ -43,6 +43,7 @@
 		CDF2F9FD8CDCFA9EFBAB5A9E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F275262010959BE9CDA3 /* Constants.swift */; };
 		CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */; };
 		CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F81C318FC582AE23E023 /* IfView.swift */; };
+		CDF2FB5A77F5EA5B4DCA361C /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0E9BD6EDCF089EB2C13 /* ContextMenu.swift */; };
 		CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F521214ABD01967F51E8 /* DisplayStore.swift */; };
 		CDF2FB80159CBF6C270357DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */; };
 		CDF2FB998C59041CEFBDCA17 /* TwoPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */; };
@@ -79,6 +80,7 @@
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		CDF2F01E9410339930D7821C /* MainWindowToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowToolbar.swift; sourceTree = "<group>"; };
+		CDF2F0E9BD6EDCF089EB2C13 /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
 		CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatchQueueExtensions.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 				D138ADF425BE342000E4F9E4 /* UserOp.swift */,
 				D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */,
 				D19B16B626158E610072F8A8 /* Device.swift */,
+				CDF2F0E9BD6EDCF089EB2C13 /* ContextMenu.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -405,7 +408,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */,
+				D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -536,6 +539,7 @@
 				CDF2F3650509D3F27D800ABE /* GlobalEventMonitor.swift in Sources */,
 				CDF2F747A43A94C499A41B32 /* AppMainMenu.swift in Sources */,
 				CDF2F09F3C9E022C4F98F52B /* MainWindowToolbar.swift in Sources */,
+				CDF2FB5A77F5EA5B4DCA361C /* ContextMenu.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -734,7 +738,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */ = {
+		D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Wildchild9/LinkedList.git";
 			requirement = {
@@ -747,7 +751,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D194BEFA25E8F83000B4827F /* LinkedList */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList" */;
+			package = D194BEF925E8F83000B4827F /* XCRemoteSwiftPackageReference "LinkedList.git" */;
 			productName = LinkedList;
 		};
 /* End XCSwiftPackageProductDependency section */
