@@ -10,6 +10,20 @@ import SwiftUI
 class TreeActions {
   weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
 
+  typealias ActionHandler = ([SPIDNodePair]) -> Void
+
+  private let actionHandlerDict: [ActionID : ActionHandler] = [
+    .EXPAND_ALL: { snList in self.con.treeView?.expandAll(snList) },
+    .REFRESH: self.refreshSubtree,
+    .GO_INTO_DIR: self.goIntoDir,
+    .SHOW_IN_FILE_EXPLORER: self.showInFinder,
+    .OPEN_WITH_DEFAULT_APP: { snList in self.openLocalFileWithDefaultApp(snList[0].spid.get_single_path()) },
+    .DOWNLOAD_FROM_GDRIVE: { snList in self.downloadFileFromGDrive(snList[0].node) },
+
+    .SET_ROWS_CHECKED: { snList in self.setChecked(snList, true) },
+    .SET_ROWS_UNCHECKED: { snList in self.setChecked(snList, false) }
+  ]
+
   var treeID: String {
     return con.treeID
   }
@@ -19,24 +33,45 @@ class TreeActions {
 
   // For dynamic menus provided by the backend. Uses the actionID to determine what to do (either local action or call into the backend)
   @objc public func executeMenuAction(_ sender: GeneratedMenuItem) {
+    if sender.menuItemMeta.targetGUIDList.count > 0 {
+      // If GUIDs are present here, they were provided by the backend. Send them right back for execution - it will know what to do with them.
 
-    // TODO!
-  }
+      // Special overrides for delete actions: we want to confirm with the user first
+      switch (sender.menuItemMeta.actionID) {
+      case .DELETE_SINGLE_FILE:
+        if !confirmDelete(sender.snList[0]) {
+          return
+        }
+      case .DELETE_SUBTREE, .DELETE_SUBTREE_FOR_SINGLE_DEVICE:
+        if !confirmDelete(sender.menuItemMeta.targetGUIDList.count) {
+          return
+        }
+      default:
+        fallthrough
+      }
 
 
-  @objc public func expandAll(_ sender: MenuItemWithSNList) {
-    guard sender.snList.count > 0 else {
+      do {
+        try self.con.backend.executeTreeAction(self.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList)
+      } catch {
+        self.con.reportException("Failed to execute action: \(sender.menuItemMeta.actionID)", error)
+      }
       return
     }
 
-    self.con.treeView?.expandAll(sender.snList)
-  }
-
-  @objc public func refreshSubtree(_ sender: MenuItemWithSNList) {
-    guard sender.snList.count > 0 else {
+    // No GUIDs? Must be a FE action. Look up its handler and execute it:
+    guard let handler: ActionHandler = actionHandlerDict[sender.menuItemMeta.actionID] else {
+      self.con.reportError("Internal error", "No handler found for action: \(sender.menuItemMeta.actionID)")
       return
     }
-    let nodeIdentifier = sender.snList[0].spid
+    handler(sender.snList)
+  }
+
+  private func refreshSubtree(_ snList: [SPIDNodePair]) {
+    guard snList.count > 0 else {
+      return
+    }
+    let nodeIdentifier = snList[0].spid
     do {
       try self.con.backend.enqueueRefreshSubtreeTask(nodeIdentifier: nodeIdentifier, treeID: self.treeID)
     } catch {
@@ -44,42 +79,21 @@ class TreeActions {
     }
   }
 
-  @objc public func showInFinder(_ sender: MenuItemWithNodeList) {
-    guard sender.nodeList.count > 0 else {
+  private func showInFinder(_ snList: [SPIDNodePair]) {
+    guard snList.count > 0 else {
       return
     }
 
-    let node = sender.nodeList[0]
-    let url = URL(fileURLWithPath: node.nodeIdentifier.getSinglePath())
+    let url = URL(fileURLWithPath: snList[0].spid.getSinglePath())
     NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
-  @objc public func downloadFromGDrive(_ sender: MenuItemWithNodeList) {
-    guard sender.nodeList.count > 0 else {
+  private func goIntoDir(_ snList: [SPIDNodePair]) {
+    guard snList.count > 0 else {
       return
     }
 
-    let node = sender.nodeList[0]
-
-    self.downloadFileFromGDrive(node)
-  }
-
-  @objc public func openFile(_ sender: MenuItemWithSNList) {
-    guard sender.snList.count > 0 else {
-      return
-    }
-
-    let sn = sender.snList[0]
-
-    self.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
-  }
-
-  @objc public func goIntoDir(_ sender: MenuItemWithSNList) {
-    guard sender.snList.count > 0 else {
-      return
-    }
-
-    let spid = sender.snList[0].spid
+    let spid = snList[0].spid
 
     NSLog("DEBUG goIntoDir(): \(spid)")
 
@@ -102,22 +116,7 @@ class TreeActions {
     }
   }
 
-  @objc public func checkAll(_ sender: MenuItemWithSNList) {
-    let snList: [SPIDNodePair] = sender.snList
-    self.setChecked(snList, true)
-  }
-
-  @objc public func uncheckAll(_ sender: MenuItemWithSNList) {
-    let snList: [SPIDNodePair] = sender.snList
-    self.setChecked(snList, false)
-  }
-
-  @objc func deleteSubtree(_ sender: MenuItemWithNodeList) {
-    NSLog("DEBUG [\(self.con.treeID)] User selected to Delete Subtree menu item for \(sender.nodeList.count) nodes")
-    self.confirmAndDeleteSubtrees(sender.nodeList)
-  }
-
-  // Reusable actions
+  // Reusable actions (public)
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   public func downloadFileFromGDrive(_ node: Node) {
@@ -135,27 +134,30 @@ class TreeActions {
     NSWorkspace.shared.open(url)
   }
 
-  public func confirmAndDeleteSubtrees(_ nodeList: [Node]) {
-    if nodeList.count == 0 {
-      self.con.reportError("Cannot Delete", "No items are selected!")
-      return
-    }
+  func confirmDelete(_ singleSN: SPIDNodePair) -> Bool {
+    return self.confirmDelete("\"\(singleSN.node.name)\"", okText: "Delete")
+  }
 
-    var msg = "Are you sure you want to delete "
-    var okText = "Delete"
-    if nodeList.count == 1 {
-      msg += "\"\(nodeList[0].name)\"?"
-    } else {
-      msg += "these \(nodeList.count) items?"
-      okText = "Delete \(nodeList.count) items"
-    }
+  func confirmDelete(_ count: Int) -> Bool {
+    return self.confirmDelete("these \(count) items", okText: "Delete \(count) items")
+  }
+
+  func confirmDelete(_ itemDescription: String, okText: String) -> Bool {
+    let msg = "Are you sure you want to delete \(itemDescription)?"
 
     guard self.con.app.confirmWithUserDialog("Confirm Delete", msg, okButtonText: okText, cancelButtonText: "Cancel") else {
       NSLog("DEBUG [\(treeID)] User cancelled delete")
-      return
+      return false
     }
 
     NSLog("DEBUG [\(treeID)] User confirmed delete of \(nodeList.count) items")
+    return true
+  }
+
+  public func confirmAndDeleteSubtrees(_ nodeList: [Node]) {
+    if !confirmDelete(nodeList.count) {
+      return
+    }
 
     var nodeUIDList: [UID] = []
     for node in nodeList {

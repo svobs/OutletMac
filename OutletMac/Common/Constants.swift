@@ -149,6 +149,23 @@ enum MenuItemType: UInt32 {
   case DISABLED = 3
 }
 
+enum ActionID: UInt32 {
+  case NO_ACTION = 1
+  case REFRESH = 2                  // FE only (should be BE though)
+  case EXPAND_ALL = 3               // FE only
+  case GO_INTO_DIR = 4              // FE only (should be BE though)
+  case SHOW_IN_FILE_EXPLORER = 5    // FE only
+  case OPEN_WITH_DEFAULT_APP = 6    // FE only
+  case DELETE_SINGLE_FILE = 7       // FE only (should be BE though)
+  case DELETE_SUBTREE = 8           // FE only (should be BE though)
+  case DELETE_SUBTREE_FOR_SINGLE_DEVICE = 9  // BE: requires: target_guid_list
+  case DOWNLOAD_FROM_GDRIVE = 10    // FE only (should be BE though)
+  case SET_ROWS_CHECKED = 11        // FE only
+  case SET_ROWS_UNCHECKED = 12      // FE only
+
+  case CALL_EXIFTOOL = 50           // FE only
+}
+
 // --- FE + BE SHARED ---
 
 /**

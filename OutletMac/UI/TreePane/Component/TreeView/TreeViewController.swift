@@ -777,6 +777,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     func expandAll(_ snList: [SPIDNodePair]) {
         assert(DispatchQueue.isExecutingIn(.main))
+
+        guard snList.count > 0 else {
+            return
+        }
+
         self.outlineView.beginUpdates()
         defer {
             self.outlineView.endUpdates()

@@ -9,6 +9,7 @@ class ContextMenuItem: CustomStringConvertible {
     let itemType: MenuItemType
     let title: String
     let actionID: UInt32
+    var targetGUIDList: [GUID] = []
     var submenuItemList: [ContextMenuItem]
 
     init(itemType: MenuItemType, title: String, actionID: UInt32) {

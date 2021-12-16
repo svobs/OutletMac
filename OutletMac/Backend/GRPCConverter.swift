@@ -386,6 +386,9 @@ class GRPCConverter {
     for submenuItem in grpc.submenuItemList {
       item.submenuItemList.append(try self.menuItemFromGRPC(submenuItem))
     }
+    for guid in grpc.targetGuidList {
+      item.targetGUIDList.append(guid)
+    }
     return item
   }
 }

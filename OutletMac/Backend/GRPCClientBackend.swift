@@ -575,6 +575,17 @@ class GRPCClientBackend: OutletBackend {
     return try self.grpcConverter.menuItemListFromGRPC(response.menuItemList)
   }
 
+  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws {
+    var request = Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request()
+    request.treeID = treeID
+    request.actionID = actionID.rawValue
+    for guid in targetGUIDList {
+      request.targetGuidList.append(guid)
+    }
+
+    let _ = try self.callAndTranslateErrors(self.stub.execute_tree_action(request), "executeTreeAction")
+  }
+
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree? {
     let spid = self.nodeIdentifierFactory.getRootConstantGDriveSPID(deviceUID)
     let request = DisplayTreeRequest(treeID: ID_GDRIVE_DIR_SELECT, returnAsync: false, spid: spid, treeDisplayMode: .ONE_TREE_ALL_ITEMS)

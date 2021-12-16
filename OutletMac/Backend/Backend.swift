@@ -33,7 +33,8 @@ protocol OutletBackend: HasLifecycle {
   func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws
   func removeExpandedRow(_ rowUID: GUID, _ treeID: TreeID) throws
   func getContextMenu(treeID: TreeID, _ identifierList: [NodeIdentifier]) throws -> [ContextMenuItem]
-  
+  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws
+
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree?
   func createDisplayTreeFromConfig(treeID: TreeID, isStartup: Bool) throws -> DisplayTree?
   func createDisplayTreeFromSPID(treeID: TreeID, spid: SinglePathNodeIdentifier) throws -> DisplayTree?
@@ -84,6 +85,7 @@ class MockBackend: OutletBackend {
   let app: OutletApp
   let dipatcher: SignalDispatcher
   let nodeIdentifierFactory = NodeIdentifierFactory()
+
   init(_ d: SignalDispatcher? = nil, _ app: OutletApp) {
     self.dipatcher = d ?? SignalDispatcher()
     self.app = app
@@ -104,11 +106,11 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getConfigList(_ configKeyList: [String]) throws -> [String : String] {
+  func getConfigList(_ configKeyList: [String]) throws -> [String: String] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func putConfigList(_ configDict: [String : String]) throws {
+  func putConfigList(_ configDict: [String: String]) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
@@ -133,7 +135,8 @@ class MockBackend: OutletBackend {
   }
 
   func nextUID() throws -> UID {
-    throw OutletError.invalidOperation("Cannot call MockBackend methods")  }
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
 
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
@@ -176,6 +179,10 @@ class MockBackend: OutletBackend {
   }
 
   func getContextMenu(treeID: TreeID, _ identifierList: [NodeIdentifier]) throws -> [ContextMenuItem] {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

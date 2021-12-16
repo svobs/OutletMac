@@ -1150,7 +1150,38 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
 
   public var actionID: UInt32 = 0
 
+  /// Optional. Only used for menu items which apply to a subset, but not the entirety, of the selected nodes:
+  public var targetGuidList: [String] = []
+
   public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var treeID: String = String()
+
+  public var actionID: UInt32 = 0
+
+  /// only required for certain actions
+  public var targetGuidList: [String] = []
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+/// nothing
+public struct Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -3623,7 +3654,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     1: .standard(proto: "item_type"),
     2: .same(proto: "title"),
     3: .standard(proto: "action_id"),
-    4: .standard(proto: "submenu_item_list"),
+    4: .standard(proto: "target_guid_list"),
+    5: .standard(proto: "submenu_item_list"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -3635,7 +3667,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
       case 1: try { try decoder.decodeSingularUInt32Field(value: &self.itemType) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.title) }()
       case 3: try { try decoder.decodeSingularUInt32Field(value: &self.actionID) }()
-      case 4: try { try decoder.decodeRepeatedMessageField(value: &self.submenuItemList) }()
+      case 4: try { try decoder.decodeRepeatedStringField(value: &self.targetGuidList) }()
+      case 5: try { try decoder.decodeRepeatedMessageField(value: &self.submenuItemList) }()
       default: break
       }
     }
@@ -3651,8 +3684,11 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     if self.actionID != 0 {
       try visitor.visitSingularUInt32Field(value: self.actionID, fieldNumber: 3)
     }
+    if !self.targetGuidList.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.targetGuidList, fieldNumber: 4)
+    }
     if !self.submenuItemList.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.submenuItemList, fieldNumber: 4)
+      try visitor.visitRepeatedMessageField(value: self.submenuItemList, fieldNumber: 5)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -3661,7 +3697,71 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     if lhs.itemType != rhs.itemType {return false}
     if lhs.title != rhs.title {return false}
     if lhs.actionID != rhs.actionID {return false}
+    if lhs.targetGuidList != rhs.targetGuidList {return false}
     if lhs.submenuItemList != rhs.submenuItemList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".ExecuteTreeAction_Request"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "tree_id"),
+    2: .standard(proto: "action_id"),
+    3: .standard(proto: "target_guid_list"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.actionID) }()
+      case 3: try { try decoder.decodeRepeatedStringField(value: &self.targetGuidList) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.treeID.isEmpty {
+      try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
+    }
+    if self.actionID != 0 {
+      try visitor.visitSingularUInt32Field(value: self.actionID, fieldNumber: 2)
+    }
+    if !self.targetGuidList.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.targetGuidList, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request) -> Bool {
+    if lhs.treeID != rhs.treeID {return false}
+    if lhs.actionID != rhs.actionID {return false}
+    if lhs.targetGuidList != rhs.targetGuidList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".ExecuteTreeAction_Response"
+  public static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let _ = try decoder.nextFieldNumber() {
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response, rhs: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response) -> Bool {
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
