@@ -564,7 +564,7 @@ class GRPCClientBackend: OutletBackend {
     let _ = try self.callAndTranslateErrors(self.stub.remove_expanded_row(request), "removeExpandedRow")
   }
 
-  func getContextMenu(treeID: TreeID, _ identifierList: [NodeIdentifier]) throws -> [ContextMenuItem] {
+  func getContextMenu(treeID: TreeID, _ identifierList: [NodeIdentifier]) throws -> [MenuItemMeta] {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request()
     request.treeID = treeID
     for nodeIdentifier in identifierList {

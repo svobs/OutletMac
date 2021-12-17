@@ -5,7 +5,6 @@
 //  Created by Matthew Svoboda on 2021-02-01.
 //
 import SwiftUI
-import LinkedList
 
 /**
  PROTOCOL TreePanelControllable
@@ -289,7 +288,9 @@ class TreePanelController: TreePanelControllable {
         }
         return
       }
-      queue.append(contentsOf: topLevelSNList)
+      for sn in topLevelSNList {
+        queue.append(sn)
+      }
     } catch OutletError.maxResultsExceeded(let actualCount) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
@@ -314,7 +315,9 @@ class TreePanelController: TreePanelControllable {
           NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) child nodes for parent \(sn.spid)")
 
           self.displayStore.putChildList(guid, childSNList)
-          queue.append(contentsOf: childSNList)
+          for sn in childSNList {
+            queue.append(sn)
+          }
 
         } catch OutletError.maxResultsExceeded(let actualCount) {
           // append err node and continue

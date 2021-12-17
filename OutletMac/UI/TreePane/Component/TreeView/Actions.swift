@@ -12,17 +12,21 @@ class TreeActions {
 
   typealias ActionHandler = ([SPIDNodePair]) -> Void
 
-  private let actionHandlerDict: [ActionID : ActionHandler] = [
-    .EXPAND_ALL: { snList in self.con.treeView?.expandAll(snList) },
-    .REFRESH: self.refreshSubtree,
-    .GO_INTO_DIR: self.goIntoDir,
-    .SHOW_IN_FILE_EXPLORER: self.showInFinder,
-    .OPEN_WITH_DEFAULT_APP: { snList in self.openLocalFileWithDefaultApp(snList[0].spid.get_single_path()) },
-    .DOWNLOAD_FROM_GDRIVE: { snList in self.downloadFileFromGDrive(snList[0].node) },
+  private var actionHandlerDict: [ActionID : ActionHandler] = [:]
 
-    .SET_ROWS_CHECKED: { snList in self.setChecked(snList, true) },
-    .SET_ROWS_UNCHECKED: { snList in self.setChecked(snList, false) }
-  ]
+  init() {
+    actionHandlerDict = [
+      .EXPAND_ALL: { snList in self.con.treeView?.expandAll(snList) },
+      .REFRESH: self.refreshSubtree,
+      .GO_INTO_DIR: self.goIntoDir,
+      .SHOW_IN_FILE_EXPLORER: self.showInFinder,
+      .OPEN_WITH_DEFAULT_APP: { snList in self.openLocalFileWithDefaultApp(snList[0].spid.getSinglePath()) },
+      .DOWNLOAD_FROM_GDRIVE: { snList in self.downloadFileFromGDrive(snList[0].node) },
+
+      .SET_ROWS_CHECKED: { snList in self.setChecked(snList, true) },
+      .SET_ROWS_UNCHECKED: { snList in self.setChecked(snList, false) }
+    ]
+  }
 
   var treeID: String {
     return con.treeID
@@ -47,12 +51,12 @@ class TreeActions {
           return
         }
       default:
-        fallthrough
+          break
       }
 
 
       do {
-        try self.con.backend.executeTreeAction(self.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList)
+        try self.con.backend.executeTreeAction(self.treeID, sender.menuItemMeta.actionID, targetGUIDList: sender.menuItemMeta.targetGUIDList)
       } catch {
         self.con.reportException("Failed to execute action: \(sender.menuItemMeta.actionID)", error)
       }
@@ -150,7 +154,7 @@ class TreeActions {
       return false
     }
 
-    NSLog("DEBUG [\(treeID)] User confirmed delete of \(nodeList.count) items")
+    NSLog("DEBUG [\(treeID)] User confirmed delete of \(itemDescription)")
     return true
   }
 

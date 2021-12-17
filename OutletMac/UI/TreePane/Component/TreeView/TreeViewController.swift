@@ -4,7 +4,6 @@
 //
 
 import AppKit
-import LinkedList
 
 /*
  TreeViewController: AppKit controller for TreeViewRepresentable.

@@ -217,7 +217,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
         let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
-                target: nil, action: Selector("toolbarPickerDidSelectItem:") )
+                                             target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
 
         toolbarItem.label = group.groupLabel
         toolbarItem.paletteLabel = group.groupLabel
@@ -266,7 +266,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
                     NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for identifier '\(toolbarIdentifier.rawValue)'")
                     // This will not fire listeners however. We should have set those values elsewhere.
                     itemGroup.setSelected(true, at: index)
-                    let pickerItem = group.itemList[index]
+//                    let pickerItem = group.itemList[index]
                     itemGroup.toolTip = group.tooltipTemplate //+ "\n\n(current value: \(String(pickerItem.title)))"  // TODO: this doesn't update
                 }
             }

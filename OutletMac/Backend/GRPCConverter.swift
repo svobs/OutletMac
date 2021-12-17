@@ -369,8 +369,8 @@ class GRPCConverter {
   // Tree Context Menu
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem]) throws -> [ContextMenuItem] {
-    var menuItemList: [ContextMenuItem] = []
+  func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta]) throws -> [MenuItemMeta] {
+    var menuItemList: [MenuItemMeta] = []
 
     for grpcItem in grpcList {
       menuItemList.append(try self.menuItemFromGRPC(grpcItem))
@@ -378,11 +378,14 @@ class GRPCConverter {
     return menuItemList
   }
 
-  func menuItemFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) throws -> ContextMenuItem {
+  func menuItemFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta) throws -> MenuItemMeta {
     guard let itemType = MenuItemType.init(rawValue: grpc.itemType) else {
       throw OutletError.invalidState("Bad value received from gRPC: MenuItemType (\(grpc.itemType)) is invalid!")
     }
-    let item = ContextMenuItem(itemType: itemType, title: grpc.title, actionID: grpc.actionID)
+    guard let actionID = ActionID(rawValue: grpc.actionID) else {
+      throw OutletError.invalidState("Bad value received from gRPC: ActionID (\(grpc.actionID)) is invalid!")
+    }
+    let item = MenuItemMeta(itemType: itemType, title: grpc.title, actionID: actionID)
     for submenuItem in grpc.submenuItemList {
       item.submenuItemList.append(try self.menuItemFromGRPC(submenuItem))
     }

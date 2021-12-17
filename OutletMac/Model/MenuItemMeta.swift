@@ -5,14 +5,14 @@
 
 import Foundation
 
-class ContextMenuItem: CustomStringConvertible {
+class MenuItemMeta: CustomStringConvertible {
     let itemType: MenuItemType
     let title: String
-    let actionID: UInt32
+    let actionID: ActionID
     var targetGUIDList: [GUID] = []
-    var submenuItemList: [ContextMenuItem]
+    var submenuItemList: [MenuItemMeta]
 
-    init(itemType: MenuItemType, title: String, actionID: UInt32) {
+    init(itemType: MenuItemType, title: String, actionID: ActionID) {
         self.itemType = itemType
         self.title = title
         self.actionID = actionID
@@ -20,6 +20,6 @@ class ContextMenuItem: CustomStringConvertible {
     }
 
     var description: String {
-        return "ContextMenuItem[type=\(itemType) actionID=\(actionID) title='\(title) submenu=\(submenuItemList)']"
+        return "MenuItemMeta[type=\(itemType) actionID=\(actionID) title='\(title) submenu=\(submenuItemList)']"
     }
 }

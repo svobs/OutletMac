@@ -6,7 +6,6 @@
 //
 
 import AppKit
-import LinkedList
 
 typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
 
@@ -695,7 +694,7 @@ class DisplayStore {
 
 
     while !searchQueue.isEmpty {
-      let guid = searchQueue.popFirst()!
+      let guid: GUID = searchQueue.popFirst()!
       bfsList.append(guid)
 
       for childGUID in self.getChildGUIDList_NoLock(guid) {

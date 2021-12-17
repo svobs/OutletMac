@@ -1132,14 +1132,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var menuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
+  public var menuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
+public struct Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1153,7 +1153,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
   /// Optional. Only used for menu items which apply to a subset, but not the entirety, of the selected nodes:
   public var targetGuidList: [String] = []
 
-  public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
+  public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -3648,8 +3648,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response: SwiftProt
   }
 }
 
-extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".TreeContextMenuItem"
+extension Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".TreeMenuItemMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "item_type"),
     2: .same(proto: "title"),
@@ -3693,7 +3693,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta) -> Bool {
     if lhs.itemType != rhs.itemType {return false}
     if lhs.title != rhs.title {return false}
     if lhs.actionID != rhs.actionID {return false}

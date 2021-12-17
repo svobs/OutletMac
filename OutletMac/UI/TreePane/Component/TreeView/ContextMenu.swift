@@ -9,9 +9,9 @@ import SwiftUI
 
 class GeneratedMenuItem: NSMenuItem {
   var snList: [SPIDNodePair]
-  var menuItemMeta: ContextMenuItem // provided by the backend
+  var menuItemMeta: MenuItemMeta // provided by the backend
 
-  public init(_ snList: [SPIDNodePair], _ menuItemMeta: ContextMenuItem, action selector: Selector?) {
+  public init(_ snList: [SPIDNodePair], _ menuItemMeta: MenuItemMeta, action selector: Selector?) {
     self.snList = snList
     self.menuItemMeta = menuItemMeta
     super.init(title: menuItemMeta.title, action: selector, keyEquivalent: "")
@@ -59,14 +59,14 @@ class TreeContextMenu {
     }
 
     do {
-      let menuItemList: [ContextMenuItem] = try self.con.backend.getContextMenu(treeID: self.treeID, snList.map { sn in sn.spid })
+      let menuItemList: [MenuItemMeta] = try self.con.backend.getContextMenu(treeID: self.treeID, snList.map { sn in sn.spid })
       buildMenuFromMeta(menuItemList, menu: menu, snList)
     } catch {
       self.con.reportError("Failed to build context menu", "\(error)")
     }
   }
 
-  private func buildMenuFromMeta(_ itemMetaList: [ContextMenuItem], menu: NSMenu, _ snList: [SPIDNodePair]) {
+  private func buildMenuFromMeta(_ itemMetaList: [MenuItemMeta], menu: NSMenu, _ snList: [SPIDNodePair]) {
     for itemMeta in itemMetaList {
       let item = GeneratedMenuItem(snList, itemMeta, action: #selector(self.con.treeActions.executeMenuAction(_:)))
       item.target = self.con.treeActions

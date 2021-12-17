@@ -141,7 +141,7 @@ enum ErrorHandlingStrategy: UInt32 {
 }
 
 /**
- For tree context menus: see gRPC TreeContextMenuItem
+ For tree context menus: see gRPC TreeMenuItemMeta
  */
 enum MenuItemType: UInt32 {
   case NORMAL = 1
