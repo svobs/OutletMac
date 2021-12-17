@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import DequeModule
 
 typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
 
@@ -653,7 +654,7 @@ class DisplayStore {
    Applies the given applyFunc to the given item's descendants in breadth-first order.
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func getDescendants(_ guid: GUID) -> LinkedList<GUID> {
+  private func getDescendants(_ guid: GUID) -> Deque<GUID> {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
     return bfsList(guid, includeTopmostGUID: false)
@@ -663,7 +664,7 @@ class DisplayStore {
    Returns a list of the GUID and its descendants in breadth-first order.
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func getSelfAndAllDescendants(_ guid: GUID) -> LinkedList<GUID> {
+  private func getSelfAndAllDescendants(_ guid: GUID) -> Deque<GUID> {
     // First construct a deque of all nodes. I'm doing this to avoid possibly nesting dispatch queue work items, since it's possible
     // (likely?) that 'applyFunc' also contains a dispatch queue work item.
     return bfsList(guid, includeTopmostGUID: true)
@@ -673,8 +674,8 @@ class DisplayStore {
    Returns a list of GUIDs in the given subtree in breadth-first order.
    Note: this should be executed inside a dispatch queue. It is not thread-safe on its own
    */
-  private func bfsList(_ topmostGUID: GUID, includeTopmostGUID: Bool) -> LinkedList<GUID> {
-    var bfsList = LinkedList<GUID>()
+  private func bfsList(_ topmostGUID: GUID, includeTopmostGUID: Bool) -> Deque<GUID> {
+    var bfsList = Deque<GUID>()
 
     guard let sn = self.getSN_NoLock(topmostGUID) else {
       return bfsList
@@ -684,7 +685,7 @@ class DisplayStore {
       NSLog("DEBUG [\(treeID)] bfsList(): topmost_spid=\(sn.spid)")
     }
 
-    var searchQueue = LinkedList<GUID>()
+    var searchQueue = Deque<GUID>()
     if includeTopmostGUID {
       bfsList.append(topmostGUID)
     }

@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "File-Replace-24.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -63,7 +64,7 @@
       "scale" : "1x"
     },
     {
-      "filename" : "ModeMove-32.png",
+      "filename" : "File-Replace-32.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

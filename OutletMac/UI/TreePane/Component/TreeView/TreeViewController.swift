@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import DequeModule
 
 /*
  TreeViewController: AppKit controller for TreeViewRepresentable.
@@ -787,7 +788,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
 
         // contains items which were just expanded and need their children examined
-        var queue = LinkedList<SPIDNodePair>()
+        var queue = Deque<SPIDNodePair>()
 
         func process(_ sn: SPIDNodePair) {
             if sn.node.isDir {

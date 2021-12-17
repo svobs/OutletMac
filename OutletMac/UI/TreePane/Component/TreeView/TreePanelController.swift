@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 2021-02-01.
 //
 import SwiftUI
+import DequeModule
 
 /**
  PROTOCOL TreePanelControllable
@@ -273,7 +274,7 @@ class TreePanelController: TreePanelControllable {
       rows = RowsOfInterest() // non-fatal error
     }
 
-    var queue = LinkedList<SPIDNodePair>()
+    var queue = Deque<SPIDNodePair>()
 
     do {
       let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
@@ -446,8 +447,8 @@ class TreePanelController: TreePanelControllable {
 
     var checkedRowList: [SPIDNodePair] = []
 
-    var checkedQueue = LinkedList<SPIDNodePair>()
-    var mixedQueue = LinkedList<SPIDNodePair>()
+    var checkedQueue = Deque<SPIDNodePair>()
+    var mixedQueue = Deque<SPIDNodePair>()
 
     assert(self.tree.hasCheckboxes, "Tree does not have checkboxes. Is this a ChangeTree? \(self.tree.state)")
 

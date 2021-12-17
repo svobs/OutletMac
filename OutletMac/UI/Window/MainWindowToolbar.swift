@@ -217,7 +217,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
         let itemGroup = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
-                                             target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
+                                           target: nil, action: #selector(OutletMacApp.toolbarPickerDidSelectItem))
 
       itemGroup.label = group.groupLabel
       itemGroup.isEnabled = true
