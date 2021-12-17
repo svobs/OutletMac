@@ -208,21 +208,22 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         var titleList: [String] = []
         var imageList: [NSImage] = []
 
-        for item in group.itemList {
-            titleList.append(item.title)
-            imageList.append(item.image)
+        for itemMeta in group.itemList {
+            titleList.append(itemMeta.title)
+            imageList.append(itemMeta.image)
         }
 
         // This will either be a segmented control or a drop down depending on your available space.
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
-        let toolbarItem = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
+        let itemGroup = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList, selectionMode: .selectOne, labels: titleList,
                                              target: nil, action: Selector(("toolbarPickerDidSelectItem:")) )
 
-        toolbarItem.label = group.groupLabel
-        toolbarItem.paletteLabel = group.groupLabel
-        toolbarItem.toolTip = group.tooltipTemplate // TODO: display current value using template
-        return toolbarItem
+      itemGroup.label = group.groupLabel
+      itemGroup.isEnabled = true
+      itemGroup.paletteLabel = group.groupLabel
+      itemGroup.toolTip = group.tooltipTemplate // TODO: display current value using template
+        return itemGroup
     }
 
     func getItemForIdentifier(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem? {
