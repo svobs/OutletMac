@@ -650,6 +650,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.opUid != 0 {
       try visitor.visitSingularUInt32Field(value: self.opUid, fieldNumber: 1)
     }
@@ -659,12 +663,12 @@ extension Outlet_Backend_Agent_Grpc_Generated_UserOp: SwiftProtobuf.Message, Swi
     if self.opType != 0 {
       try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 3)
     }
-    if let v = self._srcNode {
+    try { if let v = self._srcNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-    }
-    if let v = self._dstNode {
+    } }()
+    try { if let v = self._dstNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    }
+    } }()
     if self.createTs != 0 {
       try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 6)
     }
@@ -704,12 +708,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList: SwiftProtobuf.Mess
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._srcNode {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._srcNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._dstNode {
+    } }()
+    try { if let v = self._dstNode {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -742,12 +750,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Messag
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._spid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._spid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
-    if let v = self._node {
+    } }()
+    try { if let v = self._node {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -879,75 +891,107 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
         case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._iconID) }()
         case 10: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .containerMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .containerMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .containerMeta(v)
+          }
         }()
         case 11: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .categoryMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .categoryMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .categoryMeta(v)
+          }
         }()
         case 12: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .rootTypeMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .rootTypeMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .rootTypeMeta(v)
+          }
         }()
         case 20: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .localDirMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .localDirMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .localDirMeta(v)
+          }
         }()
         case 21: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .localFileMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .localFileMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .localFileMeta(v)
+          }
         }()
         case 22: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .gdriveFileMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .gdriveFileMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .gdriveFileMeta(v)
+          }
         }()
         case 23: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .gdriveFolderMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .gdriveFolderMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .gdriveFolderMeta(v)
+          }
         }()
         case 24: try {
           var v: Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta?
+          var hadOneofValue = false
           if let current = _storage._nodeType {
-            try decoder.handleConflictingOneOf()
+            hadOneofValue = true
             if case .nonexistentDirMeta(let m) = current {v = m}
           }
           try decoder.decodeSingularMessageField(value: &v)
-          if let v = v {_storage._nodeType = .nonexistentDirMeta(v)}
+          if let v = v {
+            if hadOneofValue {try decoder.handleConflictingOneOf()}
+            _storage._nodeType = .nonexistentDirMeta(v)
+          }
         }()
         default: break
         }
@@ -957,9 +1001,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._nodeIdentifier {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._nodeIdentifier {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      }
+      } }()
       if _storage._trashed != 0 {
         try visitor.visitSingularUInt32Field(value: _storage._trashed, fieldNumber: 2)
       }
@@ -969,9 +1017,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
       if _storage._iconID != 0 {
         try visitor.visitSingularUInt32Field(value: _storage._iconID, fieldNumber: 4)
       }
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch _storage._nodeType {
       case .containerMeta?: try {
         guard case .containerMeta(let v)? = _storage._nodeType else { preconditionFailure() }
@@ -1173,9 +1218,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_ContainerNodeMeta: SwiftProtobuf.M
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._dirMeta {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1207,9 +1256,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Me
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._dirMeta {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if self.opType != 0 {
       try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 2)
     }
@@ -1243,9 +1296,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta: SwiftProtobuf.Me
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._dirMeta {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1281,9 +1338,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._dirMeta {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if self.isLive != false {
       try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 2)
     }
@@ -1566,6 +1627,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.Me
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
       if !_storage._googID.isEmpty {
         try visitor.visitSingularStringField(value: _storage._googID, fieldNumber: 1)
       }
@@ -1593,9 +1658,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta: SwiftProtobuf.Me
       if _storage._createTs != 0 {
         try visitor.visitSingularUInt64Field(value: _storage._createTs, fieldNumber: 9)
       }
-      if let v = _storage._dirMeta {
+      try { if let v = _storage._dirMeta {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 10)
-      }
+      } }()
       if _storage._allChildrenFetched != false {
         try visitor.visitSingularBoolField(value: _storage._allChildrenFetched, fieldNumber: 11)
       }

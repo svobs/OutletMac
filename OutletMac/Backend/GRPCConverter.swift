@@ -369,7 +369,7 @@ class GRPCConverter {
   // Tree Context Menu
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta]) throws -> [MenuItemMeta] {
+  func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem]) throws -> [MenuItemMeta] {
     var menuItemList: [MenuItemMeta] = []
 
     for grpcItem in grpcList {
@@ -378,7 +378,7 @@ class GRPCConverter {
     return menuItemList
   }
 
-  func menuItemFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta) throws -> MenuItemMeta {
+  func menuItemFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) throws -> MenuItemMeta {
     guard let itemType = MenuItemType.init(rawValue: grpc.itemType) else {
       throw OutletError.invalidState("Bad value received from gRPC: MenuItemType (\(grpc.itemType)) is invalid!")
     }

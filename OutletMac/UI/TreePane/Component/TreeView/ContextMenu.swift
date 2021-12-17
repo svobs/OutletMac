@@ -59,21 +59,31 @@ class TreeContextMenu {
     }
 
     do {
-      let menuItemList: [MenuItemMeta] = try self.con.backend.getContextMenu(treeID: self.treeID, snList.map { sn in sn.spid })
-      buildMenuFromMeta(menuItemList, menu: menu, snList)
+      let menuItemMetaList: [MenuItemMeta] = try self.con.backend.getContextMenu(treeID: self.treeID, snList.map { sn in sn.spid.guid })
+      menu.autoenablesItems = false
+      buildMenuFromMeta(menuItemMetaList, menu: menu, snList)
     } catch {
       self.con.reportError("Failed to build context menu", "\(error)")
     }
   }
 
-  private func buildMenuFromMeta(_ itemMetaList: [MenuItemMeta], menu: NSMenu, _ snList: [SPIDNodePair]) {
-    for itemMeta in itemMetaList {
-      let item = GeneratedMenuItem(snList, itemMeta, action: #selector(self.con.treeActions.executeMenuAction(_:)))
-      item.target = self.con.treeActions
+  private func buildMenuFromMeta(_ menuItemMetaList: [MenuItemMeta], menu: NSMenu, _ snList: [SPIDNodePair]) {
+    for itemMeta in menuItemMetaList {
+      let item: NSMenuItem
+      if itemMeta.itemType == .SEPARATOR {
+        item = NSMenuItem.separator()
+      } else {
+        item = GeneratedMenuItem(snList, itemMeta, action: #selector(self.con.treeActions.executeMenuAction(_:)))
+        item.target = self.con.treeActions
+        if itemMeta.itemType == .DISABLED || itemMeta.itemType == .ITALIC_DISABLED {
+          item.isEnabled = false
+        }
+      }
       menu.addItem(item)
 
       if itemMeta.submenuItemList.count > 0 {
         let submenu = NSMenu()
+        submenu.autoenablesItems = false
         menu.setSubmenu(submenu, for: item)
         buildMenuFromMeta(itemMeta.submenuItemList, menu: submenu, snList)
       }

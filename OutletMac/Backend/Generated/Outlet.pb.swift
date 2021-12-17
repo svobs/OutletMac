@@ -1120,7 +1120,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request {
 
   public var treeID: String = String()
 
-  public var identifierList: [Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier] = []
+  public var targetGuidList: [String] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1132,14 +1132,14 @@ public struct Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var menuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta] = []
+  public var menuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
 }
 
-public struct Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta {
+public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1153,7 +1153,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta {
   /// Optional. Only used for menu items which apply to a subset, but not the entirety, of the selected nodes:
   public var targetGuidList: [String] = []
 
-  public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta] = []
+  public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1624,9 +1624,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetIcon_Response: SwiftProtobuf.Me
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._icon {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._icon {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1827,9 +1831,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetFilter_Response: SwiftProtobuf.
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._filterCriteria {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._filterCriteria {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1861,12 +1869,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request: SwiftProtobu
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
     }
-    if let v = self._filterCriteria {
+    try { if let v = self._filterCriteria {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2182,9 +2194,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Response: SwiftPr
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._userOp {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._userOp {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2410,9 +2426,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request: SwiftProto
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._nodeIdentifier {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._nodeIdentifier {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
     }
@@ -2664,12 +2684,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_DirMetaGuidUpdate: SwiftProtobuf.M
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.guid.isEmpty {
       try visitor.visitSingularStringField(value: self.guid, fieldNumber: 1)
     }
-    if let v = self._dirMeta {
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2702,12 +2726,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_DirMetaUidUpdate: SwiftProtobuf.Me
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.uid != 0 {
       try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
     }
-    if let v = self._dirMeta {
+    try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2784,12 +2812,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate: SwiftProtobuf.Mess
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.loadStateInt != 0 {
       try visitor.visitSingularUInt32Field(value: self.loadStateInt, fieldNumber: 1)
     }
-    if let v = self._statsUpdate {
+    try { if let v = self._statsUpdate {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -2824,9 +2856,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData: SwiftProtobuf.M
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._subtreeRootSpid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._subtreeRootSpid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.upsertedSnList.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.upsertedSnList, fieldNumber: 2)
     }
@@ -2991,138 +3027,198 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
       case 2: try { try decoder.decodeSingularStringField(value: &self.sender) }()
       case 10: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_Empty?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .empty(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .empty(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .empty(v)
+        }
       }()
       case 11: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_ErrorOccurred?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .errorOccurred(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .errorOccurred(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .errorOccurred(v)
+        }
       }()
       case 12: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .displayTreeUiState(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .displayTreeUiState(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .displayTreeUiState(v)
+        }
       }()
       case 13: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_PlayState?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .playState(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .playState(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .playState(v)
+        }
       }()
       case 14: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_ToggleUiEnablement?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .uiEnablement(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .uiEnablement(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .uiEnablement(v)
+        }
       }()
       case 15: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .sn(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .sn(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .sn(v)
+        }
       }()
       case 17: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_TreeLoadUpdate?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .treeLoadUpdate(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .treeLoadUpdate(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .treeLoadUpdate(v)
+        }
       }()
       case 18: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_DownloadMsg?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .downloadMsg(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .downloadMsg(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .downloadMsg(v)
+        }
       }()
       case 19: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .statsUpdate(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .statsUpdate(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .statsUpdate(v)
+        }
       }()
       case 20: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_Device?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .device(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .device(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .device(v)
+        }
       }()
       case 21: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .dualDisplayTree(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .dualDisplayTree(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .dualDisplayTree(v)
+        }
       }()
       case 22: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_SubtreeChangeData?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .subtree(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .subtree(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .subtree(v)
+        }
       }()
       case 23: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_BatchFailed?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .batchFailed(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .batchFailed(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .batchFailed(v)
+        }
       }()
       case 24: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_HandleBatchFailed?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .handleBatchFailed(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .handleBatchFailed(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .handleBatchFailed(v)
+        }
       }()
       case 25: try {
         var v: Outlet_Backend_Agent_Grpc_Generated_GUIDSet?
+        var hadOneofValue = false
         if let current = self.signalData {
-          try decoder.handleConflictingOneOf()
+          hadOneofValue = true
           if case .guidSet(let m) = current {v = m}
         }
         try decoder.decodeSingularMessageField(value: &v)
-        if let v = v {self.signalData = .guidSet(v)}
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.signalData = .guidSet(v)
+        }
       }()
       default: break
       }
@@ -3130,15 +3226,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_SignalMsg: SwiftProtobuf.Message, 
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.sigInt != 0 {
       try visitor.visitSingularUInt32Field(value: self.sigInt, fieldNumber: 1)
     }
     if !self.sender.isEmpty {
       try visitor.visitSingularStringField(value: self.sender, fieldNumber: 2)
     }
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every case branch when no optimizations are
-    // enabled. https://github.com/apple/swift-protobuf/issues/1034
     switch self.signalData {
     case .empty?: try {
       guard case .empty(let v)? = self.signalData else { preconditionFailure() }
@@ -3260,12 +3357,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_DualDisplayTree: SwiftProtobuf.Mes
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      if let v = _storage._leftTree {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._leftTree {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      }
-      if let v = _storage._rightTree {
+      } }()
+      try { if let v = _storage._rightTree {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-      }
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -3362,9 +3463,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request: SwiftProtobu
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._parentSpid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._parentSpid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 2)
     }
@@ -3446,9 +3551,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request: SwiftProt
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._spid {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._spid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     if !self.stopAtPath.isEmpty {
       try visitor.visitSingularStringField(value: self.stopAtPath, fieldNumber: 2)
     }
@@ -3582,7 +3691,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request: SwiftProto
   public static let protoMessageName: String = _protobuf_package + ".GetContextMenu_Request"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "tree_id"),
-    2: .standard(proto: "identifier_list"),
+    2: .standard(proto: "target_guid_list"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -3592,7 +3701,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request: SwiftProto
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.treeID) }()
-      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.identifierList) }()
+      case 2: try { try decoder.decodeRepeatedStringField(value: &self.targetGuidList) }()
       default: break
       }
     }
@@ -3602,15 +3711,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request: SwiftProto
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
     }
-    if !self.identifierList.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.identifierList, fieldNumber: 2)
+    if !self.targetGuidList.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.targetGuidList, fieldNumber: 2)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, rhs: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request) -> Bool {
     if lhs.treeID != rhs.treeID {return false}
-    if lhs.identifierList != rhs.identifierList {return false}
+    if lhs.targetGuidList != rhs.targetGuidList {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -3648,8 +3757,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response: SwiftProt
   }
 }
 
-extension Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".TreeMenuItemMeta"
+extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".TreeContextMenuItem"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "item_type"),
     2: .same(proto: "title"),
@@ -3693,7 +3802,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta: SwiftProtobuf.Me
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeMenuItemMeta) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem, rhs: Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem) -> Bool {
     if lhs.itemType != rhs.itemType {return false}
     if lhs.title != rhs.title {return false}
     if lhs.actionID != rhs.actionID {return false}
@@ -3798,12 +3907,16 @@ extension Outlet_Backend_Agent_Grpc_Generated_DisplayTreeUiState: SwiftProtobuf.
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.treeID.isEmpty {
       try visitor.visitSingularStringField(value: self.treeID, fieldNumber: 1)
     }
-    if let v = self._rootSn {
+    try { if let v = self._rootSn {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-    }
+    } }()
     if self.rootExists != false {
       try visitor.visitSingularBoolField(value: self.rootExists, fieldNumber: 3)
     }
@@ -3866,6 +3979,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if self.isStartup != false {
       try visitor.visitSingularBoolField(value: self.isStartup, fieldNumber: 1)
     }
@@ -3881,9 +3998,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request: SwiftP
     if self.deviceUid != 0 {
       try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 5)
     }
-    if let v = self._spid {
+    try { if let v = self._spid {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
-    }
+    } }()
     if self.treeDisplayMode != 0 {
       try visitor.visitSingularUInt32Field(value: self.treeDisplayMode, fieldNumber: 7)
     }
@@ -3922,9 +4039,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response: Swift
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._displayTreeUiState {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._displayTreeUiState {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -3954,9 +4075,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response: SwiftProtobuf
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._node {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._node {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4100,9 +4225,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Response: SwiftProtobuf.M
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if let v = self._sn {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._sn {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    }
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 

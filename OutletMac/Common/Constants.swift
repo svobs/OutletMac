@@ -147,6 +147,7 @@ enum MenuItemType: UInt32 {
   case NORMAL = 1
   case SEPARATOR = 2
   case DISABLED = 3
+  case ITALIC_DISABLED = 4
 }
 
 enum ActionID: UInt32 {
