@@ -7,3 +7,17 @@
 //
 
 import Foundation
+
+class TreeAction {
+  let treeID: TreeID
+  let actionID: ActionID
+  let targetGUIDList: [GUID]
+  let targetNodeList: [Node]
+
+  init(_ treeID: TreeID, _ actionID: ActionID, _ targetGUIDList: [GUID], _ targetNodeList: [Node]) {
+    self.treeID = treeID
+    self.actionID = actionID
+    self.targetGUIDList = targetGUIDList
+    self.targetNodeList = targetNodeList
+  }
+}

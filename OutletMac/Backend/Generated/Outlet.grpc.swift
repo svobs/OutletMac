@@ -101,10 +101,10 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol: GRPCCl
     callOptions: CallOptions?
   ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>
 
-  func execute_tree_action(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request,
+  func execute_tree_action_list(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request,
     callOptions: CallOptions?
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response>
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response>
 
   func request_display_tree(
     _ request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request,
@@ -437,21 +437,21 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletClientProtocol {
     )
   }
 
-  /// Unary call to execute_tree_action
+  /// Unary call to execute_tree_action_list
   ///
   /// - Parameters:
-  ///   - request: Request to send to execute_tree_action.
+  ///   - request: Request to send to execute_tree_action_list.
   ///   - callOptions: Call options.
   /// - Returns: A `UnaryCall` with futures for the metadata, status and response.
-  public func execute_tree_action(
-    _ request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request,
+  public func execute_tree_action_list(
+    _ request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request,
     callOptions: CallOptions? = nil
-  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response> {
+  ) -> UnaryCall<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response> {
     return self.makeUnaryCall(
-      path: "/outlet.backend.agent.grpc.generated.Outlet/execute_tree_action",
+      path: "/outlet.backend.agent.grpc.generated.Outlet/execute_tree_action_list",
       request: request,
       callOptions: callOptions ?? self.defaultCallOptions,
-      interceptors: self.interceptors?.makeexecute_tree_actionInterceptors() ?? []
+      interceptors: self.interceptors?.makeexecute_tree_action_listInterceptors() ?? []
     )
   }
 
@@ -752,8 +752,8 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletClientInterceptorFacto
   /// - Returns: Interceptors to use when invoking 'get_context_menu'.
   func makeget_context_menuInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>]
 
-  /// - Returns: Interceptors to use when invoking 'execute_tree_action'.
-  func makeexecute_tree_actionInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response>]
+  /// - Returns: Interceptors to use when invoking 'execute_tree_action_list'.
+  func makeexecute_tree_action_listInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response>]
 
   /// - Returns: Interceptors to use when invoking 'request_display_tree'.
   func makerequest_display_treeInterceptors() -> [ClientInterceptor<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>]
@@ -855,7 +855,7 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletProvider: CallHandlerP
 
   func get_context_menu(request: Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>
 
-  func execute_tree_action(request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response>
+  func execute_tree_action_list(request: Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response>
 
   func request_display_tree(request: Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request, context: StatusOnlyCallContext) -> EventLoopFuture<Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Response>
 
@@ -1022,13 +1022,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_OutletProvider {
         userFunction: self.get_context_menu(request:context:)
       )
 
-    case "execute_tree_action":
+    case "execute_tree_action_list":
       return UnaryServerHandler(
         context: context,
-        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request>(),
-        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response>(),
-        interceptors: self.interceptors?.makeexecute_tree_actionInterceptors() ?? [],
-        userFunction: self.execute_tree_action(request:context:)
+        requestDeserializer: ProtobufDeserializer<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request>(),
+        responseSerializer: ProtobufSerializer<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response>(),
+        interceptors: self.interceptors?.makeexecute_tree_action_listInterceptors() ?? [],
+        userFunction: self.execute_tree_action_list(request:context:)
       )
 
     case "request_display_tree":
@@ -1221,9 +1221,9 @@ public protocol Outlet_Backend_Agent_Grpc_Generated_OutletServerInterceptorFacto
   ///   Defaults to calling `self.makeInterceptors()`.
   func makeget_context_menuInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request, Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Response>]
 
-  /// - Returns: Interceptors to use when handling 'execute_tree_action'.
+  /// - Returns: Interceptors to use when handling 'execute_tree_action_list'.
   ///   Defaults to calling `self.makeInterceptors()`.
-  func makeexecute_tree_actionInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Response>]
+  func makeexecute_tree_action_listInterceptors() -> [ServerInterceptor<Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request, Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Response>]
 
   /// - Returns: Interceptors to use when handling 'request_display_tree'.
   ///   Defaults to calling `self.makeInterceptors()`.

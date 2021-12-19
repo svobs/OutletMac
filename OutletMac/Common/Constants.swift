@@ -163,8 +163,12 @@ enum ActionID: UInt32 {
   case DOWNLOAD_FROM_GDRIVE = 10    // FE only (should be BE though)
   case SET_ROWS_CHECKED = 11        // FE only
   case SET_ROWS_UNCHECKED = 12      // FE only
+  case EXPAND_ROWS = 13             // BE -> FE
+  case COLLAPSE_ROWS = 14           // BE -> FE
 
   case CALL_EXIFTOOL = 50           // FE only
+
+  case ACTIVATE = 100
 }
 
 // --- FE + BE SHARED ---

@@ -67,6 +67,7 @@
 		D17FA94F276C96800024527E /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D17FA94E276C96800024527E /* DequeModule */; };
 		D19B16B726158E610072F8A8 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19B16B626158E610072F8A8 /* Device.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
+		D1BF4E1C276F5AD6008B84DB /* TreeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -139,6 +140,7 @@
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
+		D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeAction.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -264,6 +266,7 @@
 				CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */,
 				CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */,
 				CDF2F275262010959BE9CDA3 /* Constants.swift */,
+				D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -519,6 +522,7 @@
 				CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */,
 				CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */,
 				CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */,
+				D1BF4E1C276F5AD6008B84DB /* TreeAction.swift in Sources */,
 				CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */,
 				CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */,
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,

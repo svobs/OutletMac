@@ -54,9 +54,9 @@ class TreeActions {
           break
       }
 
-
       do {
-        try self.con.backend.executeTreeAction(self.treeID, sender.menuItemMeta.actionID, targetGUIDList: sender.menuItemMeta.targetGUIDList)
+        let treeAction = TreeAction(self.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList, [])
+        try self.con.backend.executeTreeAction(treeAction)
       } catch {
         self.con.reportException("Failed to execute action: \(sender.menuItemMeta.actionID)", error)
       }

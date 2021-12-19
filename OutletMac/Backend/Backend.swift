@@ -33,7 +33,8 @@ protocol OutletBackend: HasLifecycle {
   func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws
   func removeExpandedRow(_ rowUID: GUID, _ treeID: TreeID) throws
   func getContextMenu(treeID: TreeID, _ guidList: [GUID]) throws -> [MenuItemMeta]
-  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws
+  func executeTreeAction(_ treeAction: TreeAction) throws
+  func executeTreeActionList(_ treeActionList: [TreeAction]) throws
 
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree?
   func createDisplayTreeFromConfig(treeID: TreeID, isStartup: Bool) throws -> DisplayTree?
@@ -182,7 +183,11 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws {
+  func executeTreeAction(_ treeAction: TreeAction) throws {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func executeTreeActionList(_ treeActionList: [TreeAction]) throws {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

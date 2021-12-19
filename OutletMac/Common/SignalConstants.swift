@@ -45,6 +45,7 @@ enum Signal: UInt32 {
    */
   case SHUTDOWN_APP = 34
   case DEREGISTER_DISPLAY_TREE = 35
+  case EXECUTE_ACTION = 36
 
   // Fired by the backend each time the TreeLoadState changes for a given tree
   case TREE_LOAD_STATE_UPDATED = 40

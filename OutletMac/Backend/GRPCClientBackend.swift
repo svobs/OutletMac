@@ -321,80 +321,18 @@ class GRPCClientBackend: OutletBackend {
 
   private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) throws {
     guard let signal = Signal(rawValue: signalGRPC.sigInt) else {
-      fatalError("Could not resolve Signal from int value: \(signalGRPC.sigInt)")
+      reportError("Internal Error", "Could not resolve Signal from int value: \(signalGRPC.sigInt)")
+      return
     }
     NSLog("DEBUG GRPCClient: got signal from backend via gRPC: \(signal) with sender: \(signalGRPC.sender)")
-    var argDict: [String: Any] = [:]
-
-    switch signal {
-    case .WELCOME:
-        // Do not forward to clients. Welcome msg is used just for its ping functionality
-        return
-      case .DISPLAY_TREE_CHANGED, .GENERATE_MERGE_TREE_DONE:
-        let displayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.displayTreeUiState)
-        let tree: DisplayTree = displayTreeUiState.toDisplayTree(backend: self)
-        argDict["tree"] = tree
-      case .DIFF_TREES_DONE, .DIFF_TREES_CANCELLED:
-        let displayTreeUiStateL = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.dualDisplayTree.leftTree)
-        let treeL: DisplayTree = displayTreeUiStateL.toDisplayTree(backend: self)
-        argDict["tree_left"] = treeL
-        let displayTreeUiStateR = try self.grpcConverter.displayTreeUiStateFromGRPC(signalGRPC.dualDisplayTree.rightTree)
-        let treeR: DisplayTree = displayTreeUiStateR.toDisplayTree(backend: self)
-        argDict["tree_right"] = treeR
-      case .OP_EXECUTION_PLAY_STATE_CHANGED:
-        argDict["is_enabled"] = signalGRPC.playState.isEnabled
-      case .TOGGLE_UI_ENABLEMENT:
-        argDict["enable"] = signalGRPC.uiEnablement.enable
-      case .SET_SELECTED_ROWS:
-        var guidSet = Set<GUID>()
-        for guid in signalGRPC.guidSet.guidSet {
-          guidSet.insert(guid)
-        }
-        argDict["selected_rows"] = guidSet
-      case .ERROR_OCCURRED:
-        argDict["msg"] = signalGRPC.errorOccurred.msg
-        argDict["secondary_msg"] = signalGRPC.errorOccurred.secondaryMsg
-      case .NODE_UPSERTED, .NODE_REMOVED:
-        argDict["sn"] = try self.grpcConverter.snFromGRPC(signalGRPC.sn)
-      case .SUBTREE_NODES_CHANGED:
-        argDict["subtree_root_spid"] = try self.grpcConverter.spidFromGRPC(spidGRPC: signalGRPC.subtree.subtreeRootSpid)
-        argDict["upserted_sn_list"] = try self.grpcConverter.snListFromGRPC(signalGRPC.subtree.upsertedSnList)
-        argDict["removed_sn_list"] = try self.grpcConverter.snListFromGRPC(signalGRPC.subtree.removedSnList)
-      case .TREE_LOAD_STATE_UPDATED:
-        argDict["tree_load_state"] = TreeLoadState(rawValue: signalGRPC.treeLoadUpdate.loadStateInt)
-        try self.convertStatsAndStatus(statsUpdate: signalGRPC.treeLoadUpdate.statsUpdate, argDict: &argDict)
-      case .DOWNLOAD_FROM_GDRIVE_DONE:
-        argDict["filename"] = signalGRPC.downloadMsg.filename
-      case .STATS_UPDATED:
-        try self.convertStatsAndStatus(statsUpdate: signalGRPC.statsUpdate, argDict: &argDict)
-      case .DEVICE_UPSERTED:
-        argDict["device"] = try self.grpcConverter.deviceFromGRPC(signalGRPC.device)
-      case .BATCH_FAILED:
-        argDict["batch_uid"] = signalGRPC.batchFailed.batchUid
-        argDict["msg"] = signalGRPC.batchFailed.msg
-        argDict["secondary_msg"] = signalGRPC.batchFailed.secondaryMsg
-      default:
-        break
+    
+    if signal == .WELCOME {
+      // Do not forward to clients. Welcome msg is used just for its ping functionality
+      return
     }
-    argDict["signal"] = signal
 
+    let argDict = try self.grpcConverter.signalArgDictFromGRPC(signal, signalGRPC)
     app.dispatcher.sendSignal(signal: signal, senderID: signalGRPC.sender, argDict)
-  }
-
-  private func convertStatsAndStatus(statsUpdate: Outlet_Backend_Agent_Grpc_Generated_StatsUpdate, argDict: inout [String: Any]) throws {
-    argDict["status_msg"] = statsUpdate.statusMsg
-
-    var dirStatsByUidDict: [UID:DirectoryStats] = [:]
-    for dirMetaUpdate in statsUpdate.dirMetaByUidList {
-      dirStatsByUidDict[dirMetaUpdate.uid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-    }
-    argDict["dir_stats_dict_by_uid"] = dirStatsByUidDict
-
-    var dirStatsByGuidDict: [GUID:DirectoryStats] = [:]
-    for dirMetaUpdate in statsUpdate.dirMetaByGuidList {
-      dirStatsByGuidDict[dirMetaUpdate.guid] = try self.grpcConverter.dirMetaFromGRPC(dirMetaUpdate.dirMeta)
-    }
-    argDict["dir_stats_dict_by_guid"] = dirStatsByGuidDict
   }
 
   /**
@@ -575,15 +513,16 @@ class GRPCClientBackend: OutletBackend {
     return try self.grpcConverter.menuItemListFromGRPC(response.menuItemList)
   }
 
-  func executeTreeAction(_ treeID: TreeID, _ actionID: ActionID, targetGUIDList: [GUID]) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeAction_Request()
-    request.treeID = treeID
-    request.actionID = actionID.rawValue
-    for guid in targetGUIDList {
-      request.targetGuidList.append(guid)
-    }
+  func executeTreeAction(_ treeAction: TreeAction) throws {
+    return try self.executeTreeActionList([treeAction])
+  }
 
-    let _ = try self.callAndTranslateErrors(self.stub.execute_tree_action(request), "executeTreeAction")
+  func executeTreeActionList(_ treeActionList: [TreeAction]) throws {
+    var request = Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request()
+    for treeAction in treeActionList {
+      request.actionList.append(try self.grpcConverter.treeActionToGRPC(treeAction))
+    }
+    let _ = try self.callAndTranslateErrors(self.stub.execute_tree_action_list(request), "executeTreeActionList")
   }
 
   func createDisplayTreeForGDriveSelect(deviceUID: UID) throws -> DisplayTree? {
