@@ -236,7 +236,7 @@ class SignalDispatcher {
             countNotified += 1
             self.recvQueue.async {  // do not block the send queue
               do {
-                NSLog("DEBUG SignalDispatcher: Calling listener \(subID) for signal '\(signal)'")
+                NSLog("DEBUG SignalDispatcher: Calling listener '\(subID)' for signal '\(signal)'")
                 try subscriber.callback(senderID, propertyList)
               } catch {
                 NSLog("ERROR SignalDispatcher: While calling listener \(subID) for signal '\(signal)': \(error)")

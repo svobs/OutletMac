@@ -91,35 +91,11 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let item = sender.item(atRow: sender.clickedRow)
 
         let guid = itemToGUID(item)
-        guard let sn = self.displayStore.getSN(guid) else {
-            return
-        }
-
-        NSLog("DEBUG [\(treeID)] User double-clicked on: \(sn.spid)")
-
-        if sn.node.isDir {
-            // Is dir -> toggle expand/collapse
-
-            if outlineView.isItemExpanded(guid) {
-                NSLog("DEBUG [\(treeID)] User double-clicked on dir node: collapsing item: \(guid)")
-                outlineView.animator().collapseItem(guid, collapseChildren: true)
-            } else {
-                NSLog("DEBUG [\(treeID)] User double-clicked on dir node: expanding item: \(guid)")
-                outlineView.animator().expandItem(guid)
-            }
-
-        } else {
-            if sn.node.isLive {
-                if sn.node.treeType == .LOCAL_DISK {
-                    NSLog("DEBUG [\(treeID)] Opening local file with default app: \(sn.spid.getSinglePath())")
-                    self.con.treeActions.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
-                } else if sn.node.treeType == .GDRIVE {
-                    self.con.treeActions.downloadFileFromGDrive(sn.spid.guid)
-                    // See signal "DOWNLOAD_FROM_GDRIVE_DONE" for handling of async response
-                }
-            } else {
-                NSLog("INFO  [\(treeID)] No action for double-click: node is not live")
-            }
+        let treeAction = TreeAction(self.con.treeID, .ACTIVATE, [guid], [])
+        do {
+            try self.con.backend.executeTreeAction(treeAction)
+        } catch {
+            self.con.reportException("Failed sending double-click action to backend", error)
         }
     }
 
@@ -779,6 +755,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         }
     }
 
+    /**
+     Expands all of the rows with the given GUIDs, and also all of their descendants, using an animation.
+     */
     func expandAll(_ guidList: [GUID]) {
         assert(DispatchQueue.isExecutingIn(.main))
 

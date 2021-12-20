@@ -16,18 +16,30 @@ class TreeActions {
 
   init() {
     actionHandlerDict = [
-      .EXPAND_ALL: { action in self.con.treeView?.expandAll(action.targetGUIDList) },
+      .EXPAND_ALL: { action in
+        DispatchQueue.main.async {
+          self.con.treeView?.expandAll(action.targetGUIDList)
+        }
+      },
       .REFRESH: { action in self.refreshSubtree(action.targetGUIDList) },
       .GO_INTO_DIR: { action in self.goIntoDir(action.targetGUIDList) },
       .SHOW_IN_FILE_EXPLORER: { action in self.showInFinder(action.targetGUIDList) },
-      .OPEN_WITH_DEFAULT_APP: { action in self.openLocalFileWithDefaultAppForGUID(action.targetGUIDList[0]) },
-      .DOWNLOAD_FROM_GDRIVE: { action in self.downloadFileFromGDrive(action.targetGUIDList[0]) },
+      .OPEN_WITH_DEFAULT_APP: { action in self.openLocalFileWithDefaultAppForNodeList(action.targetNodeList) },
+      .DOWNLOAD_FROM_GDRIVE: { action in self.downloadFileListFromGDrive(action.targetNodeList) },
 
       .SET_ROWS_CHECKED: { action in self.setChecked(action.targetGUIDList, true) },
       .SET_ROWS_UNCHECKED: { action in self.setChecked(action.targetGUIDList, false) },
 
-      .EXPAND_ROWS: {action in self.con.treeView?.expand(action.targetGUIDList, isAlreadyPopulated: false)},
-      .COLLAPSE_ROWS: {action in self.con.treeView?.collapse(action.targetGUIDList)}
+      .EXPAND_ROWS: {action in
+        DispatchQueue.main.async {
+          self.con.treeView?.expand(action.targetGUIDList, isAlreadyPopulated: false)
+        }
+      },
+      .COLLAPSE_ROWS: {action in
+        DispatchQueue.main.async {
+          self.con.treeView?.collapse(action.targetGUIDList)
+        }
+      }
     ]
   }
 
@@ -44,8 +56,11 @@ class TreeActions {
   }
 
   func executeTreeAction(_ action: TreeAction) {
+    NSLog("DEBUG [\(self.con.treeID)] Executing action \(action.actionID) guidList=\(action.targetGUIDList) nodeList=\(action.targetNodeList.count)")
+
     // First see if we can handle this in the FE:
     if let handler: ActionHandler = actionHandlerDict[action.actionID] {
+      NSLog("DEBUG [\(self.con.treeID)] Calling local handler for action: \(action.actionID)")
       handler(action)
       return
     }
@@ -107,7 +122,7 @@ class TreeActions {
 
     let spid = snList[0].spid
 
-    NSLog("DEBUG goIntoDir(): \(spid)")
+    NSLog("DEBUG [\(self.con.treeID)] goIntoDir(): \(spid)")
 
     self.con.clearTreeAndDisplayMsg(LOADING_MESSAGE, .ICON_LOADING)
 
@@ -131,26 +146,27 @@ class TreeActions {
   // Reusable actions (public)
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  public func downloadFileFromGDrive(_ guid: GUID) {
+  public func downloadFileListFromGDrive(_ nodeList: [Node]) {
     do {
-      let sn = self.con.displayStore.getSN(guid)!
-      let node = sn.node
-      NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
-      try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
+      for node in nodeList {
+        NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
+        try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
+      }
     } catch {
       self.con.reportException("Failed to download file from Google Drive", error)
     }
   }
 
-  public func openLocalFileWithDefaultAppForGUID(_ guid: GUID) {
-    guard let sn = self.con.displayStore.getSN(guid) else {
-      self.con.reportError("Internal error", "Could not find node in DisplayStore for: \(guid)")
-      return
+  public func openLocalFileWithDefaultAppForNodeList(_ nodeList: [Node]) {
+    for node in nodeList {
+      if node.treeType == .LOCAL_DISK {
+        self.openLocalFileWithDefaultApp(node.firstPath)
+      }
     }
-    self.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
   }
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {
+    NSLog("DEBUG [\(self.con.treeID)] Opening file with default app: '\(fullPath)'")
     // FIXME: need permissions
     let url = URL(fileURLWithPath: fullPath)
     NSWorkspace.shared.open(url)
