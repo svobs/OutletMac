@@ -10,21 +10,24 @@ import SwiftUI
 class TreeActions {
   weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
 
-  typealias ActionHandler = ([SPIDNodePair]) -> Void
+  typealias ActionHandler = (TreeAction) -> Void
 
   private var actionHandlerDict: [ActionID : ActionHandler] = [:]
 
   init() {
     actionHandlerDict = [
-      .EXPAND_ALL: { snList in self.con.treeView?.expandAll(snList) },
-      .REFRESH: self.refreshSubtree,
-      .GO_INTO_DIR: self.goIntoDir,
-      .SHOW_IN_FILE_EXPLORER: self.showInFinder,
-      .OPEN_WITH_DEFAULT_APP: { snList in self.openLocalFileWithDefaultApp(snList[0].spid.getSinglePath()) },
-      .DOWNLOAD_FROM_GDRIVE: { snList in self.downloadFileFromGDrive(snList[0].node) },
+      .EXPAND_ALL: { action in self.con.treeView?.expandAll(action.targetGUIDList) },
+      .REFRESH: { action in self.refreshSubtree(action.targetGUIDList) },
+      .GO_INTO_DIR: { action in self.goIntoDir(action.targetGUIDList) },
+      .SHOW_IN_FILE_EXPLORER: { action in self.showInFinder(action.targetGUIDList) },
+      .OPEN_WITH_DEFAULT_APP: { action in self.openLocalFileWithDefaultAppForGUID(action.targetGUIDList[0]) },
+      .DOWNLOAD_FROM_GDRIVE: { action in self.downloadFileFromGDrive(action.targetGUIDList[0]) },
 
-      .SET_ROWS_CHECKED: { snList in self.setChecked(snList, true) },
-      .SET_ROWS_UNCHECKED: { snList in self.setChecked(snList, false) }
+      .SET_ROWS_CHECKED: { action in self.setChecked(action.targetGUIDList, true) },
+      .SET_ROWS_UNCHECKED: { action in self.setChecked(action.targetGUIDList, false) },
+
+      .EXPAND_ROWS: {action in self.con.treeView?.expand(action.targetGUIDList, isAlreadyPopulated: false)},
+      .COLLAPSE_ROWS: {action in self.con.treeView?.collapse(action.targetGUIDList)}
     ]
   }
 
@@ -37,41 +40,44 @@ class TreeActions {
 
   // For dynamic menus provided by the backend. Uses the actionID to determine what to do (either local action or call into the backend)
   @objc public func executeMenuAction(_ sender: GeneratedMenuItem) {
-    if sender.menuItemMeta.targetGUIDList.count > 0 {
-      // If GUIDs are present here, they were provided by the backend. Send them right back for execution - it will know what to do with them.
-
-      // Special overrides for delete actions: we want to confirm with the user first
-      switch (sender.menuItemMeta.actionID) {
-      case .DELETE_SINGLE_FILE:
-        if !confirmDelete(sender.snList[0]) {
-          return
-        }
-      case .DELETE_SUBTREE, .DELETE_SUBTREE_FOR_SINGLE_DEVICE:
-        if !confirmDelete(sender.menuItemMeta.targetGUIDList.count) {
-          return
-        }
-      default:
-          break
-      }
-
-      do {
-        let treeAction = TreeAction(self.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList, [])
-        try self.con.backend.executeTreeAction(treeAction)
-      } catch {
-        self.con.reportException("Failed to execute action: \(sender.menuItemMeta.actionID)", error)
-      }
-      return
-    }
-
-    // No GUIDs? Must be a FE action. Look up its handler and execute it:
-    guard let handler: ActionHandler = actionHandlerDict[sender.menuItemMeta.actionID] else {
-      self.con.reportError("Internal error", "No handler found for action: \(sender.menuItemMeta.actionID)")
-      return
-    }
-    handler(sender.snList)
+    executeTreeAction(TreeAction(self.con.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList, []))
   }
 
-  private func refreshSubtree(_ snList: [SPIDNodePair]) {
+  func executeTreeAction(_ action: TreeAction) {
+    // First see if we can handle this in the FE:
+    if let handler: ActionHandler = actionHandlerDict[action.actionID] {
+      handler(action)
+      return
+    }
+
+    // Special overrides for delete actions: we want to confirm with the user first
+    switch (action.actionID) {
+    case .DELETE_SINGLE_FILE:
+      guard let sn = self.con.displayStore.getSN(action.targetGUIDList[0]) else {
+        self.con.reportError("Internal error", "Could not find node in DisplayStore for: \(action.targetGUIDList[0])")
+        return
+      }
+      if !confirmDelete(sn) {
+        return
+      }
+    case .DELETE_SUBTREE, .DELETE_SUBTREE_FOR_SINGLE_DEVICE:
+      if !confirmDelete(action.targetGUIDList.count) {
+        return
+      }
+    default:
+      break
+    }
+
+    do {
+      let treeAction = TreeAction(self.treeID, action.actionID, action.targetGUIDList, [])
+      try self.con.backend.executeTreeAction(treeAction)
+    } catch {
+      self.con.reportException("Failed to execute action: \(action.actionID)", error)
+    }
+  }
+
+  private func refreshSubtree(_ guidList: [GUID]) {
+    let snList = self.con.displayStore.getSNList(guidList)
     guard snList.count > 0 else {
       return
     }
@@ -83,7 +89,8 @@ class TreeActions {
     }
   }
 
-  private func showInFinder(_ snList: [SPIDNodePair]) {
+  private func showInFinder(_ guidList: [GUID]) {
+    let snList = self.con.displayStore.getSNList(guidList)
     guard snList.count > 0 else {
       return
     }
@@ -92,7 +99,8 @@ class TreeActions {
     NSWorkspace.shared.activateFileViewerSelecting([url])
   }
 
-  private func goIntoDir(_ snList: [SPIDNodePair]) {
+  private func goIntoDir(_ guidList: [GUID]) {
+    let snList = self.con.displayStore.getSNList(guidList)
     guard snList.count > 0 else {
       return
     }
@@ -110,10 +118,10 @@ class TreeActions {
     }
   }
 
-  private func setChecked(_ snList: [SPIDNodePair], _ checked: Bool) {
+  private func setChecked(_ guidList: [GUID], _ checked: Bool) {
     do {
-      for sn in snList {
-        try self.con.setChecked(sn.spid.guid, checked)
+      for guid in guidList {
+        try self.con.setChecked(guid, checked)
       }
     } catch {
       self.con.reportException("Error while toggling checkbox", error)
@@ -123,13 +131,23 @@ class TreeActions {
   // Reusable actions (public)
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  public func downloadFileFromGDrive(_ node: Node) {
+  public func downloadFileFromGDrive(_ guid: GUID) {
     do {
+      let sn = self.con.displayStore.getSN(guid)!
+      let node = sn.node
       NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
       try self.con.backend.downloadFileFromGDrive(deviceUID: node.deviceUID, nodeUID: node.uid, requestorID: self.treeID)
     } catch {
       self.con.reportException("Failed to download file from Google Drive", error)
     }
+  }
+
+  public func openLocalFileWithDefaultAppForGUID(_ guid: GUID) {
+    guard let sn = self.con.displayStore.getSN(guid) else {
+      self.con.reportError("Internal error", "Could not find node in DisplayStore for: \(guid)")
+      return
+    }
+    self.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
   }
 
   public func openLocalFileWithDefaultApp(_ fullPath: String) {

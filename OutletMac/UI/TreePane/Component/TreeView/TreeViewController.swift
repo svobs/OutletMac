@@ -114,7 +114,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                     NSLog("DEBUG [\(treeID)] Opening local file with default app: \(sn.spid.getSinglePath())")
                     self.con.treeActions.openLocalFileWithDefaultApp(sn.spid.getSinglePath())
                 } else if sn.node.treeType == .GDRIVE {
-                    self.con.treeActions.downloadFileFromGDrive(sn.node)
+                    self.con.treeActions.downloadFileFromGDrive(sn.spid.guid)
                     // See signal "DOWNLOAD_FROM_GDRIVE_DONE" for handling of async response
                 }
             } else {
@@ -750,7 +750,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
     }
 
     /**
-     Do not use the animator to expand the nodes. If isAlreadyPopulated==true, we disable the listeners so that network calls are not made to
+     If isAlreadyPopulated==true, do not use the animator to expand the nodes, and disable the listeners so that network calls are not made to
      populate the DisplayStore.
      */
     func expand(_ toExpandInOrder: [GUID], isAlreadyPopulated: Bool) {
@@ -771,13 +771,18 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         NSLog("DEBUG [\(self.treeID)] Expanding rows: \(toExpandInOrder)")
         for guid in toExpandInOrder {
             NSLog("DEBUG [\(self.treeID)] Expanding item: \"\(guid)\"")
-            self.outlineView.expandItem(guid)
+            if isAlreadyPopulated {
+                self.outlineView.expandItem(guid)
+            } else {
+                outlineView.animator().expandItem(guid)
+            }
         }
     }
 
-    func expandAll(_ snList: [SPIDNodePair]) {
+    func expandAll(_ guidList: [GUID]) {
         assert(DispatchQueue.isExecutingIn(.main))
 
+        let snList = self.con.displayStore.getSNList(guidList)
         guard snList.count > 0 else {
             return
         }
@@ -811,6 +816,18 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             for sn in self.con.displayStore.getChildSNList(parentGUID) {
                 process(sn)
             }
+        }
+    }
+
+    func collapse(_ guidList: [GUID]) {
+        assert(DispatchQueue.isExecutingIn(.main))
+
+        self.outlineView.beginUpdates()
+        defer {
+            self.outlineView.endUpdates()
+        }
+        for guid in guidList {
+            outlineView.animator().collapseItem(guid, collapseChildren: true)
         }
     }
 

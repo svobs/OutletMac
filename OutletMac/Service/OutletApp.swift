@@ -98,6 +98,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
     dispatchListener.subscribe(signal: .BATCH_FAILED, onBatchFailed)
+    dispatchListener.subscribe(signal: .EXECUTE_ACTION, onExecuteActionList)
 
     let eventMask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .flagsChanged]
     let eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
@@ -286,6 +287,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
         // just run a modal dialog if no window
         let response = alert.runModal()
         self.handleBatchFailedModalResponse(response, batchUID: batchUID)
+      }
+    }
+  }
+
+  private func onExecuteActionList(senderID: SenderID, propDict: PropDict) throws {
+    let treeActionList = try propDict.get("action_list") as! [TreeAction]
+    NSLog("DEBUG Got \(Signal.EXECUTE_ACTION) signal from '\(senderID)' with \(treeActionList.count) tree actions")
+    for treeAction in treeActionList {
+      if let con = self.getTreePanelController(treeAction.treeID) {
+        con.treeActions.executeTreeAction(treeAction)
+      } else {
+        NSLog("ERROR Failed to find tree controller for treeID '\(treeAction.treeID)'; discarding action \(treeAction.actionID)")
       }
     }
   }
