@@ -298,7 +298,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
       if let con = self.getTreePanelController(treeAction.treeID) {
         con.treeActions.executeTreeAction(treeAction)
       } else {
-        NSLog("ERROR Failed to find tree controller for treeID '\(treeAction.treeID)'; discarding action \(treeAction.actionID)")
+        NSLog("ERROR Failed to find tree controller for treeID '\(treeAction.treeID)'; discarding action \(treeAction.actionType)")
       }
     }
   }

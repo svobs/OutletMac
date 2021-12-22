@@ -369,6 +369,14 @@ class GRPCConverter {
   // Tree Context Menu
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  func actionTypeFromGRPC(_ grpcActionID: UInt32) -> ActionType {
+    if let actionID = ActionID(rawValue: grpcActionID) {
+      return ActionType.BUILTIN(actionID)
+    } else {
+      return .CUSTOM(grpcActionID)
+    }
+  }
+
   func menuItemListFromGRPC(_ grpcList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem]) throws -> [MenuItemMeta] {
     var menuItemList: [MenuItemMeta] = []
 
@@ -382,10 +390,8 @@ class GRPCConverter {
     guard let itemType = MenuItemType.init(rawValue: grpc.itemType) else {
       throw OutletError.invalidState("Bad value received from gRPC: MenuItemType (\(grpc.itemType)) is invalid!")
     }
-    guard let actionID = ActionID(rawValue: grpc.actionID) else {
-      throw OutletError.invalidState("Bad value received from gRPC: ActionID (\(grpc.actionID)) is invalid!")
-    }
-    let item = MenuItemMeta(itemType: itemType, title: grpc.title, actionID: actionID)
+    let actionType: ActionType = self.actionTypeFromGRPC(grpc.actionID)
+    let item = MenuItemMeta(itemType: itemType, title: grpc.title, actionType: actionType)
     for submenuItem in grpc.submenuItemList {
       item.submenuItemList.append(try self.menuItemFromGRPC(submenuItem))
     }
@@ -396,9 +402,7 @@ class GRPCConverter {
   }
 
   func treeActionFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_TreeAction) throws -> TreeAction {
-    guard let actionID = ActionID(rawValue: grpc.actionID) else {
-      throw OutletError.invalidState("Bad value received from gRPC: ActionID (\(grpc.actionID)) is invalid!")
-    }
+    let actionType: ActionType = self.actionTypeFromGRPC(grpc.actionID)
 
     var targetGUIDList: [GUID] = []
     for guid in grpc.targetGuidList {
@@ -410,12 +414,12 @@ class GRPCConverter {
       targetNodeList.append(try self.nodeFromGRPC(nodeGRPC))
     }
 
-    return TreeAction(grpc.treeID, actionID, targetGUIDList, targetNodeList)
+    return TreeAction(grpc.treeID, actionType, targetGUIDList, targetNodeList)
   }
 
   func treeActionToGRPC(_ treeAction: TreeAction) throws -> Outlet_Backend_Agent_Grpc_Generated_TreeAction {
     var treeActionGRPC = Outlet_Backend_Agent_Grpc_Generated_TreeAction()
-    treeActionGRPC.actionID = treeAction.actionID.rawValue
+    treeActionGRPC.actionID = treeAction.getActionID()
     treeActionGRPC.treeID = treeAction.treeID
     treeActionGRPC.targetGuidList = treeAction.targetGUIDList
     for node in treeAction.targetNodeList {

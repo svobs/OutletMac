@@ -150,6 +150,11 @@ enum MenuItemType: UInt32 {
   case ITALIC_DISABLED = 4
 }
 
+enum ActionType {
+  case BUILTIN(ActionID)
+  case CUSTOM(UInt32)
+}
+
 enum ActionID: UInt32 {
   case NO_ACTION = 1
   case REFRESH = 2                  // FE only (should be BE though)

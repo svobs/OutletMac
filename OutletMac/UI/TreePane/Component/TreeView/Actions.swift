@@ -35,9 +35,28 @@ class TreeActions {
           self.con.treeView?.expand(action.targetGUIDList, isAlreadyPopulated: false)
         }
       },
-      .COLLAPSE_ROWS: {action in
+      .COLLAPSE_ROWS: { action in
         DispatchQueue.main.async {
           self.con.treeView?.collapse(action.targetGUIDList)
+        }
+      },
+      .DELETE_SINGLE_FILE: { action in
+        guard let sn = self.con.displayStore.getSN(action.targetGUIDList[0]) else {
+          self.con.reportError("Internal error", "Could not find node in DisplayStore for: \(action.targetGUIDList[0])")
+          return
+        }
+        if self.confirmDelete(sn) {
+          self.executeActionViaBackend(action)
+        }
+      },
+      .DELETE_SUBTREE_FOR_SINGLE_DEVICE: { action in
+        if self.confirmDelete(action.targetGUIDList.count) {
+          self.executeActionViaBackend(action)
+        }
+      },
+      .DELETE_SUBTREE: { action in
+        if self.confirmDelete(action.targetGUIDList.count) {
+          self.executeActionViaBackend(action)
         }
       }
     ]
@@ -52,42 +71,32 @@ class TreeActions {
 
   // For dynamic menus provided by the backend. Uses the actionID to determine what to do (either local action or call into the backend)
   @objc public func executeMenuAction(_ sender: GeneratedMenuItem) {
-    executeTreeAction(TreeAction(self.con.treeID, sender.menuItemMeta.actionID, sender.menuItemMeta.targetGUIDList, []))
+    executeTreeAction(TreeAction(self.con.treeID, sender.menuItemMeta.actionType, sender.menuItemMeta.targetGUIDList, []))
   }
 
   func executeTreeAction(_ action: TreeAction) {
-    NSLog("DEBUG [\(self.con.treeID)] Executing action \(action.actionID) guidList=\(action.targetGUIDList) nodeList=\(action.targetNodeList.count)")
+    NSLog("DEBUG [\(self.con.treeID)] Executing action \(action.actionType) guidList=\(action.targetGUIDList) nodeList=\(action.targetNodeList.count)")
 
-    // First see if we can handle this in the FE:
-    if let handler: ActionHandler = actionHandlerDict[action.actionID] {
-      NSLog("DEBUG [\(self.con.treeID)] Calling local handler for action: \(action.actionID)")
-      handler(action)
-      return
-    }
-
-    // Special overrides for delete actions: we want to confirm with the user first
-    switch (action.actionID) {
-    case .DELETE_SINGLE_FILE:
-      guard let sn = self.con.displayStore.getSN(action.targetGUIDList[0]) else {
-        self.con.reportError("Internal error", "Could not find node in DisplayStore for: \(action.targetGUIDList[0])")
+    switch action.actionType {
+    case .BUILTIN(let actionID):
+      // First see if we can handle this in the FE:
+      if let handler: ActionHandler = actionHandlerDict[actionID] {
+        NSLog("DEBUG [\(self.con.treeID)] Calling local handler for action: \(actionID)")
+        handler(action)
         return
       }
-      if !confirmDelete(sn) {
-        return
-      }
-    case .DELETE_SUBTREE, .DELETE_SUBTREE_FOR_SINGLE_DEVICE:
-      if !confirmDelete(action.targetGUIDList.count) {
-        return
-      }
-    default:
+    case .CUSTOM:
       break
     }
 
+    executeActionViaBackend(action)
+  }
+
+  private func executeActionViaBackend(_ action: TreeAction) {
     do {
-      let treeAction = TreeAction(self.treeID, action.actionID, action.targetGUIDList, [])
-      try self.con.backend.executeTreeAction(treeAction)
+      try self.con.backend.executeTreeAction(action)
     } catch {
-      self.con.reportException("Failed to execute action: \(action.actionID)", error)
+      self.con.reportException("Failed to execute action: \(action.actionType)", error)
     }
   }
 

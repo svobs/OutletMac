@@ -91,7 +91,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         let item = sender.item(atRow: sender.clickedRow)
 
         let guid = itemToGUID(item)
-        let treeAction = TreeAction(self.con.treeID, .ACTIVATE, [guid], [])
+        let treeAction = TreeAction(self.con.treeID, .BUILTIN(.ACTIVATE), [guid], [])
         do {
             try self.con.backend.executeTreeAction(treeAction)
         } catch {
