@@ -59,8 +59,7 @@ fileprivate struct TreeViewRepresentable: NSViewControllerRepresentable {
   }
   
   func updateNSViewController(_ nsViewController: TreeViewController, context: Context) {
-    // TODO: apply updates here
-    NSLog("DEBUG [\(self.con.treeID)] TreeView update requested!")
-    return
+    // Apply updates here?
+    NSLog("DEBUG [\(self.con.treeID)] TreeView update requested")
   }
 }

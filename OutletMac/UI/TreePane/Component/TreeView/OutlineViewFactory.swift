@@ -73,7 +73,6 @@ class OutlineViewFactory {
     ctimeCol.width = 200
     ctimeCol.minWidth = 100
     ctimeCol.isEditable = false
-//    ctimeCol.isHidden = true
     outlineView.addTableColumn(ctimeCol)
     ctimeCol.sortDescriptorPrototype = NSSortDescriptor(key: META_CHANGE_TS_COL_KEY, ascending: true)
 

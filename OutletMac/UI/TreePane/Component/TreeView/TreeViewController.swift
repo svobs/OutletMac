@@ -814,6 +814,9 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         assert(DispatchQueue.isExecutingIn(.main))
 
         NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore")
+        let isGDrive = self.con.tree.state.rootSN.node.treeType == .GDRIVE
+        self.outlineView.tableColumn(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: META_CHANGE_TS_COL_KEY))?.isHidden = isGDrive
+
         self.outlineView.reloadData()
         // The previous line can wipe out our selection. Try to restore it:
         self.selectGUIDList(self.guidSelectedSet)
