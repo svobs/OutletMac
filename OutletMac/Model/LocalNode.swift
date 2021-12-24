@@ -121,7 +121,17 @@ class LocaFileNode: LocalNode {
       self._syncTS = newSyncTS
     }
   }
-  
+
+  var _createTS: UInt64?
+  override var createTS: UInt64? {
+    get {
+      return self._createTS
+    }
+    set(createTS) {
+      self._createTS = createTS
+    }
+  }
+
   var _modifyTS: UInt64?
   override var modifyTS: UInt64? {
     get {
@@ -153,11 +163,12 @@ class LocaFileNode: LocalNode {
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,
-       sizeBytes: UInt64?, syncTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
+       sizeBytes: UInt64?, syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
     self._md5 = md5
     self._sha256 = sha256
     self._sizeBytes = sizeBytes
     self._syncTS = syncTS
+    self._createTS = createTS
     self._modifyTS = modifyTS
     self._changeTS = changeTS
     super.init(nodeIdentifer, parentUID, trashed, isLive: isLive)

@@ -72,6 +72,9 @@ class DisplayStore {
     case SIZE_COL_KEY:
       colSortOrder = .SIZE
       break
+    case CREATE_TS_COL_KEY:
+      colSortOrder = .CREATE_TS
+      break
     case MODIFY_TS_COL_KEY:
       colSortOrder = .MODIFY_TS
       break
@@ -117,6 +120,13 @@ class DisplayStore {
         snSortedList = snList.sorted { ($0.node.sizeBytes ?? UInt64.max) < ($1.node.sizeBytes ?? UInt64.max) }
       } else {
         snSortedList = snList.sorted { ($0.node.sizeBytes ?? UInt64.max) > ($1.node.sizeBytes ?? UInt64.max) }
+      }
+    case .CREATE_TS:
+      if self.sortAscending {
+        // put nodes with missing TS at the end
+        snSortedList = snList.sorted { ($0.node.createTS ?? UInt64.max) < ($1.node.createTS ?? UInt64.max) }
+      } else {
+        snSortedList = snList.sorted { ($0.node.createTS ?? UInt64.max) > ($1.node.createTS ?? UInt64.max) }
       }
     case .MODIFY_TS:
       if self.sortAscending {

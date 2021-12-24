@@ -104,7 +104,13 @@ class Node: CustomStringConvertible {
       return nil
     }
   }
-  
+
+  var createTS: UInt64? {
+    get {
+      return nil
+    }
+  }
+
   var modifyTS: UInt64? {
     get {
       return nil

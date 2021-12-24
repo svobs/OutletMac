@@ -163,10 +163,11 @@ class GRPCConverter {
           let sha256 = metaGRPC.sha256 == "" ? nil : metaGRPC.sha256
           let sizeBytes = metaGRPC.sizeBytes == 0 ? nil : metaGRPC.sizeBytes
           let syncTs = metaGRPC.syncTs == 0 ? nil : metaGRPC.syncTs
+          let createTs = metaGRPC.createTs == 0 ? nil : metaGRPC.createTs
           let modifyTs = metaGRPC.modifyTs == 0 ? nil : metaGRPC.modifyTs
           let changeTs = metaGRPC.changeTs == 0 ? nil : metaGRPC.changeTs
           node = LocaFileNode(localNodeIdentifier, metaGRPC.parentUid, trashed: trashed, isLive: metaGRPC.isLive, md5: md5, sha256: sha256,
-                              sizeBytes: sizeBytes, syncTS: syncTs, modifyTS: modifyTs, changeTS: changeTs)
+                              sizeBytes: sizeBytes, syncTS: syncTs, createTS: createTs, modifyTS: modifyTs, changeTS: changeTs)
         case .containerMeta(let metaGRPC):
           node = ContainerNode(nodeIdentifier)
           let dirStats = try self.dirMetaFromGRPC(metaGRPC.dirMeta)

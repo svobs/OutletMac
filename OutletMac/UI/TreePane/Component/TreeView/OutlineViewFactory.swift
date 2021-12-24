@@ -52,6 +52,14 @@ class OutlineViewFactory {
     etcCol.isEditable = false
     outlineView.addTableColumn(etcCol)
 
+    let crtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: CREATE_TS_COL_KEY))
+    crtimeCol.title = "Creation Time"
+    crtimeCol.width = 200
+    crtimeCol.minWidth = 100
+    crtimeCol.isEditable = false
+    outlineView.addTableColumn(crtimeCol)
+    crtimeCol.sortDescriptorPrototype = NSSortDescriptor(key: CREATE_TS_COL_KEY, ascending: true)
+
     let mtimeCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(rawValue: MODIFY_TS_COL_KEY))
     mtimeCol.title = "Modification Time"
     mtimeCol.width = 200

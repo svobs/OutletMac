@@ -36,6 +36,7 @@ let TREE_VIEW_CELL_HEIGHT: CGFloat = 32.0
 let NAME_COL_KEY = "name"
 let SIZE_COL_KEY = "size"
 let ETC_COL_KEY = "etc"
+let CREATE_TS_COL_KEY = "crtime"
 let MODIFY_TS_COL_KEY = "mtime"
 let META_CHANGE_TS_COL_KEY = "ctime"
 
@@ -43,8 +44,9 @@ let META_CHANGE_TS_COL_KEY = "ctime"
 enum ColSortOrder: Int {
   case NAME = 1
   case SIZE = 2
-  case MODIFY_TS = 3
-  case CHANGE_TS = 4
+  case CREATE_TS = 3
+  case MODIFY_TS = 4
+  case CHANGE_TS = 5
 }
 
 // Padding in pixels
@@ -174,6 +176,7 @@ enum ActionID: UInt32 {
   case CALL_EXIFTOOL = 50           // FE only
 
   case ACTIVATE = 100
+  // 101 & above are reserved for custom actions
 }
 
 // --- FE + BE SHARED ---

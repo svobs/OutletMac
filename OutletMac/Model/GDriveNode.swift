@@ -23,7 +23,16 @@ class GDriveNode: Node {
     }
   }
   
-  var createTS: UInt64?
+  var _createTS: UInt64?
+  override var createTS: UInt64? {
+    get {
+      return _createTS
+    }
+    set (createTS) {
+      self._createTS = createTS
+    }
+  }
+
   var _modifyTS: UInt64?
   override var modifyTS: UInt64? {
     get {
@@ -83,7 +92,7 @@ class GDriveNode: Node {
   init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?,
        modifyTS: UInt64?, name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?) {
     self.googID = googID
-    self.createTS = createTS
+    self._createTS = createTS
     self._modifyTS = modifyTS
     self._name = name
     self.ownerUID = ownerUID
@@ -98,7 +107,7 @@ class GDriveNode: Node {
   override func updateFrom(_ otherNode: Node) {
     if let otherGDriveNode = otherNode as? GDriveNode {
       self.googID = otherGDriveNode.googID
-      self.createTS = otherGDriveNode.createTS
+      self._createTS = otherGDriveNode.createTS
       self._modifyTS = otherGDriveNode._modifyTS
       self.ownerUID = otherGDriveNode.ownerUID
       self.driveID = otherGDriveNode.driveID

@@ -68,7 +68,7 @@ class CellFactory {
 
     let node = sn.node
     switch identifier.rawValue {
-      case "name":
+    case NAME_COL_KEY:
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NameCellView
         if cell == nil {
           cell = makeNameCell(for: sn, withIdentifier: identifier, tvc)
@@ -80,28 +80,35 @@ class CellFactory {
         cell!.needsLayout = true
 
         return cell
-      case "size":
+      case SIZE_COL_KEY:
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = StringUtil.formatByteCount(node.sizeBytes)
         return cell
-      case "etc":
+      case ETC_COL_KEY:
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = String(node.etc)
         return cell
-      case "mtime":
+      case CREATE_TS_COL_KEY:
+        var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
+        if cell == nil {
+          cell = makeTextOnlyCell(withIdentifier: identifier)
+        }
+        cell!.textField!.stringValue = DateUtil.formatTS(node.createTS)
+        return cell
+      case MODIFY_TS_COL_KEY:
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)
         }
         cell!.textField!.stringValue = DateUtil.formatTS(node.modifyTS)
         return cell
-      case "ctime":
+      case META_CHANGE_TS_COL_KEY:
         var cell = outlineView.makeView(withIdentifier: identifier, owner: outlineView.delegate) as? NSTableCellView
         if cell == nil {
           cell = makeTextOnlyCell(withIdentifier: identifier)

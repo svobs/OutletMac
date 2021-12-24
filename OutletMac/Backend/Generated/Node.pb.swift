@@ -444,6 +444,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
 
   public var parentUid: UInt32 = 0
 
+  /// TODO: add timestamps
   public var allChildrenFetched: Bool = false
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
@@ -461,6 +462,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta {
   public var sizeBytes: UInt64 = 0
 
   public var syncTs: UInt64 = 0
+
+  public var createTs: UInt64 = 0
 
   public var modifyTs: UInt64 = 0
 
@@ -1372,12 +1375,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Messa
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "size_bytes"),
     2: .standard(proto: "sync_ts"),
-    3: .standard(proto: "modify_ts"),
-    4: .standard(proto: "change_ts"),
-    5: .standard(proto: "is_live"),
-    6: .same(proto: "md5"),
-    7: .same(proto: "sha256"),
-    8: .standard(proto: "parent_uid"),
+    3: .standard(proto: "create_ts"),
+    4: .standard(proto: "modify_ts"),
+    5: .standard(proto: "change_ts"),
+    6: .standard(proto: "is_live"),
+    7: .same(proto: "md5"),
+    8: .same(proto: "sha256"),
+    9: .standard(proto: "parent_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1388,12 +1392,13 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Messa
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
       case 2: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
-      case 3: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
-      case 4: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
-      case 5: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
-      case 6: try { try decoder.decodeSingularStringField(value: &self.md5) }()
-      case 7: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
-      case 8: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 3: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
+      case 4: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
+      case 5: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
+      case 6: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.md5) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
+      case 9: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
       default: break
       }
     }
@@ -1406,23 +1411,26 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Messa
     if self.syncTs != 0 {
       try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 2)
     }
+    if self.createTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 3)
+    }
     if self.modifyTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 3)
+      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 4)
     }
     if self.changeTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 4)
+      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 5)
     }
     if self.isLive != false {
-      try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 5)
+      try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 6)
     }
     if !self.md5.isEmpty {
-      try visitor.visitSingularStringField(value: self.md5, fieldNumber: 6)
+      try visitor.visitSingularStringField(value: self.md5, fieldNumber: 7)
     }
     if !self.sha256.isEmpty {
-      try visitor.visitSingularStringField(value: self.sha256, fieldNumber: 7)
+      try visitor.visitSingularStringField(value: self.sha256, fieldNumber: 8)
     }
     if self.parentUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 8)
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 9)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1430,6 +1438,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Messa
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta) -> Bool {
     if lhs.sizeBytes != rhs.sizeBytes {return false}
     if lhs.syncTs != rhs.syncTs {return false}
+    if lhs.createTs != rhs.createTs {return false}
     if lhs.modifyTs != rhs.modifyTs {return false}
     if lhs.changeTs != rhs.changeTs {return false}
     if lhs.isLive != rhs.isLive {return false}
