@@ -48,7 +48,7 @@ class GDriveRootChooserWindow: SingleTreePopUpWindow {
     DispatchQueue.main.async {
       let selectionValid = (snList.count == 1 && snList[0].node.isDir)
       self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList.count == 1 && snList[0].node.isDir))")
+      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList[0].spid))")
     }
   }
 

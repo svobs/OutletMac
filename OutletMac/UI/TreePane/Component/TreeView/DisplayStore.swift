@@ -177,10 +177,22 @@ class DisplayStore {
   private func putChildSNList_Internal(_ parentGUID: GUID, _ childSNList: [SPIDNodePair]) {
     let parentChecked: Bool = self.checkedNodeSet.contains(parentGUID)
 
-    for childSN in childSNList {
+    let childSNListSorted = self.sortDirContents(snList: childSNList)
+
+    var childGUIDList: [GUID] = []
+    for childSN in childSNListSorted {
       let childGUID = childSN.spid.guid
       if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): storing child: \(childGUID)")
+      }
+      if childGUID == rootGUID {
+        // should really throw an exception here
+        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
+        continue
+      }
+      if childGUID == parentGUID {
+        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Cannot put a parent into itself: \(parentGUID)")
+        continue
       }
       self.primaryDict[childGUID] = childSN
       self.childParentDict[childGUID] = parentGUID
@@ -189,9 +201,9 @@ class DisplayStore {
         // all children are implicitly checked:
         self.checkedNodeSet.insert(childSN.spid.guid)
       }
-    }
 
-    let childSNListSorted = self.sortDirContents(snList: childSNList)
+      childGUIDList.append(childGUID)
+    }
 
     // Remove stale nodes
     if let existingChildGUIDList = self.parentChildListDict[parentGUID] {
@@ -200,8 +212,8 @@ class DisplayStore {
       }
       for existingChildGUID in existingChildGUIDList {
         var isStillPresent = false
-        for newChildSN in childSNListSorted {
-          if newChildSN.spid.guid == existingChildGUID {
+        for newChildGUID in childGUIDList {
+          if newChildGUID == existingChildGUID {
             isStillPresent = true
             break
           }
@@ -215,15 +227,24 @@ class DisplayStore {
       NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): no existing children for parent \(parentGUID)")
     }
 
-    self.parentChildListDict[parentGUID] = childSNListSorted.map { $0.spid.guid }
+    self.parentChildListDict[parentGUID] = childGUIDList
 
-    NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childSNList.count) children for parent: \(parentGUID)")
+    NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childGUIDList.count) children for parent: \(parentGUID)")
   }
 
   func putSN(_ childSN: SPIDNodePair, parentGUID: GUID) -> Bool {
     var wasPresent: Bool = false
     dq.sync {
       let childGUID = childSN.spid.guid
+      if childGUID == rootGUID {
+        // should really throw an exception here
+        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
+        return
+      }
+      if childGUID == parentGUID {
+        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Cannot put a parent into itself: \(parentGUID)")
+        return
+      }
       if self.primaryDict[childGUID] != nil {
         wasPresent = true
       }
@@ -239,7 +260,7 @@ class DisplayStore {
       }
 
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG DisplayStore.putSN(): Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID] ?? [])")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID] ?? [])")
       }
 
       // Child -> Parent
