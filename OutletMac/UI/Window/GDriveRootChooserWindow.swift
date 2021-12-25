@@ -47,8 +47,9 @@ class GDriveRootChooserWindow: SingleTreePopUpWindow {
 
     DispatchQueue.main.async {
       let selectionValid = (snList.count == 1 && snList[0].node.isDir)
+      // If valid, enable Select button:
       self.chooserState.selectionIsValid = selectionValid
-      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid) (\(snList[0].spid))")
+      NSLog("DEBUG [\(self.winID)] Selection changed: valid=\(self.chooserState.selectionIsValid)")
     }
   }
 
@@ -111,7 +112,9 @@ struct GDriveRootChooserContent: View {
           .contentShape(Rectangle()) // taps should be detected in the whole window
           .preference(key: ContentAreaPrefKey.self, value: ContentAreaPrefData(height: geo.size.height))
         .onPreferenceChange(ContentAreaPrefKey.self) { key in
-  //        NSLog("HEIGHT OF WINDOW CANVAS: \(key.height)")
+          if TRACE_ENABLED {
+            NSLog("DEBUG [\(ID_MAIN_WINDOW)] HEIGHT OF WINDOW CANVAS: \(key.height)")
+          }
           self.windowState.windowHeight = key.height
         }
       }

@@ -52,8 +52,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
     func selectSPID(_ spid: SPID) {
         // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
         // being hit
-        // FIXME: Need to add logic to expand ancestor nodes
-        self.con?.treeView!.selectSingleGUID(spid.guid)
+        self.con?.treeView!.selectSingleGUID(spid.guid, scrollToSelection: true)
     }
 
     // DispatchListener callbacks
@@ -65,11 +64,9 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
 
         switch treeLoadState {
         case .COMPLETELY_LOADED:
-            // note: around exactly the same time, the TreeController will receive this and start populating
-            DispatchQueue.main.async {
-                NSLog("DEBUG [\(self.winID)] Backend load complete. Showing dialog")
-                self.showWindow()
-            }
+            // note: around exactly the same time, the TreeController will also receive this and start populating.
+            // We'll wait for its POPULATE_UI_TREE_DONE signal before showing the window
+            NSLog("DEBUG [\(self.winID)] Backend load complete")
         default:
             break
         }
@@ -77,13 +74,25 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
 
     // This will be triggered by the tree panel controller
     func onPopulateTreeDone(_ senderID: SenderID, _ props: PropDict) throws {
+        if let selectionSPID = self.initialSelection?.spid {
+            // TODO: put all this logic in the backend, let it update the expanded row set and push it out like other trees
+            NSLog("DEBUG [\(self.winID)] Populate complete! Selecting SPID: \(selectionSPID)")
+            do {
+                let ancestorList: [SPIDNodePair] = try self.con!.backend.getAncestorList(spid: selectionSPID, stopAtPath: nil)
+                let ancestorGUIDList: [GUID] = ancestorList.map({ $0.spid.guid })
+
+                DispatchQueue.main.async {
+                    self.con!.treeView!.expand(ancestorGUIDList, isAlreadyPopulated: false)
+                    self.selectSPID(selectionSPID)
+                    // Fall through and show window.
+                }
+            } catch {
+                self.con!.reportException("Failed to restore tree selection", error)
+                // Fall through and still show window:
+            }
+        }
         DispatchQueue.main.async {
             self.showWindow()
-
-            if let selectionSPID = self.initialSelection?.spid {
-                NSLog("DEBUG [\(self.winID)] Populate complete! Selecting SPID: \(selectionSPID)")
-                self.selectSPID(selectionSPID)
-            }
         }
     }
 

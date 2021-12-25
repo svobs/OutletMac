@@ -674,13 +674,16 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
     /**
      Selects the row with the given GUID in the tree UI, if it exists
      */
-    func selectSingleGUID(_ guid: GUID) {
+    func selectSingleGUID(_ guid: GUID, scrollToSelection: Bool) {
         assert(DispatchQueue.isExecutingIn(.main))
 
         let indexSet = self.getIndexSetFor([guid])
         if !indexSet.isEmpty {
             NSLog("DEBUG [\(self.treeID)] Selecting single GUID \(guid)")
             self.outlineView.selectRowIndexes(indexSet, byExtendingSelection: false)
+            if scrollToSelection, let rowIndex = indexSet.first {
+                self.outlineView.scrollRowToVisible(rowIndex)
+            }
         }
     }
 

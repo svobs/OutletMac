@@ -644,7 +644,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
       return
     }
 
-    let currentSN: SPIDNodePair = sourceCon.tree.rootSN
+    var currentSN: SPIDNodePair? = nil
+    if sourceCon.tree.rootSN.node.treeType == .GDRIVE {
+      currentSN = sourceCon.tree.rootSN
+    }
 
     DispatchQueue.main.async {
       do {
