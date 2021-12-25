@@ -10,7 +10,7 @@ import Foundation
 import AppKit
 
 class CellCheckboxButton: NSButton {
-  let parent: TreeViewController
+  let parent: TreeNSViewController
   var guid: GUID
 
   var treeID: TreeID {
@@ -25,7 +25,7 @@ class CellCheckboxButton: NSButton {
     }
   }
 
-  init(sn: SPIDNodePair, parent: TreeViewController) {
+  init(sn: SPIDNodePair, parent: TreeNSViewController) {
     self.parent = parent
     self.guid = sn.spid.guid
     // NOTE: *MUST* use this constructor when subclassing. All other constructors will crash at runtime.

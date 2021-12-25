@@ -12,9 +12,9 @@ import SwiftUI
 struct RootPathPanel: View {
   @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftTreeState: SwiftTreeState
-  let con: TreePanelControllable
+  let con: TreeControllable
 
-  init(_ controller: TreePanelControllable) {
+  init(_ controller: TreeControllable) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
   }

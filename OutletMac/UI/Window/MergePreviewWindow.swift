@@ -9,7 +9,7 @@ import SwiftUI
  Container class for all GDrive root chooser dialog data. Actual view starts with GDriveRootChooserContent
  */
 class MergePreviewWindow: SingleTreePopUpWindow {
-    override init(_ app: OutletApp, treeID: TreeID) {
+    override init(_ app: OutletAppProtocol, treeID: TreeID) {
         super.init(app, treeID: treeID)
         self.center()
         self.isReleasedWhenClosed = false  // make it reusable

@@ -11,8 +11,8 @@ let SHOW_TOOLBAR_ON_START = true
  Has two panes (Left and Right), each of which contain a TreeView and its associated panels
  */
 class MainWindow: AppWindow, ObservableObject {
-  weak var conLeft: TreePanelControllable? = nil
-  weak var conRight: TreePanelControllable? = nil
+  weak var conLeft: TreeControllable? = nil
+  weak var conRight: TreeControllable? = nil
   private var contentRect = NSRect(x: DEFAULT_MAIN_WIN_X, y: DEFAULT_MAIN_WIN_Y, width: DEFAULT_MAIN_WIN_WIDTH, height: DEFAULT_MAIN_WIN_HEIGHT)
   private lazy var winCoordsTimer = HoldOffTimer(WIN_SIZE_STORE_DELAY_MS, self.reportWinCoords)
 
@@ -22,7 +22,7 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
-  init(_ app: OutletApp, _ contentRect: NSRect? = nil) {
+  init(_ app: OutletAppProtocol, _ contentRect: NSRect? = nil) {
     if let customContentRect = contentRect {
       self.contentRect = customContentRect
     }
@@ -51,7 +51,7 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
-  func setControllers(left: TreePanelControllable, right: TreePanelControllable) {
+  func setControllers(left: TreeControllable, right: TreeControllable) {
     self.conLeft = left
     self.conRight = right
 
@@ -67,7 +67,7 @@ class MainWindow: AppWindow, ObservableObject {
 
     try super.start()  // this creates the dispatchListener
 
-    // These are close to being global, but , we listen for these here rather than in OutletApp
+    // These are close to being global, but , we listen for these here rather than in OutletAppProtocol
     // mainly because we want to discard these signals if this window is not open
     dispatchListener.subscribe(signal: .DIFF_TREES_DONE, afterDiffTreesDone)
     dispatchListener.subscribe(signal: .DIFF_TREES_FAILED, afterDiffTreesFailed)
@@ -235,12 +235,12 @@ class MainWindow: AppWindow, ObservableObject {
 struct MainContentView: View {
   @EnvironmentObject var globalState: GlobalState
   @StateObject var windowState: WindowState = WindowState()
-  weak var app: OutletApp!
-  weak var conLeft: TreePanelControllable!
-  weak var conRight: TreePanelControllable!
+  weak var app: OutletAppProtocol!
+  weak var conLeft: TreeControllable!
+  weak var conRight: TreeControllable!
   @State private var window: NSWindow?  // enclosing window(?)
 
-  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
+  init(app: OutletAppProtocol, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight

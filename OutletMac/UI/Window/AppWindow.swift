@@ -9,7 +9,7 @@ import SwiftUI
  Abstract base class
  */
 class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
-    weak var app: OutletApp!
+    weak var app: OutletAppProtocol!
     var dispatchListener: DispatchListener! = nil
     private var windowIsOpen = true
 
@@ -42,7 +42,7 @@ class AppWindow: NSWindow, NSWindowDelegate, HasLifecycle {
         }
     }
 
-    init(_ app: OutletApp, _ contentRect: NSRect, styleMask style: NSWindow.StyleMask) {
+    init(_ app: OutletAppProtocol, _ contentRect: NSRect, styleMask style: NSWindow.StyleMask) {
         self.app = app
 
         // TODO: save content rect in config

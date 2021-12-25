@@ -58,7 +58,7 @@ class CellFactory {
     }
   }
 
-  static func upsertCellToOutlineView(_ tvc: TreeViewController, _ outlineView: NSOutlineView,
+  static func upsertCellToOutlineView(_ tvc: TreeNSViewController, _ outlineView: NSOutlineView,
                                       _ identifier: NSUserInterfaceItemIdentifier, _ guid: GUID) -> NSView? {
 
     guard let sn = tvc.displayStore.getSN(guid) else {
@@ -123,11 +123,11 @@ class CellFactory {
 
   // note: it's ok for cellHeight to be larger than necessary (the icon will not be larger than will fit)
   private static func makeIcon(_ sn: SPIDNodePair, _ cell: NSTableCellView, _ cellHeight: CGFloat,
-                               _ tvc: TreeViewController) -> NSImage? {
+                               _ tvc: TreeNSViewController) -> NSImage? {
     return tvc.con.app.iconStore.getNodeIcon(sn.node, height: cellHeight)
   }
 
-  private static func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier, _ tvc: TreeViewController) -> NameCellView {
+  private static func makeNameCell(for sn: SPIDNodePair, withIdentifier identifier: NSUserInterfaceItemIdentifier, _ tvc: TreeNSViewController) -> NameCellView {
     let cell = NameCellView()
     cell.identifier = identifier
 

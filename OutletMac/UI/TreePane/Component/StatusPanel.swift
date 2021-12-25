@@ -14,7 +14,7 @@ import SwiftUI
 struct StatusPanel: View {
   @ObservedObject var swiftTreeState: SwiftTreeState
 
-  init(_ controller: TreePanelControllable) {
+  init(_ controller: TreeControllable) {
     self.swiftTreeState = controller.swiftTreeState
   }
 

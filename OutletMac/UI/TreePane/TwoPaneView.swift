@@ -30,11 +30,11 @@ struct TodoPlaceholder: View {
  */
 fileprivate struct ButtonBar: View {
   @EnvironmentObject var globalState: GlobalState
-  let app: OutletApp
-  let conLeft: TreePanelControllable
-  let conRight: TreePanelControllable
+  let app: OutletAppProtocol
+  let conLeft: TreeControllable
+  let conRight: TreeControllable
 
-  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable) {
+  init(app: OutletAppProtocol, conLeft: TreeControllable, conRight: TreeControllable) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
@@ -83,11 +83,11 @@ struct TwoPaneView: View {
     GridItem(.flexible(minimum: 400, maximum: .infinity), spacing: H_PAD),
   ]
 
-  let app: OutletApp
-  let conLeft: TreePanelControllable
-  let conRight: TreePanelControllable
+  let app: OutletAppProtocol
+  let conLeft: TreeControllable
+  let conRight: TreeControllable
 
-  init(app: OutletApp, conLeft: TreePanelControllable, conRight: TreePanelControllable, _ windowState: WindowState) {
+  init(app: OutletAppProtocol, conLeft: TreeControllable, conRight: TreeControllable, _ windowState: WindowState) {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight

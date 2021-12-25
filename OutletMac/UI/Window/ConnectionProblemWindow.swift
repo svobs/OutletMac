@@ -6,7 +6,7 @@
 import SwiftUI
 
 class ConnectionProblemWindow: AppWindow, ObservableObject {
-    init(_ app: OutletApp, _ backendConnectionState: BackendConnectionState) {
+    init(_ app: OutletAppProtocol, _ backendConnectionState: BackendConnectionState) {
         NSLog("DEBUG [ConnectionProblemWindow] Init")
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
         super.init(app, contentRect, styleMask: [.titled, .closable, .fullSizeContentView])
@@ -35,9 +35,9 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
 struct ConnectionProblemContent: View {
     @ObservedObject var backendConnectionState: BackendConnectionState
     weak var parentWindow: ConnectionProblemWindow!
-    weak var app: OutletApp!
+    weak var app: OutletAppProtocol!
 
-    init(_ app: OutletApp, _ parentWindow: ConnectionProblemWindow, _ backendConnectionState: BackendConnectionState) {
+    init(_ app: OutletAppProtocol, _ parentWindow: ConnectionProblemWindow, _ backendConnectionState: BackendConnectionState) {
         self.parentWindow = parentWindow
         self.app = app
         self.backendConnectionState = backendConnectionState

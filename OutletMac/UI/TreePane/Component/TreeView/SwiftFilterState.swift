@@ -12,7 +12,7 @@ import Foundation
  Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
  */
 class SwiftFilterState: ObservableObject, CustomStringConvertible {
-    // See: TreePanelController.onFilterChanged()
+    // See: TreeController.onFilterChanged()
     var onChangeCallback: FilterStateCallback? = nil
 
     @Published var searchQuery: String {

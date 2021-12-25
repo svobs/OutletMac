@@ -5,12 +5,12 @@ import SwiftUI
  TreeView: enclosing SwiftUI view to specify layout
  */
 struct TreeView: View {
-  let con: TreePanelControllable
+  let con: TreeControllable
   @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftTreeState: SwiftTreeState
   @ObservedObject var windowState: WindowState
 
-  init(controller: TreePanelControllable, _ windowState: WindowState) {
+  init(controller: TreeControllable, _ windowState: WindowState) {
     self.con = controller
     self.swiftTreeState = self.con.swiftTreeState
     self.windowState = windowState
@@ -45,20 +45,20 @@ struct TreeView: View {
  TreeViewRepresentable: SwiftUI wrapper for NSOutlineView
  */
 fileprivate struct TreeViewRepresentable: NSViewControllerRepresentable {
-  let con: TreePanelControllable
+  let con: TreeControllable
 
-  init(controller: TreePanelControllable) {
+  init(controller: TreeControllable) {
     self.con = controller
   }
 
-  func makeNSViewController(context: Context) -> TreeViewController {
-    NSLog("DEBUG [\(self.con.treeID)] Creating TreeViewController")
-    let treeViewController = TreeViewController()
+  func makeNSViewController(context: Context) -> TreeNSViewController {
+    NSLog("DEBUG [\(self.con.treeID)] Creating TreeNSViewController")
+    let treeViewController = TreeNSViewController()
     treeViewController.con = self.con
     return treeViewController
   }
   
-  func updateNSViewController(_ nsViewController: TreeViewController, context: Context) {
+  func updateNSViewController(_ nsViewController: TreeNSViewController, context: Context) {
     // Apply updates here?
     NSLog("DEBUG [\(self.con.treeID)] TreeView update requested")
   }

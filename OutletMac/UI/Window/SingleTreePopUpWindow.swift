@@ -7,7 +7,7 @@ import SwiftUI
 
 class SingleTreePopUpWindow: AppWindow, ObservableObject {
     private let _winID: String
-    weak var con: TreePanelControllable? = nil
+    weak var con: TreeControllable? = nil
     var initialSelection: SPIDNodePair? = nil
 
     override var winID: String {
@@ -16,13 +16,13 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
         }
     }
 
-    init(_ app: OutletApp, treeID: TreeID) {
+    init(_ app: OutletAppProtocol, treeID: TreeID) {
         self._winID = "\(treeID)-window"
         let contentRect = NSRect(x: 0, y: 0, width: 800, height: 600)
         super.init(app, contentRect, styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView])
     }
 
-    func setController(_ con: TreePanelControllable, initialSelection: SPIDNodePair? = nil) {
+    func setController(_ con: TreeControllable, initialSelection: SPIDNodePair? = nil) {
         self.con = con
         self.initialSelection = initialSelection
     }
@@ -65,7 +65,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
 
         switch treeLoadState {
         case .COMPLETELY_LOADED:
-            // note: around exactly the same time, the TreePanelController will receive this and start populating
+            // note: around exactly the same time, the TreeController will receive this and start populating
             DispatchQueue.main.async {
                 NSLog("DEBUG [\(self.winID)] Backend load complete. Showing dialog")
                 self.showWindow()

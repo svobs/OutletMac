@@ -94,9 +94,9 @@ class DisplayTree {
     let childList = try self.backend.getChildList(parentSPID: parentSPID, treeID: self.treeID, isExpandingParent: false,
             maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(treeID)] Got \(childList.count) children for parent '\(parentSPID.guid)': \(childList.map({ "\($0.spid.guid)"}).joined(separator: "  "))")
+      NSLog("DEBUG [\(treeID)] getChildList(): Got \(childList.count) children from BE for parent '\(parentSPID.guid)': \(childList.map({ "\($0.spid.guid)"}).joined(separator: "  "))")
     } else {
-      NSLog("DEBUG [\(treeID)] Got \(childList.count) children for parent '\(parentSPID.guid)'")
+      NSLog("DEBUG [\(treeID)] getChildList(): Got \(childList.count) children from BE for parent '\(parentSPID.guid)'")
     }
     return childList
   }

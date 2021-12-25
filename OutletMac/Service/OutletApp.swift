@@ -1,5 +1,5 @@
 //
-//  OutletApp.swift
+//  OutletAppProtocol.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 1/6/21.
@@ -9,9 +9,9 @@ import Cocoa
 import SwiftUI
 
 /**
- PROTOCOL OutletApp
+ PROTOCOL OutletAppProtocol
  */
-protocol OutletApp: HasLifecycle {
+protocol OutletAppProtocol: HasLifecycle {
   // Services:
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
@@ -28,18 +28,18 @@ protocol OutletApp: HasLifecycle {
 
   func confirmWithUserDialog(_ messageText: String, _ informativeText: String, okButtonText: String, cancelButtonText: String) -> Bool
 
-  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreePanelController
-  func registerTreePanelController(_ treeID: String, _ controller: TreePanelControllable)
+  func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreeController
+  func registerTreePanelController(_ treeID: String, _ controller: TreeControllable)
   func deregisterTreePanelController(_ treeID: TreeID)
-  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreePanelControllable)
-  func getTreePanelController(_ treeID: String) -> TreePanelControllable?
+  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreeControllable)
+  func getTreePanelController(_ treeID: String) -> TreeControllable?
 
   func sendEnableUISignal(enable: Bool)
 
   func openGDriveRootChooser(_ deviceUID: UID, _ treeID: String)
 }
 
-class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
+class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
   // Windows which ARE reused:
   var connectionProblemWindow: ConnectionProblemWindow! = nil
   var mainWindow: MainWindow? = nil
@@ -63,7 +63,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
    Everything else should be a weak ref. Thus, when deregisterTreePanelController() is called, the only ref
    is deleted.
    */
-  private var treeControllerDict: [String: TreePanelControllable] = [:]
+  private var treeControllerDict: [String: TreeControllable] = [:]
 
   var backend: OutletBackend {
     get {
@@ -556,22 +556,22 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     self.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_APP)
   }
 
-  // TreePanelController registry
+  // TreeController registry
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   /**
    Creates and starts a tree controller for the given tree, but does not load it.
   */
-  public func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreePanelController {
+  public func buildController(_ tree: DisplayTree, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws -> TreeController {
     let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: tree.treeID)
-    let con = try TreePanelController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowsMultipleSelection: allowsMultipleSelection)
+    let con = try TreeController(app: self, tree: tree, filterCriteria: filterCriteria, canChangeRoot: canChangeRoot, allowsMultipleSelection: allowsMultipleSelection)
 
     self.registerTreePanelController(con.treeID, con)
     try con.start()
     return con
   }
 
-  func registerTreePanelController(_ treeID: TreeID, _ controller: TreePanelControllable) {
+  func registerTreePanelController(_ treeID: TreeID, _ controller: TreeControllable) {
     self.tcDQ.sync {
       NSLog("DEBUG [\(treeID)] Registering tree controller in frontend")
       self.treeControllerDict[treeID] = controller
@@ -585,7 +585,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     }
   }
 
-  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreePanelControllable) {
+  func reregisterTreePanelController(oldTreeID: TreeID, newTreeID: TreeID, _ controller: TreeControllable) {
     self.tcDQ.sync {
       NSLog("DEBUG [\(oldTreeID)] Deregistering tree controller in frontend")
       self.treeControllerDict.removeValue(forKey: oldTreeID)
@@ -594,10 +594,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
     }
   }
 
-  func getTreePanelController(_ treeID: TreeID) -> TreePanelControllable? {
+  func getTreePanelController(_ treeID: TreeID) -> TreeControllable? {
     assert(DispatchQueue.isNotExecutingIn(self.tcDQ))
 
-    var con: TreePanelControllable?
+    var con: TreeControllable?
     self.tcDQ.sync {
       con = self.treeControllerDict[treeID]
     }
@@ -669,7 +669,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletApp {
   /**
    Display Merge Preview dialog
    */
-  func openMergePreview(_ con: TreePanelControllable) {
+  func openMergePreview(_ con: TreeControllable) {
     assert(DispatchQueue.isExecutingIn(.main))
 
     do {

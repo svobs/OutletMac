@@ -287,6 +287,9 @@ class GRPCConverter {
   func spidFromGRPC(spidGRPC: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> SinglePathNodeIdentifier {
     let nodeIdentifier = try self.nodeIdentifierFromGRPC(spidGRPC)
     if let spid = nodeIdentifier as? SinglePathNodeIdentifier {
+      if spid.parentGUID == spid.guid {
+        throw OutletError.invalidState("SPID's GUID is the same as its parent GUID: \(spid)")
+      }
       return spid
     } else {
       NSLog("""

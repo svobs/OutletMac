@@ -47,9 +47,9 @@ struct FancyTextField: View {
 struct FilterPanel: View {
   @EnvironmentObject var globalState: GlobalState
   @ObservedObject var swiftFilterState: SwiftFilterState
-  let con: TreePanelControllable
+  let con: TreeControllable
 
-  init(_ controller: TreePanelControllable) {
+  init(_ controller: TreeControllable) {
     self.con = controller
     self.swiftFilterState = controller.swiftFilterState
   }

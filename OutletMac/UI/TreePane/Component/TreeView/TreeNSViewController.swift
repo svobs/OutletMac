@@ -7,14 +7,14 @@ import AppKit
 import DequeModule
 
 /*
- TreeViewController: AppKit controller for TreeViewRepresentable.
+ TreeNSViewController: AppKit controller for TreeViewRepresentable.
 
  See: https://www.appcoda.com/macos-programming-nsoutlineview/
  See: https://stackoverflow.com/questions/45373039/how-to-program-a-nsoutlineview
  */
-final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, NSMenuDelegate {
+final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, NSMenuDelegate {
     // Cannot override init(), but this must be set manually before loadView() is called
-    var con: TreePanelControllable! = nil
+    var con: TreeControllable! = nil
 
     private var guidSelectedSet: Set<GUID> = []
 
@@ -47,7 +47,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             NSLog("DEBUG [\(treeID)] Ignoring Del key: UI is disabled")
             return
         }
-        NSLog("DEBUG [\(self.treeID)] TreeViewController: Del key detected")
+        NSLog("DEBUG [\(self.treeID)] TreeNSViewController: Del key detected")
         self.deleteSelectedNodes()
     }
 
@@ -59,7 +59,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             NSLog("DEBUG [\(treeID)] Ignoring Delete key: UI is disabled")
             return
         }
-        NSLog("DEBUG [\(self.treeID)] TreeViewController: Delete key detected")
+        NSLog("DEBUG [\(self.treeID)] TreeNSViewController: Delete key detected")
         self.deleteSelectedNodes()
     }
 
@@ -104,7 +104,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
 
     override func loadView() {
         // connect to controller
-        NSLog("DEBUG [\(treeID)] loadView(): setting TreeViewController in TreeController")
+        NSLog("DEBUG [\(treeID)] loadView(): setting TreeNSViewController in TreeController")
         self.con.connectTreeView(self)
 
         view = NSView()
@@ -386,7 +386,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
             return
         }
 
-        guard let guidList = TreeViewController.extractGUIDs(session.draggingPasteboard) else {
+        guard let guidList = TreeNSViewController.extractGUIDs(session.draggingPasteboard) else {
             return
         }
 
@@ -466,7 +466,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
                 dstSN = parentSN
             }
 
-            guard let srcGUIDList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
+            guard let srcGUIDList = TreeNSViewController.extractGUIDs(info.draggingPasteboard) else {
                 if SUPER_DEBUG_ENABLED {
                     NSLog("DEBUG [\(treeID)] Validating drop: no src GUIDs found")
                 }
@@ -493,7 +493,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
      'item', and are the values previously set in the validateDrop: method.
      */
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        guard let srcGUIDList = TreeViewController.extractGUIDs(info.draggingPasteboard) else {
+        guard let srcGUIDList = TreeNSViewController.extractGUIDs(info.draggingPasteboard) else {
             return false
         }
 
@@ -547,7 +547,7 @@ final class TreeViewController: NSViewController, NSOutlineViewDelegate, NSOutli
         if let dragSource = dragInfo.draggingSource {
             if let srcOutlineView = dragSource as? NSOutlineView {
                 if let srcDelegate = srcOutlineView.delegate {
-                    if let srcTreeController = srcDelegate as? TreeViewController {
+                    if let srcTreeController = srcDelegate as? TreeNSViewController {
                         return srcTreeController.treeID
                     }
                 }

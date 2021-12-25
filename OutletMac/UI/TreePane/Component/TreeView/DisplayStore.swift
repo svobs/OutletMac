@@ -17,7 +17,7 @@ typealias ApplyToSNFunc = (_ sn: SPIDNodePair) -> Void
  */
 class DisplayStore {
   private static let CHECKBOX_STATE_NAMES: [String] = ["off", "on", "mixed"]
-  weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
+  weak var con: TreeControllable! = nil  // Need to set this in parent controller's start() method
 
   private let dq = DispatchQueue(label: "DisplayStore-SerialQueue") // custom dispatch queues are serial by default
 
@@ -183,7 +183,7 @@ class DisplayStore {
     for childSN in childSNListSorted {
       let childGUID = childSN.spid.guid
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): storing child: \(childGUID)")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): storing child: \(childGUID)")
       }
       if childGUID == rootGUID {
         // should really throw an exception here
@@ -208,7 +208,7 @@ class DisplayStore {
     // Remove stale nodes
     if let existingChildGUIDList = self.parentChildListDict[parentGUID] {
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): found existing children for \(parentGUID): \(existingChildGUIDList)")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): found existing children for \(parentGUID): \(existingChildGUIDList)")
       }
       for existingChildGUID in existingChildGUIDList {
         var isStillPresent = false
@@ -219,17 +219,21 @@ class DisplayStore {
           }
         }
         if !isStillPresent {
-          NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): child was orphaned; removing: \(parentGUID)")
+          NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): child was orphaned; removing: \(parentGUID)")
           _ = self.removeSN_NoLock(existingChildGUID)
         }
       }
     } else if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(self.treeID)] DisplayStore: putChildList(): no existing children for parent \(parentGUID)")
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): no existing children for parent \(parentGUID)")
     }
 
     self.parentChildListDict[parentGUID] = childGUIDList
 
-    NSLog("DEBUG [\(self.treeID)] DisplayStore: stored \(childGUIDList.count) children for parent: \(parentGUID)")
+    NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): stored \(childGUIDList.count) children for parent: \(parentGUID)")
+
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Children of par \(parentGUID) is now: \(self.parentChildListDict[parentGUID] ?? [])")
+    }
   }
 
   func putSN(_ childSN: SPIDNodePair, parentGUID: GUID) -> Bool {
@@ -260,7 +264,7 @@ class DisplayStore {
       }
 
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Children of parent \(parentGUID): \(self.parentChildListDict[parentGUID] ?? [])")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Children of parent \(parentGUID) is now: \(self.parentChildListDict[parentGUID] ?? [])")
       }
 
       // Child -> Parent

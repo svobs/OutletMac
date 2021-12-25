@@ -18,7 +18,7 @@
 		CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */; };
 		CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */; };
 		CDF2F3650509D3F27D800ABE /* GlobalEventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F612A5D2E77A2F1143B3 /* GlobalEventMonitor.swift */; };
-		CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */; };
+		CDF2F3957AD95AC535EFAC3B /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreeController.swift */; };
 		CDF2F41B01F78B9015ECD905 /* DateUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F40499F9D376AD844203 /* DateUtil.swift */; };
 		CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */; };
 		CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */; };
@@ -34,7 +34,7 @@
 		CDF2F747A43A94C499A41B32 /* AppMainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAAAA937EC757CB4E0D3 /* AppMainMenu.swift */; };
 		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
 		CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */; };
-		CDF2F78FB501FB569A528DDB /* TreeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */; };
+		CDF2F78FB501FB569A528DDB /* TreeNSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AF108531A39C4C0491 /* TreeNSViewController.swift */; };
 		CDF2F7BB73F2144A7AE9BD31 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */; };
 		CDF2F889C9D3A7C82422AB93 /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F1282202188B26AB6D98 /* TreeView.swift */; };
 		CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */; };
@@ -90,7 +90,7 @@
 		CDF2F275262010959BE9CDA3 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
 		CDF2F40499F9D376AD844203 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
-		CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreePanelController.swift; sourceTree = "<group>"; };
+		CDF2F417B755E31D38CA0B03 /* TreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
 		CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
 		CDF2F521214ABD01967F51E8 /* DisplayStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayStore.swift; sourceTree = "<group>"; };
 		CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenu.swift; sourceTree = "<group>"; };
@@ -103,7 +103,7 @@
 		CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		CDF2F81C318FC582AE23E023 /* IfView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IfView.swift; sourceTree = "<group>"; };
 		CDF2F8947C9C2112E7C61FF0 /* HoldOffTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HoldOffTimer.swift; sourceTree = "<group>"; };
-		CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeViewController.swift; sourceTree = "<group>"; };
+		CDF2F8AF108531A39C4C0491 /* TreeNSViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeNSViewController.swift; sourceTree = "<group>"; };
 		CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutlineViewFactory.swift; sourceTree = "<group>"; };
 		CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTreeState.swift; sourceTree = "<group>"; };
 		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooserWindow.swift; sourceTree = "<group>"; };
@@ -225,10 +225,10 @@
 				CDF2F77AA899F692856B9A3D /* CellFactory.swift */,
 				CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */,
 				CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */,
-				CDF2F8AF108531A39C4C0491 /* TreeViewController.swift */,
+				CDF2F8AF108531A39C4C0491 /* TreeNSViewController.swift */,
 				CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */,
 				CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */,
-				CDF2F417B755E31D38CA0B03 /* TreePanelController.swift */,
+				CDF2F417B755E31D38CA0B03 /* TreeController.swift */,
 				CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */,
 			);
 			path = TreeView;
@@ -516,14 +516,14 @@
 				CDF2F9EB179BD47115578D6A /* CellFactory.swift in Sources */,
 				CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */,
 				CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */,
-				CDF2F78FB501FB569A528DDB /* TreeViewController.swift in Sources */,
+				CDF2F78FB501FB569A528DDB /* TreeNSViewController.swift in Sources */,
 				CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */,
 				CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */,
 				CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */,
 				CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */,
 				D1BF4E1C276F5AD6008B84DB /* TreeAction.swift in Sources */,
 				CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */,
-				CDF2F3957AD95AC535EFAC3B /* TreePanelController.swift in Sources */,
+				CDF2F3957AD95AC535EFAC3B /* TreeController.swift in Sources */,
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
 				CDF2FD53EACBC96639E728D4 /* HoldOffTimer.swift in Sources */,
 				CDF2FCD7BE6118B00DD48C9D /* HasLifecycle.swift in Sources */,

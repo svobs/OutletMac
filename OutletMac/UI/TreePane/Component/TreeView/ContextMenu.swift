@@ -22,7 +22,7 @@ class GeneratedMenuItem: NSMenuItem {
 
 
 class TreeContextMenu {
-  weak var con: TreePanelControllable! = nil  // Need to set this in parent controller's start() method
+  weak var con: TreeControllable! = nil  // Need to set this in parent controller's start() method
 
   var treeID: String {
     return con.treeID

@@ -23,10 +23,10 @@ struct SinglePaneView: View {
     GridItem(.flexible(minimum: 400, maximum: .infinity), spacing: H_PAD),
   ]
 
-  let app: OutletApp
-  let con: TreePanelControllable
+  let app: OutletAppProtocol
+  let con: TreeControllable
 
-  init(_ app: OutletApp, _ con: TreePanelControllable, _ windowState: WindowState) {
+  init(_ app: OutletAppProtocol, _ con: TreeControllable, _ windowState: WindowState) {
     self.app = app
     self.con = con
     self.windowState = windowState

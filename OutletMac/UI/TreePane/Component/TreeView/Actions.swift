@@ -8,7 +8,7 @@
 import SwiftUI
 
 class TreeActions {
-  weak var con: TreePanelControllable!  // Need to set this in parent controller's start() method
+  weak var con: TreeControllable!  // Need to set this in parent controller's start() method
 
   typealias ActionHandler = (TreeAction) -> Void
 

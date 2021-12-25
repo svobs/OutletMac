@@ -1,5 +1,5 @@
 //
-//  TreePanelController.swift
+//  TreeController.swift
 //  OutletMac
 //
 //  Created by Matthew Svoboda on 2021-02-01.
@@ -8,15 +8,15 @@ import SwiftUI
 import DequeModule
 
 /**
- PROTOCOL TreePanelControllable
+ PROTOCOL TreeControllable
  */
-protocol TreePanelControllable: HasLifecycle {
-  var app: OutletApp { get }
+protocol TreeControllable: HasLifecycle {
+  var app: OutletAppProtocol { get }
   var tree: DisplayTree { get }
   var swiftTreeState: SwiftTreeState { get }
   var swiftFilterState: SwiftFilterState { get }
 
-  var treeView: TreeViewController? { get set }
+  var treeView: TreeNSViewController? { get set }
   var displayStore: DisplayStore { get }
   var treeActions: TreeActions { get }
   var contextMenu: TreeContextMenu { get }
@@ -38,7 +38,7 @@ protocol TreePanelControllable: HasLifecycle {
   func generateCheckedRowList() throws -> [SPIDNodePair]
   func setChecked(_ guid: GUID, _ isChecked: Bool) throws
 
-  func connectTreeView(_ treeView: TreeViewController)
+  func connectTreeView(_ treeView: TreeNSViewController)
   func clearTreeAndDisplayMsg(_ msg: String, _ iconID: IconID)
   func appendEphemeralNode(_ parentSPID: SPID, _ nodeName: String, _ iconID: IconID, reloadParent: Bool)
 
@@ -49,7 +49,7 @@ protocol TreePanelControllable: HasLifecycle {
 /**
  Add convenience methods for commonly used sub-member objects
  */
-extension TreePanelControllable {
+extension TreeControllable {
   var backend: OutletBackend {
     get {
       return app.backend
@@ -70,21 +70,21 @@ extension TreePanelControllable {
 }
 
 /**
- CLASS TreePanelController
+ CLASS TreeController
 
  Serves as the controller for the entire tree panel for a single UI tree.
 
  Equivalent to "TreeController" in the Python/GTK3 version of the app, but renamed in the Mac version so as not
- to be confused with the TreeViewController (which is an AppKit controller for NSOutlineView)
+ to be confused with the TreeNSViewController (which is an AppKit controller for NSOutlineView)
  */
-class TreePanelController: TreePanelControllable {
-  var app: OutletApp
+class TreeController: TreeControllable {
+  var app: OutletAppProtocol
   var tree: DisplayTree
   var dispatchListener: DispatchListener
   let displayStore: DisplayStore = DisplayStore()
   let treeActions: TreeActions = TreeActions()
   let contextMenu: TreeContextMenu = TreeContextMenu()
-  var treeView: TreeViewController? = nil
+  var treeView: TreeNSViewController? = nil
 
   // State variables:
   var swiftTreeState: SwiftTreeState
@@ -99,9 +99,9 @@ class TreePanelController: TreePanelControllable {
 
   private lazy var filterTimer = HoldOffTimer(FILTER_APPLY_DELAY_MS, self.fireFilterTimer)
 
-  private let dq = DispatchQueue(label: "TreePanelController-SerialQueue") // custom dispatch queues are serial by default
+  private let dq = DispatchQueue(label: "TreeController-SerialQueue") // custom dispatch queues are serial by default
 
-  init(app: OutletApp, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws {
+  init(app: OutletAppProtocol, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws {
     self.app = app
     self.tree = tree
     self.swiftTreeState = try SwiftTreeState.from(tree)
@@ -194,9 +194,9 @@ class TreePanelController: TreePanelControllable {
     }
   }
 
-  // Should be called by TreeViewController
-  func connectTreeView(_ treeView: TreeViewController) {
-    NSLog("INFO  [\(self.treeID)] Connecting TreeView to TreePanelController")
+  // Should be called by TreeNSViewController
+  func connectTreeView(_ treeView: TreeNSViewController) {
+    NSLog("INFO  [\(self.treeID)] Connecting TreeView to TreeController")
     self.treeView = treeView
 
     if self.readyToPopulate {
@@ -513,7 +513,7 @@ class TreePanelController: TreePanelControllable {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func reportError(_ title: String, _ errorMsg: String) {
-    // See listener in OutletApp
+    // See listener in OutletAppProtocol
     NSLog("DEBUG [\(self.treeID)] Reporting local error: title='\(title)' error='\(errorMsg)'")
     self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
   }

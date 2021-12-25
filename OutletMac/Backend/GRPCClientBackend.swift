@@ -17,7 +17,7 @@ import NIO
  */
 class GRPCClientBackend: OutletBackend {
   var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
-  let app: OutletApp
+  let app: OutletAppProtocol
   let bonjourService = BonjourService()
   let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
@@ -38,7 +38,7 @@ class GRPCClientBackend: OutletBackend {
     }
   }
 
-  init(_ app: OutletApp, useFixedAddress: Bool = false, fixedHost: String? = nil, fixedPort: Int? = nil) {
+  init(_ app: OutletAppProtocol, useFixedAddress: Bool = false, fixedHost: String? = nil, fixedPort: Int? = nil) {
     self.app = app
     self.useFixedAddress = useFixedAddress
     self.fixedHost = fixedHost
