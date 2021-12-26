@@ -40,6 +40,18 @@ protocol OutletAppProtocol: HasLifecycle {
 }
 
 class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
+  override init() {
+    self.dispatchListener = self.dispatcher.createListener(ID_APP)
+
+    // Enable detection of our custom queue, for debugging and assertions:
+    DispatchQueue.registerDetection(of: self.tcDQ)
+
+    super.init()
+  }
+
+  // Member variables & accessors
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+
   // Windows which ARE reused:
   var connectionProblemWindow: ConnectionProblemWindow! = nil
   var mainWindow: MainWindow? = nil
@@ -77,14 +89,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  override init() {
-    self.dispatchListener = self.dispatcher.createListener(ID_APP)
-
-    // Enable detection of our custom queue, for debugging and assertions:
-    DispatchQueue.registerDetection(of: self.tcDQ)
-
-    super.init()
-  }
+  // Lifecycle methods
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func start() throws {
     NSLog("DEBUG [\(ID_APP)] OutletMacApp starting: CurrentDispatchQueue='\(DispatchQueue.currentQueueLabel ?? "nil")'")
@@ -174,6 +180,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
       self.wasShutdown = true
     }
   }
+
+  // Umm. Misc stuff
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func grpcDidGoDown() {
     DispatchQueue.main.async {

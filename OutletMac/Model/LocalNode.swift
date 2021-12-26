@@ -11,28 +11,19 @@ import Foundation
  CLASS LocalNode
  */
 class LocalNode: Node {
-  var _isLive: Bool
-  override var isLive: Bool {
-    _isLive
-  }
-  
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, _ trashed: TrashStatus = .NOT_TRASHED, isLive: Bool,
        syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
     self._isLive = isLive
+    self._syncTS = syncTS
+    self._createTS = createTS
+    self._modifyTS = modifyTS
+    self._changeTS = changeTS
     super.init(nodeIdentifer, [parentUID], trashed)
   }
-  
-  override func updateFrom(_ otherNode: Node) {
-    super.updateFrom(otherNode)
-    self._isLive = otherNode.isLive
-  }
-  
-  func deriveParentPath() throws -> String {
-    return URL(fileURLWithPath: self.nodeIdentifier.getSinglePath()).deletingLastPathComponent().absoluteString
-  }
-  
-  override func getSingleParent() -> UID {
-    return self.parentList[0]
+
+  var _isLive: Bool
+  override var isLive: Bool {
+    _isLive
   }
 
   var _syncTS: UInt64?
@@ -73,6 +64,19 @@ class LocalNode: Node {
     set(changeTS) {
       self._changeTS = changeTS
     }
+  }
+
+  override func updateFrom(_ otherNode: Node) {
+    super.updateFrom(otherNode)
+    self._isLive = otherNode.isLive
+  }
+
+  func deriveParentPath() throws -> String {
+    return URL(fileURLWithPath: self.nodeIdentifier.getSinglePath()).deletingLastPathComponent().absoluteString
+  }
+
+  override func getSingleParent() -> UID {
+    return self.parentList[0]
   }
 
 }
@@ -124,6 +128,14 @@ class LocalDirNode: LocalNode {
  CLASS LocalFileNode
  */
 class LocaFileNode: LocalNode {
+  init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,
+       sizeBytes: UInt64?, syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
+    self._md5 = md5
+    self._sha256 = sha256
+    self._sizeBytes = sizeBytes
+    super.init(nodeIdentifer, parentUID, trashed, isLive: isLive, syncTS: syncTS, createTS: createTS, modifyTS: modifyTS, changeTS: changeTS)
+  }
+
   var _md5: MD5?
   override var md5: MD5? {
     get {
@@ -162,14 +174,6 @@ class LocaFileNode: LocalNode {
   
   override public var description: String {
     return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(sha256 ?? "null") sizeBytes=\(sizeBytes ?? 0) createTS=\(createTS ?? 0) modifyTS=\(modifyTS ?? 0) changeTS=\(changeTS ?? 0) trashed=\(trashed) live=\(_isLive) icon=\(icon)"
-  }
-  
-  init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,
-       sizeBytes: UInt64?, syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
-    self._md5 = md5
-    self._sha256 = sha256
-    self._sizeBytes = sizeBytes
-    super.init(nodeIdentifer, parentUID, trashed, isLive: isLive, syncTS: syncTS, createTS: createTS, modifyTS: modifyTS, changeTS: changeTS)
   }
 
   override func isParentOf(_ otherNode: Node) -> Bool {

@@ -39,6 +39,9 @@ class TreeContextMenu {
     }
     let clickedOnSelection = selectedGUIDs.contains(clickedGUID)
     NSLog("DEBUG [\(treeID)] User opened context menu on GUID=\(clickedGUID) selectedItems=\(selectedGUIDs.count) isOnSelection=\(clickedOnSelection)")
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(treeID)] Clicked GUID '\(clickedGUID)' = \(snClicked.node)")
+    }
 
     menu.removeAllItems()
 

@@ -15,6 +15,21 @@ typealias GoogID = String
  "Abstract" base class: do not instantiate directly
  */
 class GDriveNode: Node {
+  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?,
+       modifyTS: UInt64?, name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?) {
+    self.googID = googID
+    self._createTS = createTS
+    self._modifyTS = modifyTS
+    self._name = name
+    self.ownerUID = ownerUID
+    self.driveID = driveID
+    self._isShared = isShared
+    self.sharedByUserUID = sharedByUserUID
+    self._syncTS = syncTS
+
+    super.init(nodeIdentifer, parentList, trashed)
+  }
+
   var googID: GoogID?
   var _name: String
   override var name: String {
@@ -88,22 +103,7 @@ class GDriveNode: Node {
   override var isLive: Bool {
     return self.googID != nil
   }
-  
-  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?,
-       modifyTS: UInt64?, name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?) {
-    self.googID = googID
-    self._createTS = createTS
-    self._modifyTS = modifyTS
-    self._name = name
-    self.ownerUID = ownerUID
-    self.driveID = driveID
-    self._isShared = isShared
-    self.sharedByUserUID = sharedByUserUID
-    self._syncTS = syncTS
-    
-    super.init(nodeIdentifer, parentList, trashed)
-  }
-  
+
   override func updateFrom(_ otherNode: Node) {
     if let otherGDriveNode = otherNode as? GDriveNode {
       self.googID = otherGDriveNode.googID
@@ -126,8 +126,6 @@ class GDriveNode: Node {
  CLASS GDriveFolder
  */
 class GDriveFolder: GDriveNode {
-  var isAllChildrenFetched: Bool
-  var _dirStats: DirectoryStats?
   init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?,
        name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, allChildrenFetched: Bool) {
     self.isAllChildrenFetched = allChildrenFetched
@@ -135,6 +133,9 @@ class GDriveFolder: GDriveNode {
     super.init(nodeIdentifer, parentList, trashed: trashed, googID: googID, createTS: createTS, modifyTS: modifyTS, name: name,
                ownerUID: ownerUID, driveID: driveID, isShared: isShared, sharedByUserUID: sharedByUserUID, syncTS: syncTS)
   }
+
+  var isAllChildrenFetched: Bool
+  var _dirStats: DirectoryStats?
   
   override var mimeTypeUID: UID {
     get {
@@ -197,6 +198,18 @@ class GDriveFolder: GDriveNode {
  CLASS GDriveFile
  */
 class GDriveFile: GDriveNode {
+  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?,
+       name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, version: UInt32?, md5: MD5?,
+       mimeTypeUID: UID, sizeBytes: UInt64?) {
+    self.version = version
+    self._md5 = md5
+    self._mimeTypeUID = mimeTypeUID
+    self._sizeBytes = sizeBytes
+
+    super.init(nodeIdentifer, parentList, trashed: trashed, googID: googID, createTS: createTS, modifyTS: modifyTS, name: name, ownerUID: ownerUID,
+            driveID: driveID, isShared: isShared, sharedByUserUID: sharedByUserUID, syncTS: syncTS)
+  }
+
   var version: UInt32?
   var _md5: MD5?
   override var md5: MD5? {
@@ -227,19 +240,7 @@ class GDriveFile: GDriveNode {
       self._sizeBytes = sizeBytes
     }
   }
-  
-  init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?, modifyTS: UInt64?,
-       name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?, version: UInt32?, md5: MD5?,
-       mimeTypeUID: UID, sizeBytes: UInt64?) {
-    self.version = version
-    self._md5 = md5
-    self._mimeTypeUID = mimeTypeUID
-    self._sizeBytes = sizeBytes
-    
-    super.init(nodeIdentifer, parentList, trashed: trashed, googID: googID, createTS: createTS, modifyTS: modifyTS, name: name, ownerUID: ownerUID,
-               driveID: driveID, isShared: isShared, sharedByUserUID: sharedByUserUID, syncTS: syncTS)
-  }
-  
+
   override func updateFrom(_ otherNode: Node) {
     if let otherGDriveFile = otherNode as? GDriveFile {
       self.version = otherGDriveFile.version

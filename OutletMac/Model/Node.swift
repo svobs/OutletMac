@@ -8,6 +8,13 @@
 import Foundation
 
 class Node: CustomStringConvertible {
+  init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
+    self.nodeIdentifier = nodeIdentifer
+    self.parentList = parentList
+    self.trashed = trashed
+    self._icon = nil
+  }
+
   var nodeIdentifier: NodeIdentifier
   var parentList: [UID]
   var trashed: TrashStatus
@@ -203,14 +210,7 @@ class Node: CustomStringConvertible {
   func getDirStats() -> DirectoryStats? {
     nil
   }
-  
-  init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
-    self.nodeIdentifier = nodeIdentifer
-    self.parentList = parentList
-    self.trashed = trashed
-    self._icon = nil
-  }
-  
+
   func updateFrom(_ otherNode: Node) {
     self.parentList = otherNode.parentList
     self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
@@ -328,11 +328,12 @@ class EphemeralNode: Node {
 }
 
 class DirNode: Node {
-  // need to include this for all nodes where isDir==true
-  var _dirStats: DirectoryStats? = nil
   init(_ nodeIdentifer: NodeIdentifier) {
     super.init(nodeIdentifer)
   }
+
+  // need to include this for all nodes where isDir==true
+  var _dirStats: DirectoryStats? = nil
 
   override var isDir: Bool {
     get {
@@ -358,12 +359,12 @@ class DirNode: Node {
   It's much safer to use this class rather than remembering to deal with null/nil/None.
  */
 class NonexistentDirNode: DirNode {
-  let _name: String
-
   init(_ nodeIdentifer: NodeIdentifier, _ name: String) {
     self._name = name
     super.init(nodeIdentifer)
   }
+
+  let _name: String
 
   override var name: String {
     get {
