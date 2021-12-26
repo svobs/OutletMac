@@ -149,8 +149,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     self._backend = GRPCClientBackend(self, useFixedAddress: useFixedAddress, fixedHost: fixedHost, fixedPort: fixedPort)
     self._iconStore = IconStore(self.backend)
 
-    self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
-
     // show Connection Problem window right away, cuz it might take a while to connect.
     // TODO: add a delay or something prettier
     self.grpcDidGoDown()
@@ -704,6 +702,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     assert(DispatchQueue.isExecutingIn(.main))
 
     self.globalState.reset()
+
+    if self.connectionProblemWindow == nil {
+      self.connectionProblemWindow = ConnectionProblemWindow(self, self._backend!.backendConnectionState)
+    }
 
     NSLog("DEBUG [\(ID_APP)] Closing other windows besides ConnectionProblemWindow")
     // Close all other windows beside the Connection Problem window, if they exist

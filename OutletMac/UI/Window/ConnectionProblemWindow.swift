@@ -8,16 +8,17 @@ import SwiftUI
 class ConnectionProblemWindow: AppWindow, ObservableObject {
     init(_ app: OutletAppProtocol, _ backendConnectionState: BackendConnectionState) {
         NSLog("DEBUG [ConnectionProblemWindow] Init")
+        self.backendConnectionState = backendConnectionState
         let contentRect = NSRect(x: 0, y: 0, width: 400, height: 200)
         super.init(app, contentRect, styleMask: [.titled, .closable, .fullSizeContentView])
         self.isReleasedWhenClosed = false  // make it reusable
-        self.center()
         self.title = "Connection to Agent Failed"
+        self.center()
 
-        let content = ConnectionProblemContent(self.app, self, backendConnectionState)
-        self.contentView = NSHostingView(rootView: content)
         NSLog("DEBUG [ConnectionProblemWindow] Init done")
     }
+
+    private var backendConnectionState: BackendConnectionState
 
     override var winID: String {
         get {
@@ -27,20 +28,23 @@ class ConnectionProblemWindow: AppWindow, ObservableObject {
 
     override func start() throws {
         try super.start()  // this creates the dispatchListener
+
+        let content = ConnectionProblemContent(self.app, self).environmentObject(self.backendConnectionState)
+        // FIXME: it doesn't seem to be happy something here:
+        self.contentView = NSHostingView(rootView: content)
         NSLog("DEBUG [\(self.winID)] Start done")
     }
 
 }
 
 struct ConnectionProblemContent: View {
-    @ObservedObject var backendConnectionState: BackendConnectionState
+    @EnvironmentObject var backendConnectionState: BackendConnectionState
     weak var parentWindow: ConnectionProblemWindow!
     weak var app: OutletAppProtocol!
 
-    init(_ app: OutletAppProtocol, _ parentWindow: ConnectionProblemWindow, _ backendConnectionState: BackendConnectionState) {
+    init(_ app: OutletAppProtocol, _ parentWindow: ConnectionProblemWindow) {
         self.parentWindow = parentWindow
         self.app = app
-        self.backendConnectionState = backendConnectionState
     }
 
     func quitButtonClicked() {
