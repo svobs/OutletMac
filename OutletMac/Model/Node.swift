@@ -129,7 +129,7 @@ class Node: CustomStringConvertible {
     }
   }
   
-  var `defaultIcon`: IconID {
+  var defaultIcon: IconID {
     get {
       if self.isLive {
         return .ICON_GENERIC_FILE

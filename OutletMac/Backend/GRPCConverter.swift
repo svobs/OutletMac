@@ -153,7 +153,11 @@ class GRPCConverter {
         case .localDirMeta(let metaGRPC):
           let localNodeIdentifier = nodeIdentifier as! LocalNodeIdentifier
           let trashed = TrashStatus(rawValue: nodeGRPC.trashed)!
-          node = LocalDirNode(localNodeIdentifier, metaGRPC.parentUid, trashed, isLive: metaGRPC.isLive)
+          let syncTs = metaGRPC.syncTs == 0 ? nil : metaGRPC.syncTs
+          let createTs = metaGRPC.createTs == 0 ? nil : metaGRPC.createTs
+          let modifyTs = metaGRPC.modifyTs == 0 ? nil : metaGRPC.modifyTs
+          let changeTs = metaGRPC.changeTs == 0 ? nil : metaGRPC.changeTs
+          node = LocalDirNode(localNodeIdentifier, metaGRPC.parentUid, trashed, isLive: metaGRPC.isLive, syncTS: syncTs, createTS: createTs, modifyTS: modifyTs, changeTS: changeTs)
           let dirStats = try self.dirMetaFromGRPC(metaGRPC.dirMeta)
           node.setDirStats(dirStats)
         case .localFileMeta(let metaGRPC):

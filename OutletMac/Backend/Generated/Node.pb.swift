@@ -431,6 +431,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var parentUid: UInt32 = 0
+
+  public var isLive: Bool = false
+
   public var dirMeta: Outlet_Backend_Agent_Grpc_Generated_DirMeta {
     get {return _dirMeta ?? Outlet_Backend_Agent_Grpc_Generated_DirMeta()}
     set {_dirMeta = newValue}
@@ -440,12 +444,15 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta {
   /// Clears the value of `dirMeta`. Subsequent reads from it will return its default value.
   public mutating func clearDirMeta() {self._dirMeta = nil}
 
-  public var isLive: Bool = false
-
-  public var parentUid: UInt32 = 0
-
-  /// TODO: add timestamps
   public var allChildrenFetched: Bool = false
+
+  public var syncTs: UInt64 = 0
+
+  public var createTs: UInt64 = 0
+
+  public var modifyTs: UInt64 = 0
+
+  public var changeTs: UInt64 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -459,6 +466,10 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  public var parentUid: UInt32 = 0
+
+  public var isLive: Bool = false
+
   public var sizeBytes: UInt64 = 0
 
   public var syncTs: UInt64 = 0
@@ -469,13 +480,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta {
 
   public var changeTs: UInt64 = 0
 
-  public var isLive: Bool = false
-
   public var md5: String = String()
 
   public var sha256: String = String()
-
-  public var parentUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1319,10 +1326,14 @@ extension Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta: SwiftProtobuf.Me
 extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LocalDirMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "dir_meta"),
+    1: .standard(proto: "parent_uid"),
     2: .standard(proto: "is_live"),
-    3: .standard(proto: "parent_uid"),
-    4: .standard(proto: "all_children_fetched"),
+    3: .standard(proto: "dir_meta"),
+    5: .standard(proto: "all_children_fetched"),
+    6: .standard(proto: "sync_ts"),
+    7: .standard(proto: "create_ts"),
+    8: .standard(proto: "modify_ts"),
+    9: .standard(proto: "change_ts"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1331,10 +1342,14 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
       case 2: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
-      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
-      case 4: try { try decoder.decodeSingularBoolField(value: &self.allChildrenFetched) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
+      case 5: try { try decoder.decodeSingularBoolField(value: &self.allChildrenFetched) }()
+      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
+      case 7: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
+      case 8: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
+      case 9: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
       default: break
       }
     }
@@ -1345,26 +1360,42 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._dirMeta {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-    } }()
+    if self.parentUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 1)
+    }
     if self.isLive != false {
       try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 2)
     }
-    if self.parentUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 3)
-    }
+    try { if let v = self._dirMeta {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
     if self.allChildrenFetched != false {
-      try visitor.visitSingularBoolField(value: self.allChildrenFetched, fieldNumber: 4)
+      try visitor.visitSingularBoolField(value: self.allChildrenFetched, fieldNumber: 5)
+    }
+    if self.syncTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 6)
+    }
+    if self.createTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 7)
+    }
+    if self.modifyTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 8)
+    }
+    if self.changeTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 9)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta) -> Bool {
-    if lhs._dirMeta != rhs._dirMeta {return false}
-    if lhs.isLive != rhs.isLive {return false}
     if lhs.parentUid != rhs.parentUid {return false}
+    if lhs.isLive != rhs.isLive {return false}
+    if lhs._dirMeta != rhs._dirMeta {return false}
     if lhs.allChildrenFetched != rhs.allChildrenFetched {return false}
+    if lhs.syncTs != rhs.syncTs {return false}
+    if lhs.createTs != rhs.createTs {return false}
+    if lhs.modifyTs != rhs.modifyTs {return false}
+    if lhs.changeTs != rhs.changeTs {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1373,15 +1404,15 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalDirMeta: SwiftProtobuf.Messag
 extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   public static let protoMessageName: String = _protobuf_package + ".LocalFileMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .standard(proto: "size_bytes"),
-    2: .standard(proto: "sync_ts"),
-    3: .standard(proto: "create_ts"),
-    4: .standard(proto: "modify_ts"),
-    5: .standard(proto: "change_ts"),
-    6: .standard(proto: "is_live"),
-    7: .same(proto: "md5"),
-    8: .same(proto: "sha256"),
-    9: .standard(proto: "parent_uid"),
+    1: .standard(proto: "parent_uid"),
+    2: .standard(proto: "is_live"),
+    3: .standard(proto: "size_bytes"),
+    4: .standard(proto: "sync_ts"),
+    5: .standard(proto: "create_ts"),
+    6: .standard(proto: "modify_ts"),
+    7: .standard(proto: "change_ts"),
+    8: .same(proto: "md5"),
+    9: .same(proto: "sha256"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1390,61 +1421,61 @@ extension Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta: SwiftProtobuf.Messa
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
-      case 2: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
-      case 3: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
-      case 4: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
-      case 5: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
-      case 6: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
-      case 7: try { try decoder.decodeSingularStringField(value: &self.md5) }()
-      case 8: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
-      case 9: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.parentUid) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self.isLive) }()
+      case 3: try { try decoder.decodeSingularUInt64Field(value: &self.sizeBytes) }()
+      case 4: try { try decoder.decodeSingularUInt64Field(value: &self.syncTs) }()
+      case 5: try { try decoder.decodeSingularUInt64Field(value: &self.createTs) }()
+      case 6: try { try decoder.decodeSingularUInt64Field(value: &self.modifyTs) }()
+      case 7: try { try decoder.decodeSingularUInt64Field(value: &self.changeTs) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self.md5) }()
+      case 9: try { try decoder.decodeSingularStringField(value: &self.sha256) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.sizeBytes != 0 {
-      try visitor.visitSingularUInt64Field(value: self.sizeBytes, fieldNumber: 1)
-    }
-    if self.syncTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 2)
-    }
-    if self.createTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 3)
-    }
-    if self.modifyTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 4)
-    }
-    if self.changeTs != 0 {
-      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 5)
+    if self.parentUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 1)
     }
     if self.isLive != false {
-      try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 6)
+      try visitor.visitSingularBoolField(value: self.isLive, fieldNumber: 2)
+    }
+    if self.sizeBytes != 0 {
+      try visitor.visitSingularUInt64Field(value: self.sizeBytes, fieldNumber: 3)
+    }
+    if self.syncTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.syncTs, fieldNumber: 4)
+    }
+    if self.createTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.createTs, fieldNumber: 5)
+    }
+    if self.modifyTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.modifyTs, fieldNumber: 6)
+    }
+    if self.changeTs != 0 {
+      try visitor.visitSingularUInt64Field(value: self.changeTs, fieldNumber: 7)
     }
     if !self.md5.isEmpty {
-      try visitor.visitSingularStringField(value: self.md5, fieldNumber: 7)
+      try visitor.visitSingularStringField(value: self.md5, fieldNumber: 8)
     }
     if !self.sha256.isEmpty {
-      try visitor.visitSingularStringField(value: self.sha256, fieldNumber: 8)
-    }
-    if self.parentUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.parentUid, fieldNumber: 9)
+      try visitor.visitSingularStringField(value: self.sha256, fieldNumber: 9)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_LocalFileMeta) -> Bool {
+    if lhs.parentUid != rhs.parentUid {return false}
+    if lhs.isLive != rhs.isLive {return false}
     if lhs.sizeBytes != rhs.sizeBytes {return false}
     if lhs.syncTs != rhs.syncTs {return false}
     if lhs.createTs != rhs.createTs {return false}
     if lhs.modifyTs != rhs.modifyTs {return false}
     if lhs.changeTs != rhs.changeTs {return false}
-    if lhs.isLive != rhs.isLive {return false}
     if lhs.md5 != rhs.md5 {return false}
     if lhs.sha256 != rhs.sha256 {return false}
-    if lhs.parentUid != rhs.parentUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

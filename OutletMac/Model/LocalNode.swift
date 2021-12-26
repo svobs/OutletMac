@@ -16,7 +16,8 @@ class LocalNode: Node {
     _isLive
   }
   
-  init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, _ trashed: TrashStatus = .NOT_TRASHED, isLive: Bool) {
+  init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, _ trashed: TrashStatus = .NOT_TRASHED, isLive: Bool,
+       syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
     self._isLive = isLive
     super.init(nodeIdentifer, [parentUID], trashed)
   }
@@ -33,6 +34,47 @@ class LocalNode: Node {
   override func getSingleParent() -> UID {
     return self.parentList[0]
   }
+
+  var _syncTS: UInt64?
+  override var syncTS: UInt64? {
+    get {
+      return self._syncTS
+    }
+    set(newSyncTS) {
+      self._syncTS = newSyncTS
+    }
+  }
+
+  var _createTS: UInt64?
+  override var createTS: UInt64? {
+    get {
+      return self._createTS
+    }
+    set(createTS) {
+      self._createTS = createTS
+    }
+  }
+
+  var _modifyTS: UInt64?
+  override var modifyTS: UInt64? {
+    get {
+      return self._modifyTS
+    }
+    set(modifyTS) {
+      self._modifyTS = modifyTS
+    }
+  }
+
+  var _changeTS: UInt64?
+  override var changeTS: UInt64? {
+    get {
+      return self._changeTS
+    }
+    set(changeTS) {
+      self._changeTS = changeTS
+    }
+  }
+
 }
 
 /**
@@ -62,7 +104,7 @@ class LocalDirNode: LocalNode {
   }
   
   override public var description: String {
-    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed) live=\(self._isLive) icon=\(icon)"
+    return "LocalDirNode(\(nodeIdentifier.description) parents=\(parentList) sizeBytes=\(self.sizeBytes ?? 0) createTS=\(createTS ?? 0) modifyTS=\(modifyTS ?? 0) changeTS=\(changeTS ?? 0) trashed=\(self.trashed) live=\(self._isLive) icon=\(icon)"
   }
 
 
@@ -111,47 +153,7 @@ class LocaFileNode: LocalNode {
       self._sizeBytes = sizeBytes
     }
   }
-  
-  var _syncTS: UInt64?
-  override var syncTS: UInt64? {
-    get {
-      return self._syncTS
-    }
-    set(newSyncTS) {
-      self._syncTS = newSyncTS
-    }
-  }
 
-  var _createTS: UInt64?
-  override var createTS: UInt64? {
-    get {
-      return self._createTS
-    }
-    set(createTS) {
-      self._createTS = createTS
-    }
-  }
-
-  var _modifyTS: UInt64?
-  override var modifyTS: UInt64? {
-    get {
-      return self._modifyTS
-    }
-    set(modifyTS) {
-      self._modifyTS = modifyTS
-    }
-  }
-  
-  var _changeTS: UInt64?
-  override var changeTS: UInt64? {
-    get {
-      return self._changeTS
-    }
-    set(changeTS) {
-      self._changeTS = changeTS
-    }
-  }
-  
   override var isFile: Bool {
     get {
       true
@@ -159,7 +161,7 @@ class LocaFileNode: LocalNode {
   }
   
   override public var description: String {
-    return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(self.sha256 ?? "null") sizeBytes=\(self.sizeBytes ?? 0) trashed=\(self.trashed) live=\(self._isLive) icon=\(icon)"
+    return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(sha256 ?? "null") sizeBytes=\(sizeBytes ?? 0) createTS=\(createTS ?? 0) modifyTS=\(modifyTS ?? 0) changeTS=\(changeTS ?? 0) trashed=\(trashed) live=\(_isLive) icon=\(icon)"
   }
   
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, trashed: TrashStatus = .NOT_TRASHED, isLive: Bool, md5: MD5? = nil, sha256: SHA256? = nil,
@@ -167,11 +169,7 @@ class LocaFileNode: LocalNode {
     self._md5 = md5
     self._sha256 = sha256
     self._sizeBytes = sizeBytes
-    self._syncTS = syncTS
-    self._createTS = createTS
-    self._modifyTS = modifyTS
-    self._changeTS = changeTS
-    super.init(nodeIdentifer, parentUID, trashed, isLive: isLive)
+    super.init(nodeIdentifer, parentUID, trashed, isLive: isLive, syncTS: syncTS, createTS: createTS, modifyTS: modifyTS, changeTS: changeTS)
   }
 
   override func isParentOf(_ otherNode: Node) -> Bool {
