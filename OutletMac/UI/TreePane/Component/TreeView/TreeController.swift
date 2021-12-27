@@ -677,7 +677,9 @@ class TreeController: TreeControllable {
 
   private func onSetSelectedRows(_ senderID: SenderID, _ propDict: PropDict) throws {
     let selectedRows = try propDict.get("selected_rows") as! Set<GUID>
-    self.treeView!.selectGUIDList(selectedRows)
+    DispatchQueue.main.async {
+      self.treeView!.selectGUIDList(selectedRows)
+    }
   }
 
   // Other callbacks
