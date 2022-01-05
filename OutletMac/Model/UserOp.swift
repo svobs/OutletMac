@@ -5,14 +5,29 @@
 //  Created by Matthew Svoboda on 2021-01-24.
 //
 
+
+/*
+See equivalent backend code for better documentation.
+*/
 enum UserOpType: UInt32 {
-  case RM = 1  // Remove src node
-  case UNLINK = 2  // Will (a) just remove from parent, for GDrive nodes, or (b) unlink shortcuts/links, if those type
-  case MKDIR = 3 // Make dir represented by src node
-  case CP = 4  // Copy content of src node to dst node (where dst node does not currently exist)
-  case CP_ONTO = 5 // Copy content of src node to existing dst node, overwriting the previous contents of dst
-  case MV = 6 // Equivalent to CP followed by RM: copy src node to dst node, then delete src node
-  case MV_ONTO = 7 // Copy content of src node to dst node, overwriting the contents of dst, then delete src
+  // --- 1-digit enum = 1 node op ---
+  case RM = 1             // Remove src node: file or empty dir
+  case MKDIR = 2          // Make dir represented by src node
+  case UNLINK = 3         // Will (a) just remove from parent, for GDrive nodes, or (b) unlink shortcuts/links, if those type
+
+  // --- 2-node ops ---
+  case CP = 10            // Copy content of src node to dst node (where dst node does not currently exist)
+  case CP_ONTO = 11       // Copy content of src node to existing dst node, overwriting the previous contents of dst
+  case START_DIR_CP = 12
+  case FINISH_DIR_CP = 13
+
+  case MV = 20            // Equivalent to CP followed by RM: copy src node to dst node, then delete src node
+  case MV_ONTO = 21       // Copy content of src node to dst node, overwriting the contents of dst, then delete src
+  case START_DIR_MV = 22
+  case FINISH_DIR_MV = 23
+
+  case CREATE_LINK = 30   // Create a link at dst which points to src.
+
   
   static let DISPLAYED_USER_OP_TYPES: [UserOpType: String] = [
     UserOpType.CP: "To Add",
@@ -22,7 +37,7 @@ enum UserOpType: UInt32 {
   ]
 
   func hasDst() -> Bool {
-    return self == .CP || self == .MV || self == .CP_ONTO || self == .MV_ONTO
+    return self.rawValue >= 10
   }
 }
 
