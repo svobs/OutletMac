@@ -39,7 +39,6 @@ class GRPCConverter {
       // ContainerNode or subclass
       if let catNode = containerNode as? CategoryNode {
         grpc.categoryMeta = Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta()
-        grpc.categoryMeta.opType = catNode.opType.rawValue
         grpc.categoryMeta.dirMeta = try self.dirMetaToGRPC(catNode.getDirStats())
       } else if let rootTypeNode = containerNode as? RootTypeNode {
         grpc.rootTypeMeta = Outlet_Backend_Agent_Grpc_Generated_RootTypeNodeMeta()
@@ -177,8 +176,10 @@ class GRPCConverter {
           let dirStats = try self.dirMetaFromGRPC(metaGRPC.dirMeta)
           node.setDirStats(dirStats)
         case .categoryMeta(let metaGRPC):
-          let opType = UserOpType(rawValue: metaGRPC.opType)!
-          node = CategoryNode(nodeIdentifier, opType)
+          guard let changeTreeSPID = nodeIdentifier as? ChangeTreeSPID else {
+            throw OutletError.invalidState("CategoryNode from gRPC has incorrect identifier type: \(nodeIdentifier)")
+          }
+          node = CategoryNode(changeTreeSPID)
           let dirStats = try self.dirMetaFromGRPC(metaGRPC.dirMeta)
           node.setDirStats(dirStats)
         case .rootTypeMeta(let metaGRPC):
@@ -262,28 +263,38 @@ class GRPCConverter {
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   func nodeIdentifierFromGRPC(_ grpc: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) throws -> NodeIdentifier {
-    try self.backend.nodeIdentifierFactory.forValues(grpc.uid, deviceUID: grpc.deviceUid, grpc.pathList, pathUID: grpc.pathUid, opType: grpc.opType,
-            parentGUID: grpc.parentGuid)
+    guard let nidType = NodeIdentifierType(rawValue: grpc.identifierType) else {
+      throw OutletError.invalidState("Invalid NodeIdentifierType came from gRPC: \(grpc.identifierType)")
+    }
+    guard let subtypeMeta = grpc.subtypeMeta else {
+      throw OutletError.invalidState("Invalid NodeIdentifier from gRPC: no subtypeMeta field!")
+    }
+    switch subtypeMeta {
+    case .spidMeta(let metaGRPC):
+      return try self.backend.nodeIdentifierFactory.buildSPID(grpc.nodeUid, deviceUID: grpc.deviceUid, nidType,
+              metaGRPC.singlePath, pathUID: metaGRPC.pathUid, parentGUID: metaGRPC.parentGuid)
+    case .multiPathIDMeta(let metaGRPC):
+      return try self.backend.nodeIdentifierFactory.buildNodeID(grpc.nodeUid, deviceUID: grpc.deviceUid, nidType, metaGRPC.pathList)
+    }
   }
 
   func nodeIdentifierToGRPC(_ nodeIdentifier: NodeIdentifier) throws -> Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
     var grpc = Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier()
-    grpc.uid = nodeIdentifier.nodeUID
+    grpc.nodeUid = nodeIdentifier.nodeUID
     grpc.deviceUid = nodeIdentifier.deviceUID
-    grpc.pathList = nodeIdentifier.pathList
-    if let spid = nodeIdentifier as? SPID {
-      grpc.pathUid = spid.pathUID
-      if let parentGUID = spid.parentGUID {
-        grpc.parentGuid = parentGUID
+    grpc.identifierType = nodeIdentifier.identifierType.rawValue
+
+    if nodeIdentifier.isSPID() {
+      guard let spid = nodeIdentifier as? SPID else {
+        throw OutletError.invalidState("NodeIdentifier incorrectly claims to be a SPID: \(nodeIdentifier)")
       }
-    }
-    if nodeIdentifier is ChangeTreeSPID {
-      let changeTreeSPID = nodeIdentifier as! ChangeTreeSPID
-      if let opType = changeTreeSPID.opType {
-        grpc.opType = opType.rawValue
-      } else {
-        grpc.opType = GRPC_CHANGE_TREE_NO_OP
-      }
+      grpc.spidMeta = Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta()
+      grpc.spidMeta.singlePath = spid.getSinglePath()
+      grpc.spidMeta.pathUid = spid.pathUID
+      grpc.spidMeta.parentGuid = spid.parentGUID ?? ""
+    } else {
+      grpc.multiPathIDMeta = Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta()
+      grpc.multiPathIDMeta.pathList = nodeIdentifier.pathList
     }
     return grpc
   }
@@ -296,11 +307,7 @@ class GRPCConverter {
       }
       return spid
     } else {
-      NSLog("""
-            ERROR Cannot be cast to SPID: \(nodeIdentifier) (values: uid=\(spidGRPC.uid), 
-            deviceUID=\(spidGRPC.deviceUid), pathList=\(spidGRPC.pathList), pathUID: \(spidGRPC.pathUid), opType: \(spidGRPC.opType), 
-            parentGUID: \(spidGRPC.parentGuid))
-            """)
+      NSLog("ERROR NID from gRPC cannot be cast to SPID: \(nodeIdentifier) (values: uid=\(spidGRPC.nodeUid), deviceUID=\(spidGRPC.deviceUid))")
       throw OutletError.invalidState("Server sent us invalid data: expected a SPID but got a NodeIdentifier: \(nodeIdentifier)")
     }
   }

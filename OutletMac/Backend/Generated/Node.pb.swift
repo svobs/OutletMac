@@ -133,27 +133,94 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
   fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
 }
 
-public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+public struct Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var uid: UInt32 = 0
-
-  public var deviceUid: UInt32 = 0
-
   public var pathList: [String] = []
 
-  /// If nonzero, is single path
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// Only nonzero for SPIDs
   public var pathUid: UInt32 = 0
 
-  /// If nonzero, is ChangeTreeSPID. 1 to 5 = UserOpType. 9 = no UserOpType.
-  public var opType: UInt32 = 0
+  public var singlePath: String = String()
 
   /// Optional. For SPIDs only (needed for: NODE_UPSERTED, NODE_REMOVED, SUBTREE_NODES_CHANGED)
   public var parentGuid: String = String()
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public init() {}
+}
+
+public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  public var identifierType: UInt32 = 0
+
+  public var deviceUid: UInt32 = 0
+
+  public var nodeUid: UInt32 = 0
+
+  public var subtypeMeta: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier.OneOf_SubtypeMeta? = nil
+
+  /// AKA "not a SPID"
+  public var multiPathIDMeta: Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta {
+    get {
+      if case .multiPathIDMeta(let v)? = subtypeMeta {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta()
+    }
+    set {subtypeMeta = .multiPathIDMeta(newValue)}
+  }
+
+  /// SPIDs
+  public var spidMeta: Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta {
+    get {
+      if case .spidMeta(let v)? = subtypeMeta {return v}
+      return Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta()
+    }
+    set {subtypeMeta = .spidMeta(newValue)}
+  }
+
+  public var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  public enum OneOf_SubtypeMeta: Equatable {
+    /// AKA "not a SPID"
+    case multiPathIDMeta(Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta)
+    /// SPIDs
+    case spidMeta(Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta)
+
+  #if !swift(>=4.1)
+    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier.OneOf_SubtypeMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier.OneOf_SubtypeMeta) -> Bool {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch (lhs, rhs) {
+      case (.multiPathIDMeta, .multiPathIDMeta): return {
+        guard case .multiPathIDMeta(let l) = lhs, case .multiPathIDMeta(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      case (.spidMeta, .spidMeta): return {
+        guard case .spidMeta(let l) = lhs, case .spidMeta(let r) = rhs else { preconditionFailure() }
+        return l == r
+      }()
+      default: return false
+      }
+    }
+  #endif
+  }
 
   public init() {}
 }
@@ -395,8 +462,6 @@ public struct Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta {
   public var hasDirMeta: Bool {return self._dirMeta != nil}
   /// Clears the value of `dirMeta`. Subsequent reads from it will return its default value.
   public mutating func clearDirMeta() {self._dirMeta = nil}
-
-  public var opType: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -781,15 +846,10 @@ extension Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair: SwiftProtobuf.Messag
   }
 }
 
-extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".NodeIdentifier"
+extension Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".MultiPathIdentifierMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
-    1: .same(proto: "uid"),
-    2: .standard(proto: "device_uid"),
-    3: .standard(proto: "path_list"),
-    4: .standard(proto: "path_uid"),
-    5: .standard(proto: "op_type"),
-    6: .standard(proto: "parent_guid"),
+    4: .standard(proto: "path_list"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -798,46 +858,153 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.uid) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
-      case 3: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
-      case 4: try { try decoder.decodeSingularUInt32Field(value: &self.pathUid) }()
-      case 5: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
-      case 6: try { try decoder.decodeSingularStringField(value: &self.parentGuid) }()
+      case 4: try { try decoder.decodeRepeatedStringField(value: &self.pathList) }()
       default: break
       }
     }
   }
 
   public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if self.uid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.uid, fieldNumber: 1)
+    if !self.pathList.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.pathList, fieldNumber: 4)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta) -> Bool {
+    if lhs.pathList != rhs.pathList {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".SinglePathIdentifierMeta"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    5: .standard(proto: "path_uid"),
+    6: .standard(proto: "single_path"),
+    7: .standard(proto: "parent_guid"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 5: try { try decoder.decodeSingularUInt32Field(value: &self.pathUid) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self.singlePath) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self.parentGuid) }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.pathUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.pathUid, fieldNumber: 5)
+    }
+    if !self.singlePath.isEmpty {
+      try visitor.visitSingularStringField(value: self.singlePath, fieldNumber: 6)
+    }
+    if !self.parentGuid.isEmpty {
+      try visitor.visitSingularStringField(value: self.parentGuid, fieldNumber: 7)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta) -> Bool {
+    if lhs.pathUid != rhs.pathUid {return false}
+    if lhs.singlePath != rhs.singlePath {return false}
+    if lhs.parentGuid != rhs.parentGuid {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".NodeIdentifier"
+  public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    1: .standard(proto: "identifier_type"),
+    2: .standard(proto: "device_uid"),
+    3: .standard(proto: "node_uid"),
+    4: .standard(proto: "multi_path_id_meta"),
+    5: .standard(proto: "spid_meta"),
+  ]
+
+  public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularUInt32Field(value: &self.identifierType) }()
+      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.deviceUid) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self.nodeUid) }()
+      case 4: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta?
+        var hadOneofValue = false
+        if let current = self.subtypeMeta {
+          hadOneofValue = true
+          if case .multiPathIDMeta(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.subtypeMeta = .multiPathIDMeta(v)
+        }
+      }()
+      case 5: try {
+        var v: Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta?
+        var hadOneofValue = false
+        if let current = self.subtypeMeta {
+          hadOneofValue = true
+          if case .spidMeta(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.subtypeMeta = .spidMeta(v)
+        }
+      }()
+      default: break
+      }
+    }
+  }
+
+  public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if self.identifierType != 0 {
+      try visitor.visitSingularUInt32Field(value: self.identifierType, fieldNumber: 1)
     }
     if self.deviceUid != 0 {
       try visitor.visitSingularUInt32Field(value: self.deviceUid, fieldNumber: 2)
     }
-    if !self.pathList.isEmpty {
-      try visitor.visitRepeatedStringField(value: self.pathList, fieldNumber: 3)
+    if self.nodeUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.nodeUid, fieldNumber: 3)
     }
-    if self.pathUid != 0 {
-      try visitor.visitSingularUInt32Field(value: self.pathUid, fieldNumber: 4)
-    }
-    if self.opType != 0 {
-      try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 5)
-    }
-    if !self.parentGuid.isEmpty {
-      try visitor.visitSingularStringField(value: self.parentGuid, fieldNumber: 6)
+    switch self.subtypeMeta {
+    case .multiPathIDMeta?: try {
+      guard case .multiPathIDMeta(let v)? = self.subtypeMeta else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    }()
+    case .spidMeta?: try {
+      guard case .spidMeta(let v)? = self.subtypeMeta else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+    }()
+    case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier, rhs: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier) -> Bool {
-    if lhs.uid != rhs.uid {return false}
+    if lhs.identifierType != rhs.identifierType {return false}
     if lhs.deviceUid != rhs.deviceUid {return false}
-    if lhs.pathList != rhs.pathList {return false}
-    if lhs.pathUid != rhs.pathUid {return false}
-    if lhs.opType != rhs.opType {return false}
-    if lhs.parentGuid != rhs.parentGuid {return false}
+    if lhs.nodeUid != rhs.nodeUid {return false}
+    if lhs.subtypeMeta != rhs.subtypeMeta {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -1249,7 +1416,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Me
   public static let protoMessageName: String = _protobuf_package + ".CategoryNodeMeta"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "dir_meta"),
-    2: .standard(proto: "op_type"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -1259,7 +1425,6 @@ extension Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Me
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularMessageField(value: &self._dirMeta) }()
-      case 2: try { try decoder.decodeSingularUInt32Field(value: &self.opType) }()
       default: break
       }
     }
@@ -1273,15 +1438,11 @@ extension Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta: SwiftProtobuf.Me
     try { if let v = self._dirMeta {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     } }()
-    if self.opType != 0 {
-      try visitor.visitSingularUInt32Field(value: self.opType, fieldNumber: 2)
-    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta, rhs: Outlet_Backend_Agent_Grpc_Generated_CategoryNodeMeta) -> Bool {
     if lhs._dirMeta != rhs._dirMeta {return false}
-    if lhs.opType != rhs.opType {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

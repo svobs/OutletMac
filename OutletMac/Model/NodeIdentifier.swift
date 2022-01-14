@@ -34,6 +34,12 @@ class NodeIdentifier: CustomStringConvertible, Equatable {
     }
   }
 
+  var identifierType: NodeIdentifierType {
+    get {
+      return .GENERIC_MULTI_PATH
+    }
+  }
+
   var guid: GUID {
     // This MUST match the BE's behavior exactly, or bugs will result!
     return "\(self.deviceUID):\(self.nodeUID)"
@@ -76,6 +82,12 @@ class SinglePathNodeIdentifier: NodeIdentifier {
     get {
       // default to nodeUID for LocalDisk, etc, where paths and nodes are 1-to-1
       return self.nodeUID
+    }
+  }
+
+  override var identifierType: NodeIdentifierType {
+    get {
+      return .GENERIC_SPID
     }
   }
 
@@ -148,6 +160,12 @@ class GDriveSPID: SinglePathNodeIdentifier {
     super.init(nodeUID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
   }
 
+  override var identifierType: NodeIdentifierType {
+    get {
+      return .GDRIVE_SPID
+    }
+  }
+
   let _pathUID: UID
 
   override var pathUID: UID {
@@ -189,6 +207,12 @@ class MixedTreeSPID: SinglePathNodeIdentifier {
   init(_ nodeUID: UID, deviceUID: UID, pathUID: UID, _ singlePath: String, parentGUID: GUID? = nil) {
     self._pathUID = pathUID
     super.init(nodeUID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
+  }
+
+  override var identifierType: NodeIdentifierType {
+    get {
+      return .MIXED_TREE_SPID
+    }
   }
 
   let _pathUID: UID
@@ -236,6 +260,12 @@ class GDriveIdentifier: NodeIdentifier {
     }
   }
 
+  override var identifierType: NodeIdentifierType {
+    get {
+      return .GDRIVE_MPID
+    }
+  }
+
   public override var description: String {
     return "∣\(TreeType.display(treeType))-\(deviceUID):\(nodeUID):x⩨\(pathList)∣"
   }
@@ -253,6 +283,12 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
     }
   }
 
+  override var identifierType: NodeIdentifierType {
+    get {
+      return .LOCAL_DISK_SPID
+    }
+  }
+
 }
 
 /**
@@ -263,8 +299,8 @@ class LocalNodeIdentifier: SinglePathNodeIdentifier {
  */
 class ChangeTreeSPID: SinglePathNodeIdentifier {
 
-  init(pathUID: UID, deviceUID: UID, _ singlePath: String, _ opType: UserOpType?, parentGUID: GUID? = nil) {
-    self.opType = opType
+  init(pathUID: UID, deviceUID: UID, _ singlePath: String, _ category: ChangeTreeCategory, parentGUID: GUID? = nil) {
+    self.category = category
     self._path_uid = pathUID
     super.init(NULL_UID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
   }
@@ -273,12 +309,18 @@ class ChangeTreeSPID: SinglePathNodeIdentifier {
 
   override var pathUID: UID {
     get {
-      // default to nodeUID for LocalDisk, etc, where paths and nodes are 1-to-1
       return self._path_uid
     }
   }
 
-  let opType: UserOpType?
+  let category: ChangeTreeCategory
+
+  override var identifierType: NodeIdentifierType {
+    get {
+      return NodeIdentifierType(rawValue: self.category.rawValue)!
+    }
+  }
+
 
   override var treeType: TreeType {
     get {
@@ -289,15 +331,11 @@ class ChangeTreeSPID: SinglePathNodeIdentifier {
 
   override var guid: GUID {
     // This MUST match the BE's behavior exactly, or bugs will result!
-    if self.opType != nil {
-      return "\(self.deviceUID):\(self.opType!):\(self.pathUID)"
-    } else {
-      return "\(self.deviceUID)"
-    }
+    return "\(self.deviceUID):\(self.category.display()):\(self.pathUID)"
   }
 
   func equals(_ rhs: ChangeTreeSPID) -> Bool {
-    return super.equals(_: rhs) && self.pathUID == rhs.pathUID && ((self.opType == nil && rhs.opType == nil) || (self.opType == rhs.opType))
+    return super.equals(_: rhs) && self.pathUID == rhs.pathUID && self.category == rhs.category
   }
 
   static func ==(lhs: ChangeTreeSPID, rhs: ChangeTreeSPID) -> Bool {

@@ -28,14 +28,6 @@ enum UserOpType: UInt32 {
 
   case CREATE_LINK = 30   // Create a link at dst which points to src.
 
-  
-  static let DISPLAYED_USER_OP_TYPES: [UserOpType: String] = [
-    UserOpType.CP: "To Add",
-    UserOpType.RM: "To Delete",
-    UserOpType.CP_ONTO: "To Update",
-    UserOpType.MV: "To Move"
-  ]
-
   func hasDst() -> Bool {
     return self.rawValue >= 10
   }

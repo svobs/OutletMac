@@ -436,6 +436,58 @@ enum TreeType: UID {
   }
 }
 
+enum NodeIdentifierType: UInt32 {
+  case NULL = 0
+
+  case GENERIC_MULTI_PATH = 1
+  case GENERIC_SPID = 2
+
+  case MIXED_TREE_SPID = 3
+  case LOCAL_DISK_SPID = 4
+  case GDRIVE_MPID = 10
+  case GDRIVE_SPID = 11
+
+  case CHANGE_TREE_CATEGORY_NONE = 90
+  case CHANGE_TREE_CATEGORY_RM = 91
+  case CHANGE_TREE_CATEGORY_CP = 92
+  case CHANGE_TREE_CATEGORY_CP_ONTO = 93
+  case CHANGE_TREE_CATEGORY_MV = 94
+  case CHANGE_TREE_CATEGORY_MV_ONTO = 95
+
+}
+
+let _CAT_NONE: UInt32 = NodeIdentifierType.CHANGE_TREE_CATEGORY_NONE.rawValue
+let _CAT_RM = NodeIdentifierType.CHANGE_TREE_CATEGORY_RM.rawValue
+
+enum ChangeTreeCategory: UInt32 {
+  case NONE = 90
+  case RM = 91
+  case CP = 92
+  case CP_ONTO = 93
+  case MV = 94
+  case MV_ONTO = 95
+
+  static let DISPLAY_STRINGS: [ChangeTreeCategory: String] = [
+    .NONE: "None",
+    .RM: "To Delete",
+    .CP: "To Add",
+    .CP_ONTO: "To Update",
+    .MV: "To Move",
+    .MV_ONTO: "To Replace"
+  ]
+
+  func display() -> String {
+    return ChangeTreeCategory.DISPLAY_STRINGS[self] ?? "[ERROR_CC01]"
+  }
+}
+
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_NONE.rawValue == ChangeTreeCategory.NONE.rawValue)
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_RM.rawValue == ChangeTreeCategory.RM.rawValue)
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_CP.rawValue == ChangeTreeCategory.CP.rawValue)
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_CP_ONTO.rawValue == ChangeTreeCategory.CP_ONTO.rawValue)
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_MV.rawValue == ChangeTreeCategory.MV.rawValue)
+//assert(NodeIdentifierType.CHANGE_TREE_CATEGORY_MV_ONTO.rawValue == ChangeTreeCategory.MV_ONTO.rawValue)
+
 // UID reserved values:
 let NULL_UID: UID = TreeType.NA.rawValue
 let SUPER_ROOT_UID = TreeType.MIXED.rawValue

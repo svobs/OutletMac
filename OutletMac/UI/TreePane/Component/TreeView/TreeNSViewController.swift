@@ -817,6 +817,14 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
         assert(DispatchQueue.isExecutingIn(.main))
 
         NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore")
+
+        // Force view to load, if it isn't already (avoids race condition which causes NSInternalInconsistencyException)
+        let _ = self.view
+
+        self.outlineView.beginUpdates()
+        defer {
+            self.outlineView.endUpdates()
+        }
         let isGDrive = self.con.tree.state.rootSN.node.treeType == .GDRIVE
         self.outlineView.tableColumn(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: META_CHANGE_TS_COL_KEY))?.isHidden = isGDrive
 

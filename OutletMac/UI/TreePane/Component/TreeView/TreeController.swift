@@ -331,6 +331,7 @@ class TreeController: TreeControllable {
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
+      // TODO: experiment with beginUpdates()/endUpdates()
       self.treeView?.reloadData()
 
       self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)
@@ -350,6 +351,8 @@ class TreeController: TreeControllable {
     let ephemeralNode = EphemeralNode(nodeName, parent: parentSPID, iconID)
     let ephemeralSN = ephemeralNode.toSN()
     let parentGUID = parentSPID.guid
+
+    NSLog("DEBUG [\(self.treeID)] Appending ephemeral node to parent \(parentGUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' reloadParent=\(reloadParent)")
 
     // yeah, make sure we put this inside the main DQ or weird race conditions result:
     if parentGUID == self.tree.rootSPID.guid {

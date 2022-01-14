@@ -25,17 +25,19 @@ class ContainerNode: DirNode {
  CLASS CategoryNode
  */
 class CategoryNode: ContainerNode {
-  var opType: UserOpType
-  
-  init(_ nodeIdentifer: NodeIdentifier, _ opType: UserOpType) {
-    self.opType = opType
+  init(_ nodeIdentifer: ChangeTreeSPID) {
+    assert(type(of: nodeIdentifer) == ChangeTreeSPID.self)
     super.init(nodeIdentifer)
   }
   
   override var name: String {
     get {
-      return UserOpType.DISPLAYED_USER_OP_TYPES[self.opType]!
+      return (nodeIdentifier as? ChangeTreeSPID)?.category.display() ?? "[ERROR_CN01]"
     }
+  }
+
+  var category: ChangeTreeCategory {
+    return (nodeIdentifier as? ChangeTreeSPID)!.category
   }
   
   override var defaultIcon: IconID {
@@ -55,7 +57,7 @@ class CategoryNode: ContainerNode {
   }
 
   override var description: String {
-    return "CategoryNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) opType=\(opType) name='\(name)'"
+    return "CategoryNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon) category=\(category) name='\(name)'"
   }
 
 }

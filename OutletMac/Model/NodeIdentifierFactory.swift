@@ -63,52 +63,44 @@ class NodeIdentifierFactory {
     return LocalNodeIdentifier(LOCAL_ROOT_UID, deviceUID: deviceUID, ROOT_PATH)
   }
 
-  func forValues(_ uid: UID, deviceUID: UID, _ pathList: [String], pathUID: UID, opType: UInt32, parentGUID: GUID) throws -> NodeIdentifier {
+  func buildNodeID(_ nodeUID: UID, deviceUID: UID, _ identifierType: NodeIdentifierType, _ pathList: [String]) throws -> NodeIdentifier {
     if deviceUID == NULL_UID {
       // this can indicate that the entire node doesn't exist or is invalid
       throw OutletError.invalidState("device_uid cannot be null!")
     }
 
+    switch identifierType {
+    case .GDRIVE_MPID:
+      return GDriveIdentifier(nodeUID, deviceUID: deviceUID, pathList)
+    default:
+      throw OutletError.invalidState("Invalid identifierType for MPID: \(identifierType) (deviceUID=\(deviceUID) nodeUID=\(nodeUID))")
+    }
+  }
+
+  func buildSPID(_ nodeUID: UID, deviceUID: UID, _ identifierType: NodeIdentifierType, _ singlePath: String, pathUID: UID, parentGUID: GUID) throws
+          -> SPID {
+
     let parentGUID = parentGUID == "" ? nil : parentGUID
 
-    if opType > 0 {
-      // ChangeTreeSPID (we must be coming from gRPC)
-      let opTypeEnum: UserOpType?
-      if opType == GRPC_CHANGE_TREE_NO_OP {
-        opTypeEnum = nil
-      } else {
-        opTypeEnum = UserOpType(rawValue: opType)
-      }
-      return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, pathList[0], opTypeEnum, parentGUID: parentGUID)
-    }
-
-    let treeType = try self.getTreeType(for: deviceUID)
-
-    if treeType == .LOCAL_DISK {
-      // LocalNodeIdentifier is always a SPID
-      return LocalNodeIdentifier(uid, deviceUID: deviceUID, pathList[0], parentGUID: parentGUID)
-    } else if treeType == .GDRIVE {
-      if pathUID > NULL_UID { // non-null value indicates that it must be single path
-        if pathList.count > 1 {
-            throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): mustBeSinglePath=true but paths count is: \(pathList.count)")
-        }
-        return GDriveSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0], parentGUID: parentGUID)
-      }
-      return GDriveIdentifier(uid, deviceUID: deviceUID, pathList)
-    } else if treeType == .MIXED {
-      if pathList.count > 1 {
-        throw OutletError.invalidState("Too many paths for tree_type MIXED: \(pathList)")
-      }
+    switch identifierType {
+    case .LOCAL_DISK_SPID:
+      return LocalNodeIdentifier(nodeUID, deviceUID: deviceUID, singlePath, parentGUID: parentGUID)
+    case .GDRIVE_SPID:
+      return GDriveSPID(nodeUID, deviceUID: deviceUID, pathUID: pathUID, singlePath, parentGUID: parentGUID)
+    case .MIXED_TREE_SPID:
       if deviceUID != SUPER_ROOT_DEVICE_UID {
         throw OutletError.invalidState("Expected deviceUID of \(SUPER_ROOT_DEVICE_UID) but found \(deviceUID)")
       }
       if pathUID == NULL_UID {
-        throw OutletError.invalidState("PathUID is null!")
+        throw OutletError.invalidState("PathUID cannot be null for MIXED_TREE_SPID!")
       }
-      return MixedTreeSPID(uid, deviceUID: deviceUID, pathUID: pathUID, pathList[0], parentGUID: parentGUID)
+      return MixedTreeSPID(nodeUID, deviceUID: deviceUID, pathUID: pathUID, singlePath, parentGUID: parentGUID)
+    default:
+      // Must be a category of ChangeTreeSPID
+      guard let category = ChangeTreeCategory(rawValue: identifierType.rawValue) else {
+        throw OutletError.invalidState("Invalid identifierType for SPID: \(identifierType) (deviceUID=\(deviceUID) nodeUID=\(nodeUID))")
+      }
+      return ChangeTreeSPID(pathUID: pathUID, deviceUID: deviceUID, singlePath, category, parentGUID: parentGUID)
     }
-    
-    throw OutletError.invalidState("NodeIdentifierFactory.forAllValues(): bad combination of values: uid=\(uid), deviceUID=\(deviceUID), treeType=\(treeType), pathList=\(pathList), pathUID=\(pathUID)")
   }
-
 }
