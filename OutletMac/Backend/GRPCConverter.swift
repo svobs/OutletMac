@@ -288,6 +288,9 @@ class GRPCConverter {
       guard let spid = nodeIdentifier as? SPID else {
         throw OutletError.invalidState("NodeIdentifier incorrectly claims to be a SPID: \(nodeIdentifier)")
       }
+      guard spid.pathUID > 0 else {
+        throw OutletError.invalidState("SPID is missing pathUID: \(spid)")
+      }
       grpc.spidMeta = Outlet_Backend_Agent_Grpc_Generated_SinglePathIdentifierMeta()
       grpc.spidMeta.singlePath = spid.getSinglePath()
       grpc.spidMeta.pathUid = spid.pathUID

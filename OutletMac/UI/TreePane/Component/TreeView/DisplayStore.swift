@@ -184,7 +184,7 @@ class DisplayStore {
     for childSN in childSNListSorted {
       let childGUID = childSN.spid.guid
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): storing child: \(childGUID)")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Storing child: \(childGUID)")
       }
       if childGUID == rootGUID {
         // should really throw an exception here
@@ -209,7 +209,7 @@ class DisplayStore {
     // Remove stale nodes
     if let existingChildGUIDList = self.parentChildListDict[parentGUID] {
       if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): found existing children for \(parentGUID): \(existingChildGUIDList)")
+        NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Found existing children for \(parentGUID): \(existingChildGUIDList)")
       }
       for existingChildGUID in existingChildGUIDList {
         var isStillPresent = false
@@ -220,17 +220,17 @@ class DisplayStore {
           }
         }
         if !isStillPresent {
-          NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): child was orphaned; removing: \(parentGUID)")
+          NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Child was orphaned; removing: \(parentGUID)")
           _ = self.removeSN_NoLock(existingChildGUID)
         }
       }
     } else if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): no existing children for parent \(parentGUID)")
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): No existing children for parent \(parentGUID)")
     }
 
     self.parentChildListDict[parentGUID] = childGUIDList
 
-    NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): stored \(childGUIDList.count) children for parent: \(parentGUID)")
+    NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Stored \(childGUIDList.count) children for parent: \(parentGUID)")
 
     if SUPER_DEBUG_ENABLED {
       NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Parent \(parentGUID) now has children: \(self.parentChildListDict[parentGUID] ?? [])")

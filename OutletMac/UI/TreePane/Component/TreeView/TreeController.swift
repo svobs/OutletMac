@@ -370,7 +370,7 @@ class TreeController: TreeControllable {
     }
 
     if reloadParent {
-      self.treeView!.reloadItem(parentGUID, reloadChildren: true)
+      self.treeView?.reloadItem(parentGUID, reloadChildren: true)
     }
     NSLog("DEBUG [\(self.treeID)] Appended ephemeral node to parent \(parentGUID): guid=\(ephemeralSN.spid.guid) name='\(nodeName)' reloadParent=\(reloadParent)")
   }
