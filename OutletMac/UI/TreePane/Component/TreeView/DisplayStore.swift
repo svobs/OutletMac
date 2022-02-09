@@ -155,6 +155,7 @@ class DisplayStore {
   */
   func putRootChildList(_ rootSN: SPIDNodePair, _ topLevelSNList: [SPIDNodePair]) -> Void {
     dq.sync {
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putRootChildList(): clearing store. New root \(rootSN.spid.guid) has \(topLevelSNList.count) children")
       self.primaryDict.removeAll()
       self.childParentDict.removeAll()
       self.parentChildListDict.removeAll()
@@ -232,7 +233,7 @@ class DisplayStore {
     NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): stored \(childGUIDList.count) children for parent: \(parentGUID)")
 
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Children of par \(parentGUID) is now: \(self.parentChildListDict[parentGUID] ?? [])")
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putChildList(): Parent \(parentGUID) now has children: \(self.parentChildListDict[parentGUID] ?? [])")
     }
   }
 

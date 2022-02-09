@@ -721,9 +721,16 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
             defer {
                 self.con.expandContractListenersEnabled = true
             }
+
             // remember, GUID at root of tree is nil
             let item = self.guidToItem(guid)
             NSLog("DEBUG [\(self.treeID)] Reloading item: \(item ?? "<root>") (reloadChildren=\(reloadChildren))")
+            if item == nil {
+                // Apparently need to call this if reloading root, otherwise we get an NSCrash!
+                // See: https://stackoverflow.com/questions/14933970/reloading-nsoutlineview-frequently-causes-crashes
+                NSLog("DEBUG [\(self.treeID)] Calling reloadData() because we are reloading root")
+                self.outlineView.reloadData()
+            }
             self.outlineView.reloadItem(item, reloadChildren: reloadChildren)
         }
     }

@@ -196,6 +196,10 @@ class TreeController: TreeControllable {
 
   // Should be called by TreeNSViewController
   func connectTreeView(_ treeView: TreeNSViewController) {
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(self.treeID)] connectTreeView() starting")
+    }
+
     NSLog("INFO  [\(self.treeID)] Connecting TreeView to TreeController")
     self.treeView = treeView
 
@@ -203,6 +207,10 @@ class TreeController: TreeControllable {
       self.populateTreeView()
     } else {
       NSLog("DEBUG [\(self.treeID)] readyToPopulate is false")
+    }
+
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(self.treeID)] connectTreeView() done")
     }
   }
 

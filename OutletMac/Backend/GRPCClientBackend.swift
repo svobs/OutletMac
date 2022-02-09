@@ -829,7 +829,7 @@ class GRPCClientBackend: OutletBackend {
     } else {
       if SUPER_DEBUG_ENABLED {
         // We should avoid seeing the main queue show up here, as much as possible
-        NSLog("DEBUG callAndTranslateErrors(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+        NSLog("DEBUG callAndTranslateErrors(): (About to call'\(rpcName)') Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
       }
 
       var exception: OutletError? = nil
