@@ -68,6 +68,7 @@ class TreeContextMenu {
     }
   }
 
+  // TODO: make static, and put in factory class
   private func buildMenuFromMeta(_ menuItemMetaList: [MenuItemMeta], menu: NSMenu) {
     for itemMeta in menuItemMetaList {
       let item: NSMenuItem

@@ -33,12 +33,37 @@ class GlobalState: ObservableObject {
     // the backend will be notified every time they're changed
 
     // This is the value set in the toolbar/menu, but can be overridden by modifierKeyDragOperation
-    var currentDragOperation: DragOperation = .COPY
+    var currentDragOperation: DragOperation = .COPY {
+        willSet {
+            guard currentDragOperation != newValue else {
+                return
+            }
+
+            NSLog("DEBUG [\(ID_APP)] Changing DefaultDragOperation from \(currentDragOperation) to \(newValue)")
+        }
+    }
     // FIXME: bug: this doesn't get changed during a drag; it's frozen when the drag starts
     var modifierKeyDragOperation: DragOperation? = nil
 
-    var currentDirConflictPolicy: DirConflictPolicy = .MERGE
-    var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_DIFFERENT
+    var currentDirConflictPolicy: DirConflictPolicy = .MERGE {
+        willSet {
+            guard currentDirConflictPolicy != newValue else {
+                return
+            }
+
+            NSLog("DEBUG [\(ID_APP)] Changing DirConflictPolicy from \(currentDirConflictPolicy) to \(newValue)")
+        }
+    }
+
+    var currentFileConflictPolicy: FileConflictPolicy = .RENAME_IF_DIFFERENT {
+        willSet {
+            guard currentFileConflictPolicy != newValue else {
+                return
+            }
+
+            NSLog("DEBUG [\(ID_APP)] Changing FileConflictPolicy from \(currentFileConflictPolicy) to \(newValue)")
+        }
+    }
     // --------------------------------------------------------------------------------------------
 
     func getCurrentDefaultDragOperation() -> DragOperation {

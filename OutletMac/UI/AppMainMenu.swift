@@ -10,6 +10,8 @@ import Cocoa
  This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
  */
 class AppMainMenu: NSMenu {
+    // App-wide actions:
+    // TODO: find a better place for these
     public static let DIFF_TREES_BY_CONTENT: Selector = #selector(OutletMacApp.diffTreesByContent)
     public static let MERGE_CHANGES: Selector = #selector(OutletMacApp.mergeDiffChanges)
     public static let CANCEL_DIFF: Selector = #selector(OutletMacApp.cancelDiff)
@@ -31,6 +33,9 @@ class AppMainMenu: NSMenu {
 
     }
 
+    /*
+     Application Menu
+     */
     private static func buildAppMenu() -> NSMenuItem {
         let appMenu = NSMenuItem()
         appMenu.submenu = NSMenu()
@@ -51,6 +56,9 @@ class AppMainMenu: NSMenu {
         return appMenu
     }
 
+    /*
+     Edit Menu
+     */
     private static func buildEditMenu() -> NSMenuItem {
         let editMenu = NSMenuItem()
         editMenu.title = "Edit"
@@ -58,6 +66,8 @@ class AppMainMenu: NSMenu {
 
         let delete = NSMenuItem(title: "Delete", action: nil, keyEquivalent: "⌫")
         delete.keyEquivalentModifierMask.remove(.command)
+
+        let app: OutletAppProtocol = NSApplication.shared.delegate as! OutletAppProtocol
 
         editMenu.submenu?.items = [
             NSMenuItem(title: "Undo", action: #selector(UndoManager.undo), keyEquivalent: "z"),
@@ -68,18 +78,37 @@ class AppMainMenu: NSMenu {
             NSMenuItem(title: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v"),
             delete,
             NSMenuItem.separator(),
-            NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+            NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a"),
+            NSMenuItem.separator(),
+//            buildDragModeSubmenu(app),
             ]
 
         return editMenu
     }
 
+    private static func buildDragModeSubmenu(_ app: OutletAppProtocol) -> NSMenuItem {
+        let group = ToolStateSpace.dragModeGroup
+
+//        let groupMenuMeta: MenuItemMeta = group.toMenuMeta()
+        // TODO!
+
+        let submenu = NSMenuItem()
+        submenu.title = group.groupLabel
+        submenu.submenu = NSMenu(title: group.groupLabel)
+
+
+//        for item in group.itemList {
+//            let menuItem = NSMenuItem(title: item.title, action: #selector(OutletMacApp.changeDragMode(<#T##OutletMacApp##OutletMac.OutletMacApp#>)), keyEquivalent: "")
+//            menuItem.toolTip = item.toolTip
+//            submenu.submenu?.items.append(menuItem)
+//        }
+
+        return submenu
+    }
+
     private static func buildToolsMenu() -> NSMenuItem {
         let toolsMenu = NSMenuItem()
         toolsMenu.submenu = NSMenu(title: "Tools")
-
-        let diffTreesByContent = NSMenuItem(title: "Diff Trees By Content", action: AppMainMenu.DIFF_TREES_BY_CONTENT, keyEquivalent: "d")
-        diffTreesByContent.target = NSApplication.shared
 
         toolsMenu.submenu?.items = [
             NSMenuItem(title: "Diff Trees By Content", action: #selector(OutletMacApp.diffTreesByContent), keyEquivalent: "d"),

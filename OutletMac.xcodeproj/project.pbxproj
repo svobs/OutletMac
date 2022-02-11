@@ -26,6 +26,7 @@
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
+		CDF2F5B54151D03A68981E6A /* ToolStateSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F9FF0A28F09076770990 /* ToolStateSpace.swift */; };
 		CDF2F615F9059EA67EB224BA /* OutletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */; };
 		CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB4729ECD01C785776D8 /* Backend.swift */; };
 		CDF2F6C5E603DB335DB8E920 /* GDriveRootChooserWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */; };
@@ -108,6 +109,7 @@
 		CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTreeState.swift; sourceTree = "<group>"; };
 		CDF2F90A12D2FA42A43E44AC /* GDriveRootChooserWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GDriveRootChooserWindow.swift; sourceTree = "<group>"; };
 		CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutletApp.swift; sourceTree = "<group>"; };
+		CDF2F9FF0A28F09076770990 /* ToolStateSpace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolStateSpace.swift; sourceTree = "<group>"; };
 		CDF2FAAAA937EC757CB4E0D3 /* AppMainMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppMainMenu.swift; sourceTree = "<group>"; };
 		CDF2FAC3B920540522051982 /* UnwrapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnwrapView.swift; sourceTree = "<group>"; };
 		CDF2FB1106717FF3D9D70C9B /* IconStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconStore.swift; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */,
 				CDF2F26A81EB1214E0F983EE /* AppWindow.swift */,
 				CDF2F01E9410339930D7821C /* MainWindowToolbar.swift */,
+				CDF2F9FF0A28F09076770990 /* ToolStateSpace.swift */,
 			);
 			path = Window;
 			sourceTree = "<group>";
@@ -411,7 +414,7 @@
 			);
 			mainGroup = 11DDEEC223A6F9580014C2A6;
 			packageReferences = (
-				D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections" */,
+				D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections.git" */,
 			);
 			productRefGroup = 11DDEECC23A6F9580014C2A6 /* Products */;
 			projectDirPath = "";
@@ -544,6 +547,7 @@
 				CDF2F747A43A94C499A41B32 /* AppMainMenu.swift in Sources */,
 				CDF2F09F3C9E022C4F98F52B /* MainWindowToolbar.swift in Sources */,
 				CDF2FB5A77F5EA5B4DCA361C /* MenuItemMeta.swift in Sources */,
+				CDF2F5B54151D03A68981E6A /* ToolStateSpace.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -742,7 +746,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+		D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
 			requirement = {
@@ -755,7 +759,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		D17FA94E276C96800024527E /* DequeModule */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections" */;
+			package = D17FA94D276C96800024527E /* XCRemoteSwiftPackageReference "swift-collections.git" */;
 			productName = DequeModule;
 		};
 /* End XCSwiftPackageProductDependency section */

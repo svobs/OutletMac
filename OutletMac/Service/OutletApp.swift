@@ -392,9 +392,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
       NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): identifier = \(toolbarItemGroup.itemIdentifier)")
 
-      let newValue: PickerItemValue
+      let newValue: PickerItemIdentifier
       do {
-        guard let val = try MainWindowToolbar.getValueFromIndex(toolbarItemGroup.selectedIndex, toolbarItemGroup.itemIdentifier) else {
+        guard let val = try MainWindowToolbar.getPickerItemIdentifierFromIndex(toolbarItemGroup.selectedIndex, toolbarItemGroup.itemIdentifier) else {
           return
         }
         newValue = val
@@ -406,33 +406,47 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
         return
       }
 
-      switch newValue {
-      case PickerItemValue.DragMode(let selection):
-        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selection) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.currentDragOperation = selection
-        do {
-          try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(selection.rawValue))
-        } catch {
-          self.reportException("Failed to save new drag mode", error)
-        }
-      case PickerItemValue.DirPolicy(let selection):
-        NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selection) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.currentDirConflictPolicy = selection
-        do {
-          try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(selection.rawValue))
-        } catch {
-          self.reportException("Failed to save new dir conflict policy", error)
-        }
+      NSLog("DEBUG [\(ID_APP)] Got value \(newValue) for index \(toolbarItemGroup.selectedIndex)")
 
-      case PickerItemValue.FilePolicy(let selection):
-        NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selection) (index \(toolbarItemGroup.selectedIndex))")
-        self.globalState.currentFileConflictPolicy = selection
-        do {
-          try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(selection.rawValue))
-        } catch {
-          self.reportException("Failed to save new file conflict policy", error)
-        }
+      switch newValue {
+      case PickerItemIdentifier.DragMode(let selectedMode):
+        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selectedMode) (index \(toolbarItemGroup.selectedIndex))")
+        self.changeDragMode(selectedMode)
+
+      case PickerItemIdentifier.DirPolicy(let selectedPolicy):
+        NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selectedPolicy) (index \(toolbarItemGroup.selectedIndex))")
+        self.changeDirConflictPolicy(selectedPolicy)
+
+      case PickerItemIdentifier.FilePolicy(let selectedPolicy):
+        NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selectedPolicy) (index \(toolbarItemGroup.selectedIndex))")
       }
+    }
+  }
+
+  func changeDragMode(_ newMode: DragOperation) {
+    self.globalState.currentDragOperation = newMode
+    do {
+      try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newMode.rawValue))
+    } catch {
+      self.reportException("Failed to save Drag Mode selection", error)
+    }
+  }
+
+  func changeDirConflictPolicy(_ newPolicy: DirConflictPolicy) {
+    self.globalState.currentDirConflictPolicy = newPolicy
+    do {
+      try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
+    } catch {
+      self.reportException("Failed to save Dir Conflict Policy selection", error)
+    }
+  }
+
+  func changeFileConflictPolicy(_ newPolicy: FileConflictPolicy) {
+    self.globalState.currentFileConflictPolicy = newPolicy
+    do {
+      try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
+    } catch {
+      self.reportException("Failed to save new file conflict policy", error)
     }
   }
 
@@ -465,6 +479,9 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     NSLog("DEBUG [\(ID_APP)] validateMenuItem(): item \(action) enabled=\(isEnabled)")
     return isEnabled
   }
+
+  // Diff Trees
+  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
   /**
    Diff Trees By Content
