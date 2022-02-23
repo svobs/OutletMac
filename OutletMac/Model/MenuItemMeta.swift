@@ -25,11 +25,10 @@ class MenuItemMeta: CustomStringConvertible {
     var description: String {
         return "MenuItemMeta[type=\(itemType) actionType=\(actionType) title='\(title) submenu=\(submenuItemList)']"
     }
+}
 
-    /*
-     Convenience factory method: create submenu
-     */
-    static func makeSubmenuItem(title: String) -> MenuItemMeta {
-        return MenuItemMeta(itemType: .NORMAL, title: title, actionType: .BUILTIN(.NO_ACTION))
+class SubmenuItemMeta : MenuItemMeta {
+    init(title: String) {
+        super.init(itemType: .NORMAL, title: title, actionType: .BUILTIN(.NO_ACTION))
     }
 }

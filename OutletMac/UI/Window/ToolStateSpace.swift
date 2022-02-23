@@ -42,6 +42,10 @@ class PickerItem {
     let image: NSImage
     let toolTip: String
     let setterActionID: ActionID
+
+    func toMenuItemMeta() -> MenuItemMeta {
+        return MenuItemMeta(itemType: .NORMAL, title: self.title, actionType: .BUILTIN(self.setterActionID))
+    }
 }
 
 /**
@@ -69,11 +73,10 @@ class PickerGroup: Hashable {
     let tooltipTemplate: String
 
     func toMenuMeta() -> MenuItemMeta {
-        let menu = MenuItemMeta.makeSubmenuItem(title: groupLabel)
+        let menu = SubmenuItemMeta(title: groupLabel)
 
         for item in itemList {
-            let menuItem = MenuItemMeta(itemType: .NORMAL, title: item.title, actionType: .BUILTIN(item.setterActionID))
-            menu.submenuItemList.append(menuItem)
+            menu.submenuItemList.append(item.toMenuItemMeta())
         }
 
         return menu
@@ -135,4 +138,17 @@ class ToolStateSpace {
         groupLabel: "File Conflict Policy",
         tooltipTemplate: "When moving or copying: what to do when the destination already contains a file with the same name as a file being copied")
 
+    static let groupList = [dragModeGroup, dirConflictPolicyGroup, fileConflictPolicyGroup]
+
+    static let setterActionMap: [ActionID : PickerItem] = buildSetterActionMap()
+
+    private static func buildSetterActionMap() -> [ActionID : PickerItem] {
+        var map: [ActionID : PickerItem] = [:]
+        for group in groupList {
+            for pickerItem in group.itemList {
+                map[pickerItem.setterActionID] = pickerItem
+            }
+        }
+        return map
+    }
 }

@@ -45,9 +45,9 @@ class MainWindow: AppWindow, ObservableObject {
   func updateToolbarSelections() {
     if let toolbar = self.toolbar as? MainWindowToolbar {
       // bring UI up to sync with state:
-      toolbar.setDragMode(self.app.globalState.getCurrentDefaultDragOperation())
-      toolbar.setToolbarSelection(.dirConflictPolicyPicker, .DirPolicy(self.app.globalState.currentDirConflictPolicy))
-      toolbar.setToolbarSelection(.fileConflictPolicyPicker, .FilePolicy(self.app.globalState.currentFileConflictPolicy))
+      toolbar.setToolbarSelection(.DragMode(self.app.globalState.getCurrentDefaultDragOperation()))
+      toolbar.setToolbarSelection(.DirPolicy(self.app.globalState.currentDirConflictPolicy))
+      toolbar.setToolbarSelection(.FilePolicy(self.app.globalState.currentFileConflictPolicy))
     }
   }
 
@@ -195,7 +195,7 @@ class MainWindow: AppWindow, ObservableObject {
       let newMode = self.app.globalState.getCurrentDefaultDragOperation()
       NSLog("DEBUG [\(self.winID)] CmdKeyPressed=\(isCommandKeyDepressed) OptionKeyPressed=\(isOptionKeyDepressed) ModDragMode=\(String(modifierDragMode)) NewDragMode=\(newMode)")
       if let toolbar = self.toolbar as? MainWindowToolbar {
-        toolbar.setDragMode(newMode)
+        toolbar.setToolbarSelection(.DragMode(newMode))
       }
     }
   }

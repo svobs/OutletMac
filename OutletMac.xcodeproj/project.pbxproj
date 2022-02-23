@@ -15,6 +15,7 @@
 		CDF2F198D54C4E84C72FD7D3 /* AppWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F26A81EB1214E0F983EE /* AppWindow.swift */; };
 		CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */; };
 		CDF2F2281EC016791BFB4E66 /* GlobalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB2EA146750617D29EDD /* GlobalState.swift */; };
+		CDF2F2815043CAE45CEDA919 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F09B9311893F83A72AAB /* Action.swift */; };
 		CDF2F321C5415ED9D2082BF9 /* SinglePaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */; };
 		CDF2F345DB9EC8B949A698C1 /* ConnectionProblemWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */; };
 		CDF2F3650509D3F27D800ABE /* GlobalEventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F612A5D2E77A2F1143B3 /* GlobalEventMonitor.swift */; };
@@ -36,7 +37,7 @@
 		CDF2F7496FCFFD2A2CEF3ACB /* WindowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FE3CBB814776E801E1E4 /* WindowState.swift */; };
 		CDF2F77865164DD11ED402D9 /* NodePasteboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */; };
 		CDF2F78FB501FB569A528DDB /* TreeNSViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8AF108531A39C4C0491 /* TreeNSViewController.swift */; };
-		CDF2F7BB73F2144A7AE9BD31 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */; };
+		CDF2F7BB73F2144A7AE9BD31 /* TreeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBDA9CAC6C3CB4C4EF4A /* TreeActions.swift */; };
 		CDF2F889C9D3A7C82422AB93 /* TreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F1282202188B26AB6D98 /* TreeView.swift */; };
 		CDF2F955BC18F939D04E2CE2 /* DispatchQueueExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F13CD3D9F9AFCD77BD27 /* DispatchQueueExtensions.swift */; };
 		CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F902C8E6209A6997301B /* SwiftTreeState.swift */; };
@@ -44,6 +45,7 @@
 		CDF2F9FD8CDCFA9EFBAB5A9E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F275262010959BE9CDA3 /* Constants.swift */; };
 		CDF2FA6AC9C4A78BF32BB41F /* StatusPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */; };
 		CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F81C318FC582AE23E023 /* IfView.swift */; };
+		CDF2FAF6AACFF7BE8E28F788 /* GlobalActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F36D71F017EE670CF98E /* GlobalActions.swift */; };
 		CDF2FB5A77F5EA5B4DCA361C /* MenuItemMeta.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F0E9BD6EDCF089EB2C13 /* MenuItemMeta.swift */; };
 		CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F521214ABD01967F51E8 /* DisplayStore.swift */; };
 		CDF2FB80159CBF6C270357DB /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F7E0DC2E1724E2A40A96 /* FilterPanel.swift */; };
@@ -68,7 +70,6 @@
 		D17FA94F276C96800024527E /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = D17FA94E276C96800024527E /* DequeModule */; };
 		D19B16B726158E610072F8A8 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19B16B626158E610072F8A8 /* Device.swift */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
-		D1BF4E1C276F5AD6008B84DB /* TreeAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */; };
 		D1CB049E25B182B500556B28 /* NodeIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB049D25B182B500556B28 /* NodeIdentifier.swift */; };
 		D1CB04A125B1832E00556B28 /* GRPCConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A025B1832E00556B28 /* GRPCConverter.swift */; };
 		D1CB04A425B184C100556B28 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1CB04A325B184C100556B28 /* Node.swift */; };
@@ -82,6 +83,7 @@
 		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F9163E76F32FDC4F899A8CD /* Pods-OutletMac.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OutletMac.release.xcconfig"; path = "Target Support Files/Pods-OutletMac/Pods-OutletMac.release.xcconfig"; sourceTree = "<group>"; };
 		CDF2F01E9410339930D7821C /* MainWindowToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowToolbar.swift; sourceTree = "<group>"; };
+		CDF2F09B9311893F83A72AAB /* Action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
 		CDF2F0E9BD6EDCF089EB2C13 /* MenuItemMeta.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuItemMeta.swift; sourceTree = "<group>"; };
 		CDF2F0F3C727EC0086553C21 /* HasLifecycle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HasLifecycle.swift; sourceTree = "<group>"; };
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 		CDF2F26A81EB1214E0F983EE /* AppWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppWindow.swift; sourceTree = "<group>"; };
 		CDF2F275262010959BE9CDA3 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CDF2F2C33E5B5D0D8016A08B /* TwoPaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwoPaneView.swift; sourceTree = "<group>"; };
+		CDF2F36D71F017EE670CF98E /* GlobalActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalActions.swift; sourceTree = "<group>"; };
 		CDF2F40499F9D376AD844203 /* DateUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateUtil.swift; sourceTree = "<group>"; };
 		CDF2F417B755E31D38CA0B03 /* TreeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeController.swift; sourceTree = "<group>"; };
 		CDF2F44119EF4BD37F1B838A /* StatusPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusPanel.swift; sourceTree = "<group>"; };
@@ -116,7 +119,7 @@
 		CDF2FB2EA146750617D29EDD /* GlobalState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalState.swift; sourceTree = "<group>"; };
 		CDF2FB4729ECD01C785776D8 /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
-		CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		CDF2FBDA9CAC6C3CB4C4EF4A /* TreeActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeActions.swift; sourceTree = "<group>"; };
 		CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
 		CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
 		CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreviewWindow.swift; sourceTree = "<group>"; };
@@ -142,7 +145,6 @@
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
-		D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreeAction.swift; sourceTree = "<group>"; };
 		D1CB049D25B182B500556B28 /* NodeIdentifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeIdentifier.swift; sourceTree = "<group>"; };
 		D1CB04A025B1832E00556B28 /* GRPCConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GRPCConverter.swift; sourceTree = "<group>"; };
 		D1CB04A325B184C100556B28 /* Node.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
@@ -223,7 +225,7 @@
 				CDF2F1282202188B26AB6D98 /* TreeView.swift */,
 				CDF2F521214ABD01967F51E8 /* DisplayStore.swift */,
 				CDF2F56E4E74C90031EDF05E /* ContextMenu.swift */,
-				CDF2FBDA9CAC6C3CB4C4EF4A /* Actions.swift */,
+				CDF2FBDA9CAC6C3CB4C4EF4A /* TreeActions.swift */,
 				CDF2F77AA899F692856B9A3D /* CellFactory.swift */,
 				CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */,
 				CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */,
@@ -243,6 +245,7 @@
 				CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */,
 				CDF2FB1106717FF3D9D70C9B /* IconStore.swift */,
 				CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */,
+				CDF2F36D71F017EE670CF98E /* GlobalActions.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -268,7 +271,6 @@
 				CDF2FEBEFB7244ED88477D00 /* StringUtil.swift */,
 				CDF2F77A1387D9A81D64D22C /* SignalConstants.swift */,
 				CDF2F275262010959BE9CDA3 /* Constants.swift */,
-				D1BF4E1B276F5AD6008B84DB /* TreeAction.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -345,6 +347,7 @@
 				D138AE0025BFEF8600E4F9E4 /* FilterCriteria.swift */,
 				D19B16B626158E610072F8A8 /* Device.swift */,
 				CDF2F0E9BD6EDCF089EB2C13 /* MenuItemMeta.swift */,
+				CDF2F09B9311893F83A72AAB /* Action.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -515,7 +518,7 @@
 				CDF2F889C9D3A7C82422AB93 /* TreeView.swift in Sources */,
 				CDF2FB6889F5FA2D2AAFDC3E /* DisplayStore.swift in Sources */,
 				CDF2F1BEFE4BA3291BCA54A5 /* ContextMenu.swift in Sources */,
-				CDF2F7BB73F2144A7AE9BD31 /* Actions.swift in Sources */,
+				CDF2F7BB73F2144A7AE9BD31 /* TreeActions.swift in Sources */,
 				CDF2F9EB179BD47115578D6A /* CellFactory.swift in Sources */,
 				CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */,
 				CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */,
@@ -524,7 +527,6 @@
 				CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */,
 				CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */,
 				CDF2FA7A9931D7C1A10B94C1 /* IfView.swift in Sources */,
-				D1BF4E1C276F5AD6008B84DB /* TreeAction.swift in Sources */,
 				CDF2F9D48A83FB79043C5D8F /* SwiftTreeState.swift in Sources */,
 				CDF2F3957AD95AC535EFAC3B /* TreeController.swift in Sources */,
 				CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */,
@@ -548,6 +550,8 @@
 				CDF2F09F3C9E022C4F98F52B /* MainWindowToolbar.swift in Sources */,
 				CDF2FB5A77F5EA5B4DCA361C /* MenuItemMeta.swift in Sources */,
 				CDF2F5B54151D03A68981E6A /* ToolStateSpace.swift in Sources */,
+				CDF2F2815043CAE45CEDA919 /* Action.swift in Sources */,
+				CDF2FAF6AACFF7BE8E28F788 /* GlobalActions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

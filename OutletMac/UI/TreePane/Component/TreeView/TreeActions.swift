@@ -5,14 +5,19 @@
 //  Created by Matthew Svoboda on 21/3/17.
 //
 
-import SwiftUI
+import AppKit
 
+/*
+ A set of handlers for TreeAction, each of which is identified by an ActionID.
+ See: TreeAction.swift
+ See:
+ */
 class TreeActions {
   weak var con: TreeControllable!  // Need to set this in parent controller's start() method
 
-  typealias ActionHandler = (TreeAction) -> Void
+  private typealias TreeActionHandler = (TreeAction) -> Void
 
-  private var actionHandlerDict: [ActionID : ActionHandler] = [:]
+  private var actionHandlerDict: [ActionID : TreeActionHandler] = [:]
 
   init() {
     actionHandlerDict = [
@@ -80,7 +85,7 @@ class TreeActions {
     switch action.actionType {
     case .BUILTIN(let actionID):
       // First see if we can handle this in the FE:
-      if let handler: ActionHandler = actionHandlerDict[actionID] {
+      if let handler: TreeActionHandler = actionHandlerDict[actionID] {
         NSLog("DEBUG [\(self.con.treeID)] Calling local handler for action: \(actionID)")
         handler(action)
         return

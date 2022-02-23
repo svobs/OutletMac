@@ -19,6 +19,7 @@ protocol OutletAppProtocol: HasLifecycle {
 
   // State:
   var globalState: GlobalState { get }
+  var globalActions: GlobalActions { get }
 
   func validateMenuItem(_ item: NSMenuItem) -> Bool
   func diffTreesByContent()
@@ -70,6 +71,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
 
   private var eventMonitor: GlobalEventMonitor? = nil
 
+  let globalActions = GlobalActions()
+
   /**
    This should be the ONLY place where strong references to TreePanelControllables are stored.
    Everything else should be a weak ref. Thus, when deregisterTreePanelController() is called, the only ref
@@ -104,7 +107,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     dispatchListener.subscribe(signal: .SHUTDOWN_APP, shutdownApp)
     dispatchListener.subscribe(signal: .ERROR_OCCURRED, onErrorOccurred)
     dispatchListener.subscribe(signal: .BATCH_FAILED, onBatchFailed)
-    dispatchListener.subscribe(signal: .EXECUTE_ACTION, onExecuteActionList)
+    dispatchListener.subscribe(signal: .EXECUTE_ACTION, onExecuteActionRequest)
 
     let eventMask: NSEvent.EventTypeMask = [.leftMouseDown, .rightMouseDown, .flagsChanged]
     let eventMonitor =  GlobalEventMonitor(mask: eventMask, handler: self.onGlobalEvent)
@@ -229,12 +232,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  private func reportError(_ msg: String, _ secondaryMsg: String) {
+  func reportError(_ msg: String, _ secondaryMsg: String) {
     NSLog("ERROR Error from OutletApp: msg='\(msg)' secondaryMsg='\(secondaryMsg)'")
     self.displayError(msg, secondaryMsg)
   }
 
-  private func reportException(_ title: String, _ error: Error) {
+  func reportException(_ title: String, _ error: Error) {
     let errorMsg: String = "\(error)"
     reportError(title, errorMsg)
   }
@@ -298,7 +301,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  private func onExecuteActionList(senderID: SenderID, propDict: PropDict) throws {
+  private func onExecuteActionRequest(senderID: SenderID, propDict: PropDict) throws {
     let treeActionList = try propDict.get("action_list") as! [TreeAction]
     NSLog("DEBUG Got \(Signal.EXECUTE_ACTION) signal from '\(senderID)' with \(treeActionList.count) tree actions")
     for treeAction in treeActionList {
@@ -383,47 +386,50 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
 
   // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-  /**
-    Called when a user clicks on a picker in the toolbar
-   */
-  @objc func toolbarPickerDidSelectItem(_ sender: Any) {
-    NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem() entered")
 
-    if  let toolbarItemGroup = sender as? NSToolbarItemGroup {
-      NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): identifier = \(toolbarItemGroup.itemIdentifier)")
-
-      let newValue: PickerItemIdentifier
-      do {
-        guard let val = try MainWindowToolbar.getPickerItemIdentifierFromIndex(toolbarItemGroup.selectedIndex, toolbarItemGroup.itemIdentifier) else {
-          return
-        }
-        newValue = val
-      } catch OutletError.invalidArgument {
-        reportError("Could not select option", "Invalid toolbar index: \(toolbarItemGroup.selectedIndex)")
-        return
-      } catch {
-        reportError("Could not select option", "Unexpected error: \(error)")
+  @objc public func executeGlobalMenuAction(_ sender: GeneratedMenuItem) {
+    NSLog("DEBUG Entered executeGlobalMenuAction(): actionType='\(sender.menuItemMeta.actionType)'")
+    switch sender.menuItemMeta.actionType {
+    case .BUILTIN (let actionID):
+      // Try global actions first
+      if let selector = self.globalActions.forActionID(actionID) {
+        NSLog("DEBUG executeGlobalMenuAction(): Executing global action: \(sender.menuItemMeta.actionType)'")
+        NSApp.sendAction(selector, to: self, from: self)
         return
       }
 
-      NSLog("DEBUG [\(ID_APP)] Got value \(newValue) for index \(toolbarItemGroup.selectedIndex)")
-
-      switch newValue {
-      case PickerItemIdentifier.DragMode(let selectedMode):
-        NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selectedMode) (index \(toolbarItemGroup.selectedIndex))")
-        self.changeDragMode(selectedMode)
-
-      case PickerItemIdentifier.DirPolicy(let selectedPolicy):
-        NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selectedPolicy) (index \(toolbarItemGroup.selectedIndex))")
-        self.changeDirConflictPolicy(selectedPolicy)
-
-      case PickerItemIdentifier.FilePolicy(let selectedPolicy):
-        NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selectedPolicy) (index \(toolbarItemGroup.selectedIndex))")
+      // Now try picker item
+      if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
+        NSLog("DEBUG executeGlobalMenuAction(): Changing pickerItem: \(pickerItem.identifier)'")
+        self.changePickerItem(pickerItem.identifier)
+        return
       }
+    default:
+      NSLog("ERROR executeGlobalMenuAction(): Unrecognized actionType: \(sender.menuItemMeta.actionType)'")
+      return
     }
   }
 
-  func changeDragMode(_ newMode: DragOperation) {
+  func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+    return true
+  }
+
+  func changePickerItem(_ newSelection: PickerItemIdentifier) {
+    switch newSelection {
+    case PickerItemIdentifier.DragMode(let selectedMode):
+      NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selectedMode)")
+      self.changeDragMode(selectedMode)
+
+    case PickerItemIdentifier.DirPolicy(let selectedPolicy):
+      NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selectedPolicy)")
+      self.changeDirConflictPolicy(selectedPolicy)
+
+    case PickerItemIdentifier.FilePolicy(let selectedPolicy):
+      NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selectedPolicy)")
+    }
+  }
+
+  private func changeDragMode(_ newMode: DragOperation) {
     self.globalState.currentDragOperation = newMode
     do {
       try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newMode.rawValue))
@@ -432,7 +438,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  func changeDirConflictPolicy(_ newPolicy: DirConflictPolicy) {
+  private func changeDirConflictPolicy(_ newPolicy: DirConflictPolicy) {
     self.globalState.currentDirConflictPolicy = newPolicy
     do {
       try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
@@ -441,7 +447,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  func changeFileConflictPolicy(_ newPolicy: FileConflictPolicy) {
+  private func changeFileConflictPolicy(_ newPolicy: FileConflictPolicy) {
     self.globalState.currentFileConflictPolicy = newPolicy
     do {
       try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
@@ -455,29 +461,33 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     - Returns: true if the given menu item should be enabled, false if it should be disabled
    */
   @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
-    guard let action = item.action else {
-      return true
+    if let generatedItem = item as? GeneratedMenuItem {
+      switch generatedItem.menuItemMeta.actionType {
+      case .BUILTIN(let actionID):
+        switch actionID {
+        case .DIFF_TREES_BY_CONTENT:
+          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
+            return true
+          }
+        case .MERGE_CHANGES:
+          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+            return true
+          }
+        case .CANCEL_DIFF:
+          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+            return true
+          }
+        default:
+          NSLog("ERROR [\(ID_APP)] validateMenuItem(): returning isEnabled=false for built-in menu actionID \(actionID)")
+          return false
+        }
+      default:
+        NSLog("ERROR [\(ID_APP)] validateMenuItem(): returning isEnabled=false for menu actionType \(generatedItem.menuItemMeta.actionType)")
+        return false
+      }
     }
-    var isEnabled = false
-    switch action {
-    case AppMainMenu.DIFF_TREES_BY_CONTENT:
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
-        isEnabled = true
-      }
-    case AppMainMenu.MERGE_CHANGES:
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-        isEnabled = true
-      }
-    case AppMainMenu.CANCEL_DIFF:
-      if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-        isEnabled = true
-      }
-    default:
-      NSLog("ERROR [\(ID_APP)] validateMenuItem(): unrecognized action: \(action)")
-      return false
-    }
-    NSLog("DEBUG [\(ID_APP)] validateMenuItem(): item \(action) enabled=\(isEnabled)")
-    return isEnabled
+
+    return true
   }
 
   // Diff Trees

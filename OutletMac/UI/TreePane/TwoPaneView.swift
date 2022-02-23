@@ -45,16 +45,16 @@ fileprivate struct ButtonBar: View {
     HStack {
       if globalState.mode == .BROWSING {
         Button("Diff (content-first)", action: {
-          NSApp.sendAction(AppMainMenu.DIFF_TREES_BY_CONTENT, to: self.app, from: self)
+          NSApp.sendAction(app.globalActions.forActionID(.DIFF_TREES_BY_CONTENT)!, to: self.app, from: self)
         })
           .disabled(!self.globalState.isUIEnabled)
       } else if globalState.mode == .DIFF {
         Button("Merge...", action: {
-          NSApp.sendAction(AppMainMenu.MERGE_CHANGES, to: self.app, from: self)
+          NSApp.sendAction(app.globalActions.forActionID(.MERGE_CHANGES)!, to: self.app, from: self)
         })
           .disabled(!self.globalState.isUIEnabled)
         Button("Cancel Diff", action: {
-          NSApp.sendAction(AppMainMenu.CANCEL_DIFF, to: self.app, from: self)
+          NSApp.sendAction(app.globalActions.forActionID(.CANCEL_DIFF)!, to: self.app, from: self)
         })
           .disabled(!self.globalState.isUIEnabled)
       }

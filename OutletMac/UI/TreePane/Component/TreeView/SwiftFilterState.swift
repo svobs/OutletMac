@@ -8,7 +8,7 @@ import Foundation
 /**
  CLASS SwiftFilterState
 
- See FilterCriteria class.
+ SwiftUI ObservableObject version of FilterCriteria class.
  Note that this class uses "isMatchCase", which is the inverse of FilterCriteria's "isIgnoreCase"
  */
 class SwiftFilterState: ObservableObject, CustomStringConvertible {

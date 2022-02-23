@@ -10,12 +10,6 @@ import Cocoa
  This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
  */
 class AppMainMenu: NSMenu {
-    // App-wide actions:
-    // TODO: find a better place for these
-    public static let DIFF_TREES_BY_CONTENT: Selector = #selector(OutletMacApp.diffTreesByContent)
-    public static let MERGE_CHANGES: Selector = #selector(OutletMacApp.mergeDiffChanges)
-    public static let CANCEL_DIFF: Selector = #selector(OutletMacApp.cancelDiff)
-
     override init(title: String) {
         super.init(title: title)
 
@@ -30,7 +24,6 @@ class AppMainMenu: NSMenu {
         return [
             buildAppMenu(), buildEditMenu(), buildToolsMenu(), buildViewMenu(), buildWindowMenu()
         ]
-
     }
 
     /*
@@ -67,8 +60,6 @@ class AppMainMenu: NSMenu {
         let delete = NSMenuItem(title: "Delete", action: nil, keyEquivalent: "⌫")
         delete.keyEquivalentModifierMask.remove(.command)
 
-        let app: OutletAppProtocol = NSApplication.shared.delegate as! OutletAppProtocol
-
         editMenu.submenu?.items = [
             NSMenuItem(title: "Undo", action: #selector(UndoManager.undo), keyEquivalent: "z"),
             NSMenuItem(title: "Redo", action: #selector(UndoManager.redo), keyEquivalent: "Z"),
@@ -80,28 +71,25 @@ class AppMainMenu: NSMenu {
             NSMenuItem.separator(),
             NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a"),
             NSMenuItem.separator(),
-//            buildDragModeSubmenu(app),
+            buildToolPickerGroupSubmenu(ToolStateSpace.dragModeGroup)
             ]
 
         return editMenu
     }
 
-    private static func buildDragModeSubmenu(_ app: OutletAppProtocol) -> NSMenuItem {
-        let group = ToolStateSpace.dragModeGroup
-
-//        let groupMenuMeta: MenuItemMeta = group.toMenuMeta()
-        // TODO!
-
+    private static func buildToolPickerGroupSubmenu(_ group: PickerGroup) -> NSMenuItem {
         let submenu = NSMenuItem()
         submenu.title = group.groupLabel
         submenu.submenu = NSMenu(title: group.groupLabel)
 
-
-//        for item in group.itemList {
-//            let menuItem = NSMenuItem(title: item.title, action: #selector(OutletMacApp.changeDragMode(<#T##OutletMacApp##OutletMac.OutletMacApp#>)), keyEquivalent: "")
-//            menuItem.toolTip = item.toolTip
-//            submenu.submenu?.items.append(menuItem)
-//        }
+        for item in group.itemList {
+            let menuItem = GeneratedMenuItem(item.toMenuItemMeta(), action: #selector(OutletMacApp.executeGlobalMenuAction(_:)))
+            menuItem.toolTip = item.toolTip
+            menuItem.target = self
+            // FIXME: Validation and checked state
+            menuItem.state = .on    // checked
+            submenu.submenu?.items.append(menuItem)
+        }
 
         return submenu
     }
@@ -110,9 +98,14 @@ class AppMainMenu: NSMenu {
         let toolsMenu = NSMenuItem()
         toolsMenu.submenu = NSMenu(title: "Tools")
 
-        toolsMenu.submenu?.items = [
-            NSMenuItem(title: "Diff Trees By Content", action: #selector(OutletMacApp.diffTreesByContent), keyEquivalent: "d"),
-        ]
+        let diffItem = GeneratedMenuItem(MenuItemMeta(itemType: .NORMAL, title: "Diff Trees By Content", actionType: .BUILTIN(.DIFF_TREES_BY_CONTENT)),
+                action: #selector(OutletMacApp.executeGlobalMenuAction(_:)))
+        diffItem.keyEquivalent = "d"
+        toolsMenu.submenu?.items.append(diffItem)
+
+        toolsMenu.submenu?.items.append(GeneratedMenuItem(MenuItemMeta(itemType: .NORMAL, title: "Merge Changes", actionType: .BUILTIN(.MERGE_CHANGES)),
+                action: #selector(OutletMacApp.executeGlobalMenuAction(_:))))
+
         return toolsMenu
     }
 
