@@ -18,15 +18,6 @@ extension NSToolbarItem.Identifier {
     static let fileConflictPolicyPicker = NSToolbarItem.Identifier("FileConflictPolicyPicker-ItemGroup")
 }
 
-class MainWindowToolbarItemGroup: NSToolbarItemGroup {
-    let pickerGroup: PickerGroup
-
-    init(pickerGroup: PickerGroup, itemIdentifier: NSToolbarItem.Identifier, images: [NSImage], selectionMode: NSToolbarItemGroup.SelectionMode, labels: [String]?, target: Any?, action: Selector?) {
-        self.pickerGroup = pickerGroup
-        super.init(itemIdentifier: itemIdentifier, images: images, selectionMode: selectionMode, labels: labels, target: target, action: action)
-    }
-}
-
 /**
  See doc: https://developer.apple.com/documentation/appkit/touch_bar/integrating_a_toolbar_and_touch_bar_into_your_app
  See example: https://github.com/marioaguzman/toolbar/blob/master/Toolbar/MainWindowController.swift
@@ -38,25 +29,6 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         NSToolbarItem.Identifier.dirConflictPolicyPicker: ToolStateSpace.dirConflictPolicyGroup,
         NSToolbarItem.Identifier.fileConflictPolicyPicker: ToolStateSpace.fileConflictPolicyGroup
     ]
-
-    private static func getGroup(_ identifier: NSToolbarItem.Identifier) -> PickerGroup {
-        if let group = MainWindowToolbar.groupIdentifierMap[identifier] {
-            return group
-        } else {
-            fatalError("Identifier does not correspond to a picker group: \(identifier)")
-        }
-    }
-
-    private static func getGroupNSTIIDFromPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> NSToolbarItem.Identifier {
-        switch pickerItemIdentifier {
-        case .DragMode:
-            return NSToolbarItem.Identifier.dragModePicker
-        case .DirPolicy:
-            return NSToolbarItem.Identifier.dirConflictPolicyPicker
-        case .FilePolicy:
-            return NSToolbarItem.Identifier.fileConflictPolicyPicker
-        }
-    }
 
     override init(identifier: NSToolbar.Identifier) {
         super.init(identifier: identifier)
@@ -144,7 +116,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // This will either be a segmented control or a drop down depending on your available space.
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
-        let itemGroup = MainWindowToolbarItemGroup(pickerGroup: group, itemIdentifier: itemIdentifier, images: imageList,
+        let itemGroup = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList,
                 selectionMode: .selectOne, labels: titleList, target: nil, action: #selector(MainWindowToolbar.toolbarPickerDidSelectItem))
 
         itemGroup.label = group.groupLabel
@@ -152,35 +124,6 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         itemGroup.paletteLabel = group.groupLabel
         itemGroup.toolTip = group.tooltipTemplate // TODO: display current value using template
         return itemGroup
-    }
-
-    func getToolbarItemGroupForPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> MainWindowToolbarItemGroup? {
-        assert(self.items.count > 0, "No items in toolbar!")
-        let gnstiid = MainWindowToolbar.getGroupNSTIIDFromPickerItemIdentifier(pickerItemIdentifier)
-
-        for item in self.items {
-            if item.itemIdentifier == gnstiid {
-                if let group = item as? MainWindowToolbarItemGroup {
-                    return group
-                } else {
-                    NSLog("ERROR PickerItemIdentifier does not resolve to a MainWindowToolbarItemGroup: \(pickerItemIdentifier)")
-                    return nil
-                }
-            }
-        }
-        return nil
-    }
-
-    private static func indexForPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> Int? {
-        var index = 0
-        let nstiid = self.getGroupNSTIIDFromPickerItemIdentifier(pickerItemIdentifier)
-        for item in self.getGroup(nstiid).itemList {
-            if item.identifier == pickerItemIdentifier {
-                return index
-            }
-            index += 1
-        }
-        return nil
     }
 
     func setToolbarSelection(_ pickerItemIdentifier: PickerItemIdentifier) {
@@ -191,22 +134,77 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
                 NSLog("DEBUG setToolbarSelection(): selecting index: \(index) for pickerItemIdentifier '\(pickerItemIdentifier)'")
                 // This will not fire listeners however. We should have set those values elsewhere.
                 toolbarGroup.setSelected(true, at: index)
-                toolbarGroup.toolTip = toolbarGroup.pickerGroup.tooltipTemplate //+ "\n\n(current value: \(String(pickerItem.title)))"  // TODO: this doesn't update
+                let pickerGroup = MainWindowToolbar.getPickerGroupForNSTIID(toolbarGroup.itemIdentifier)
+                toolbarGroup.toolTip = pickerGroup.tooltipTemplate //+ "\n\n(current value: \(String(pickerItem.title)))"  // TODO: this doesn't update
             }
         }
     }
 
+    // --------------------------------------------------------------------------------------------
+    // Lookup Functions
+
+    private static func getPickerGroupForNSTIID(_ identifier: NSToolbarItem.Identifier) -> PickerGroup {
+        if let group = MainWindowToolbar.groupIdentifierMap[identifier] {
+            return group
+        } else {
+            fatalError("Identifier does not correspond to a picker group: \(identifier)")
+        }
+    }
+
+    private static func getGroupNSTIIDFromPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> NSToolbarItem.Identifier {
+        switch pickerItemIdentifier {
+        case .DragMode:
+            return NSToolbarItem.Identifier.dragModePicker
+        case .DirPolicy:
+            return NSToolbarItem.Identifier.dirConflictPolicyPicker
+        case .FilePolicy:
+            return NSToolbarItem.Identifier.fileConflictPolicyPicker
+        }
+    }
+
+    func getToolbarItemGroupForPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> NSToolbarItemGroup? {
+        assert(self.items.count > 0, "No items in toolbar!")
+        let gnstiid = MainWindowToolbar.getGroupNSTIIDFromPickerItemIdentifier(pickerItemIdentifier)
+
+        for item in self.items {
+            if item.itemIdentifier == gnstiid {
+                if let itemGroup = item as? NSToolbarItemGroup {
+                    return itemGroup
+                } else {
+                    NSLog("ERROR PickerItemIdentifier does not resolve to a NSToolbarItemGroup: \(item.itemIdentifier)")
+                    return nil
+                }
+            }
+        }
+        return nil
+    }
+
+    private static func indexForPickerItemIdentifier(_ pickerItemIdentifier: PickerItemIdentifier) -> Int? {
+        var index = 0
+        let nstiid = self.getGroupNSTIIDFromPickerItemIdentifier(pickerItemIdentifier)
+        for pickerGroup in self.getPickerGroupForNSTIID(nstiid).itemList {
+            if pickerGroup.identifier == pickerItemIdentifier {
+                return index
+            }
+            index += 1
+        }
+        return nil
+    }
+
     static func getPickerItemIdentifierFromIndex(_ selectedIndex: Int, _ groupIdentifier: NSToolbarItem.Identifier) throws -> PickerItemIdentifier? {
-        let pickerList = MainWindowToolbar.getGroup(groupIdentifier).itemList
+        let pickerList = MainWindowToolbar.getPickerGroupForNSTIID(groupIdentifier).itemList
         guard selectedIndex < pickerList.count else {
             throw OutletError.invalidArgument("Index \(selectedIndex) is invalid for group \(groupIdentifier)")
         }
         return pickerList[selectedIndex].identifier
     }
+
+    // --------------------------------------------------------------------------------------------
+
     /**
     Called when a user clicks on a picker in the toolbar
    */
-    @objc func toolbarPickerDidSelectItem(_ sender: MainWindowToolbarItemGroup) {
+    @objc func toolbarPickerDidSelectItem(_ sender: NSToolbarItemGroup) {
         let app: OutletMacApp = NSApplication.shared.delegate as! OutletMacApp
         NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem() entered: identifier = \(sender.itemIdentifier)")
 
