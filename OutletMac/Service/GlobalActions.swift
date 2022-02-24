@@ -52,10 +52,32 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
 
         if let generatedItem = item as? GeneratedMenuItem {
             let actionType = generatedItem.menuItemMeta.actionType
+
+            updateCheckboxStateIfIsPickerItem(actionType, item)
+
             return isActionValid(actionType)
         }
 
         return true
+    }
+
+    private func updateCheckboxStateIfIsPickerItem(_ actionType: ActionType, _ menuItem: NSMenuItem) {
+        switch actionType {
+        case .BUILTIN(let actionID):
+            // Check for toolbar states first (there are many):
+            if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
+                switch pickerItem.identifier {
+                case .DragMode(let dragOperation):
+                    menuItem.state = (self.app.globalState.currentDragOperation == dragOperation) ? .on : .off
+                case .DirPolicy(let policy):
+                    menuItem.state = (self.app.globalState.currentDirConflictPolicy == policy) ? .on : .off
+                case .FilePolicy(let policy):
+                    menuItem.state = (self.app.globalState.currentFileConflictPolicy == policy) ? .on : .off
+                }
+            }
+        default:
+            break
+        }
     }
 
     func isActionValid(_ actionType: ActionType) -> Bool {
@@ -141,38 +163,50 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
     }
 
     private func changeDragMode(_ newMode: DragOperation) {
+        // 1. Update in-memory state
         self.app.globalState.currentDragOperation = newMode
+
+        // 2. Update persistent state
         do {
             try self.app.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newMode.rawValue))
         } catch {
             self.app.reportException("Failed to save Drag Mode selection", error)
         }
+
+        // 3. Update toolbar UI
+        app.mainWindow?.getMainToolbar()?.setToolbarSelection(.DragMode(newMode))
     }
 
     private func changeDirConflictPolicy(_ newPolicy: DirConflictPolicy) {
         self.app.globalState.currentDirConflictPolicy = newPolicy
+
         do {
             try self.app.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
         } catch {
             self.app.reportException("Failed to save Dir Conflict Policy selection", error)
         }
+
+        app.mainWindow?.getMainToolbar()?.setToolbarSelection(.DirPolicy(newPolicy))
     }
 
     private func changeFileConflictPolicy(_ newPolicy: FileConflictPolicy) {
         self.app.globalState.currentFileConflictPolicy = newPolicy
+
         do {
             try self.app.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
         } catch {
             self.app.reportException("Failed to save new file conflict policy", error)
         }
+
+        app.mainWindow?.getMainToolbar()?.setToolbarSelection(.FilePolicy(newPolicy))
     }
 
     // Diff Trees
     // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
     /**
-   Diff Trees By Content
-   */
+    Diff Trees By Content
+    */
     @objc func diffTreesByContent() {
         if SUPER_DEBUG_ENABLED {
             NSLog("DEBUG [\(ID_APP)] Entered diffTreesByContent()")
@@ -221,8 +255,8 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
     }
 
     /**
-   Merge Changes
-   */
+    Merge Changes
+    */
     @objc func mergeDiffChanges() {
 
         guard isActionValid(.BUILTIN(.MERGE_CHANGES)) else {
@@ -264,8 +298,8 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
     }
 
     /**
-   Cancel Diff
-   */
+    Cancel Diff
+    */
     @objc func cancelDiff() {
         guard isActionValid(.BUILTIN(.CANCEL_DIFF)) else {
             // add specific error msg if appropriate

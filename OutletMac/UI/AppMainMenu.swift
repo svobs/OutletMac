@@ -99,13 +99,10 @@ class AppMainMenu: NSMenu {
 
         for item in group.itemList {
             NSLog("DEBUG Adding ToolbarPicker menu item: \(item.identifier)")
-            // NOTE: for validation, see GlobalActions.validateMenuItem() (since apparently the class of the selector is first responsible)
+            // NOTE: for validation & checkmarks, see GlobalActions.validateMenuItem() (since apparently the class of the selector is responsible)
             let menuItem = GeneratedMenuItem(item.toMenuItemMeta(), action: #selector(GlobalActions.executeGlobalMenuAction(_:)))
             menuItem.toolTip = item.toolTip
             menuItem.target = self.app.globalActions   // This MUST match the action class (I think) or else silent failure
-            // FIXME: checked state
-            menuItem.isEnabled = true
-            menuItem.state = .on    // checked
             submenu.submenu?.items.append(menuItem)
         }
 

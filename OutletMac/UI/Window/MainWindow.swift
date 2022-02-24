@@ -42,19 +42,20 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
+  func getMainToolbar() -> MainWindowToolbar? {
+    return self.toolbar as? MainWindowToolbar
+  }
+
   override func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
     NSLog("DEBUG [\(self.winID)] validateUserInterfaceItem(): \(item) (delegating to app)")
     return self.app.validateUserInterfaceItem(item)
-    return true
   }
 
   func updateToolbarSelections() {
-    if let toolbar = self.toolbar as? MainWindowToolbar {
-      // bring UI up to sync with state:
-      toolbar.setToolbarSelection(.DragMode(self.app.globalState.getCurrentDefaultDragOperation()))
-      toolbar.setToolbarSelection(.DirPolicy(self.app.globalState.currentDirConflictPolicy))
-      toolbar.setToolbarSelection(.FilePolicy(self.app.globalState.currentFileConflictPolicy))
-    }
+    // bring UI up to sync with state:
+    getMainToolbar()?.setToolbarSelection(.DragMode(self.app.globalState.getCurrentDefaultDragOperation()))
+    getMainToolbar()?.setToolbarSelection(.DirPolicy(self.app.globalState.currentDirConflictPolicy))
+    getMainToolbar()?.setToolbarSelection(.FilePolicy(self.app.globalState.currentFileConflictPolicy))
   }
 
   func setControllers(left: TreeControllable, right: TreeControllable) {
