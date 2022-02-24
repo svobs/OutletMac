@@ -10,14 +10,21 @@ import Cocoa
  This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
  */
 class AppMainMenu: NSMenu {
+
     override init(title: String) {
         super.init(title: title)
-
+        self.autoenablesItems = true
         self.items = AppMainMenu.buildMainMenu()
     }
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
+    }
+
+    // Callback
+    override func itemChanged(_ item: NSMenuItem) {
+        NSLog("WARNING [\(ID_APP)] ITEM CHANGED: \(item)")
+        super.itemChanged(item)
     }
 
     private static func buildMainMenu() -> [NSMenuItem] {
@@ -83,10 +90,13 @@ class AppMainMenu: NSMenu {
         submenu.submenu = NSMenu(title: group.groupLabel)
 
         for item in group.itemList {
+            NSLog("DEBUG Adding ToolbarPicker menu item: \(item.identifier)")
+            // NOTE: for validation, see OutletMacApp.validateMenuItem() (since apparently the class of the selector is first responsible)
             let menuItem = GeneratedMenuItem(item.toMenuItemMeta(), action: #selector(OutletMacApp.executeGlobalMenuAction(_:)))
             menuItem.toolTip = item.toolTip
-            menuItem.target = self
-            // FIXME: Validation and checked state
+            menuItem.target = nil   // Do NOT set target to an object, or nothing will happen
+            // FIXME: checked state
+            menuItem.isEnabled = true
             menuItem.state = .on    // checked
             submenu.submenu?.items.append(menuItem)
         }

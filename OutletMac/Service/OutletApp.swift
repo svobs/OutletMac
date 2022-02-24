@@ -11,7 +11,7 @@ import SwiftUI
 /**
  PROTOCOL OutletAppProtocol
  */
-protocol OutletAppProtocol: HasLifecycle {
+protocol OutletAppProtocol: HasLifecycle, NSUserInterfaceValidations {
   // Services:
   var dispatcher: SignalDispatcher { get }
   var backend: OutletBackend { get }
@@ -387,31 +387,94 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
   // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
+  /**
+   VALIDATE MENU ITEM
+   Called by certain menu items, when they are drawn, to determine if they should be enabled.
+    - Returns: true if the given menu item should be enabled, false if it should be disabled
+   */
+  @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(ID_APP)] Entered validateMenuItem() for item \(item)'")
+    }
+
+    if let generatedItem = item as? GeneratedMenuItem {
+      let actionType = generatedItem.menuItemMeta.actionType
+      return isActionValid(actionType)
+    }
+
+    return true
+  }
+
+  func isActionValid(_ actionType: ActionType) -> Bool {
+    switch actionType {
+    case .BUILTIN(let actionID):
+      // Check for toolbar states first (there are many):
+      if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
+        NSLog("DEBUG [\(ID_APP)] isActionValid(): Returning true for pickerItem: \(pickerItem.identifier)'")
+        return true
+      }
+
+      switch actionID {
+      case .DIFF_TREES_BY_CONTENT:
+        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
+          return true
+        } else {
+          return false
+        }
+      case .MERGE_CHANGES:
+        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+          return true
+        } else {
+          return false
+        }
+      case .CANCEL_DIFF:
+        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
+          return true
+        } else {
+          return false
+        }
+      default:
+        NSLog("ERROR [\(ID_APP)] isActionValid(): returning isEnabled=false for unrecognzied menu item type=BUILTIN actionID=\(actionID)")
+        return false
+      }
+    default:
+      NSLog("ERROR [\(ID_APP)] isActionValid(): returning isEnabled=false for unrecognzied menu item actionType=\(actionType)")
+      return false
+    }
+  }
+
+  func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+    NSLog("WARNING [\(ID_APP)] Validating: \(item)")
+    return true
+  }
+
+  /*
+   EXECUTE GLOBAL ACTION
+   This includes menu item actions.
+   */
   @objc public func executeGlobalMenuAction(_ sender: GeneratedMenuItem) {
-    NSLog("DEBUG Entered executeGlobalMenuAction(): actionType='\(sender.menuItemMeta.actionType)'")
-    switch sender.menuItemMeta.actionType {
+    let actionType = sender.menuItemMeta.actionType
+    NSLog("DEBUG Entered executeGlobalMenuAction(): actionType='\(actionType)'")
+
+    switch actionType {
     case .BUILTIN (let actionID):
       // Try global actions first
       if let selector = self.globalActions.forActionID(actionID) {
-        NSLog("DEBUG executeGlobalMenuAction(): Executing global action: \(sender.menuItemMeta.actionType)'")
+        NSLog("DEBUG executeGlobalMenuAction(): Executing global action: \(actionType)'")
         NSApp.sendAction(selector, to: self, from: self)
         return
       }
 
       // Now try picker item
       if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
-        NSLog("DEBUG executeGlobalMenuAction(): Changing pickerItem: \(pickerItem.identifier)'")
+        NSLog("DEBUG executeGlobalMenuAction(): Selecting PickerItem: \(pickerItem.identifier)")
         self.changePickerItem(pickerItem.identifier)
         return
       }
     default:
-      NSLog("ERROR executeGlobalMenuAction(): Unrecognized actionType: \(sender.menuItemMeta.actionType)'")
+      NSLog("ERROR executeGlobalMenuAction(): Unrecognized actionType: \(actionType)'")
       return
     }
-  }
-
-  func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
-    return true
   }
 
   func changePickerItem(_ newSelection: PickerItemIdentifier) {
@@ -456,40 +519,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     }
   }
 
-  /**
-   Called by certain menu items, when they are drawn, to determine if they should be enabled.
-    - Returns: true if the given menu item should be enabled, false if it should be disabled
-   */
-  @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
-    if let generatedItem = item as? GeneratedMenuItem {
-      switch generatedItem.menuItemMeta.actionType {
-      case .BUILTIN(let actionID):
-        switch actionID {
-        case .DIFF_TREES_BY_CONTENT:
-          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
-            return true
-          }
-        case .MERGE_CHANGES:
-          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-            return true
-          }
-        case .CANCEL_DIFF:
-          if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-            return true
-          }
-        default:
-          NSLog("ERROR [\(ID_APP)] validateMenuItem(): returning isEnabled=false for built-in menu actionID \(actionID)")
-          return false
-        }
-      default:
-        NSLog("ERROR [\(ID_APP)] validateMenuItem(): returning isEnabled=false for menu actionType \(generatedItem.menuItemMeta.actionType)")
-        return false
-      }
-    }
-
-    return true
-  }
-
   // Diff Trees
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
@@ -501,16 +530,20 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
       NSLog("DEBUG [\(ID_APP)] Entered diffTreesByContent()")
     }
 
+    guard isActionValid(.BUILTIN(.DIFF_TREES_BY_CONTENT)) else {
+      // add specific error msg if appropriate
+      if self.globalState.mode == .DIFF {
+        self.reportError("Cannot start diff", "A diff is already in process, apparently (this is probably a bug)")
+      }
+      return
+    }
+
     guard let conLeft = self.getTreePanelController(ID_LEFT_TREE) else {
       self.reportError("Cannot diff", "Internal error: no controller for \(ID_LEFT_TREE) found!")
       return
     }
     guard let conRight = self.getTreePanelController(ID_RIGHT_TREE) else {
       self.reportError("Cannot diff", "Internal error: no controller for \(ID_RIGHT_TREE) found!")
-      return
-    }
-    guard globalState.mode == .BROWSING else {
-      self.reportError("Cannot start diff", "A diff is already in process, apparently (this is probably a bug)")
       return
     }
 
@@ -543,8 +576,12 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
    Merge Changes
    */
   @objc func mergeDiffChanges() {
-    guard self.globalState.mode == .DIFF else {
-      self.reportError("Cannot merge changes", "A diff is not currently in progress")
+
+    guard isActionValid(.BUILTIN(.MERGE_CHANGES)) else {
+      // add specific error msg if appropriate
+      if self.globalState.mode != .DIFF {
+        self.reportError("Cannot merge changes", "A diff is not currently in progress")
+      }
       return
     }
 
@@ -582,8 +619,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
    Cancel Diff
    */
   @objc func cancelDiff() {
-    if self.globalState.mode != .DIFF {
-      self.reportError("Cannot cancel diff", "A diff is not currently in progress")
+    guard isActionValid(.BUILTIN(.CANCEL_DIFF)) else {
+      // add specific error msg if appropriate
+      if self.globalState.mode != .DIFF {
+        self.reportError("Cannot cancel diff", "A diff is not currently in progress")
+      }
       return
     }
     NSLog("DEBUG CancelDiff activated! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")

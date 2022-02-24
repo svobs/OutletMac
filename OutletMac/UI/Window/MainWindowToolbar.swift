@@ -5,6 +5,16 @@
 
 import Cocoa
 
+extension NSViewController: NSUserInterfaceValidations {
+    public func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+        NSLog("ERROR [ViewController] Entered validateUserInterfaceItem()")
+        switch item.action {
+
+        default: return true
+        }
+    }
+}
+
 /*
  NSToolbarItem Identifier (NSTIID) definitions:
  */
@@ -16,6 +26,12 @@ extension NSToolbarItem.Identifier {
     static let dragModePicker = NSToolbarItem.Identifier("DragModePicker-ItemGroup")
     static let dirConflictPolicyPicker = NSToolbarItem.Identifier("DirConflictPolicyPicker-ItemGroup")
     static let fileConflictPolicyPicker = NSToolbarItem.Identifier("FileConflictPolicyPicker-ItemGroup")
+}
+
+class MainWindowToolbarItemGroup: NSToolbarItemGroup {
+    override func validate() {
+        NSLog("ERROR VALIDATING!")
+    }
 }
 
 /**
@@ -38,6 +54,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         self.allowsUserCustomization = true
         self.autosavesConfiguration = true
     }
+
 
     let isBordered: Bool = true
 
@@ -116,11 +133,11 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         // This will either be a segmented control or a drop down depending on your available space.
         // NOTE: When you set the target as nil and use the string method to define the Selector, it will go down the Responder Chain,
         // which in this app, this method is in AppDelegate. Neat!
-        let itemGroup = NSToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList,
-                selectionMode: .selectOne, labels: titleList, target: nil, action: #selector(MainWindowToolbar.toolbarPickerDidSelectItem))
+        let itemGroup = MainWindowToolbarItemGroup(itemIdentifier: itemIdentifier, images: imageList,
+                selectionMode: .selectOne, labels: titleList, target: self, action: #selector(MainWindowToolbar.toolbarPickerDidSelectItem))
 
         itemGroup.label = group.groupLabel
-        itemGroup.isEnabled = true    // TODO: try excluding this
+//        itemGroup.isEnabled = true    // TODO: try excluding this
         itemGroup.paletteLabel = group.groupLabel
         itemGroup.toolTip = group.tooltipTemplate // TODO: display current value using template
         return itemGroup
@@ -171,7 +188,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
                 if let itemGroup = item as? NSToolbarItemGroup {
                     return itemGroup
                 } else {
-                    NSLog("ERROR PickerItemIdentifier does not resolve to a NSToolbarItemGroup: \(item.itemIdentifier)")
+                    NSLog("ERROR PickerItemIdentifier does not resolve to a NSToolbarItemGroup: \(item.itemIdentifier) (found: \(type(of: item))")
                     return nil
                 }
             }
@@ -208,12 +225,12 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         let app: OutletMacApp = NSApplication.shared.delegate as! OutletMacApp
         NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem() entered: identifier = \(sender.itemIdentifier)")
 
-        let newValue: PickerItemIdentifier
+        let newItemIdentifier: PickerItemIdentifier
         do {
             guard let val = try MainWindowToolbar.getPickerItemIdentifierFromIndex(sender.selectedIndex, sender.itemIdentifier) else {
                 return
             }
-            newValue = val
+            newItemIdentifier = val
         } catch OutletError.invalidArgument {
             app.reportError("Could not select option", "Invalid toolbar index: \(sender.selectedIndex)")
             return
@@ -222,8 +239,8 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
             return
         }
 
-        NSLog("DEBUG [\(ID_APP)] Got value \(newValue) for index \(sender.selectedIndex)")
-        app.changePickerItem(newValue)
+        NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): Resolved index \(sender.selectedIndex) -> identifier \(newItemIdentifier)")
+        app.changePickerItem(newItemIdentifier)
     }
 
 }
