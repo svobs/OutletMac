@@ -20,26 +20,6 @@ class GeneratedMenuItem: NSMenuItem {
   }
 }
 
-//class MenuItemValidator: NSUserInterfaceValidations {
-//
-//  func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
-//    NSLog("WARNING [MenuItemValidator] Validating: \(item)")
-//    return true
-//  }
-//}
-//
-//class DynamicallyEnabledMenuItem: GeneratedMenuItem {
-//  let validator: MenuItemValidator
-//  public init(_ menuItemMeta: MenuItemMeta, action selector: Selector?, validator: MenuItemValidator) {
-//    self.validator = validator
-//    super.init(menuItemMeta, action: selector)
-//  }
-//
-//  required init(coder: NSCoder) {
-//    fatalError("init(coder:) has not been implemented")
-//  }
-//}
-
 
 class TreeContextMenu {
   weak var con: TreeControllable! = nil  // Need to set this in parent controller's start() method

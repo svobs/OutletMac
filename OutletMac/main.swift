@@ -14,5 +14,5 @@ NSLog("INFO  DEBUG mode is enabled")
 let app = OutletMacApp()
 // Need this code to launch the app, since I'm not using a storyboard
 NSApplication.shared.delegate = app
-NSApplication.shared.mainMenu = AppMainMenu()
+//NSApplication.shared.mainMenu = AppMainMenu()
 _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)

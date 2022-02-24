@@ -21,9 +21,6 @@ protocol OutletAppProtocol: HasLifecycle, NSUserInterfaceValidations {
   var globalState: GlobalState { get }
   var globalActions: GlobalActions { get }
 
-  func validateMenuItem(_ item: NSMenuItem) -> Bool
-  func diffTreesByContent()
-
   func grpcDidGoDown()
   func grpcDidGoUp()
 
@@ -41,6 +38,7 @@ protocol OutletAppProtocol: HasLifecycle, NSUserInterfaceValidations {
 }
 
 class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
+
   override init() {
     self.dispatchListener = self.dispatcher.createListener(ID_APP)
 
@@ -48,6 +46,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     DispatchQueue.registerDetection(of: self.tcDQ)
 
     super.init()
+    self.globalActions.app = self
   }
 
   // Member variables & accessors
@@ -61,6 +60,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
 
   private var wasShutdown: Bool = false
 
+  let globalActions = GlobalActions()
   let globalState = GlobalState()
   let dispatcher = SignalDispatcher()
   let dispatchListener: DispatchListener
@@ -70,8 +70,6 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
   private let tcDQ = DispatchQueue(label: "TreeControllerDict-SerialQueue")
 
   private var eventMonitor: GlobalEventMonitor? = nil
-
-  let globalActions = GlobalActions()
 
   /**
    This should be the ONLY place where strong references to TreePanelControllables are stored.
@@ -369,12 +367,25 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
 
   // NSApplicationDelegate methods
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
+  func applicationDockMenu(sender: NSApplication) -> NSMenu? {
+    // TODO
+    let menu = NSMenu(title: "")
+    let clickMe = NSMenuItem(title: "ClickMe", action: "didSelectClickMe", keyEquivalent: "C")
+    clickMe.target = self
+
+    return menu
+  }
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     return true
   }
 
   func applicationDidFinishLaunching(_ notification: Notification) {
+
+    let menu = AppMainMenu()
+    menu.buildMainMenu(self)
+    NSApplication.shared.mainMenu = menu
+
     do {
       try self.start()
     } catch OutletError.invalidArgument(let msg) {
@@ -386,248 +397,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
 
   // Menu/Toolbar actions
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  /**
-   VALIDATE MENU ITEM
-   Called by certain menu items, when they are drawn, to determine if they should be enabled.
-    - Returns: true if the given menu item should be enabled, false if it should be disabled
-   */
   @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(ID_APP)] Entered validateMenuItem() for item \(item)'")
+      NSLog("DEBUG [\(ID_APP)] validateMenuItem(): \(item)")
     }
-
-    if let generatedItem = item as? GeneratedMenuItem {
-      let actionType = generatedItem.menuItemMeta.actionType
-      return isActionValid(actionType)
-    }
-
-    return true
-  }
-
-  func isActionValid(_ actionType: ActionType) -> Bool {
-    switch actionType {
-    case .BUILTIN(let actionID):
-      // Check for toolbar states first (there are many):
-      if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
-        NSLog("DEBUG [\(ID_APP)] isActionValid(): Returning true for pickerItem: \(pickerItem.identifier)'")
-        return true
-      }
-
-      switch actionID {
-      case .DIFF_TREES_BY_CONTENT:
-        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .BROWSING {
-          return true
-        } else {
-          return false
-        }
-      case .MERGE_CHANGES:
-        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-          return true
-        } else {
-          return false
-        }
-      case .CANCEL_DIFF:
-        if let mainWin = self.mainWindow, mainWin.isVisible && self.globalState.isUIEnabled && self.globalState.mode == .DIFF {
-          return true
-        } else {
-          return false
-        }
-      default:
-        NSLog("ERROR [\(ID_APP)] isActionValid(): returning isEnabled=false for unrecognzied menu item type=BUILTIN actionID=\(actionID)")
-        return false
-      }
-    default:
-      NSLog("ERROR [\(ID_APP)] isActionValid(): returning isEnabled=false for unrecognzied menu item actionType=\(actionType)")
-      return false
-    }
+    return self.globalActions.validateMenuItem(item)
   }
 
   func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
-    NSLog("WARNING [\(ID_APP)] Validating: \(item)")
-    return true
-  }
-
-  /*
-   EXECUTE GLOBAL ACTION
-   This includes menu item actions.
-   */
-  @objc public func executeGlobalMenuAction(_ sender: GeneratedMenuItem) {
-    let actionType = sender.menuItemMeta.actionType
-    NSLog("DEBUG Entered executeGlobalMenuAction(): actionType='\(actionType)'")
-
-    switch actionType {
-    case .BUILTIN (let actionID):
-      // Try global actions first
-      if let selector = self.globalActions.forActionID(actionID) {
-        NSLog("DEBUG executeGlobalMenuAction(): Executing global action: \(actionType)'")
-        NSApp.sendAction(selector, to: self, from: self)
-        return
-      }
-
-      // Now try picker item
-      if let pickerItem = ToolStateSpace.setterActionMap[actionID] {
-        NSLog("DEBUG executeGlobalMenuAction(): Selecting PickerItem: \(pickerItem.identifier)")
-        self.changePickerItem(pickerItem.identifier)
-        return
-      }
-    default:
-      NSLog("ERROR executeGlobalMenuAction(): Unrecognized actionType: \(actionType)'")
-      return
-    }
-  }
-
-  func changePickerItem(_ newSelection: PickerItemIdentifier) {
-    switch newSelection {
-    case PickerItemIdentifier.DragMode(let selectedMode):
-      NSLog("INFO  [\(ID_APP)] User changed default drag operation: \(selectedMode)")
-      self.changeDragMode(selectedMode)
-
-    case PickerItemIdentifier.DirPolicy(let selectedPolicy):
-      NSLog("INFO  [\(ID_APP)] User changed dir conflict policy: \(selectedPolicy)")
-      self.changeDirConflictPolicy(selectedPolicy)
-
-    case PickerItemIdentifier.FilePolicy(let selectedPolicy):
-      NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selectedPolicy)")
-    }
-  }
-
-  private func changeDragMode(_ newMode: DragOperation) {
-    self.globalState.currentDragOperation = newMode
-    do {
-      try self.backend.putConfig(DRAG_MODE_CONFIG_PATH, String(newMode.rawValue))
-    } catch {
-      self.reportException("Failed to save Drag Mode selection", error)
-    }
-  }
-
-  private func changeDirConflictPolicy(_ newPolicy: DirConflictPolicy) {
-    self.globalState.currentDirConflictPolicy = newPolicy
-    do {
-      try self.backend.putConfig(DIR_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
-    } catch {
-      self.reportException("Failed to save Dir Conflict Policy selection", error)
-    }
-  }
-
-  private func changeFileConflictPolicy(_ newPolicy: FileConflictPolicy) {
-    self.globalState.currentFileConflictPolicy = newPolicy
-    do {
-      try self.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
-    } catch {
-      self.reportException("Failed to save new file conflict policy", error)
-    }
-  }
-
-  // Diff Trees
-  // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
-
-  /**
-   Diff Trees By Content
-   */
-  @objc func diffTreesByContent() {
     if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(ID_APP)] Entered diffTreesByContent()")
+      NSLog("DEBUG [\(ID_APP)] validateUserInterfaceItem(): \(item)")
     }
-
-    guard isActionValid(.BUILTIN(.DIFF_TREES_BY_CONTENT)) else {
-      // add specific error msg if appropriate
-      if self.globalState.mode == .DIFF {
-        self.reportError("Cannot start diff", "A diff is already in process, apparently (this is probably a bug)")
-      }
-      return
-    }
-
-    guard let conLeft = self.getTreePanelController(ID_LEFT_TREE) else {
-      self.reportError("Cannot diff", "Internal error: no controller for \(ID_LEFT_TREE) found!")
-      return
-    }
-    guard let conRight = self.getTreePanelController(ID_RIGHT_TREE) else {
-      self.reportError("Cannot diff", "Internal error: no controller for \(ID_RIGHT_TREE) found!")
-      return
-    }
-
-    // TODO: will this work if not loaded?
-//    if conLeft.treeLoadState != .COMPLETELY_LOADED {
-//      self.reportError("Cannot start diff", "Left tree is not finished loading")
-//      return
-//    }
-//    if conRight.treeLoadState != .COMPLETELY_LOADED {
-//      self.reportError("Cannot start diff", "Right tree is not finished loading")
-//      return
-//    }
-
-    NSLog("DEBUG [\(ID_APP)] Sending request to BE to diff trees '\(conLeft.treeID)' & '\(conRight.treeID)'")
-
-    // First disable UI
-    self.sendEnableUISignal(enable: false)
-
-    // Now ask BE to start the diff
-    do {
-      _ = try self.backend.startDiffTrees(treeIDLeft: conLeft.treeID, treeIDRight: conRight.treeID)
-      //  We will be notified asynchronously when it is done/failed. If successful, the old tree_ids will be notified and supplied the new IDs
-    } catch {
-      NSLog("ERROR \(ID_APP)] Failed to start tree diff: \(error)")
-      self.sendEnableUISignal(enable: true)
-    }
-  }
-
-  /**
-   Merge Changes
-   */
-  @objc func mergeDiffChanges() {
-
-    guard isActionValid(.BUILTIN(.MERGE_CHANGES)) else {
-      // add specific error msg if appropriate
-      if self.globalState.mode != .DIFF {
-        self.reportError("Cannot merge changes", "A diff is not currently in progress")
-      }
-      return
-    }
-
-    guard let conLeft = self.mainWindow?.conLeft else {
-      self.reportError("Cannot merge", "Internal error: controller for left tree not found in main window!")
-      return
-    }
-    guard let conRight = self.mainWindow?.conRight else {
-      self.reportError("Cannot merge", "Internal error: controller for right tree not found in main window!")
-      return
-    }
-    do {
-      let selectedChangeListLeft = try conLeft.generateCheckedRowList()
-      let selectedChangeListRight = try conRight.generateCheckedRowList()
-
-      let guidListLeft: [GUID] = selectedChangeListLeft.map({ $0.spid.guid })
-      let guidListRight: [GUID] = selectedChangeListRight.map({ $0.spid.guid })
-      if SUPER_DEBUG_ENABLED {
-        NSLog("INFO  Selected changes (Left): [\(selectedChangeListLeft.map({ "\($0.spid)" }).joined(separator: "  "))]")
-        NSLog("INFO  Selected changes (Right): [\(selectedChangeListRight.map({ "\($0.spid)" }).joined(separator: "  "))]")
-      }
-
-      self.sendEnableUISignal(enable: false)
-
-      try self.backend.generateMergeTree(treeIDLeft: conLeft.treeID, treeIDRight: conRight.treeID,
-              selectedChangeListLeft: guidListLeft, selectedChangeListRight: guidListRight)
-
-    } catch {
-      self.reportException("Failed to generate merge preview", error)
-      self.sendEnableUISignal(enable: true)
-    }
-  }
-
-  /**
-   Cancel Diff
-   */
-  @objc func cancelDiff() {
-    guard isActionValid(.BUILTIN(.CANCEL_DIFF)) else {
-      // add specific error msg if appropriate
-      if self.globalState.mode != .DIFF {
-        self.reportError("Cannot cancel diff", "A diff is not currently in progress")
-      }
-      return
-    }
-    NSLog("DEBUG CancelDiff activated! Sending signal: '\(Signal.EXIT_DIFF_MODE)'")
-    self.dispatcher.sendSignal(signal: .EXIT_DIFF_MODE, senderID: ID_APP)
+    return self.globalActions.validateUserInterfaceItem(item)
   }
 
   // TreeController registry

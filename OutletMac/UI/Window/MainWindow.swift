@@ -42,6 +42,12 @@ class MainWindow: AppWindow, ObservableObject {
     }
   }
 
+  override func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {
+    NSLog("DEBUG [\(self.winID)] validateUserInterfaceItem(): \(item) (delegating to app)")
+    return self.app.validateUserInterfaceItem(item)
+    return true
+  }
+
   func updateToolbarSelections() {
     if let toolbar = self.toolbar as? MainWindowToolbar {
       // bring UI up to sync with state:

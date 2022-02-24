@@ -10,13 +10,22 @@ import Cocoa
  This is awesome: https://medium.com/@theboi/macos-apps-without-storyboard-or-xib-menu-bar-in-swift-5-menubar-and-toolbar-6f6f2fa39ccb
  */
 class AppMainMenu: NSMenu {
+    var app: OutletMacApp!
 
     override init(title: String) {
         super.init(title: title)
         self.autoenablesItems = true
-        self.items = AppMainMenu.buildMainMenu()
     }
 
+    func buildMainMenu(_ app: OutletMacApp) {
+        self.app = app
+
+        self.items = [
+            buildAppMenu(), buildEditMenu(), buildToolsMenu(), buildViewMenu(), buildWindowMenu()
+        ]
+    }
+
+    // Why does AppKit need this?? So annoying.
     required init(coder: NSCoder) {
         super.init(coder: coder)
     }
@@ -27,16 +36,15 @@ class AppMainMenu: NSMenu {
         super.itemChanged(item)
     }
 
-    private static func buildMainMenu() -> [NSMenuItem] {
-        return [
-            buildAppMenu(), buildEditMenu(), buildToolsMenu(), buildViewMenu(), buildWindowMenu()
-        ]
+    @objc func validateMenuItem(_ item: NSMenuItem) -> Bool {
+        NSLog("WARNING [AppMainMenu] Entered validateMenuItem() for item \(item)'")
+        return true
     }
 
     /*
      Application Menu
      */
-    private static func buildAppMenu() -> NSMenuItem {
+    private func buildAppMenu() -> NSMenuItem {
         let appMenu = NSMenuItem()
         appMenu.submenu = NSMenu()
         let appName = ProcessInfo.processInfo.processName
@@ -59,7 +67,7 @@ class AppMainMenu: NSMenu {
     /*
      Edit Menu
      */
-    private static func buildEditMenu() -> NSMenuItem {
+    private func buildEditMenu() -> NSMenuItem {
         let editMenu = NSMenuItem()
         editMenu.title = "Edit"
         editMenu.submenu = NSMenu(title: "Edit")
@@ -84,17 +92,17 @@ class AppMainMenu: NSMenu {
         return editMenu
     }
 
-    private static func buildToolPickerGroupSubmenu(_ group: PickerGroup) -> NSMenuItem {
+    private func buildToolPickerGroupSubmenu(_ group: PickerGroup) -> NSMenuItem {
         let submenu = NSMenuItem()
         submenu.title = group.groupLabel
         submenu.submenu = NSMenu(title: group.groupLabel)
 
         for item in group.itemList {
             NSLog("DEBUG Adding ToolbarPicker menu item: \(item.identifier)")
-            // NOTE: for validation, see OutletMacApp.validateMenuItem() (since apparently the class of the selector is first responsible)
-            let menuItem = GeneratedMenuItem(item.toMenuItemMeta(), action: #selector(OutletMacApp.executeGlobalMenuAction(_:)))
+            // NOTE: for validation, see GlobalActions.validateMenuItem() (since apparently the class of the selector is first responsible)
+            let menuItem = GeneratedMenuItem(item.toMenuItemMeta(), action: #selector(GlobalActions.executeGlobalMenuAction(_:)))
             menuItem.toolTip = item.toolTip
-            menuItem.target = nil   // Do NOT set target to an object, or nothing will happen
+            menuItem.target = self.app.globalActions   // This MUST match the action class (I think) or else silent failure
             // FIXME: checked state
             menuItem.isEnabled = true
             menuItem.state = .on    // checked
@@ -104,22 +112,23 @@ class AppMainMenu: NSMenu {
         return submenu
     }
 
-    private static func buildToolsMenu() -> NSMenuItem {
+    private func buildToolsMenu() -> NSMenuItem {
         let toolsMenu = NSMenuItem()
         toolsMenu.submenu = NSMenu(title: "Tools")
 
         let diffItem = GeneratedMenuItem(MenuItemMeta(itemType: .NORMAL, title: "Diff Trees By Content", actionType: .BUILTIN(.DIFF_TREES_BY_CONTENT)),
-                action: #selector(OutletMacApp.executeGlobalMenuAction(_:)))
+                action: #selector(GlobalActions.executeGlobalMenuAction(_:)))
         diffItem.keyEquivalent = "d"
+        diffItem.target = self.app.globalActions   // This MUST match the action class (I think) or else silent failure
         toolsMenu.submenu?.items.append(diffItem)
 
         toolsMenu.submenu?.items.append(GeneratedMenuItem(MenuItemMeta(itemType: .NORMAL, title: "Merge Changes", actionType: .BUILTIN(.MERGE_CHANGES)),
-                action: #selector(OutletMacApp.executeGlobalMenuAction(_:))))
+                action: #selector(GlobalActions.executeGlobalMenuAction(_:))))
 
         return toolsMenu
     }
 
-    private static func buildViewMenu() -> NSMenuItem {
+    private func buildViewMenu() -> NSMenuItem {
         let viewMenu = NSMenuItem()
         viewMenu.submenu = NSMenu(title: "View")
 
@@ -138,7 +147,7 @@ class AppMainMenu: NSMenu {
         return viewMenu
     }
 
-    private static func buildWindowMenu() -> NSMenuItem {
+    private func buildWindowMenu() -> NSMenuItem {
         let windowMenu = NSMenuItem()
         windowMenu.submenu = NSMenu(title: "Window")
         windowMenu.submenu?.items = [

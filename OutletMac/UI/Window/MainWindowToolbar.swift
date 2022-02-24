@@ -240,7 +240,7 @@ class MainWindowToolbar: NSToolbar, NSToolbarDelegate {
         }
 
         NSLog("DEBUG [\(ID_APP)] toolbarPickerDidSelectItem(): Resolved index \(sender.selectedIndex) -> identifier \(newItemIdentifier)")
-        app.changePickerItem(newItemIdentifier)
+        app.globalActions.changePickerItem(newItemIdentifier)
     }
 
 }
