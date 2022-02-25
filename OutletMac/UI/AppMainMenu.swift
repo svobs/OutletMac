@@ -41,7 +41,7 @@ class AppMainMenu: NSMenu {
         return true
     }
 
-    /*
+    /**
      Application Menu
      */
     private func buildAppMenu() -> NSMenuItem {
@@ -64,7 +64,7 @@ class AppMainMenu: NSMenu {
         return appMenu
     }
 
-    /*
+    /**
      Edit Menu
      */
     private func buildEditMenu() -> NSMenuItem {
@@ -86,12 +86,17 @@ class AppMainMenu: NSMenu {
             NSMenuItem.separator(),
             NSMenuItem(title: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a"),
             NSMenuItem.separator(),
-            buildToolPickerGroupSubmenu(ToolStateSpace.dragModeGroup)
+            buildToolPickerGroupSubmenu(ToolStateSpace.dragModeGroup),
+            buildToolPickerGroupSubmenu(ToolStateSpace.dirConflictPolicyGroup),
+            buildToolPickerGroupSubmenu(ToolStateSpace.fileConflictPolicyGroup)
             ]
 
         return editMenu
     }
 
+    /**
+     Edit Menu: submenu for a single tool picker group
+     */
     private func buildToolPickerGroupSubmenu(_ group: PickerGroup) -> NSMenuItem {
         let submenu = NSMenuItem()
         submenu.title = group.groupLabel
@@ -109,6 +114,9 @@ class AppMainMenu: NSMenu {
         return submenu
     }
 
+    /**
+     Tools Menu
+     */
     private func buildToolsMenu() -> NSMenuItem {
         let toolsMenu = NSMenuItem()
         toolsMenu.submenu = NSMenu(title: "Tools")
@@ -125,6 +133,9 @@ class AppMainMenu: NSMenu {
         return toolsMenu
     }
 
+    /**
+     View Menu
+     */
     private func buildViewMenu() -> NSMenuItem {
         let viewMenu = NSMenuItem()
         viewMenu.submenu = NSMenu(title: "View")
@@ -144,6 +155,9 @@ class AppMainMenu: NSMenu {
         return viewMenu
     }
 
+    /**
+     Window Menu
+     */
     private func buildWindowMenu() -> NSMenuItem {
         let windowMenu = NSMenuItem()
         windowMenu.submenu = NSMenu(title: "Window")

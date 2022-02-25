@@ -159,6 +159,7 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
 
         case PickerItemIdentifier.FilePolicy(let selectedPolicy):
             NSLog("INFO  [\(ID_APP)] User changed file conflict policy: \(selectedPolicy)")
+            self.changeFileConflictPolicy(selectedPolicy)
         }
     }
 
@@ -195,7 +196,7 @@ class GlobalActions: NSResponder, NSUserInterfaceValidations {
         do {
             try self.app.backend.putConfig(FILE_CONFLICT_POLICY_CONFIG_PATH, String(newPolicy.rawValue))
         } catch {
-            self.app.reportException("Failed to save new file conflict policy", error)
+            self.app.reportException("Failed to save File Conflict Policy selection", error)
         }
 
         app.mainWindow?.getMainToolbar()?.setToolbarSelection(.FilePolicy(newPolicy))
