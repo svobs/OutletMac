@@ -88,9 +88,15 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
             return
         }
 
+        if !self.con.tree.rootExists {
+            NSLog("DEBUG [\(treeID)] Ignoring double-click: tree root does not exist")
+            return
+        }
+
         let item = sender.item(atRow: sender.clickedRow)
 
         let guid = itemToGUID(item)
+        NSLog("DEBUG [\(treeID)] User double-clicked on row: \(guid)")
         let treeAction = TreeAction(self.con.treeID, .BUILTIN(.ACTIVATE), [guid], [])
         do {
             try self.con.backend.executeTreeAction(treeAction)
