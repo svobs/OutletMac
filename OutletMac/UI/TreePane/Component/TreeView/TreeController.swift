@@ -339,7 +339,6 @@ class TreeController: TreeControllable {
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
-      // TODO: experiment with beginUpdates()/endUpdates()
       self.treeView?.reloadData()
 
       self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)

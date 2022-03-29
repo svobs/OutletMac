@@ -834,14 +834,17 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
         // Force view to load, if it isn't already (avoids race condition which causes NSInternalInconsistencyException)
         let _ = self.view
 
-        self.outlineView.beginUpdates()
-        defer {
-            self.outlineView.endUpdates()
-        }
-        let isGDrive = self.con.tree.state.rootSN.node.treeType == .GDRIVE
-        self.outlineView.tableColumn(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: META_CHANGE_TS_COL_KEY))?.isHidden = isGDrive
+        do {
+            self.outlineView.beginUpdates()
+            defer {
+                self.outlineView.endUpdates()
+            }
+            let isGDrive = self.con.tree.state.rootSN.node.treeType == .GDRIVE
+            self.outlineView.tableColumn(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: META_CHANGE_TS_COL_KEY))?.isHidden = isGDrive
 
-        self.outlineView.reloadData()
+            self.outlineView.reloadData()
+        }
+
         // The previous line can wipe out our selection. Try to restore it:
         self.selectGUIDList(self.guidSelectedSet)
     }
