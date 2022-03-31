@@ -223,7 +223,7 @@ class TreeController: TreeControllable {
     // Clear display store & TreeView (which draws from display store)
     NSLog("DEBUG [\(treeID)] Clearing model and tree view")
     self.displayStore.putRootChildList(self.tree.rootSN, [])
-    self.treeView?.reloadData()
+    self.treeView?.reloadData(keepSelection: false)
   }
 
   /**
@@ -339,10 +339,11 @@ class TreeController: TreeControllable {
 
     DispatchQueue.main.async {
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
-      self.treeView?.reloadData()
+      self.treeView?.reloadData(keepSelection: false)
 
       self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)
 
+      NSLog("DEBUG [\(self.treeID)] Restoring selection from BE: \(rows.selected)")
       self.treeView!.selectGUIDList(rows.selected)
 
       let timeElapsed = populateStartTimeMS.distance(to: DispatchTime.now())

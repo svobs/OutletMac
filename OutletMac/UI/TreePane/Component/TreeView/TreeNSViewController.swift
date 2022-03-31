@@ -251,8 +251,13 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
     */
     func outlineViewSelectionDidChange(_ notification: Notification) {
         let guidSet: Set<GUID> = self.getSelectedGUIDs()
-        NSLog("DEBUG [\(treeID)] User selected GUIDs: \(guidSet)")
+        if self.guidSelectedSet.symmetricDifference(guidSet).count == 0 {
+            return
+        }
+        NSLog("DEBUG [\(treeID)] Selection changed: GUIDs: \(guidSet)")
+
         self.guidSelectedSet = guidSet
+
 
         do {
             try self.con.backend.setSelectedRowSet(guidSet, self.treeID)
@@ -704,7 +709,6 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
 
         NSLog("DEBUG [\(self.treeID)] Selecting GUIDs: \(guidSet)")
         let indexSet = self.getIndexSetFor(guidSet)
-        NSLog("DEBUG [\(self.treeID)] selectGUIDList(): resolved \(guidSet.count) GUIDs into \(indexSet.count) rows")
 
         if !indexSet.isEmpty {
             if SUPER_DEBUG_ENABLED {
@@ -826,10 +830,10 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
         }
     }
 
-    func reloadData() {
+    func reloadData(keepSelection: Bool = true) {
         assert(DispatchQueue.isExecutingIn(.main))
 
-        NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore")
+        NSLog("DEBUG [\(self.treeID)] Reloading TreeView from DisplayStore (keepSelection=\(keepSelection))")
 
         // Force view to load, if it isn't already (avoids race condition which causes NSInternalInconsistencyException)
         let _ = self.view
@@ -845,8 +849,12 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
             self.outlineView.reloadData()
         }
 
-        // The previous line can wipe out our selection. Try to restore it:
-        self.selectGUIDList(self.guidSelectedSet)
+        if keepSelection {
+            // The previous line can wipe out our selection. Try to restore it:
+            self.selectGUIDList(self.guidSelectedSet)
+        } else {
+            self.guidSelectedSet = []
+        }
     }
 
     // Context Menu

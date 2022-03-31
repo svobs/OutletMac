@@ -366,7 +366,9 @@ class IconStore: HasLifecycle {
   }
 
   func getToolbarIcon(for iconID: IconID) -> ImageContainer {
-    NSLog("DEBUG getToolbarIcon(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+    if TRACE_ENABLED {
+      NSLog("DEBUG getToolbarIcon(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
+    }
 
     let key = self.makeToolbarCacheKey(iconID)
 
