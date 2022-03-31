@@ -10,6 +10,7 @@ import SwiftUI
  */
 class MergePreviewWindow: SingleTreePopUpWindow {
     override init(_ app: OutletAppProtocol, treeID: TreeID) {
+        NSLog("DEBUG [\(ID_APP)] Init MergePreview window")
         super.init(app, treeID: treeID)
         self.center()
         self.isReleasedWhenClosed = false  // make it reusable

@@ -529,6 +529,7 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
    */
   func openMergePreview(_ con: TreeControllable) {
     assert(DispatchQueue.isExecutingIn(.main))
+    NSLog("DEBUG [\(ID_APP)] Opening MergePreview window")
 
     do {
       if self.mergePreviewWindow == nil {

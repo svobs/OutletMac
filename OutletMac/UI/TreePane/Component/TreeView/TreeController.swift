@@ -315,7 +315,6 @@ class TreeController: TreeControllable {
         DispatchQueue.main.async {
           self.clearModelAndTreeView()
         }
-        self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
         return
       }
       for sn in topLevelSNList {
@@ -409,10 +408,11 @@ class TreeController: TreeControllable {
     var ancestorGUID: GUID = guid
     while true {
       ancestorGUID = self.displayStore.getParentGUID(ancestorGUID)!
-      NSLog("DEBUG [\(treeID)] setChecked(): Next higher ancestor=\(ancestorGUID)")
       if ancestorGUID == self.tree.rootSPID.guid {
+        NSLog("DEBUG [\(treeID)] setChecked(): Reached tree root, stopping: \(ancestorGUID)")
         break
       }
+      NSLog("DEBUG [\(treeID)] setChecked(): Examining next higher ancestor: \(ancestorGUID)")
       var hasChecked = false
       var hasUnchecked = false
       var hasMixed = false

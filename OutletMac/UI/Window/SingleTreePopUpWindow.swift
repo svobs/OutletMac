@@ -23,6 +23,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
     }
 
     func setController(_ con: TreeControllable, initialSelection: SPIDNodePair? = nil) {
+        NSLog("DEBUG [\(self.winID)] setController() entered")
         self.con = con
         self.initialSelection = initialSelection
     }
@@ -41,17 +42,21 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
         // TODO: create & populate progress bar to show user that something is being done here
 
         try self.con!.requestTreeLoad()
+        NSLog("DEBUG [\(self.winID)] Start done")
     }
 
     // This is called by windowWillClose()
     override func shutdown() throws {
+        NSLog("DEBUG [\(self.winID)] shutdown() starting")
         try super.shutdown()
         try self.con?.shutdown()
+        NSLog("DEBUG [\(self.winID)] shutdown() done")
     }
 
     func selectSPID(_ spid: SPID) {
         // If successful, this should fire the selection listener, which will result in onSelectionChanged() below
         // being hit
+        NSLog("DEBUG [\(self.winID)] Selecting GUID: \(spid.guid)")
         self.con?.treeView!.selectSingleGUID(spid.guid, scrollToSelection: true)
     }
 
@@ -76,7 +81,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
     func onPopulateTreeDone(_ senderID: SenderID, _ props: PropDict) throws {
         if let selectionSPID = self.initialSelection?.spid {
             // TODO: put all this logic in the backend, let it update the expanded row set and push it out like other trees
-            NSLog("DEBUG [\(self.winID)] Populate complete! Selecting SPID: \(selectionSPID)")
+            NSLog("DEBUG [\(self.winID)] Attempting to select SPID: \(selectionSPID)")
             do {
                 let ancestorList: [SPIDNodePair] = try self.con!.backend.getAncestorList(spid: selectionSPID, stopAtPath: nil)
                 let ancestorGUIDList: [GUID] = ancestorList.map({ $0.spid.guid })
@@ -91,7 +96,9 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
                 // Fall through and still show window:
             }
         }
+
         DispatchQueue.main.async {
+            NSLog("INFO  [\(self.winID)] onPopulateTreeDone(): showing window")
             self.showWindow()
         }
     }
