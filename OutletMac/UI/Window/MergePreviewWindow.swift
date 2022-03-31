@@ -15,7 +15,10 @@ class MergePreviewWindow: SingleTreePopUpWindow {
         self.center()
         self.isReleasedWhenClosed = false  // make it reusable
         self.title = "Confirm Merge"
+    }
 
+    func setController(_ con: TreeControllable) {
+        super.setController(con, initialSelection: nil)
         let content = MergePreviewContent(self)
                 .environmentObject(self.app.globalState)
         self.contentView = NSHostingView(rootView: content)

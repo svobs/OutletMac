@@ -532,10 +532,10 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     NSLog("DEBUG [\(ID_APP)] Opening MergePreview window")
 
     do {
-      if self.mergePreviewWindow == nil {
-        self.mergePreviewWindow = MergePreviewWindow(self, treeID: con.treeID)
+      if let mergePreview = self.mergePreviewWindow {
+        mergePreview.close()
       } else {
-        self.mergePreviewWindow?.close()
+        self.mergePreviewWindow = MergePreviewWindow(self, treeID: con.treeID)
       }
       self.mergePreviewWindow!.setController(con)
       try self.mergePreviewWindow!.start()
