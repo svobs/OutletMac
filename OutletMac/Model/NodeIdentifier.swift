@@ -331,7 +331,7 @@ class ChangeTreeSPID: SinglePathNodeIdentifier {
 
   override var guid: GUID {
     // This MUST match the BE's behavior exactly, or bugs will result!
-    return "\(self.deviceUID):\(self.category.display()):\(self.pathUID)"
+    return "\(self.deviceUID):\(self.category):\(self.pathUID)"
   }
 
   func equals(_ rhs: ChangeTreeSPID) -> Bool {

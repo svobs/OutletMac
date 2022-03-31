@@ -272,6 +272,7 @@ class TreeController: TreeControllable {
     }
 
     let populateStartTimeMS = DispatchTime.now()
+    var toExpandInOrder: [GUID] = []
 
     let rows: RowsOfInterest
     do {
@@ -280,6 +281,25 @@ class TreeController: TreeControllable {
     } catch {
       reportException("Failed to fetch expanded node list", error)
       rows = RowsOfInterest() // non-fatal error
+    }
+
+    // lots of return paths from this method. Make sure we send signal at the end
+    defer {
+      DispatchQueue.main.async {
+        NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
+        self.treeView?.reloadData(keepSelection: false)
+
+        if toExpandInOrder.count > 0 {
+          self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)
+        }
+
+        NSLog("DEBUG [\(self.treeID)] Restoring selection from BE: \(rows.selected)")
+        self.treeView!.selectGUIDList(rows.selected)
+
+        let timeElapsed = populateStartTimeMS.distance(to: DispatchTime.now())
+        NSLog("INFO  [\(self.treeID)] populateTreeView() completed in \(timeElapsed.toString())")
+        self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
+      }
     }
 
     var queue = Deque<SPIDNodePair>()
@@ -295,6 +315,7 @@ class TreeController: TreeControllable {
         DispatchQueue.main.async {
           self.clearModelAndTreeView()
         }
+        self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
         return
       }
       for sn in topLevelSNList {
@@ -310,7 +331,6 @@ class TreeController: TreeControllable {
 
     // We populate each expanded row in the DisplayStore first, and then reload the tree once it's fully populated.
     // This way we avoid loading in fits and spurts, and it looks cleaner
-    var toExpandInOrder: [GUID] = []
     while !queue.isEmpty {
 
       let sn = queue.popFirst()!
@@ -337,19 +357,6 @@ class TreeController: TreeControllable {
       }
     }
 
-    DispatchQueue.main.async {
-      NSLog("DEBUG [\(self.treeID)] populateTreeView(): reloading entire tree")
-      self.treeView?.reloadData(keepSelection: false)
-
-      self.treeView?.expand(toExpandInOrder, isAlreadyPopulated: true)
-
-      NSLog("DEBUG [\(self.treeID)] Restoring selection from BE: \(rows.selected)")
-      self.treeView!.selectGUIDList(rows.selected)
-
-      let timeElapsed = populateStartTimeMS.distance(to: DispatchTime.now())
-      NSLog("INFO  [\(self.treeID)] populateTreeView() completed in \(timeElapsed.toString())")
-      self.dispatcher.sendSignal(signal: .POPULATE_UI_TREE_DONE, senderID: self.treeID)
-    }
   }
 
   // MUST RUN INSIDE MAIN DQ
