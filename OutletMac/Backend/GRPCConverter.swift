@@ -409,7 +409,7 @@ class GRPCConverter {
       throw OutletError.invalidState("Bad value received from gRPC: MenuItemType (\(grpc.itemType)) is invalid!")
     }
     let actionType: ActionType = self.actionTypeFromGRPC(grpc.actionID)
-    let item = MenuItemMeta(itemType: itemType, title: grpc.title, actionType: actionType)
+    let item = MenuItemMeta(itemType: itemType, title: grpc.title, actionType: actionType, targetUID: grpc.targetUid)
     for submenuItem in grpc.submenuItemList {
       item.submenuItemList.append(try self.menuItemFromGRPC(submenuItem))
     }
@@ -432,7 +432,7 @@ class GRPCConverter {
       targetNodeList.append(try self.nodeFromGRPC(nodeGRPC))
     }
 
-    return TreeAction(grpc.treeID, actionType, targetGUIDList, targetNodeList)
+    return TreeAction(grpc.treeID, actionType, targetGUIDList, targetNodeList, targetUID: grpc.targetUid)
   }
 
   func treeActionToGRPC(_ treeAction: TreeAction) throws -> Outlet_Backend_Agent_Grpc_Generated_TreeAction {
@@ -443,6 +443,7 @@ class GRPCConverter {
     for node in treeAction.targetNodeList {
       treeActionGRPC.targetNodeList.append(try self.nodeToGRPC(node))
     }
+    treeActionGRPC.targetUid = treeAction.targetUID
     return treeActionGRPC
   }
 

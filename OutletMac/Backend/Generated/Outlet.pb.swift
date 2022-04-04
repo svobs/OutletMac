@@ -1168,6 +1168,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem {
 
   public var submenuItemList: [Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem] = []
 
+  /// context depends on the action_uid; not used for most actions
+  public var targetUid: UInt32 = 0
+
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
   public init() {}
@@ -1187,6 +1190,9 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeAction {
 
   /// only required for certain actions
   public var targetNodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
+
+  /// context depends on the action_uid; not used for most actions
+  public var targetUid: UInt32 = 0
 
   public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -3811,6 +3817,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     3: .standard(proto: "action_id"),
     4: .standard(proto: "target_guid_list"),
     5: .standard(proto: "submenu_item_list"),
+    6: .standard(proto: "target_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -3824,6 +3831,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
       case 3: try { try decoder.decodeSingularUInt32Field(value: &self.actionID) }()
       case 4: try { try decoder.decodeRepeatedStringField(value: &self.targetGuidList) }()
       case 5: try { try decoder.decodeRepeatedMessageField(value: &self.submenuItemList) }()
+      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.targetUid) }()
       default: break
       }
     }
@@ -3845,6 +3853,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     if !self.submenuItemList.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.submenuItemList, fieldNumber: 5)
     }
+    if self.targetUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.targetUid, fieldNumber: 6)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -3854,6 +3865,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeContextMenuItem: SwiftProtobuf
     if lhs.actionID != rhs.actionID {return false}
     if lhs.targetGuidList != rhs.targetGuidList {return false}
     if lhs.submenuItemList != rhs.submenuItemList {return false}
+    if lhs.targetUid != rhs.targetUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -3866,6 +3878,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeAction: SwiftProtobuf.Message,
     2: .standard(proto: "action_id"),
     3: .standard(proto: "target_guid_list"),
     4: .standard(proto: "target_node_list"),
+    5: .standard(proto: "target_uid"),
   ]
 
   public mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -3878,6 +3891,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeAction: SwiftProtobuf.Message,
       case 2: try { try decoder.decodeSingularUInt32Field(value: &self.actionID) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.targetGuidList) }()
       case 4: try { try decoder.decodeRepeatedMessageField(value: &self.targetNodeList) }()
+      case 5: try { try decoder.decodeSingularUInt32Field(value: &self.targetUid) }()
       default: break
       }
     }
@@ -3896,6 +3910,9 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeAction: SwiftProtobuf.Message,
     if !self.targetNodeList.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.targetNodeList, fieldNumber: 4)
     }
+    if self.targetUid != 0 {
+      try visitor.visitSingularUInt32Field(value: self.targetUid, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -3904,6 +3921,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_TreeAction: SwiftProtobuf.Message,
     if lhs.actionID != rhs.actionID {return false}
     if lhs.targetGuidList != rhs.targetGuidList {return false}
     if lhs.targetNodeList != rhs.targetNodeList {return false}
+    if lhs.targetUid != rhs.targetUid {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

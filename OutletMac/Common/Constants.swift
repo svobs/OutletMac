@@ -176,13 +176,8 @@ enum ActionID: UInt32 {
   case EXPAND_ROWS = 13             // BE -> FE
   case COLLAPSE_ROWS = 14           // BE -> FE
 
-  case CALL_EXIFTOOL = 50           // FE only
-
-  // --- Global actions --
-
-  case DIFF_TREES_BY_CONTENT = 51
-  case MERGE_CHANGES = 52
-  case CANCEL_DIFF = 53
+  case RETRY_OPERATION = 15
+  case RETRY_ALL_FAILED_OPERATIONS = 16
 
   // 1-to-1 for each value of enum DragOperation:
   case SET_DEFAULT_DRAG_MODE_TO_MOVE = 20
@@ -205,6 +200,14 @@ enum ActionID: UInt32 {
   case SET_DEFAULT_FILE_CONFLICT_POLICY_TO_RENAME_ALWAYS = 34
   case SET_DEFAULT_FILE_CONFLICT_POLICY_TO_RENAME_IF_OLDER_AND_DIFFERENT = 35
   case SET_DEFAULT_FILE_CONFLICT_POLICY_TO_RENAME_IF_DIFFERENT = 36
+
+  case CALL_EXIFTOOL = 50           // FE only
+
+  // --- Global actions --
+
+  case DIFF_TREES_BY_CONTENT = 51
+  case MERGE_CHANGES = 52
+  case CANCEL_DIFF = 53
 
   case ACTIVATE = 100
   // 101 & above are reserved for custom actions

@@ -168,6 +168,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  /// Indicates the class of this NodeIdentifier. CategorySPIDs have an entry for each category
   public var identifierType: UInt32 = 0
 
   public var deviceUid: UInt32 = 0
