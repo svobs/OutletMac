@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 /**
  PROTOCOL ImageContainer
@@ -326,7 +327,11 @@ class IconStore: HasLifecycle {
       if suffix == "" {
         baseIcon = NSWorkspace.shared.icon(for: .data)
       } else {
-        baseIcon = NSWorkspace.shared.icon(forFileType: suffix)
+        if let uttype = UTType.types(tag: suffix, tagClass: .filenameExtension, conformingTo: nil).first {
+          baseIcon = NSWorkspace.shared.icon(for: uttype)
+        } else {
+          baseIcon = NSWorkspace.shared.icon(for: .data)
+        }
       }
 
       return buildAndCacheMacIcon(iconID, baseIcon, height, badge, key)
