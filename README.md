@@ -17,6 +17,7 @@
 	Afterwards look in: './Pods/gRPC-Swift-Plugins/' for 'protoc-gen-swift' and 'protoc-gen-grpc-swift'
 
 ## Updating Pod Dependencies
+	# See: https://guides.cocoapods.org/using/pod-install-vs-update.html
 	pod outdated
 	pod update
 
