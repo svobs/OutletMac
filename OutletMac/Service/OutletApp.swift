@@ -582,7 +582,18 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
     assert(DispatchQueue.isExecutingIn(.main))
 
     do {
-      if self.mainWindow == nil {
+      // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
+      let treeLeft: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
+      let treeRight: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
+      let conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
+      let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
+
+      // Seems like AppKit gets buggy when we try to use member variable to reference MainWindow. Try local variables as much as possible
+      let mainWindow: MainWindow
+      if let existingMainWindow = self.mainWindow {
+        existingMainWindow.close()
+        mainWindow = existingMainWindow
+      } else {
         // FIXME: actually get the app to use these values
         var contentRect: NSRect? = nil
         do {
@@ -591,24 +602,17 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
           // recoverable error: just use defaults
           NSLog("ERROR [\(ID_MAIN_WINDOW)] Failed to load contentRect from config: \(error)")
         }
-        self.mainWindow = MainWindow(self, contentRect)
-      } else {
-        self.mainWindow?.close()
+        mainWindow = MainWindow(self, contentRect)
       }
-
-      // TODO: eventually refactor this so that all state is stored in BE, and we only supply the tree_id when we request the state
-      let treeLeft: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_LEFT_TREE, isStartup: true)!
-      let treeRight: DisplayTree = try self.backend.createDisplayTreeFromConfig(treeID: ID_RIGHT_TREE, isStartup: true)!
-      let conLeft = try self.buildController(treeLeft, canChangeRoot: true, allowsMultipleSelection: true)
-      let conRight = try self.buildController(treeRight, canChangeRoot: true, allowsMultipleSelection: true)
 
       self.tcDQ.sync {
         do {
-          self.mainWindow!.setControllers(left: conLeft, right: conRight)
-          try self.mainWindow!.start()
+          mainWindow.setControllers(left: conLeft, right: conRight)
+          try mainWindow.start()
           DispatchQueue.main.async {
-            NSLog("DEBUG [\(ID_APP)] Calling MainWindow.showWindow()")
-            self.mainWindow!.showWindow()
+            NSLog("DEBUG [\(ID_APP)] Showing MainWindow")
+            mainWindow.showWindow()
+            self.mainWindow = mainWindow
 
             // Close Connection Problem window if it is open:
             self.connectionProblemWindow?.close()

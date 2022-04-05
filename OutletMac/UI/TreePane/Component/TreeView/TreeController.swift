@@ -533,10 +533,28 @@ class TreeController: TreeControllable {
   func reportError(_ title: String, _ errorMsg: String) {
     // See listener in OutletAppProtocol
     NSLog("DEBUG [\(self.treeID)] Reporting local error: title='\(title)' error='\(errorMsg)'")
-    self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
+    self.reportErrorInternal(title, errorMsg)
   }
 
+    private func reportErrorInternal(_ title: String, _ errorMsg: String) {
+        self.dispatcher.sendSignal(signal: .ERROR_OCCURRED, senderID: treeID, ["msg": title, "secondary_msg": errorMsg])
+    }
+
   func reportException(_ title: String, _ error: Error) {
+    NSLog("ERROR [\(self.treeID)] Reporting exception: title='\(title)' error='\(error)'")
+    if let appError = error as? OutletError {
+      switch appError {
+      case .grpcFailure(let errorMsg, let grpcErrorMsg):
+        if let grpcErrorMsg = grpcErrorMsg {
+          reportError(title, grpcErrorMsg)
+        } else {
+          reportError(title, errorMsg)
+        }
+        return
+      default:
+          break
+      }
+    }
     let errorMsg: String = "\(error)" // ew, heh
     reportError(title, errorMsg)
   }

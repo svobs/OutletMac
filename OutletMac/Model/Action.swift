@@ -11,7 +11,7 @@ import Foundation
 /*
  Generic action
  */
-class Action {
+class Action: CustomStringConvertible {
   let actionType: ActionType
 
   init(_ actionType: ActionType) {
@@ -24,6 +24,15 @@ class Action {
       return actionID.rawValue
     case .CUSTOM(let actionID):
       return actionID
+    }
+  }
+
+  var description: String {
+    switch actionType {
+    case .BUILTIN(let actionID):
+      return "\(actionID)"
+    case .CUSTOM(let actionID):
+      return "CUSTOM:\(actionID)"
     }
   }
 }

@@ -101,7 +101,7 @@ class TreeActions {
     do {
       try self.con.backend.executeTreeAction(action)
     } catch {
-      self.con.reportException("Failed to execute action: \(action.actionType)", error)
+      self.con.reportException("Failed to execute action: \(action)", error)
     }
   }
 

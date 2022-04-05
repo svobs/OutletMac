@@ -845,7 +845,13 @@ class GRPCClientBackend: OutletBackend {
           exception = OutletError.grpcConnectionDown("RPC \"\(rpcName)\" failed: connection refused")
         } catch {
           // General failure. Maybe server internal error, or bad data, or something else
-          exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(error)")
+          if let status = error as? GRPCStatus {
+            var statusMsg = status.message != nil ? status.message! : "code \(status.code)"
+            if statusMsg.starts(with: "Exception calling application: ") {
+              statusMsg = statusMsg.replaceFirstOccurrence(of: "Exception calling application: ", with: "")
+            }
+            exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(statusMsg)", statusMsg)
+          }
         }
       }
       if let thrownException = exception {
