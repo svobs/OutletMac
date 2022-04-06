@@ -320,11 +320,11 @@ class TreeController: TreeControllable {
       for sn in topLevelSNList {
         queue.append(sn)
       }
-    } catch OutletError.maxResultsExceeded(let actualCount) {
+    } catch OutletError.getChildListFailed(let errorMsg, _) {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
-      NSLog("DEBUG [\(self.treeID)] populateTreeView(): Max results exceeded (actualCount=\(actualCount)")
-      self.clearTreeAndDisplayMsg("ERROR: too many items to display (\(actualCount))", .ICON_ALERT)
+      NSLog("DEBUG [\(self.treeID)] populateTreeView(): got error response from RPC 'getChildList': '\(errorMsg)'")
+      self.clearTreeAndDisplayMsg(errorMsg, .ICON_ALERT)
       return
     }
 
@@ -347,10 +347,11 @@ class TreeController: TreeControllable {
             queue.append(sn)
           }
 
-        } catch OutletError.maxResultsExceeded(let actualCount) {
+        } catch OutletError.getChildListFailed(let errorMsg, _) {
           // append err node and continue
           DispatchQueue.main.async {
-            self.appendEphemeralNode(sn.spid, "ERROR: too many items to display (\(actualCount))", .ICON_ALERT, reloadParent: false)
+            NSLog("DEBUG [\(self.treeID)] populateTreeView(): got error response from RPC 'getChildList': '\(errorMsg)'")
+            self.appendEphemeralNode(sn.spid, errorMsg, .ICON_ALERT, reloadParent: false)
           }
         }
       }

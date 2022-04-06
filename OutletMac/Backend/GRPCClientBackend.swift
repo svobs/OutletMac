@@ -452,9 +452,9 @@ class GRPCClientBackend: OutletBackend {
 
     let response = try self.callAndTranslateErrors(self.stub.get_child_list_for_spid(request), "getChildList")
 
-    if response.resultExceededCount > 0 {
-      assert (maxResults != nil && maxResults! > 0)
-      throw OutletError.maxResultsExceeded(actualCount: response.resultExceededCount)
+    if response.hasError {
+      NSLog("ERROR RPC 'getChildList' returned error: '\(response.error.beMsg)'")
+      throw OutletError.getChildListFailed(response.error.feMsg, response.error.feSecondaryMsg)
     }
 
     return try self.grpcConverter.snListFromGRPC(response.childList)

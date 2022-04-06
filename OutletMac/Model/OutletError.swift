@@ -13,5 +13,5 @@ enum OutletError: Error {
   case grpcConnectionDown(String? = nil)
   case bonjourFailure(String? = nil)
 
-  case maxResultsExceeded(actualCount: UInt32)
+  case getChildListFailed(String, String) // msg, secondaryMsg
 }
