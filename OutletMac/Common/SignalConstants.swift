@@ -6,9 +6,9 @@
 //
 
 enum Signal: UInt32 {
-  /** Sent from BE and received by FE: a Node was upserted into the DisplayTree */
+  /** Sent from BE and received by FE: a TNode was upserted into the DisplayTree */
   case NODE_UPSERTED = 1
-  /** Sent from BE and received by FE: a Node was removed from the DisplayTree */
+  /** Sent from BE and received by FE: a TNode was removed from the DisplayTree */
   case NODE_REMOVED = 2
   /** Sent from BE and received by FE: stats were updated for nodes in the DisplayTree, and also possibly the StatusMsg */
   case STATS_UPDATED = 3

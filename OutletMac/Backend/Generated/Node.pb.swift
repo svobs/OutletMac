@@ -42,8 +42,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_UserOp {
 
   public var opType: UInt32 = 0
 
-  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_srcNode = newValue}
   }
   /// Returns true if `srcNode` has been explicitly set.
@@ -51,8 +51,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_UserOp {
   /// Clears the value of `srcNode`. Subsequent reads from it will return its default value.
   public mutating func clearSrcNode() {self._srcNode = nil}
 
-  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_dstNode = newValue}
   }
   /// Returns true if `dstNode` has been explicitly set.
@@ -67,8 +67,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_UserOp {
 
   public init() {}
 
-  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
-  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
+  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
@@ -76,8 +76,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var srcNode: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _srcNode ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_srcNode = newValue}
   }
   /// Returns true if `srcNode` has been explicitly set.
@@ -85,8 +85,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
   /// Clears the value of `srcNode`. Subsequent reads from it will return its default value.
   public mutating func clearSrcNode() {self._srcNode = nil}
 
-  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var dstNode: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _dstNode ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_dstNode = newValue}
   }
   /// Returns true if `dstNode` has been explicitly set.
@@ -98,8 +98,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SrcDstNodeList {
 
   public init() {}
 
-  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
-  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _srcNode: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
+  fileprivate var _dstNode: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
@@ -116,8 +116,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
   /// Clears the value of `spid`. Subsequent reads from it will return its default value.
   public mutating func clearSpid() {self._spid = nil}
 
-  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var node: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_node = newValue}
   }
   /// Returns true if `node` has been explicitly set.
@@ -130,7 +130,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SPIDNodePair {
   public init() {}
 
   fileprivate var _spid: Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier? = nil
-  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_MultiPathIdentifierMeta {
@@ -226,7 +226,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier {
   public init() {}
 }
 
-public struct Outlet_Backend_Agent_Grpc_Generated_Node {
+public struct Outlet_Backend_Agent_Grpc_Generated_TNode {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -337,7 +337,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_Node {
     case nonexistentDirMeta(Outlet_Backend_Agent_Grpc_Generated_NonexistentDirMeta)
 
   #if !swift(>=4.1)
-    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType, rhs: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType) -> Bool {
+    public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TNode.OneOf_NodeType, rhs: Outlet_Backend_Agent_Grpc_Generated_TNode.OneOf_NodeType) -> Bool {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
@@ -1011,8 +1011,8 @@ extension Outlet_Backend_Agent_Grpc_Generated_NodeIdentifier: SwiftProtobuf.Mess
   }
 }
 
-extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  public static let protoMessageName: String = _protobuf_package + ".Node"
+extension Outlet_Backend_Agent_Grpc_Generated_TNode: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  public static let protoMessageName: String = _protobuf_package + ".TNode"
   public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "node_identifier"),
     2: .same(proto: "trashed"),
@@ -1033,7 +1033,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
     var _trashed: UInt32 = 0
     var _isShared: Bool = false
     var _iconID: UInt32 = 0
-    var _nodeType: Outlet_Backend_Agent_Grpc_Generated_Node.OneOf_NodeType?
+    var _nodeType: Outlet_Backend_Agent_Grpc_Generated_TNode.OneOf_NodeType?
 
     static let defaultInstance = _StorageClass()
 
@@ -1234,7 +1234,7 @@ extension Outlet_Backend_Agent_Grpc_Generated_Node: SwiftProtobuf.Message, Swift
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_Node, rhs: Outlet_Backend_Agent_Grpc_Generated_Node) -> Bool {
+  public static func ==(lhs: Outlet_Backend_Agent_Grpc_Generated_TNode, rhs: Outlet_Backend_Agent_Grpc_Generated_TNode) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0

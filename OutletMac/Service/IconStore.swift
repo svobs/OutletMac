@@ -184,7 +184,7 @@ class IconStore: HasLifecycle {
     nodeIconCache.removeAllObjects()
   }
 
-  func getNodeIcon(_ node: Node, height: CGFloat) -> NSImage? {
+  func getNodeIcon(_ node: TNode, height: CGFloat) -> NSImage? {
     let iconId = node.icon
     if TRACE_ENABLED {
       NSLog("DEBUG Getting nodeIcon for: \(iconId): \(node.nodeIdentifier)")
@@ -219,7 +219,7 @@ class IconStore: HasLifecycle {
     return bestRep
   }
 
-  private func getIconForDirNode(_ node: Node, _ height: CGFloat) -> NSImage {
+  private func getIconForDirNode(_ node: TNode, _ height: CGFloat) -> NSImage {
     let iconID = node.icon
     let key: String = makeSimpleIconCacheKey(iconID)
 
@@ -275,7 +275,7 @@ class IconStore: HasLifecycle {
     return buildAndCacheMacIcon(iconID, baseIcon, height, badge, key)
   }
 
-  private func getIconForFileNode(_ node: Node, _ height: CGFloat) -> NSImage {
+  private func getIconForFileNode(_ node: TNode, _ height: CGFloat) -> NSImage {
     let iconID = node.icon
     let key: String = makeFileIconCacheKey(iconID, node)
 
@@ -401,7 +401,7 @@ class IconStore: HasLifecycle {
     "\(iconID)"
   }
 
-  private func makeFileIconCacheKey(_ iconID: IconID, _ node: Node) -> String {
+  private func makeFileIconCacheKey(_ iconID: IconID, _ node: TNode) -> String {
     let suffix = URL(fileURLWithPath: node.firstPath).pathExtension
     return "\(iconID):\(suffix)"
   }
@@ -416,7 +416,7 @@ class IconStore: HasLifecycle {
         return SystemImage(width: iconSize, height: iconSize, systemImageName: iconID.systemImageName())
       }
     } else {
-      // Node icon
+      // TNode icon
       iconSize = nodeIconSize
     }
 

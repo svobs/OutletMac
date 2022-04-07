@@ -46,10 +46,10 @@ class GlobalAction: Action {
 class TreeAction: Action {
   let treeID: TreeID
   let targetGUIDList: [GUID]
-  let targetNodeList: [Node]
+  let targetNodeList: [TNode]
   let targetUID: UID  // use NULL_UID to signify null
 
-  init(_ treeID: TreeID, _ actionType: ActionType, _ targetGUIDList: [GUID], _ targetNodeList: [Node], targetUID: UID = NULL_UID) {
+  init(_ treeID: TreeID, _ actionType: ActionType, _ targetGUIDList: [GUID], _ targetNodeList: [TNode], targetUID: UID = NULL_UID) {
     self.treeID = treeID
     self.targetGUIDList = targetGUIDList
     self.targetNodeList = targetNodeList

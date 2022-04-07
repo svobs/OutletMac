@@ -19,9 +19,9 @@ class GRPCConverter {
   // Node
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func nodeToGRPC(_ node: Node) throws -> Outlet_Backend_Agent_Grpc_Generated_Node {
+  func nodeToGRPC(_ node: TNode) throws -> Outlet_Backend_Agent_Grpc_Generated_TNode {
     NSLog("DEBUG Converting to gRPC: \(node)")
-    var grpc = Outlet_Backend_Agent_Grpc_Generated_Node()
+    var grpc = Outlet_Backend_Agent_Grpc_Generated_TNode()
     // NodeIdentifier fields:
     grpc.nodeIdentifier = try self.nodeIdentifierToGRPC(node.nodeIdentifier)
 
@@ -71,7 +71,7 @@ class GRPCConverter {
       if node.isDir {  // GDrive Folder
         grpc.gdriveFolderMeta = Outlet_Backend_Agent_Grpc_Generated_GDriveFolderMeta()
         grpc.gdriveFolderMeta.dirMeta = try self.dirMetaToGRPC(node.getDirStats())
-        assert(node is GDriveFolder, "Node has isDir=true but is not GDriveFolder: \(node)")
+        assert(node is GDriveFolder, "TNode has isDir=true but is not GDriveFolder: \(node)")
         let gnode = node as! GDriveFolder
         grpc.gdriveFolderMeta.allChildrenFetched = gnode.isAllChildrenFetched
 
@@ -88,7 +88,7 @@ class GRPCConverter {
 
       } else {  // GDrive File
         assert(node.isFile, "Expected node to be File type: \(node)")
-        assert(node is GDriveFile, "Node has isDir=false but is not GDriveFile: \(node)")
+        assert(node is GDriveFile, "TNode has isDir=false but is not GDriveFile: \(node)")
         let gnode = node as! GDriveFile
         grpc.gdriveFileMeta = Outlet_Backend_Agent_Grpc_Generated_GDriveFileMeta()
         grpc.gdriveFileMeta.md5 = gnode.md5 ?? ""
@@ -112,10 +112,10 @@ class GRPCConverter {
     return grpc
   }
 
-  func nodeFromGRPC(_ nodeGRPC: Outlet_Backend_Agent_Grpc_Generated_Node) throws -> Node {
+  func nodeFromGRPC(_ nodeGRPC: Outlet_Backend_Agent_Grpc_Generated_TNode) throws -> TNode {
     let nodeIdentifier: NodeIdentifier = try self.nodeIdentifierFromGRPC(nodeGRPC.nodeIdentifier)
 
-    var node: Node
+    var node: TNode
 
     if let nodeType = nodeGRPC.nodeType {
       switch nodeType {
@@ -192,7 +192,7 @@ class GRPCConverter {
 
       node.customIcon = IconID(rawValue: nodeGRPC.iconID)
     } else {
-      throw OutletError.invalidState("gRPC Node is missing node_type!")
+      throw OutletError.invalidState("gRPC TNode is missing node_type!")
     }
 
     if SUPER_DEBUG_ENABLED {
@@ -240,19 +240,19 @@ class GRPCConverter {
     }
   }
 
-  // Node list
+  // TNode list
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func nodeListFromGRPC(_ nodeListGRPC: [Outlet_Backend_Agent_Grpc_Generated_Node]) throws -> [Node] {
-    var convertedNodeList: [Node] = []
+  func nodeListFromGRPC(_ nodeListGRPC: [Outlet_Backend_Agent_Grpc_Generated_TNode]) throws -> [TNode] {
+    var convertedNodeList: [TNode] = []
     for nodeGRPC in nodeListGRPC {
       convertedNodeList.append(try self.nodeFromGRPC(nodeGRPC))
     }
     return convertedNodeList
   }
 
-  func nodeListToGRPC(_ nodeList: [Node]) throws -> [Outlet_Backend_Agent_Grpc_Generated_Node] {
-    var nodeListGRPC: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
+  func nodeListToGRPC(_ nodeList: [TNode]) throws -> [Outlet_Backend_Agent_Grpc_Generated_TNode] {
+    var nodeListGRPC: [Outlet_Backend_Agent_Grpc_Generated_TNode] = []
     for node in nodeList {
       nodeListGRPC.append(try self.nodeToGRPC(node))
     }
@@ -427,7 +427,7 @@ class GRPCConverter {
       targetGUIDList.append(guid)
     }
 
-    var targetNodeList: [Node] = []
+    var targetNodeList: [TNode] = []
     for nodeGRPC in grpc.targetNodeList {
       targetNodeList.append(try self.nodeFromGRPC(nodeGRPC))
     }

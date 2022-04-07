@@ -20,7 +20,7 @@ protocol OutletBackend: HasLifecycle {
   func getIcon(_ iconID: IconID) throws -> NSImage?
   
   //  func reportError(sender: String, msg: String, secondaryMsg: String?) throws
-  func getNodeForUID(uid: UID, deviceUID: UID) throws -> Node?
+  func getNodeForUID(uid: UID, deviceUID: UID) throws -> TNode?
   func nextUID() throws -> UID
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID?
   func getSNFor(nodeUID: UID, deviceUID: UID, fullPath: String) throws -> SPIDNodePair?
@@ -131,7 +131,7 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getNodeForUID(uid: UID, deviceUID: UID) throws -> Node? {
+  func getNodeForUID(uid: UID, deviceUID: UID) throws -> TNode? {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

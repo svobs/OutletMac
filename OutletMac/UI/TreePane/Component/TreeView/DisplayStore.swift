@@ -413,8 +413,8 @@ class DisplayStore {
   /**
    Generic lookup func. Given a list of GUIDs, return a list of their corresponding Nodes in the same order.
    */
-  public func getNodeList(_ guidList: [GUID]) -> [Node] {
-    var nodeList: [Node] = []
+  public func getNodeList(_ guidList: [GUID]) -> [TNode] {
+    var nodeList: [TNode] = []
     dq.sync {
       for guid in guidList {
         if let sn = self.getSN_NoLock(guid) {

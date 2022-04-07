@@ -10,7 +10,7 @@ import Foundation
 /**
  CLASS LocalNode
  */
-class LocalNode: Node {
+class LocalNode: TNode {
   init(_ nodeIdentifer: NodeIdentifier, _ parentUID: UID, _ trashed: TrashStatus = .NOT_TRASHED, isLive: Bool,
        syncTS: UInt64?, createTS: UInt64?, modifyTS: UInt64?, changeTS: UInt64?) {
     self._isLive = isLive
@@ -66,7 +66,7 @@ class LocalNode: Node {
     }
   }
 
-  override func updateFrom(_ otherNode: Node) {
+  override func updateFrom(_ otherNode: TNode) {
     super.updateFrom(otherNode)
     self._isLive = otherNode.isLive
   }
@@ -112,7 +112,7 @@ class LocalDirNode: LocalNode {
   }
 
 
-  override func isParentOf(_ potentialChildNode: Node) -> Bool {
+  override func isParentOf(_ potentialChildNode: TNode) -> Bool {
     if potentialChildNode.deviceUID == self.deviceUID {
       let potentialChildNodeURL: URL = URL(fileURLWithPath: potentialChildNode.firstPath)
       if potentialChildNodeURL.deletingLastPathComponent() == URL(fileURLWithPath: self.firstPath) {
@@ -176,7 +176,7 @@ class LocaFileNode: LocalNode {
     return "LocalFileNode(\(nodeIdentifier.description) parents=\(parentList) md5=\(md5 ?? "null") sha256=\(sha256 ?? "null") sizeBytes=\(sizeBytes ?? 0) createTS=\(createTS ?? 0) modifyTS=\(modifyTS ?? 0) changeTS=\(changeTS ?? 0) trashed=\(trashed) live=\(_isLive) icon=\(icon)"
   }
 
-  override func isParentOf(_ otherNode: Node) -> Bool {
+  override func isParentOf(_ otherNode: TNode) -> Bool {
     // A file can never be the parent of anything
     return false
   }

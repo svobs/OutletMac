@@ -47,11 +47,11 @@ class UserOp: CustomStringConvertible {
   let opUID: UID
   let batchUID: UID
   let opType: UserOpType
-  var srcNode: Node
-  var dstNode: Node?
+  var srcNode: TNode
+  var dstNode: TNode?
   let createTS: UInt64
   
-  init(opUID: UID, batchUID: UID, opType: UserOpType, srcNode: Node, dstNode: Node? = nil, createTS: UInt64? = nil) {
+  init(opUID: UID, batchUID: UID, opType: UserOpType, srcNode: TNode, dstNode: TNode? = nil, createTS: UInt64? = nil) {
     self.opUID = opUID
     self.batchUID = batchUID
     self.opType = opType

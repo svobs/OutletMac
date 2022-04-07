@@ -73,7 +73,7 @@ class DisplayTree {
     }
   }
 
-  var rootNode: Node? {
+  var rootNode: TNode? {
     get {
       return self.state.rootSN.node
     }

@@ -1217,7 +1217,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_TreeAction {
   public var targetGuidList: [String] = []
 
   /// only required for certain actions
-  public var targetNodeList: [Outlet_Backend_Agent_Grpc_Generated_Node] = []
+  public var targetNodeList: [Outlet_Backend_Agent_Grpc_Generated_TNode] = []
 
   /// context depends on the action_uid; not used for most actions
   public var targetUid: UInt32 = 0
@@ -1342,8 +1342,8 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  public var node: Outlet_Backend_Agent_Grpc_Generated_Node {
-    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_Node()}
+  public var node: Outlet_Backend_Agent_Grpc_Generated_TNode {
+    get {return _node ?? Outlet_Backend_Agent_Grpc_Generated_TNode()}
     set {_node = newValue}
   }
   /// Returns true if `node` has been explicitly set.
@@ -1355,7 +1355,7 @@ public struct Outlet_Backend_Agent_Grpc_Generated_SingleNode_Response {
 
   public init() {}
 
-  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_Node? = nil
+  fileprivate var _node: Outlet_Backend_Agent_Grpc_Generated_TNode? = nil
 }
 
 public struct Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request {

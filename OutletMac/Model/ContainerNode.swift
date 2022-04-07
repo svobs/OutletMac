@@ -52,7 +52,7 @@ class CategoryNode: ContainerNode {
     }
   }
 
-  override func isParentOf(_ otherNode: Node) -> Bool {
+  override func isParentOf(_ otherNode: TNode) -> Bool {
     return false
   }
 

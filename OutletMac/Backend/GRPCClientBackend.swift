@@ -372,7 +372,7 @@ class GRPCClientBackend: OutletBackend {
     }
   }
   
-  func getNodeForUID(uid: UID, deviceUID: UID) throws -> Node? {
+  func getNodeForUID(uid: UID, deviceUID: UID) throws -> TNode? {
     var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request()
     request.uid = uid
     request.deviceUid = deviceUID
@@ -646,7 +646,7 @@ class GRPCClientBackend: OutletBackend {
       return nil
     }
     let srcNode = try self.grpcConverter.nodeFromGRPC(response.userOp.srcNode)
-    let dstNode: Node?
+    let dstNode: TNode?
     if response.userOp.hasDstNode {
       dstNode = try self.grpcConverter.nodeFromGRPC(response.userOp.dstNode)
     } else {

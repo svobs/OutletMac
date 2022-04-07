@@ -14,7 +14,7 @@ typealias GoogID = String
  
  "Abstract" base class: do not instantiate directly
  */
-class GDriveNode: Node {
+class GDriveNode: TNode {
   init(_ nodeIdentifer: GDriveIdentifier, _ parentList: [UID] = [], trashed: TrashStatus, googID: GoogID?, createTS: UInt64?,
        modifyTS: UInt64?, name: String, ownerUID: UID, driveID: String?, isShared: Bool, sharedByUserUID: UID?, syncTS: UInt64?) {
     self.googID = googID
@@ -104,7 +104,7 @@ class GDriveNode: Node {
     return self.googID != nil
   }
 
-  override func updateFrom(_ otherNode: Node) {
+  override func updateFrom(_ otherNode: TNode) {
     if let otherGDriveNode = otherNode as? GDriveNode {
       self.googID = otherGDriveNode.googID
       self._createTS = otherGDriveNode.createTS
@@ -143,7 +143,7 @@ class GDriveFolder: GDriveNode {
     }
   }
   
-  override func updateFrom(_ otherNode: Node) {
+  override func updateFrom(_ otherNode: TNode) {
     if let otherGDriveFolder = otherNode as? GDriveFolder {
       self.isAllChildrenFetched = otherGDriveFolder.isAllChildrenFetched
     } else {
@@ -186,7 +186,7 @@ class GDriveFolder: GDriveNode {
       "allChildrenFetched=\(isAllChildrenFetched) icon=\(icon))"
   }
 
-  override func isParentOf(_ potentialChildNode: Node) -> Bool {
+  override func isParentOf(_ potentialChildNode: TNode) -> Bool {
     return potentialChildNode.deviceUID == self.deviceUID && potentialChildNode.parentList.contains(self.uid)
   }
 
@@ -241,7 +241,7 @@ class GDriveFile: GDriveNode {
     }
   }
 
-  override func updateFrom(_ otherNode: Node) {
+  override func updateFrom(_ otherNode: TNode) {
     if let otherGDriveFile = otherNode as? GDriveFile {
       self.version = otherGDriveFile.version
       self.md5 = otherGDriveFile.md5
@@ -288,7 +288,7 @@ class GDriveFile: GDriveNode {
       "ownerUID=\(ownerUID) driveID=\(driveID ?? "null") isShared=\(isShared) sharedByUserUID=\(sharedByUserUIDStr) syncTS=\(syncTSStr) icon=\(icon))"
   }
 
-  override func isParentOf(_ otherNode: Node) -> Bool {
+  override func isParentOf(_ otherNode: TNode) -> Bool {
     // A file can never be parent of anything (awww...)
     return false
   }

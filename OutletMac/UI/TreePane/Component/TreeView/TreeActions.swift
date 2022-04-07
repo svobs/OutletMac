@@ -160,7 +160,7 @@ class TreeActions {
   // Reusable actions (public)
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  public func downloadFileListFromGDrive(_ nodeList: [Node]) {
+  public func downloadFileListFromGDrive(_ nodeList: [TNode]) {
     do {
       for node in nodeList {
         NSLog("DEBUG [\(self.con.treeID)] Going to download file from GDrive: \(node)")
@@ -171,7 +171,7 @@ class TreeActions {
     }
   }
 
-  public func openLocalFileWithDefaultAppForNodeList(_ nodeList: [Node]) {
+  public func openLocalFileWithDefaultAppForNodeList(_ nodeList: [TNode]) {
     for node in nodeList {
       if node.treeType == .LOCAL_DISK {
         self.openLocalFileWithDefaultApp(node.firstPath)
@@ -206,7 +206,7 @@ class TreeActions {
     return true
   }
 
-  public func confirmAndDeleteSubtrees(_ nodeList: [Node]) {
+  public func confirmAndDeleteSubtrees(_ nodeList: [TNode]) {
     if !confirmDelete(nodeList.count) {
       return
     }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Node: CustomStringConvertible {
+class TNode: CustomStringConvertible {
   init(_ nodeIdentifer: NodeIdentifier, _ parentList: [UID] = [], _ trashed: TrashStatus = .NOT_TRASHED) {
     self.nodeIdentifier = nodeIdentifer
     self.parentList = parentList
@@ -21,7 +21,7 @@ class Node: CustomStringConvertible {
   var _icon: IconID?
   
   public var description: String {
-    return "Node(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon)"
+    return "TNode(\(nodeIdentifier.description) parents=\(parentList) trashed=\(trashed) icon=\(icon)"
   }
   
   var isFile: Bool {
@@ -71,7 +71,7 @@ class Node: CustomStringConvertible {
   
   var name: String {
     get {
-      assert (self.nodeIdentifier.pathList.count > 0, "Node has no paths: \(nodeIdentifier)")
+      assert (self.nodeIdentifier.pathList.count > 0, "TNode has no paths: \(nodeIdentifier)")
       return URL(fileURLWithPath: self.nodeIdentifier.pathList[0]).lastPathComponent
     }
   }
@@ -198,8 +198,8 @@ class Node: CustomStringConvertible {
     }
   }
 
-  func isParentOf(_ otherNode: Node) -> Bool {
-    fatalError("Cannot call isParentOf for Node base class!")
+  func isParentOf(_ otherNode: TNode) -> Bool {
+    fatalError("Cannot call isParentOf for TNode base class!")
   }
 
   /** Use isDir to check if node has DirStats */
@@ -211,7 +211,7 @@ class Node: CustomStringConvertible {
     nil
   }
 
-  func updateFrom(_ otherNode: Node) {
+  func updateFrom(_ otherNode: TNode) {
     self.parentList = otherNode.parentList
     self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
     self.trashed = otherNode.trashed
@@ -219,14 +219,14 @@ class Node: CustomStringConvertible {
   
   func getSingleParent() throws -> UID {
     if self.parentList.count != 1 {
-      throw OutletError.invalidState("Node.getSingleParent(): expected exactly 1 parent but found \(self.parentList.count) (UID=\(self.uid)))")
+      throw OutletError.invalidState("TNode.getSingleParent(): expected exactly 1 parent but found \(self.parentList.count) (UID=\(self.uid)))")
     }
     return self.parentList[0]
   }
 }
 
 // the only time node is nil is if the tree's root does not exist
-typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: Node)
+typealias SPIDNodePair = (spid: SinglePathNodeIdentifier, node: TNode)
 
 
 /**
@@ -288,7 +288,7 @@ class DirectoryStats : CustomStringConvertible {
  CLASS EphemeralNode
  Not a "real" node in the sense that it represents something from central, but needed to display something to the user
  */
-class EphemeralNode: Node {
+class EphemeralNode: TNode {
   private let _name: String
   init(_ name: String, parent: SPID, _ iconID: IconID) {
     self._name = name
@@ -308,7 +308,7 @@ class EphemeralNode: Node {
     }
   }
 
-  override func isParentOf(_ otherNode: Node) -> Bool {
+  override func isParentOf(_ otherNode: TNode) -> Bool {
     return false
   }
 
@@ -327,7 +327,7 @@ class EphemeralNode: Node {
   }
 }
 
-class DirNode: Node {
+class DirNode: TNode {
   init(_ nodeIdentifer: NodeIdentifier) {
     super.init(nodeIdentifer)
   }
@@ -372,13 +372,13 @@ class NonexistentDirNode: DirNode {
     }
   }
 
-  override func updateFrom(_ otherNode: Node) {
+  override func updateFrom(_ otherNode: TNode) {
     self.parentList = otherNode.parentList
     self.nodeIdentifier.pathList = otherNode.nodeIdentifier.pathList
     self.trashed = otherNode.trashed
   }
 
-  override func isParentOf(_ otherNode: Node) -> Bool {
+  override func isParentOf(_ otherNode: TNode) -> Bool {
     return false
   }
 
