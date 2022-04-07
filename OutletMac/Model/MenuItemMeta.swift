@@ -14,9 +14,9 @@ class MenuItemMeta: CustomStringConvertible {
     let actionType: ActionType // can be handled (A) either here in the FE, or (B) if targetGUIDList is non-empty, sent back to the BE for processing
     var targetGUIDList: [GUID] = []  // if the BE wants to handle the given action, it will populate this so that it can be sent back to the BE
     var submenuItemList: [MenuItemMeta]  // if empty, this menu item is not a submenu
-    var targetUID: UID?
+    var targetUID: UID
 
-    init(itemType: MenuItemType, title: String, actionType: ActionType, targetUID: UID? = nil) {
+    init(itemType: MenuItemType, title: String, actionType: ActionType, targetUID: UID = NULL_UID) {
         self.itemType = itemType
         self.title = title
         self.actionType = actionType

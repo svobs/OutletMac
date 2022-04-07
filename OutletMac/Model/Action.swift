@@ -56,4 +56,8 @@ class TreeAction: Action {
     self.targetUID = targetUID
     super.init(actionType)
   }
+
+  override var description: String {
+    return "TreeAction(action=\(super.description) treeID=\(self.treeID) targetUID=\(self.targetUID))"
+  }
 }

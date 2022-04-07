@@ -76,11 +76,11 @@ class TreeActions {
 
   // For dynamic menus provided by the backend. Uses the actionID to determine what to do (either local action or call into the backend)
   @objc public func executeMenuAction(_ sender: GeneratedMenuItem) {
-    executeTreeAction(TreeAction(self.con.treeID, sender.menuItemMeta.actionType, sender.menuItemMeta.targetGUIDList, []))
+    executeTreeAction(TreeAction(self.con.treeID, sender.menuItemMeta.actionType, sender.menuItemMeta.targetGUIDList, [], targetUID: sender.menuItemMeta.targetUID))
   }
 
   func executeTreeAction(_ action: TreeAction) {
-    NSLog("DEBUG [\(self.con.treeID)] Executing action \(action.actionType) guidList=\(action.targetGUIDList) nodeList=\(action.targetNodeList.count)")
+    NSLog("DEBUG [\(self.con.treeID)] Executing action \(action.actionType) guidList=\(action.targetGUIDList) nodeList=\(action.targetNodeList.count) targetUID=\(action.targetUID)")
 
     switch action.actionType {
     case .BUILTIN(let actionID):
@@ -94,6 +94,7 @@ class TreeActions {
       break
     }
 
+    NSLog("DEBUG [\(self.con.treeID)] No local handler found; calling backend for: \(action)")
     executeActionViaBackend(action)
   }
 
