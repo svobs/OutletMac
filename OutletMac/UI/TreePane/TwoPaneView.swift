@@ -38,7 +38,9 @@ fileprivate struct ButtonBar: View {
     self.app = app
     self.conLeft = conLeft
     self.conRight = conRight
-    NSLog("DEBUG DONE loading ButtonBar")
+    if TRACE_ENABLED {
+      NSLog("DEBUG Done loading ButtonBar")
+    }
   }
 
   var body: some View {
