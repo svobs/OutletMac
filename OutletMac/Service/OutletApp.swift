@@ -283,9 +283,11 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
       alert.messageText = "Failed to submit batch \(batchUID):\n\"\(msg)\""
       alert.informativeText = "\(secondaryMsg)\n\nHow would you like to proceed?"
       alert.addButton(withTitle: "Cancel Batch")
-      alert.addButton(withTitle: "Try Batch Again")
+      alert.addButton(withTitle: "Retry Batch")
       alert.addButton(withTitle: "Pause Batch Intake")
       alert.alertStyle = .warning
+      // FIXME! If server disconnects then reconnects while this dialog is open, we should NOT
+      // kill the window! This will cause the app to crash!
       if let window = self.mainWindow, window.isOpen {
         // run attached to main window, if available
         alert.beginSheetModal(for: window, completionHandler: { response in

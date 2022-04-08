@@ -835,6 +835,7 @@ class GRPCClientBackend: OutletBackend {
 
       var exception: OutletError? = nil
       var response: Res? = nil
+
       // Run all calls inside a serial dispatch queue.
       self.dqGRPC.sync {
         do {
@@ -844,20 +845,26 @@ class GRPCClientBackend: OutletBackend {
           self.app.grpcDidGoDown()
           exception = OutletError.grpcConnectionDown("RPC \"\(rpcName)\" failed: connection refused")
         } catch {
-          // General failure. Maybe server internal error, or bad data, or something else
           if let status = error as? GRPCStatus {
+            // General failure. Maybe server internal error, or bad data, or something else
             var statusMsg = status.message != nil ? status.message! : "code \(status.code)"
             if statusMsg.starts(with: "Exception calling application: ") {
               statusMsg = statusMsg.replaceFirstOccurrence(of: "Exception calling application: ", with: "")
             }
             exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(statusMsg)", statusMsg)
+          } else {
+            exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(error)")
           }
         }
       }
+
       if let thrownException = exception {
         throw thrownException
+      } else if let response = response {
+        return response
+      } else {
+        throw OutletError.invalidState("Both response and exception are null!")
       }
-      return response!
     }
   }
 
