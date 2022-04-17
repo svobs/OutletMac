@@ -650,26 +650,56 @@ class DisplayStore {
     return self.getSN(guid)?.node.isDir ?? false
   }
 
-  public func updateDirStats(_ byGUID: Dictionary<GUID, DirectoryStats>, _ byUID: Dictionary<UID, DirectoryStats>) {
+  private func updateDirStatsForNode() -> Bool {
+    return false
+  }
+
+  // TODO: gRPC request timeout
+  public func updateDirStats(_ byGUID: Dictionary<GUID, DirectoryStats>, _ byUID: Dictionary<UID, DirectoryStats>) -> Set<GUID> {
+    var rootsToRefresh: Set<GUID> = Set<GUID>()
     dq.sync {
       NSLog("DEBUG [\(self.treeID)] Updating dir stats with counts: byGUID=\(byGUID.count), byUID=\(byUID.count)")
-      for (guid, sn) in self.primaryDict {
-        if !sn.node.isEphemeral && sn.node.isDir {
-          if byGUID.count > 0 {
-            if let dirStats = byGUID[guid] {
-              sn.node.setDirStats(dirStats)
-              self.primaryDict[guid] = sn
-            }
-          } else if byUID.count > 0 {
-            if let dirStats = byUID[sn.node.uid] {
-              sn.node.setDirStats(dirStats)
-              self.primaryDict[guid] = sn
+      var update_count: Int = 0
+      var parentQueue = Deque<(GUID, Bool)>()
+      parentQueue.append((rootGUID, false))
+
+      while !parentQueue.isEmpty {
+        if let (parentGUID, isParentDirty) = parentQueue.popFirst() {
+          for guid: GUID in self.getChildGUIDList_NoLock(parentGUID) {
+            if let sn: SPIDNodePair = self.getSN_NoLock(guid) {
+              if !sn.node.isEphemeral && sn.node.isDir {
+                var dirStats: DirectoryStats? = nil
+                var isDirty: Bool = isParentDirty
+
+                if byGUID.count > 0 {
+                  dirStats = byGUID[guid]
+                } else if byUID.count > 0 {
+                  dirStats = byUID[sn.node.uid]
+                }
+
+                if let dirStatsNew = dirStats {
+                  sn.node.setDirStats(dirStatsNew)
+                  self.primaryDict[guid] = sn
+
+                  isDirty = true
+                  update_count += 1
+                  if !isParentDirty {
+                    rootsToRefresh.insert(guid)
+                  }
+                }
+
+                if sn.node.isDir {
+                  parentQueue.append((guid, isDirty))
+                }
+              }
             }
           }
         }
       }
-      NSLog("DEBUG [\(self.treeID)] Done updating dir stats")
+
+      NSLog("DEBUG [\(self.treeID)] Done updating stats for \(update_count) nodes & will refresh \(rootsToRefresh.count) subtrees")
     }
+    return rootsToRefresh
   }
 
   private func toSNList(guidList: [GUID]) throws -> [SPIDNodePair] {

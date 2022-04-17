@@ -324,7 +324,7 @@ class GRPCClientBackend: OutletBackend {
       reportError("Internal Error", "Could not resolve Signal from int value: \(signalGRPC.sigInt)")
       return
     }
-    NSLog("DEBUG GRPCClient: got signal from backend via gRPC: \(signal) with sender: \(signalGRPC.sender)")
+    NSLog("INFO  GRPCClient: got signal from backend via gRPC: \(signal) with sender: \(signalGRPC.sender)")
     
     if signal == .WELCOME {
       // Do not forward to clients. Welcome msg is used just for its ping functionality
@@ -850,7 +850,7 @@ class GRPCClientBackend: OutletBackend {
           if statusMsg.starts(with: "Exception calling application: ") {
             statusMsg = statusMsg.replaceFirstOccurrence(of: "Exception calling application: ", with: "")
           }
-          exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \(statusMsg)", statusMsg)
+          exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed: \"\(statusMsg)\"", statusMsg)
         } catch {
           exception = OutletError.grpcFailure("RPC \"\(rpcName)\" failed unexpectedly: \(error)")
         }

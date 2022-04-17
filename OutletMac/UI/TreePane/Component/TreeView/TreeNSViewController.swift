@@ -747,6 +747,33 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
     }
 
     /**
+     Reloads the row with the given GUID in the NSOutlineView. Convenience function for use by external classes
+     */
+    func reloadItemSet(_ guidSet: Set<GUID>, reloadChildren: Bool) {
+        DispatchQueue.main.async {
+            // turn off listeners so that we do not trigger gRPC getChildList() for expanded nodes:
+            self.con.expandContractListenersEnabled = false
+            defer {
+                self.con.expandContractListenersEnabled = true
+            }
+
+            // remember, GUID at root of tree is nil
+            NSLog("DEBUG [\(self.treeID)] Reloading \(guidSet.count) items (reloadChildren=\(reloadChildren))")
+            for guid in guidSet {
+                let item = self.guidToItem(guid)
+                if item == nil {
+                    // Apparently need to call this if reloading root, otherwise we get an NSCrash!
+                    // See: https://stackoverflow.com/questions/14933970/reloading-nsoutlineview-frequently-causes-crashes
+                    NSLog("DEBUG [\(self.treeID)] Calling reloadData() because we are reloading root")
+                    self.outlineView.reloadData()
+                    return
+                }
+                self.outlineView.reloadItem(item, reloadChildren: reloadChildren)
+            }
+        }
+    }
+
+    /**
      If isAlreadyPopulated==true, do not use the animator to expand the nodes, and disable the listeners so that network calls are not made to
      populate the DisplayStore.
      */

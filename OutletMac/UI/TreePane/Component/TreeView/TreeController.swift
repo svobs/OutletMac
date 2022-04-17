@@ -578,8 +578,8 @@ class TreeController: TreeControllable {
       self.updateStatusBarMsg(statusBarMsg)
 
       if dirStatsDictByGUID.count > 0 || dirStatsDictByUID.count > 0 {
-        self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-        self.treeView?.reloadData()
+        let rootsToRefresh = self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
+        self.treeView?.reloadItemSet(rootsToRefresh, reloadChildren: false)
       }
 
       switch treeLoadState {
@@ -620,8 +620,8 @@ class TreeController: TreeControllable {
       NSLog("DEBUG [\(self.treeID)] Updating dir stats with status msg: \"\(statusBarMsg)\"")
       self.updateStatusBarMsg(statusBarMsg)
 
-      self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-      self.treeView?.reloadData()
+      let rootsToRefresh = self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
+      self.treeView?.reloadItemSet(rootsToRefresh, reloadChildren: false)
     }
   }
 
