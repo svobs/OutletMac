@@ -27,7 +27,7 @@ class DisplayStore {
     }
   }
 
-  private var rootGUID: GUID! = nil
+  private var rootGUID: GUID? = nil
 
   private var colSortOrder: ColSortOrder = .NAME
   private var sortAscending: Bool = true
@@ -163,9 +163,9 @@ class DisplayStore {
       self.mixedNodeSet.removeAll()
 
       self.rootGUID = rootSN.spid.guid
-      self.primaryDict[self.rootGUID] = rootSN // needed for determining implicitly checked checkboxes
+      self.primaryDict[rootSN.spid.guid] = rootSN // needed for determining implicitly checked checkboxes
 
-      self.putChildSNList_Internal(rootGUID, topLevelSNList)
+      self.putChildSNList_Internal(rootSN.spid.guid, topLevelSNList)
     }
   }
 
@@ -186,10 +186,12 @@ class DisplayStore {
       if SUPER_DEBUG_ENABLED {
         NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Storing child: \(childGUID)")
       }
-      if childGUID == rootGUID {
-        // should really throw an exception here
-        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
-        continue
+      if let rootGUID = self.rootGUID {
+        if childGUID == rootGUID {
+          // should really throw an exception here
+          NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
+          continue
+        }
       }
       if childGUID == parentGUID {
         NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Cannot put a parent into itself: \(parentGUID)")
@@ -661,6 +663,10 @@ class DisplayStore {
       NSLog("DEBUG [\(self.treeID)] Updating dir stats with counts: byGUID=\(byGUID.count), byUID=\(byUID.count)")
       var update_count: Int = 0
       var parentQueue = Deque<(GUID, Bool)>()
+      guard let rootGUID = self.rootGUID else {
+        NSLog("INFO  [\(self.treeID)] Ignoring dir stats: rootGUID is not defined")
+        return
+      }
       parentQueue.append((rootGUID, false))
 
       while !parentQueue.isEmpty {
