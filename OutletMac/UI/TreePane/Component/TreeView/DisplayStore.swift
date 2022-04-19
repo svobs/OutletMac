@@ -239,42 +239,70 @@ class DisplayStore {
     }
   }
 
-  func putSN(_ childSN: SPIDNodePair, parentGUID: GUID) -> Bool {
+  private func putSN_Internal(_ childSN: SPIDNodePair, parentGUID: GUID) -> Bool {
     var wasPresent: Bool = false
-    dq.sync {
-      let childGUID = childSN.spid.guid
-      if childGUID == rootGUID {
-        // should really throw an exception here
-        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
-        return
-      }
-      if childGUID == parentGUID {
-        NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Cannot put a parent into itself: \(parentGUID)")
-        return
-      }
-      if self.primaryDict[childGUID] != nil {
-        wasPresent = true
-      }
-      self.primaryDict[childGUID] = childSN
+    let childGUID = childSN.spid.guid
+    if childGUID == rootGUID {
+      // should really throw an exception here
+      NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Child GUID (\(childGUID)) cannot be the root GUID! (supplied parent=\(parentGUID))")
+      return false
+    }
+    if childGUID == parentGUID {
+      NSLog("ERROR [\(self.treeID)] DisplayStore.putSN(): Cannot put a parent into itself: \(parentGUID)")
+      return false
+    }
+    if self.primaryDict[childGUID] != nil {
+      wasPresent = true
+    }
+    self.primaryDict[childGUID] = childSN
 
-      // Parent -> Child
-      if var existingParentChildList = self.parentChildListDict[parentGUID] {
-        self.upsertChildToList(&existingParentChildList, childGUID)
-        // Even if the child already existed, the update to it may have changed its spot in the list. Need to resort:
-        self.parentChildListDict[parentGUID] = self.sortDirContents(existingParentChildList)
-      } else {
-        self.parentChildListDict[parentGUID] = [childGUID]
-      }
-
-      if SUPER_DEBUG_ENABLED {
-        NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Children of parent \(parentGUID) is now: \(self.parentChildListDict[parentGUID] ?? [])")
-      }
-
-      // Child -> Parent
-      self.childParentDict[childGUID] = parentGUID
+    // Parent -> Child
+    if var existingParentChildList = self.parentChildListDict[parentGUID] {
+      self.upsertChildToList(&existingParentChildList, childGUID)
+      // Even if the child already existed, the update to it may have changed its spot in the list. Need to resort:
+      self.parentChildListDict[parentGUID] = self.sortDirContents(existingParentChildList)
+    } else {
+      self.parentChildListDict[parentGUID] = [childGUID]
     }
 
+    if SUPER_DEBUG_ENABLED {
+      NSLog("DEBUG [\(self.treeID)] DisplayStore.putSN(): Children of parent \(parentGUID) is now: \(self.parentChildListDict[parentGUID] ?? [])")
+    }
+
+    // Child -> Parent
+    self.childParentDict[childGUID] = parentGUID
+
     return wasPresent
+  }
+
+  func putSN(_ childSN: SPIDNodePair, parentGUID: GUID, onSuccess: (SPIDNodePair, GUID, Bool) -> Void) {
+    dq.sync {
+      let wasPresent = putSN_Internal(childSN, parentGUID: parentGUID)
+      onSuccess(childSN, parentGUID, wasPresent)
+    }
+  }
+
+  /**
+   Basically a batch insert of SNs which can be anywhere in the tree. We expect each SN to reference a parentGUID.
+   */
+  func putSNList(_ snList: [SPIDNodePair], onSuccess: (Set<GUID>, Set<GUID>) -> Void) {
+    dq.sync {
+      var childSet: Set<GUID> = Set()
+      var parentSet: Set<GUID> = Set()
+      for childSN in snList {
+        guard let parentGUID = childSN.spid.parentGUID else {
+          NSLog("ERROR [\(self.treeID)] Cannot process upsert: \(childSN.spid) is missing parentGUID!")
+          continue
+        }
+        let wasPresent = putSN_Internal(childSN, parentGUID: parentGUID)
+        if wasPresent {
+          childSet.insert(childSN.spid.guid)
+        } else {
+          parentSet.insert(parentGUID)
+        }
+      }
+      onSuccess(childSet, parentSet)
+    }
   }
 
   private func upsertChildToList(_ childList: inout [GUID], _ newChildGUID: GUID) {
@@ -292,12 +320,37 @@ class DisplayStore {
   // "Remove" operations
   // ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼ ▼
 
-  func removeSN(_ guid: GUID) -> Bool {
+  func removeSN(_ guid: GUID, onSuccess: () -> Void) {
     var removed: Bool = false
     dq.sync {
       removed = self.removeSN_NoLock(guid)
+      if removed {
+        onSuccess()
+      }
     }
-    return removed
+  }
+
+  /**
+   Basically a batch remove of SNs which can be anywhere in the tree. We expect each SN to reference a parentGUID.
+   Maybe in the future, can refactor removeSN_NoLock() to return parent GUID, so that we don't need SPIDNodePairs in params at all; can just use GUIDs
+   */
+  func removeSNList(_ snList: [SPIDNodePair], onSuccess: (Set<GUID>) -> Void) {
+    dq.sync {
+      var parentSet: Set<GUID> = Set()
+      for sn in snList {
+        guard let parentGUID = sn.spid.parentGUID else {
+          NSLog("ERROR [\(self.treeID)] Cannot process remove: \(sn.spid) is missing parentGUID!")
+          continue
+        }
+        let guid = sn.spid.guid
+        let removed = self.removeSN_NoLock(guid)
+        if removed {
+          parentSet.insert(parentGUID)
+        }
+      }
+
+      onSuccess(parentSet)
+    }
   }
 
   func removeSubtree(_ guid: GUID) {

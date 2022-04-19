@@ -14,4 +14,5 @@ enum OutletError: Error {
   case bonjourFailure(String? = nil)
 
   case getChildListFailed(String, String) // msg, secondaryMsg
+  case treeLoadFailed(String) // msg, secondaryMsg
 }

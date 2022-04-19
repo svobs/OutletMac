@@ -250,8 +250,19 @@ class TreeController: TreeControllable {
     self.dq.async {
       do {
         try self.populateTreeView_inner()
-      } catch {
-        self.reportException("Failed to populate tree", error)
+      } catch OutletError.treeLoadFailed(let errorMsg) {
+        // this will have been thrown by populateTreeView_inner() itself
+        self.clearTreeAndDisplayMsg(errorMsg, .ICON_ALERT)
+        DispatchQueue.main.async {
+          self.setTreeLoadState(false)
+        }
+      } catch {  // catch-all for unexpected server errors, etc
+        let errorMsg = "Failed to populate tree"
+        self.reportException(errorMsg, error)
+        self.clearTreeAndDisplayMsg(errorMsg, .ICON_ALERT)
+        DispatchQueue.main.async {
+          self.setTreeLoadState(false)
+        }
       }
     }
   }
@@ -267,8 +278,7 @@ class TreeController: TreeControllable {
 
     if !self.tree.state.rootExists {
       NSLog("INFO  [\(treeID)] populateTreeView(): rootExists==false; bailling")
-      clearTreeAndDisplayMsg("Tree does not exist", .ICON_ALERT)
-      return
+      throw OutletError.treeLoadFailed("Tree does not exist")
     }
 
     let populateStartTimeMS = DispatchTime.now()
@@ -324,8 +334,7 @@ class TreeController: TreeControllable {
       // When both calls below have separate DispatchQueue WorkItems, sometimes nothing shows up.
       // Is it possible the WorkItems can arrive out of order? Need to research this.
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): got error response from RPC 'getChildList': '\(errorMsg)'")
-      self.clearTreeAndDisplayMsg(errorMsg, .ICON_ALERT)
-      return
+      throw OutletError.treeLoadFailed(errorMsg)
     }
 
     // We populate each expanded row in the DisplayStore first, and then reload the tree once it's fully populated.
@@ -584,16 +593,21 @@ class TreeController: TreeControllable {
 
       switch treeLoadState {
       case .LOAD_STARTED:
-        self.enableNodeUpdateSignals = true
-
-        if self.swiftTreeState.isManualLoadNeeded {
-          self.swiftTreeState.isManualLoadNeeded = false
-        }
+        self.setTreeLoadState(true)
 
         self.populateTreeView()
       default:
         break
       }
+    }
+  }
+
+  private func setTreeLoadState(_ ok: Bool) {
+    assert(DispatchQueue.isExecutingIn(.main))
+    self.enableNodeUpdateSignals = ok
+
+    if self.swiftTreeState.isManualLoadNeeded {
+      self.swiftTreeState.isManualLoadNeeded = !ok
     }
   }
 
@@ -638,19 +652,21 @@ class TreeController: TreeControllable {
     }
     NSLog("INFO  [\(self.treeID)] Received \(Signal.NODE_UPSERTED) signal: \(sn.spid) for parent: \(parentGUID)")
 
-    let alreadyPresent: Bool = self.displayStore.putSN(sn, parentGUID: parentGUID)
-
-    DispatchQueue.main.async {
-      let reloadTarget: GUID
-      if alreadyPresent {
-        reloadTarget = sn.spid.guid
-        NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(reloadTarget)")
-      } else {
-        reloadTarget = parentGUID
-        NSLog("DEBUG [\(self.treeID)] Upserted node is new; reloading its parent: \(reloadTarget)")
+    func reload(sn: SPIDNodePair, parentGUID: GUID, alreadyPresent: Bool) {
+      DispatchQueue.main.async {
+        let reloadTarget: GUID
+        if alreadyPresent {
+          reloadTarget = sn.spid.guid
+          NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(reloadTarget)")
+          self.treeView?.reloadItem(reloadTarget, reloadChildren: false)
+        } else {
+          reloadTarget = parentGUID
+          NSLog("DEBUG [\(self.treeID)] Upserted node is new; reloading its parent: \(reloadTarget)")
+          self.treeView?.reloadItem(reloadTarget, reloadChildren: true)
+        }
       }
-      self.treeView?.reloadItem(reloadTarget, reloadChildren: true)
     }
+    self.displayStore.putSN(sn, parentGUID: parentGUID, onSuccess: reload)
   }
 
   private func onNodeRemoved(_ senderID: SenderID, _ propDict: PropDict) throws {
@@ -666,7 +682,7 @@ class TreeController: TreeControllable {
     }
     NSLog("DEBUG [\(self.treeID)] Received \(Signal.NODE_REMOVED) signal: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
 
-    if self.displayStore.removeSN(sn.spid.guid) {
+    func reloadParent() {
       DispatchQueue.main.async {
         if parentGUID == self.tree.rootSPID.guid {
           NSLog("DEBUG [\(self.treeID)] Parent of removed node is root node!")
@@ -674,6 +690,7 @@ class TreeController: TreeControllable {
         self.treeView?.reloadItem(parentGUID, reloadChildren: true)
       }
     }
+    self.displayStore.removeSN(sn.spid.guid, onSuccess: reloadParent)
   }
 
   private func onSubtreeNodesChanged(_ senderID: SenderID, _ propDict: PropDict) throws {
@@ -687,22 +704,18 @@ class TreeController: TreeControllable {
 
     NSLog("DEBUG [\(self.treeID)] Received \(Signal.SUBTREE_NODES_CHANGED) signal with root \(subtreeRootSPID) and \(upsertedList.count) upserts & \(removedList.count) removes")
 
-    for upsertedSN in upsertedList {
-      if let parentGUID = upsertedSN.spid.parentGUID {
-        _ = self.displayStore.putSN(upsertedSN, parentGUID: parentGUID)
-      } else {
-        // make this non-lethal
-        NSLog("ERROR [\(self.treeID)] While processing \(Signal.SUBTREE_NODES_CHANGED) signal: upserted node \(upsertedSN.spid) is missing parentGUID!")
-      }
+    // It seems that reloading the entire tree can cause visual dysfunction, so let's take effort to reload only what we need to:
+    func reloadNodes(childSet: Set<GUID>, parentSet: Set<GUID>) {
+      self.treeView?.reloadItemSet(childSet, reloadChildren: false)
+      self.treeView?.reloadItemSet(parentSet, reloadChildren: true)
     }
-    for removedSN in removedList {
-      _ = self.displayStore.removeSN(removedSN.spid.guid)
-    }
+    self.displayStore.putSNList(upsertedList, onSuccess: reloadNodes)
 
-    DispatchQueue.main.async {
-      // just reload everything for now. Revisit if performance proves to be an issue
-      self.treeView?.reloadData()
+    func reloadParents(parentSet: Set<GUID>) {
+      self.treeView?.reloadItemSet(parentSet, reloadChildren: true)
     }
+    self.displayStore.removeSNList(removedList, onSuccess: reloadParents)
+
   }
 
   private func onGDriveDownloadDone(_ senderID: SenderID, _ propDict: PropDict) throws {
