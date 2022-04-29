@@ -219,7 +219,8 @@ class MainWindow: AppWindow, ObservableObject {
    */
   private func reportWinCoords() {
     let rect = self.contentRect
-    NSLog("DEBUG [\(self.winID)] Firing timer to report mainWindow size: \(rect)")
+    // TODO: test whether this blocks! And indeed whether all HoldoffTimers block
+    NSLog("DEBUG [\(self.winID)] Firing timer to report mainWindow size: \(rect) CurrentDispatchQueue='\(DispatchQueue.currentQueueLabel ?? "nil")")
 
     var configDict = [String: String]()
     configDict["ui_state.\(winID).x"] = String(Int(rect.minX))
