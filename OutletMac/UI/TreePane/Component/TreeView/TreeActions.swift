@@ -173,6 +173,7 @@ class TreeActions {
   }
 
   public func openLocalFileWithDefaultAppForNodeList(_ nodeList: [TNode]) {
+    NSLog("DEBUG [\(self.con.treeID)] Opening \(nodeList.count) local files with default app")
     for node in nodeList {
       if node.treeType == .LOCAL_DISK {
         self.openLocalFileWithDefaultApp(node.firstPath)

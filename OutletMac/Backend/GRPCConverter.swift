@@ -492,8 +492,6 @@ class GRPCConverter {
         try self.convertStatsAndStatus(statsUpdate: signalGRPC.treeLoadUpdate.statsUpdate, argDict: &argDict)
       case .DOWNLOAD_FROM_GDRIVE_DONE:
         argDict["filename"] = signalGRPC.downloadMsg.filename
-      case .STATS_UPDATED:
-        try self.convertStatsAndStatus(statsUpdate: signalGRPC.statsUpdate, argDict: &argDict)
       case .DEVICE_UPSERTED:
         argDict["device"] = try self.deviceFromGRPC(signalGRPC.device)
       case .BATCH_FAILED:

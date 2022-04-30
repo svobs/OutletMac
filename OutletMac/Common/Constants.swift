@@ -543,6 +543,7 @@ enum TreeLoadState: UInt32 {
   case UNKNOWN = 0  // should never be sent
   case NOT_LOADED = 1  // also not sent
   case LOAD_STARTED = 2  // it's ready for clients to start querying for nodes
+  case NO_LONGER_EXISTS = 3  // Tree root was deleted or no longer available
   case COMPLETELY_LOADED = 10  // final state
 }
 

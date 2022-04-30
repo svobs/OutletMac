@@ -143,7 +143,6 @@ class TreeController: TreeControllable {
     self.dispatchListener.subscribe(signal: .DISPLAY_TREE_CHANGED, self.onDisplayTreeChanged, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .CANCEL_ALL_EDIT_ROOT, self.onEditingRootCancelled)
     self.dispatchListener.subscribe(signal: .CANCEL_OTHER_EDIT_ROOT, self.onEditingRootCancelled, blacklistSenderID: treeID)
-    self.dispatchListener.subscribe(signal: .STATS_UPDATED, self.onDirStatsUpdated, whitelistSenderID: treeID)
 
     self.dispatchListener.subscribe(signal: .NODE_UPSERTED, self.onNodeUpserted, whitelistSenderID: treeID)
     self.dispatchListener.subscribe(signal: .NODE_REMOVED, self.onNodeRemoved, whitelistSenderID: treeID)
@@ -602,6 +601,13 @@ class TreeController: TreeControllable {
         self.setTreeLoadState(true)
 
         self.populateTreeView()
+      case .NO_LONGER_EXISTS:
+        self.clearTreeAndDisplayMsg(statusBarMsg, .ICON_ALERT)
+        self.dq.async {
+          DispatchQueue.main.sync {
+            self.swiftTreeState.isRootExists = false
+          }
+        }
       default:
         break
       }
@@ -628,20 +634,6 @@ class TreeController: TreeControllable {
       // restore root path to value received from server
       self.swiftTreeState.rootPath = self.tree.rootPath
       self.swiftTreeState.isEditingRoot = false
-    }
-  }
-
-  private func onDirStatsUpdated(_ senderID: SenderID, _ propDict: PropDict) throws {
-    let statusBarMsg = try propDict.getString("status_msg")
-    let dirStatsDictByGUID = try propDict.get("dir_stats_dict_by_guid") as! [GUID:DirectoryStats]
-    let dirStatsDictByUID = try propDict.get("dir_stats_dict_by_uid") as! [UID:DirectoryStats]
-
-    DispatchQueue.main.async {
-      NSLog("DEBUG [\(self.treeID)] Updating dir stats with status msg: \"\(statusBarMsg)\"")
-      self.updateStatusBarMsg(statusBarMsg)
-
-      let rootsToRefresh = self.displayStore.updateDirStats(dirStatsDictByGUID, dirStatsDictByUID)
-      self.treeView?.reloadItemSet(rootsToRefresh, reloadChildren: false)
     }
   }
 
