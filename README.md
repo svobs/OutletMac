@@ -25,3 +25,4 @@
 - Add Drag & Drop support to/from Finder, etc.
 - Test Drag & Drop of all node types
 - need to implement timeout for grpc requests
+- Try to enable Universal Binary build: currently blocked because swift-collections does not support arm64. May try this: https://developer.apple.com/documentation/swift_packages/editing_a_package_dependency_as_a_local_package

@@ -119,6 +119,7 @@ class TreeController: TreeControllable {
 
     self.subscribeToSignals(treeID)
 
+    // Can't easily set this in the constructor, so let's set here:
     self.swiftFilterState.onChangeCallback = self.onFilterChanged
   }
 
@@ -154,6 +155,9 @@ class TreeController: TreeControllable {
 
   public func updateDisplayTree(to newTree: DisplayTree) throws {
     NSLog("DEBUG [\(self.treeID)] Got new display tree (rootPath=\(newTree.rootPath), state=\(newTree.state))")
+    let filterCriteria: FilterCriteria = try backend.getFilterCriteria(treeID: newTree.treeID)
+
+    // Reattach middle tier plumbing:
     self.dq.sync {
       if newTree.treeID != self.tree.treeID {
         NSLog("INFO  [\(self.treeID)] Changing treeID to \(newTree.treeID)")
@@ -165,8 +169,10 @@ class TreeController: TreeControllable {
       self.treeLoadState = .NOT_LOADED
     }
 
+    // Re-init Swift UI state
     DispatchQueue.main.async {
       do {
+        self.swiftFilterState.updateFrom(filterCriteria, onChangeCallback: self.onFilterChanged)
         try self.swiftTreeState.updateFrom(self.tree)
       } catch {
         self.reportException("Failed to update Swift tree state", error)

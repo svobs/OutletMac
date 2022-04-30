@@ -85,12 +85,12 @@ class SwiftFilterState: ObservableObject, CustomStringConvertible {
         self.showAncestors = filter.showAncestors
     }
 
-    func toFilterCriteria() -> FilterCriteria {
-        return FilterCriteria(searchQuery: searchQuery, isTrashed: isTrashed, isShared: isShared, isIgnoreCase: !isMatchCase, showAncestors: showAncestors)
-    }
-
     static func from(_ filter: FilterCriteria, onChangeCallback: FilterStateCallback? = nil) -> SwiftFilterState {
         return SwiftFilterState(onChangeCallback: onChangeCallback, searchQuery: filter.searchQuery, isMatchCase: !filter.isIgnoreCase, isTrashed: filter.isTrashed, isShared: filter.isShared, showAncestors: filter.showAncestors)
+    }
+
+    func toFilterCriteria() -> FilterCriteria {
+        return FilterCriteria(searchQuery: searchQuery, isTrashed: isTrashed, isShared: isShared, isIgnoreCase: !isMatchCase, showAncestors: showAncestors)
     }
 
     var description: String {
