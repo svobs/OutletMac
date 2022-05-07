@@ -46,9 +46,9 @@
 		CDF2FC61CD355BF0346EE038 /* SwiftFilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */; };
 		CDF2FD8F894AD6FD40B4C76E /* OutlineViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F8F76D1E10803FEE99B8 /* OutlineViewFactory.swift */; };
 		CDF2FE0E82052AA7E1E36D2D /* IconStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FB1106717FF3D9D70C9B /* IconStore.swift */; };
+		D11151CE2826809A00C9D532 /* OutletCommon in Frameworks */ = {isa = PBXBuildFile; productRef = D11151CD2826809A00C9D532 /* OutletCommon */; };
 		D1275B002825E76B001151C0 /* UIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1275AFF2825E76B001151C0 /* UIConstants.swift */; };
 		D16839AF25AD553A00D76169 /* GRPCClientBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = D16839AE25AD553A00D76169 /* GRPCClientBackend.swift */; };
-		D1A24AAE2825DF0D00CEEC05 /* OutletCommon in Frameworks */ = {isa = PBXBuildFile; productRef = D1A24AAD2825DF0D00CEEC05 /* OutletCommon */; };
 		D1BAC56025A193C800D951A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D1BAC55525A193C700D951A2 /* Assets.xcassets */; };
 		D1CDE56525E4A9DC003816CF /* outlet-icon-256.icns in Resources */ = {isa = PBXBuildFile; fileRef = D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */; };
 		D1D8711725F1F8D60072CB97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D8711625F1F8D60072CB97 /* main.swift */; };
@@ -56,7 +56,6 @@
 
 /* Begin PBXFileReference section */
 		11DDEECB23A6F9580014C2A6 /* OutletMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OutletMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OutletMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDF2F01E9410339930D7821C /* MainWindowToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowToolbar.swift; sourceTree = "<group>"; };
 		CDF2F1282202188B26AB6D98 /* TreeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeView.swift; sourceTree = "<group>"; };
 		CDF2F18CC58FDE61FBF97927 /* RootPathPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootPathPanel.swift; sourceTree = "<group>"; };
@@ -96,12 +95,9 @@
 		CDF2FED4E9DD5BA98056B4C1 /* ConnectionProblemWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionProblemWindow.swift; sourceTree = "<group>"; };
 		CDF2FF1B1A5A83050B0C3D68 /* SwiftFilterState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftFilterState.swift; sourceTree = "<group>"; };
 		CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
+		D11151CC28267FF900C9D532 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
 		D1275AFF2825E76B001151C0 /* UIConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIConstants.swift; sourceTree = "<group>"; };
-		D1275B012826745D001151C0 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
-		D1512C2A2823A28D00045224 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
 		D16839AE25AD553A00D76169 /* GRPCClientBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GRPCClientBackend.swift; sourceTree = "<group>"; };
-		D1A24AA92825D6A500CEEC05 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
-		D1A24AAA2825DDE800CEEC05 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = OutletMac.entitlements; sourceTree = "<group>"; };
@@ -114,7 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1A24AAE2825DF0D00CEEC05 /* OutletCommon in Frameworks */,
+				D11151CE2826809A00C9D532 /* OutletCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +121,6 @@
 			isa = PBXGroup;
 			children = (
 				D1A24AA82825D6A500CEEC05 /* Packages */,
-				D1512C2A2823A28D00045224 /* OutletCommon */,
 				11DDEECD23A6F9580014C2A6 /* OutletMac */,
 				11DDEECC23A6F9580014C2A6 /* Products */,
 				4A85D5C8E87F106F79702B9F /* Frameworks */,
@@ -160,7 +155,6 @@
 		4A85D5C8E87F106F79702B9F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				50A201FFF4B039BB7466FCBD /* Pods_OutletMac.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -262,9 +256,7 @@
 		D1A24AA82825D6A500CEEC05 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				D1A24AA92825D6A500CEEC05 /* OutletCommon */,
-				D1A24AAA2825DDE800CEEC05 /* OutletCommon */,
-				D1275B012826745D001151C0 /* OutletCommon */,
+				D11151CC28267FF900C9D532 /* OutletCommon */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -309,7 +301,7 @@
 			);
 			name = OutletMac;
 			packageProductDependencies = (
-				D1A24AAD2825DF0D00CEEC05 /* OutletCommon */,
+				D11151CD2826809A00C9D532 /* OutletCommon */,
 			);
 			productName = tree_viewer;
 			productReference = 11DDEECB23A6F9580014C2A6 /* OutletMac.app */;
@@ -629,7 +621,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		D1A24AAD2825DF0D00CEEC05 /* OutletCommon */ = {
+		D11151CD2826809A00C9D532 /* OutletCommon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OutletCommon;
 		};
