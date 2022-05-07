@@ -11,11 +11,9 @@ import Foundation
  CLASS DisplayTree
  */
 class DisplayTree {
-  weak var backend: OutletBackend!
   let state: DisplayTreeUiState
   
-  init(backend: OutletBackend, state: DisplayTreeUiState) {
-    self.backend = backend
+  init(state: DisplayTreeUiState) {
     self.state = state
   }
 
@@ -77,28 +75,6 @@ class DisplayTree {
     get {
       return self.state.rootSN.node
     }
-  }
-
-  func getChildListForRoot() throws -> [SPIDNodePair] {
-    let rootSN = self.rootSN
-    if !self.state.rootExists {
-      NSLog("INFO [\(treeID)] rootExists == false; returning empty child list")
-      return []
-    } else {
-      NSLog("DEBUG [\(treeID)] Getting child list for root: \(rootSN.spid)")
-      return try self.getChildList(rootSN.spid)
-    }
-  }
-
-  func getChildList(_ parentSPID: SPID) throws -> [SPIDNodePair] {
-    let childList = try self.backend.getChildList(parentSPID: parentSPID, treeID: self.treeID, isExpandingParent: false,
-            maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
-    if SUPER_DEBUG_ENABLED {
-      NSLog("DEBUG [\(treeID)] getChildList(): Got \(childList.count) children from BE for parent '\(parentSPID.guid)': \(childList.map({ "'\($0.spid.guid)'"}).joined(separator: " "))")
-    } else {
-      NSLog("DEBUG [\(treeID)] getChildList(): Got \(childList.count) children from BE for parent '\(parentSPID.guid)'")
-    }
-    return childList
   }
 }
 
@@ -199,11 +175,11 @@ class DisplayTreeUiState: CustomStringConvertible {
     }
   }
   
-  func toDisplayTree(backend: OutletBackend) -> DisplayTree {
+  func toDisplayTree() -> DisplayTree {
     if self.rootExists {
-      return DisplayTree(backend: backend, state: self)
+      return DisplayTree(state: self)
     } else {
-      return MockDisplayTree(backend: backend, state: self)
+      return MockDisplayTree(state: self)
     }
   }
 }

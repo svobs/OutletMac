@@ -4,7 +4,7 @@
 //
 
 import AppKit
-import DequeModule
+import OutletCommon
 
 /*
  TreeNSViewController: AppKit controller for TreeViewRepresentable.
@@ -303,8 +303,7 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
         NSLog("DEBUG [\(treeID)] Row is expanding: \(parentGUID)")
 
         do {
-            let childSNList = try self.con.backend.getChildList(parentSPID: parentSN.spid, treeID: self.treeID, isExpandingParent: true,
-                    maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+            let childSNList = try self.con.backend.getChildList(parentSN.spid, treeID: self.treeID, isExpandingParent: true)
 
             outlineView.beginUpdates()
             defer {
@@ -820,7 +819,7 @@ final class TreeNSViewController: NSViewController, NSOutlineViewDelegate, NSOut
         }
 
         // contains items which were just expanded and need their children examined
-        var queue = Deque<SPIDNodePair>()
+        let queue = LinkedList<SPIDNodePair>()
 
         func process(_ sn: SPIDNodePair) {
             if sn.node.isDir {

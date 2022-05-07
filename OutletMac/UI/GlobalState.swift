@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 /**
  The EnvironmentObject containing shared state for all UI components in the app

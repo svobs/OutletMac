@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import OutletCommon
 
 // For drag & drop
 extension NSPasteboard.PasteboardType {

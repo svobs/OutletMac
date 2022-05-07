@@ -4,6 +4,7 @@
 //
 
 import Cocoa
+import OutletCommon
 
 extension NSViewController: NSUserInterfaceValidations {
     public func validateUserInterfaceItem(_ item: NSValidatedUserInterfaceItem) -> Bool {

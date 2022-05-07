@@ -6,10 +6,7 @@
 //
 
 import SwiftUI
-
-let ICON_PADDING: CGFloat = 8
-
-typealias NoArgVoidFunc = () -> Void
+import OutletCommon
 
 // TODO: add glow on hover
 fileprivate struct SelectedToolbarIcon: View {

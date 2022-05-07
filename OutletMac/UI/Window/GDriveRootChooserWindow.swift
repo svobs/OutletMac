@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 /**
  Wrap the selection in an ObservableObject so objects outside of the view can alter the view...

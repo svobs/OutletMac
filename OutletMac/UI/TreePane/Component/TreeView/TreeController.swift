@@ -5,7 +5,7 @@
 //  Created by Matthew Svoboda on 2021-02-01.
 //
 import SwiftUI
-import DequeModule
+import OutletCommon
 
 /**
  PROTOCOL TreeControllable
@@ -104,7 +104,8 @@ class TreeController: TreeControllable {
   init(app: OutletAppProtocol, tree: DisplayTree, filterCriteria: FilterCriteria, canChangeRoot: Bool, allowsMultipleSelection: Bool) throws {
     self.app = app
     self.tree = tree
-    self.swiftTreeState = try SwiftTreeState.from(tree)
+    let treeType = try app.backend.getTreeType(deviceUID: tree.rootDeviceUID)
+    self.swiftTreeState = try SwiftTreeState.from(tree, treeType)
     self.swiftFilterState = SwiftFilterState.from(filterCriteria)
     self.dispatchListener = self.app.dispatcher.createListener(tree.treeID)
     self.canChangeRoot = canChangeRoot
@@ -172,7 +173,9 @@ class TreeController: TreeControllable {
     DispatchQueue.main.async {
       do {
         self.swiftFilterState.updateFrom(filterCriteria, onChangeCallback: self.onFilterChanged)
-        try self.swiftTreeState.updateFrom(self.tree)
+
+        let treeType = try self.backend.getTreeType(deviceUID: self.tree.rootSPID.deviceUID)
+        try self.swiftTreeState.updateFrom(self.tree, treeType)
       } catch {
         self.reportException("Failed to update Swift tree state", error)
       }
@@ -317,10 +320,10 @@ class TreeController: TreeControllable {
       }
     }
 
-    var queue = Deque<SPIDNodePair>()
+    let queue = LinkedList<SPIDNodePair>()
 
     do {
-      let topLevelSNList: [SPIDNodePair] = try self.tree.getChildListForRoot()
+      let topLevelSNList: [SPIDNodePair] = try self.backend.getChildList(tree.rootSPID, treeID: self.treeID, isExpandingParent: false)
       NSLog("DEBUG [\(self.treeID)] populateTreeView(): Got \(topLevelSNList.count) top-level nodes for root (\(self.tree.rootSPID.guid))")
 
       self.displayStore.putRootChildList(self.tree.rootSN, topLevelSNList)
@@ -353,8 +356,13 @@ class TreeController: TreeControllable {
         NSLog("DEBUG [\(treeID)] populateTreeView(): Will expand row: \(guid)")
         toExpandInOrder.append(guid)
         do {
-          let childSNList: [SPIDNodePair] = try self.tree.getChildList(sn.spid)
+          let childSNList: [SPIDNodePair] = try self.backend.getChildList(sn.spid, treeID: self.treeID, isExpandingParent: false)
           NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) child nodes for parent \(sn.spid)")
+          if SUPER_DEBUG_ENABLED {
+            NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) children from BE for parent '\(sn.spid.guid)': \(childSNList.map({ "'\($0.spid.guid)'"}).joined(separator: " "))")
+          } else {
+            NSLog("DEBUG [\(treeID)] populateTreeView(): Got \(childSNList.count) children from BE for parent '\(sn.spid.guid)'")
+          }
 
           self.displayStore.putChildList(guid, childSNList)
           for sn in childSNList {
@@ -480,8 +488,8 @@ class TreeController: TreeControllable {
 
     var checkedRowList: [SPIDNodePair] = []
 
-    var checkedQueue = Deque<SPIDNodePair>()
-    var mixedQueue = Deque<SPIDNodePair>()
+    let checkedQueue = LinkedList<SPIDNodePair>()
+    let mixedQueue = LinkedList<SPIDNodePair>()
 
     assert(self.tree.hasCheckboxes, "Tree does not have checkboxes. Is this a ChangeTree? \(self.tree.state)")
 
@@ -498,7 +506,7 @@ class TreeController: TreeControllable {
 
       // Check each child of a mixed dir for checked or mixed status.
       // We will iterate through the master cache, which is necessary since we may have implicitly checked nodes which are not visible in the UI.
-      for childSN in try self.tree.getChildList(mixedDirSN.spid) {
+      for childSN in try self.backend.getChildList(mixedDirSN.spid, treeID: self.treeID, isExpandingParent: false) {
         if SUPER_DEBUG_ENABLED {
           NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Examining child of mixed-state dir: \(childSN.spid)")
         }
@@ -529,7 +537,7 @@ class TreeController: TreeControllable {
 
       // Drill down into all descendants of nodes in the checkedQueue.
       if chosenSN.node.isDir {
-        for childSN in try self.tree.getChildList(chosenSN.spid) {
+        for childSN in try self.backend.getChildList(chosenSN.spid, treeID: self.treeID, isExpandingParent: false) {
           if SUPER_DEBUG_ENABLED {
             NSLog("DEBUG [\(treeID)] generateCheckedRowList(): Adding node to checkedQueue: \(chosenSN.spid.guid)")
           }
@@ -651,17 +659,15 @@ class TreeController: TreeControllable {
     NSLog("INFO  [\(self.treeID)] Received \(Signal.NODE_UPSERTED) signal: \(sn.spid) for parent: \(parentGUID)")
 
     func reload(sn: SPIDNodePair, parentGUID: GUID, alreadyPresent: Bool) {
-      DispatchQueue.main.async {
-        let reloadTarget: GUID
-        if alreadyPresent {
-          reloadTarget = sn.spid.guid
-          NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(reloadTarget)")
-          self.treeView?.reloadItem(reloadTarget, reloadChildren: false)
-        } else {
-          reloadTarget = parentGUID
-          NSLog("DEBUG [\(self.treeID)] Upserted node is new; reloading its parent: \(reloadTarget)")
-          self.treeView?.reloadItem(reloadTarget, reloadChildren: true)
-        }
+      let reloadTarget: GUID
+      if alreadyPresent {
+        reloadTarget = sn.spid.guid
+        NSLog("DEBUG [\(self.treeID)] Upserted node was already present; reloading: \(reloadTarget)")
+        self.treeView?.reloadItem(reloadTarget, reloadChildren: false)
+      } else {
+        reloadTarget = parentGUID
+        NSLog("DEBUG [\(self.treeID)] Upserted node is new; reloading its parent: \(reloadTarget)")
+        self.treeView?.reloadItem(reloadTarget, reloadChildren: true)
       }
     }
     self.displayStore.putSN(sn, parentGUID: parentGUID, onSuccess: reload)
@@ -681,12 +687,10 @@ class TreeController: TreeControllable {
     NSLog("DEBUG [\(self.treeID)] Received \(Signal.NODE_REMOVED) signal: \(sn.spid) (GUID=\(sn.spid.guid), parent_GUID=\(parentGUID))")
 
     func reloadParent() {
-      DispatchQueue.main.async {
-        if parentGUID == self.tree.rootSPID.guid {
-          NSLog("DEBUG [\(self.treeID)] Parent of removed node is root node!")
-        }
-        self.treeView?.reloadItem(parentGUID, reloadChildren: true)
+      if parentGUID == self.tree.rootSPID.guid {
+        NSLog("DEBUG [\(self.treeID)] Parent of removed node is root node!")
       }
+      self.treeView?.reloadItem(parentGUID, reloadChildren: true)
     }
     self.displayStore.removeSN(sn.spid.guid, onSuccess: reloadParent)
   }

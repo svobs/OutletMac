@@ -4,6 +4,7 @@
 //
 
 import Cocoa
+import OutletCommon
 
 /**
  Official Apple docs: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MenuList/MenuList.html

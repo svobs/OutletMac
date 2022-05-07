@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import OutletCommon
 
 /*
  A set of handlers for TreeAction, each of which is identified by an ActionID.

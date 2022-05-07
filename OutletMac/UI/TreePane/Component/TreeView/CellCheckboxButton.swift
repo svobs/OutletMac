@@ -8,6 +8,7 @@
 
 import Foundation
 import AppKit
+import OutletCommon
 
 class CellCheckboxButton: NSButton {
   let parent: TreeNSViewController

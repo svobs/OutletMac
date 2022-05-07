@@ -7,6 +7,7 @@
 // TODO: Migrate to NotificationCenter and delete this file!
 //
 import Foundation
+import OutletCommon
 
 /** "ListenerID" is equivalent to a PyDispatch "sender" */
 typealias ListenerID = String

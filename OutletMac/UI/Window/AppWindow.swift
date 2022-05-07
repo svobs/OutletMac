@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 /**
  Abstract base class

@@ -3,6 +3,7 @@
 // Copyright (c) 2022 Matt Svoboda. All rights reserved.
 //
 import Cocoa
+import OutletCommon
 
 extension NSImage.Name {
     static let modeCopy = NSImage.Name("ModeCopy")

@@ -4,7 +4,7 @@
 //
 //  Created by Matthew Svoboda on 21/2/26.
 //
-import SwiftUI
+import Foundation
 
 class HoldOffTimer {
   private var timer: Timer? = nil

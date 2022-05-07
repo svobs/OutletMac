@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 class GeneratedMenuItem: NSMenuItem {
   var menuItemMeta: MenuItemMeta // provided by the backend

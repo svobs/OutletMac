@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 class WindowState: ObservableObject {
     // These two values are calculated and stored so that the proper height of the OutlineView can be derived

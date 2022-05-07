@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 2021-01-25.
 //
 import SwiftUI
+import OutletCommon
 
 protocol OutletBackend: HasLifecycle {
   var app: OutletAppProtocol { get }
@@ -27,8 +28,10 @@ protocol OutletBackend: HasLifecycle {
   func startSubtreeLoad(treeID: TreeID) throws
   func getOpExecutionPlayState() throws -> Bool
   func getDeviceList() throws -> [Device]
-  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair]
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair]
+  func getDefaultLocalDeviceUID() throws -> UID
+  func getTreeType(deviceUID: UID) throws -> TreeType
+  func getChildList(_ parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair]
+  func getAncestorList(_ spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair]
   func getRowsOfInterest(treeID: TreeID) throws -> RowsOfInterest
   func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws
   func removeExpandedRow(_ rowUID: GUID, _ treeID: TreeID) throws
@@ -75,6 +78,10 @@ extension OutletBackend {
   func getBoolConfig(_ configKey: String) throws -> Bool {
     return try getBoolConfig(configKey, defaultVal: nil)
   }
+
+  func getChildList(_ parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool) throws -> [SPIDNodePair] {
+    return try getChildList(parentSPID, treeID: treeID, isExpandingParent: isExpandingParent, maxResults: MAX_NUMBER_DISPLAYABLE_CHILD_NODES)
+  }
 }
 
 /**
@@ -90,7 +97,6 @@ class MockBackend: OutletBackend {
   init(_ d: SignalDispatcher? = nil, _ app: OutletAppProtocol) {
     self.dipatcher = d ?? SignalDispatcher()
     self.app = app
-    self.nodeIdentifierFactory.backend = self
   }
 
   func start() throws {
@@ -159,11 +165,19 @@ class MockBackend: OutletBackend {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair] {
+  func getDefaultLocalDeviceUID() throws -> UID {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
+  func getTreeType(deviceUID: UID) throws -> TreeType {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func getChildList(_ parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool, maxResults: UInt32?) throws -> [SPIDNodePair] {
+    throw OutletError.invalidOperation("Cannot call MockBackend methods")
+  }
+
+  func getAncestorList(_ spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
     throw OutletError.invalidOperation("Cannot call MockBackend methods")
   }
 

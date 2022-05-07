@@ -4,6 +4,7 @@
 //
 
 import AppKit
+import OutletCommon
 
 /**
  App-wide actions

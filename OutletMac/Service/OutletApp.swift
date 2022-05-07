@@ -7,6 +7,7 @@
 import AppKit
 import Cocoa
 import SwiftUI
+import OutletCommon
 
 /**
  PROTOCOL OutletAppProtocol
@@ -372,8 +373,8 @@ class OutletMacApp: NSObject, NSApplicationDelegate, OutletAppProtocol {
   func applicationDockMenu(sender: NSApplication) -> NSMenu? {
     // TODO
     let menu = NSMenu(title: "")
-    let clickMe = NSMenuItem(title: "ClickMe", action: "didSelectClickMe", keyEquivalent: "C")
-    clickMe.target = self
+//    let clickMe = NSMenuItem(title: "ClickMe", action: "didSelectClickMe", keyEquivalent: "C")
+//    clickMe.target = self
 
     return menu
   }

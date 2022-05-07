@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 21/2/16.
 //
 import SwiftUI
+import OutletCommon
 
 /**
  CLASS SwiftTreeState
@@ -36,9 +37,9 @@ class SwiftTreeState: ObservableObject {
     self.hasCheckboxes = hasCheckboxes
   }
 
-  func updateFrom(_ tree: DisplayTree) throws {
+  func updateFrom(_ tree: DisplayTree, _ treeType: TreeType) throws {
     self.rootPathNonEdit = tree.rootPath
-    self.treeType = try tree.backend.nodeIdentifierFactory.getTreeType(for: tree.rootSPID.deviceUID)
+    self.treeType = treeType
     self.rootPath = tree.rootSPID.getSinglePath()
     self.offendingPath = tree.state.offendingPath
     self.isRootExists = tree.rootExists
@@ -48,8 +49,7 @@ class SwiftTreeState: ObservableObject {
     self.hasCheckboxes = tree.hasCheckboxes
   }
 
-  static func from(_ tree: DisplayTree) throws -> SwiftTreeState {
-    let treeType = try tree.backend.nodeIdentifierFactory.getTreeType(for: tree.rootSPID.deviceUID)
+  static func from(_ tree: DisplayTree, _ treeType: TreeType) throws -> SwiftTreeState {
     return SwiftTreeState(isRootExists: tree.rootExists, isEditingRoot: false, isManualLoadNeeded: tree.needsManualLoad,
                           offendingPath: tree.state.offendingPath, rootPath: tree.rootSPID.getSinglePath(),
                           rootPathNonEdit: tree.rootPath, rootDeviceUID: tree.rootDeviceUID, treeType: treeType, hasCheckboxes: tree.hasCheckboxes)

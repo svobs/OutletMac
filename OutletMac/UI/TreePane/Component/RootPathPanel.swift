@@ -5,6 +5,7 @@
 //  Created by Matthew Svoboda on 2021-01-31.
 //
 import SwiftUI
+import OutletCommon
 
 /**
  STRUCT RootPathPanel
@@ -63,7 +64,7 @@ struct RootPathPanel: View {
   func doOpenFileDialog() {
     let deviceUID: UID
     do {
-      deviceUID = try self.con.app.backend.nodeIdentifierFactory.getDefaultLocalDeviceUID()
+      deviceUID = try self.con.app.backend.getDefaultLocalDeviceUID()
     } catch {
       self.con.reportError("Failed to open file dialog", "\(error)")
       return

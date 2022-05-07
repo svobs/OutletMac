@@ -7,8 +7,6 @@
     brew upgrade
     brew cleanup -d -v
 	brew install cocoapods
-    # is this required?
-    sudo gem install -n /usr/local/bin cocoapods -v 1.8.4
 
 	brew install swift-protobuf
 	(see: https://crlacayo.me/2020/01/15/swift-protobuf/)

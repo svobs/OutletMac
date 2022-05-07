@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import OutletCommon
 
 class SingleTreePopUpWindow: AppWindow, ObservableObject {
     private let _winID: String
@@ -83,7 +84,7 @@ class SingleTreePopUpWindow: AppWindow, ObservableObject {
             // TODO: put all this logic in the backend, let it update the expanded row set and push it out like other trees
             NSLog("DEBUG [\(self.winID)] Attempting to select SPID: \(selectionSPID)")
             do {
-                let ancestorList: [SPIDNodePair] = try self.con!.backend.getAncestorList(spid: selectionSPID, stopAtPath: nil)
+                let ancestorList: [SPIDNodePair] = try self.con!.backend.getAncestorList(selectionSPID, stopAtPath: nil)
                 let ancestorGUIDList: [GUID] = ancestorList.map({ $0.spid.guid })
 
                 DispatchQueue.main.async {

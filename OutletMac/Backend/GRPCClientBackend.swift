@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import AppKit
 import GRPC
 import Logging
 import NIO
+import OutletCommon
 
 /**
  CLASS GRPCClientBackend
@@ -16,13 +18,12 @@ import NIO
  Thin gRPC client to the backend service
  */
 class GRPCClientBackend: OutletBackend {
-  var stub: Outlet_Backend_Agent_Grpc_Generated_OutletClient
+  var stub: Outlet_Grpc_OutletClient
   let app: OutletAppProtocol
   let bonjourService = BonjourService()
   let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
   var grpcConverter = GRPCConverter()
-  var nodeIdentifierFactory = NodeIdentifierFactory()
   private var signalReceiverThread: Thread?
   private var wasShutdown = false
   private var useFixedAddress: Bool = false
@@ -31,6 +32,12 @@ class GRPCClientBackend: OutletBackend {
   private var tryLocalHostFirst = true
 
   private let dqGRPC = DispatchQueue(label: "GRPC-SerialQueue") // custom dispatch queues are serial by default
+
+  var nodeIdentifierFactory: NodeIdentifierFactory {
+    get {
+      return self.grpcConverter.nodeIdentifierFactory
+    }
+  }
 
   var isConnected: Bool {
     get {
@@ -50,8 +57,6 @@ class GRPCClientBackend: OutletBackend {
 
   func start() throws {
     NSLog("DEBUG Starting GRPCClientBackend...")
-    grpcConverter.backend = self
-    nodeIdentifierFactory.backend = self
 
     // Forward the following Dispatcher signals across gRPC:
     connectAndForwardSignal(.PAUSE_OP_EXECUTION)
@@ -80,7 +85,7 @@ class GRPCClientBackend: OutletBackend {
     self.wasShutdown = true
   }
 
-  private static func makeClientStub(_ host: String, _ port: Int) -> Outlet_Backend_Agent_Grpc_Generated_OutletClient {
+  private static func makeClientStub(_ host: String, _ port: Int) -> Outlet_Grpc_OutletClient {
     let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
     let channel = ClientConnection.insecure(group: group)
@@ -88,7 +93,7 @@ class GRPCClientBackend: OutletBackend {
             .withConnectionBackoff(retries: ConnectionBackoff.Retries.upTo(GRPC_MAX_CONNECTION_RETRIES))
             .connect(host: host, port: port)
 
-    return Outlet_Backend_Agent_Grpc_Generated_OutletClient(channel: channel)
+    return Outlet_Grpc_OutletClient(channel: channel)
   }
 
   func closeChannel() {
@@ -235,8 +240,8 @@ class GRPCClientBackend: OutletBackend {
     _ = self.stub.send_signal(signalMsg)
   }
 
-  private func createSignalMsg(_ signal: Signal, _ senderID: SenderID) -> Outlet_Backend_Agent_Grpc_Generated_SignalMsg {
-    var signalMsg = Outlet_Backend_Agent_Grpc_Generated_SignalMsg()
+  private func createSignalMsg(_ signal: Signal, _ senderID: SenderID) -> Outlet_Grpc_SignalMsg {
+    var signalMsg = Outlet_Grpc_SignalMsg()
     signalMsg.sigInt = signal.rawValue
     signalMsg.sender = senderID
     return signalMsg
@@ -271,7 +276,7 @@ class GRPCClientBackend: OutletBackend {
     NSLog("DEBUG Subscribing to server signals...")
     NSLog("DEBUG receiveServerSignals(): Current queue: '\(DispatchQueue.currentQueueLabel ?? "nil")'")
 
-    let request = Outlet_Backend_Agent_Grpc_Generated_Subscribe_Request()
+    let request = Outlet_Grpc_Subscribe_Request()
     let call = self.stub.subscribe_to_signals(request) { signalGRPC in
       // This is fired each time we get a new signal (implicitly this means the connection is back up)
 
@@ -319,7 +324,7 @@ class GRPCClientBackend: OutletBackend {
     }
   }
 
-  private func relaySignalLocally(_ signalGRPC: Outlet_Backend_Agent_Grpc_Generated_SignalMsg) throws {
+  private func relaySignalLocally(_ signalGRPC: Outlet_Grpc_SignalMsg) throws {
     guard let signal = Signal(rawValue: signalGRPC.sigInt) else {
       reportError("Internal Error", "Could not resolve Signal from int value: \(signalGRPC.sigInt)")
       return
@@ -350,7 +355,7 @@ class GRPCClientBackend: OutletBackend {
 
   func requestDisplayTree(_ request: DisplayTreeRequest) throws -> DisplayTree? {
     NSLog("DEBUG [\(request.treeID)] Requesting DisplayTree for params: \(request)")
-    var grpcRequest = Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request()
+    var grpcRequest = Outlet_Grpc_RequestDisplayTree_Request()
     grpcRequest.isStartup = request.isStartup
     grpcRequest.treeID = request.treeID
     grpcRequest.userPath = request.userPath ?? ""
@@ -366,14 +371,14 @@ class GRPCClientBackend: OutletBackend {
     if (response.hasDisplayTreeUiState) {
       let state: DisplayTreeUiState = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
       NSLog("DEBUG [\(request.treeID)] Got state: \(state)")
-      return state.toDisplayTree(backend: self)
+      return state.toDisplayTree()
     } else {
       return nil
     }
   }
   
   func getNodeForUID(uid: UID, deviceUID: UID) throws -> TNode? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetNodeForUid_Request()
+    var request = Outlet_Grpc_GetNodeForUid_Request()
     request.uid = uid
     request.deviceUid = deviceUID
     let response = try self.callAndTranslateErrors(self.stub.get_node_for_uid(request), "getNodeForUID")
@@ -386,14 +391,14 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func nextUID() throws -> UID {
-    let request = Outlet_Backend_Agent_Grpc_Generated_GetNextUid_Request()
+    let request = Outlet_Grpc_GetNextUid_Request()
     let response = try self.callAndTranslateErrors(self.stub.get_next_uid(request), "nextUID")
 
     return response.uid
   }
   
   func getUIDForLocalPath(fullPath: String, uidSuggestion: UID?) throws -> UID? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetUidForLocalPath_Request()
+    var request = Outlet_Grpc_GetUidForLocalPath_Request()
     request.fullPath = fullPath
     if let uidSuggestion = uidSuggestion {
       request.uidSuggestion = uidSuggestion
@@ -404,7 +409,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func getSNFor(nodeUID: UID, deviceUID: UID, fullPath: String) throws -> SPIDNodePair? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetSnFor_Request()
+    var request = Outlet_Grpc_GetSnFor_Request()
     request.nodeUid = nodeUID
     request.deviceUid = deviceUID
     request.fullPath = fullPath
@@ -417,13 +422,13 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func startSubtreeLoad(treeID: TreeID) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_StartSubtreeLoad_Request()
+    var request = Outlet_Grpc_StartSubtreeLoad_Request()
     request.treeID = treeID
     let _ = try self.callAndTranslateErrors(self.stub.start_subtree_load(request), "startSubtreeLoad")
   }
   
   func getOpExecutionPlayState() throws -> Bool {
-    let request = Outlet_Backend_Agent_Grpc_Generated_GetOpExecPlayState_Request()
+    let request = Outlet_Grpc_GetOpExecPlayState_Request()
     let response = try self.callAndTranslateErrors(self.stub.get_op_exec_play_state(request), "getOpExecutionPlayState")
 
     return response.isEnabled
@@ -431,7 +436,7 @@ class GRPCClientBackend: OutletBackend {
 
   func getDeviceList() throws -> [Device] {
     var deviceList: [Device] = []
-    let request = Outlet_Backend_Agent_Grpc_Generated_GetDeviceList_Request()
+    let request = Outlet_Grpc_GetDeviceList_Request()
     let response = try self.callAndTranslateErrors(self.stub.get_device_list(request), "getDeviceList")
 
     for deviceGRPC in response.deviceList {
@@ -440,8 +445,36 @@ class GRPCClientBackend: OutletBackend {
     return deviceList
   }
 
-  func getChildList(parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool = false, maxResults: UInt32?) throws -> [SPIDNodePair] {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetChildList_Request()
+  // TODO: this is TEMPORARY until we support multiple drives
+  func getDefaultLocalDeviceUID() throws -> UID {
+    var deviceUID: UID? = nil
+    for device in try self.getDeviceList() {
+      if device.treeType == .LOCAL_DISK {
+        if deviceUID != nil {
+          throw OutletError.invalidState("Multiple local disks found but this is not supported!")
+        } else {
+          deviceUID = device.uid
+        }
+      }
+    }
+    if deviceUID == nil {
+      throw OutletError.invalidState("No local disks found!")
+    } else {
+      return deviceUID!
+    }
+  }
+
+  func getTreeType(deviceUID: UID) throws -> TreeType {
+    for device in try self.getDeviceList() {
+      if device.uid == deviceUID {
+        return device.treeType
+      }
+    }
+    throw OutletError.invalidState("Could not get treeType: could not find device with UID \(deviceUID)!")
+  }
+
+  func getChildList(_ parentSPID: SPID, treeID: TreeID?, isExpandingParent: Bool = false, maxResults: UInt32?) throws -> [SPIDNodePair] {
+    var request = Outlet_Grpc_GetChildList_Request()
     if let treeID = treeID {
       request.treeID = treeID
     }
@@ -460,8 +493,8 @@ class GRPCClientBackend: OutletBackend {
     return try self.grpcConverter.snListFromGRPC(response.childList)
   }
 
-  func getAncestorList(spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetAncestorList_Request()
+  func getAncestorList(_ spid: SinglePathNodeIdentifier, stopAtPath: String?) throws -> [SPIDNodePair] {
+    var request = Outlet_Grpc_GetAncestorList_Request()
     request.stopAtPath = stopAtPath ?? ""
     request.spid = try self.grpcConverter.nodeIdentifierToGRPC(spid)
 
@@ -470,7 +503,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func getRowsOfInterest(treeID: TreeID) throws -> RowsOfInterest {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetRowsOfInterest_Request()
+    var request = Outlet_Grpc_GetRowsOfInterest_Request()
     request.treeID = treeID
 
     let response = try self.callAndTranslateErrors(self.stub.get_rows_of_interest(request), "getRowsOfInterest")
@@ -486,7 +519,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func setSelectedRowSet(_ selected: Set<GUID>, _ treeID: TreeID) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_SetSelectedRowSet_Request()
+    var request = Outlet_Grpc_SetSelectedRowSet_Request()
     for guid in selected {
       request.selectedRowGuidSet.append(guid)
     }
@@ -496,7 +529,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func removeExpandedRow(_ rowGUID: GUID, _ treeID: TreeID) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_RemoveExpandedRow_Request()
+    var request = Outlet_Grpc_RemoveExpandedRow_Request()
     request.rowGuid = rowGUID
     request.treeID = treeID
 
@@ -504,7 +537,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func getContextMenu(treeID: TreeID, _ guidList: [GUID]) throws -> [MenuItemMeta] {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetContextMenu_Request()
+    var request = Outlet_Grpc_GetContextMenu_Request()
     request.treeID = treeID
     for guid in guidList {
       request.targetGuidList.append(guid)
@@ -519,7 +552,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func executeTreeActionList(_ treeActionList: [TreeAction]) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_ExecuteTreeActionList_Request()
+    var request = Outlet_Grpc_ExecuteTreeActionList_Request()
     for treeAction in treeActionList {
       request.actionList.append(try self.grpcConverter.treeActionToGRPC(treeAction))
     }
@@ -563,7 +596,7 @@ class GRPCClientBackend: OutletBackend {
    will send a notification if/when it has finished loading.
    */
   func requestDisplayTree(request: DisplayTreeRequest) throws -> DisplayTree? {
-    var requestGRPC = Outlet_Backend_Agent_Grpc_Generated_RequestDisplayTree_Request()
+    var requestGRPC = Outlet_Grpc_RequestDisplayTree_Request()
     requestGRPC.isStartup = request.isStartup
     requestGRPC.treeID = request.treeID
     requestGRPC.returnAsync = request.returnAsync
@@ -577,7 +610,7 @@ class GRPCClientBackend: OutletBackend {
 
     if response.hasDisplayTreeUiState {
       let state = try self.grpcConverter.displayTreeUiStateFromGRPC(response.displayTreeUiState)
-      let tree = state.toDisplayTree(backend: self)
+      let tree = state.toDisplayTree()
       NSLog("Returning DisplayTree: \(tree)")
       return tree
     } else {
@@ -588,7 +621,7 @@ class GRPCClientBackend: OutletBackend {
 
   func dropDraggedNodes(srcTreeID: TreeID, srcGUIDList: [GUID], isInto: Bool, dstTreeID: TreeID, dstGUID: GUID, dragOperation: DragOperation, dirConflictPolicy: DirConflictPolicy, fileConflictPolicy: FileConflictPolicy)
       throws -> Bool {
-    var request = Outlet_Backend_Agent_Grpc_Generated_DragDrop_Request()
+    var request = Outlet_Grpc_DragDrop_Request()
     request.srcTreeID = srcTreeID
     request.dstTreeID = dstTreeID
     request.dstGuid = dstGUID
@@ -605,7 +638,7 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func startDiffTrees(treeIDLeft: String, treeIDRight: String) throws -> DiffResultTreeIDs {
-    var request = Outlet_Backend_Agent_Grpc_Generated_StartDiffTrees_Request()
+    var request = Outlet_Grpc_StartDiffTrees_Request()
     request.treeIDLeft = treeIDLeft
     request.treeIDRight = treeIDRight
 
@@ -615,7 +648,7 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func generateMergeTree(treeIDLeft: String, treeIDRight: String, selectedChangeListLeft: [GUID], selectedChangeListRight: [GUID]) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GenerateMergeTree_Request()
+    var request = Outlet_Grpc_GenerateMergeTree_Request()
     request.treeIDLeft = treeIDLeft
     request.treeIDRight = treeIDRight
     for guid in selectedChangeListLeft {
@@ -629,14 +662,14 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func enqueueRefreshSubtreeTask(nodeIdentifier: NodeIdentifier, treeID: TreeID) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_RefreshSubtree_Request()
+    var request = Outlet_Grpc_RefreshSubtree_Request()
     request.nodeIdentifier = try self.grpcConverter.nodeIdentifierToGRPC(nodeIdentifier)
     request.treeID = treeID
     let _ = try self.callAndTranslateErrors(self.stub.refresh_subtree(request), "enqueueRefreshSubtreeTask")
   }
 
   func getLastPendingOp(deviceUID: UID, nodeUID: UID) throws -> UserOp? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetLastPendingOp_Request()
+    var request = Outlet_Grpc_GetLastPendingOp_Request()
     request.deviceUid = deviceUID
     request.nodeUid = nodeUID
 
@@ -660,7 +693,7 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func downloadFileFromGDrive(deviceUID: UID, nodeUID: UID, requestorID: String) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_DownloadFromGDrive_Request()
+    var request = Outlet_Grpc_DownloadFromGDrive_Request()
     request.deviceUid = deviceUID
     request.nodeUid = nodeUID
     request.requestorID = requestorID
@@ -668,14 +701,14 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func deleteSubtree(deviceUID: UID, nodeUIDList: [UID]) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_DeleteSubtree_Request()
+    var request = Outlet_Grpc_DeleteSubtree_Request()
     request.deviceUid = deviceUID
     request.nodeUidList = nodeUIDList
     let _ = try self.callAndTranslateErrors(self.stub.delete_subtree(request), "deleteSubtree")
   }
   
   func getFilterCriteria(treeID: TreeID) throws -> FilterCriteria {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetFilter_Request()
+    var request = Outlet_Grpc_GetFilter_Request()
     request.treeID = treeID
     let response = try self.callAndTranslateErrors(self.stub.get_filter(request), "getFilterCriteria")
     if response.hasFilterCriteria {
@@ -688,14 +721,14 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func updateFilterCriteria(treeID: TreeID, filterCriteria: FilterCriteria) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_UpdateFilter_Request()
+    var request = Outlet_Grpc_UpdateFilter_Request()
     request.treeID = treeID
     request.filterCriteria = try self.grpcConverter.filterCriteriaToGRPC(filterCriteria)
     let _ = try self.callAndTranslateErrors(self.stub.update_filter(request), "updateFilterCriteria")
   }
 
   func getConfig(_ configKey: String, defaultVal: String? = nil) throws -> String {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request()
+    var request = Outlet_Grpc_GetConfig_Request()
     request.configKeyList.append(configKey)
 
     let response = try self.callAndTranslateErrors(self.stub.get_config(request), "getConfig")
@@ -774,8 +807,8 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func putConfig(_ configKey: String, _ configVal: String) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request()
-    var configEntry = Outlet_Backend_Agent_Grpc_Generated_ConfigEntry()
+    var request = Outlet_Grpc_PutConfig_Request()
+    var configEntry = Outlet_Grpc_ConfigEntry()
     configEntry.key = configKey
     configEntry.val = configVal
     request.configList.append(configEntry)
@@ -783,7 +816,7 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func getConfigList(_ configKeyList: [String]) throws -> [String: String] {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetConfig_Request()
+    var request = Outlet_Grpc_GetConfig_Request()
     request.configKeyList = configKeyList
     let response = try self.callAndTranslateErrors(self.stub.get_config(request), "getConfigList")
 
@@ -797,9 +830,9 @@ class GRPCClientBackend: OutletBackend {
   }
   
   func putConfigList(_ configDict: [String: String]) throws {
-    var request = Outlet_Backend_Agent_Grpc_Generated_PutConfig_Request()
+    var request = Outlet_Grpc_PutConfig_Request()
     for (configKey, configVal) in configDict {
-      var configEntry = Outlet_Backend_Agent_Grpc_Generated_ConfigEntry()
+      var configEntry = Outlet_Grpc_ConfigEntry()
       configEntry.key = configKey
       configEntry.val = configVal
       request.configList.append(configEntry)
@@ -808,7 +841,7 @@ class GRPCClientBackend: OutletBackend {
   }
 
   func getIcon(_ iconID: IconID) throws -> NSImage? {
-    var request = Outlet_Backend_Agent_Grpc_Generated_GetIcon_Request()
+    var request = Outlet_Grpc_GetIcon_Request()
     request.iconID = iconID.rawValue
     let response = try self.callAndTranslateErrors(self.stub.get_icon(request), "getIcon")
 
