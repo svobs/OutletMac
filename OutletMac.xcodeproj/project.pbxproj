@@ -20,7 +20,6 @@
 		CDF2F3957AD95AC535EFAC3B /* TreeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F417B755E31D38CA0B03 /* TreeController.swift */; };
 		CDF2F431BF13BE3D2F623A53 /* SingleTreePopUpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */; };
 		CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F6079EA299B2F92A5C8E /* BackendConnectionState.swift */; };
-		CDF2F5121881F0828451D058 /* BonjourService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */; };
 		CDF2F524445DDEE70B6E59BE /* ToolbarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2F5CD70767F48DAF48656 /* ToolbarButton.swift */; };
 		CDF2F53698DA43A71A0055C0 /* UnwrapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FAC3B920540522051982 /* UnwrapView.swift */; };
 		CDF2F58727701F7466ACD417 /* CellCheckboxButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */; };
@@ -87,7 +86,6 @@
 		CDF2FBD62D74542B39628AB7 /* CellCheckboxButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellCheckboxButton.swift; sourceTree = "<group>"; };
 		CDF2FBDA9CAC6C3CB4C4EF4A /* TreeActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeActions.swift; sourceTree = "<group>"; };
 		CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalDispatcher.swift; sourceTree = "<group>"; };
-		CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
 		CDF2FC5D40607D2F44B274A1 /* MergePreviewWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MergePreviewWindow.swift; sourceTree = "<group>"; };
 		CDF2FCFFB838BD927AABBD61 /* SinglePaneView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SinglePaneView.swift; sourceTree = "<group>"; };
 		CDF2FDBDA1DFEA92855B333B /* NodePasteboardWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NodePasteboardWriter.swift; sourceTree = "<group>"; };
@@ -97,6 +95,7 @@
 		CDF2FF21AB05A738E0DCED2B /* SingleTreePopUpWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleTreePopUpWindow.swift; sourceTree = "<group>"; };
 		D11151CC28267FF900C9D532 /* OutletCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletCommon; path = ../OutletCommon; sourceTree = "<group>"; };
 		D1275AFF2825E76B001151C0 /* UIConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIConstants.swift; sourceTree = "<group>"; };
+		D152FEFE2827142F005FA8D8 /* OutletSST */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = OutletSST; path = ../OutletSST; sourceTree = "<group>"; };
 		D16839AE25AD553A00D76169 /* GRPCClientBackend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GRPCClientBackend.swift; sourceTree = "<group>"; };
 		D1BAC55525A193C700D951A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D1BAC55C25A193C800D951A2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -120,6 +119,7 @@
 		11DDEEC223A6F9580014C2A6 = {
 			isa = PBXGroup;
 			children = (
+				D152FEFE2827142F005FA8D8 /* OutletSST */,
 				D1A24AA82825D6A500CEEC05 /* Packages */,
 				11DDEECD23A6F9580014C2A6 /* OutletMac */,
 				11DDEECC23A6F9580014C2A6 /* Products */,
@@ -140,13 +140,11 @@
 			children = (
 				D1CDE56425E4A9DC003816CF /* outlet-icon-256.icns */,
 				D1ED5E2425C7D75D00A8E5DB /* UI */,
-				D1CB049C25B182A000556B28 /* Model */,
 				D168399E25AD532800D76169 /* Backend */,
 				D1BAC55525A193C700D951A2 /* Assets.xcassets */,
 				D1BAC55C25A193C800D951A2 /* Info.plist */,
 				D1BAC55D25A193C800D951A2 /* OutletMac.entitlements */,
 				D1D8711625F1F8D60072CB97 /* main.swift */,
-				CDF2FCDDCFE5BFFDBDD633DD /* Common */,
 				CDF2F84959AF17A98CA69288 /* Service */,
 			);
 			path = OutletMac;
@@ -182,7 +180,6 @@
 			isa = PBXGroup;
 			children = (
 				CDF2FC0F3100B7AA054A139C /* SignalDispatcher.swift */,
-				CDF2FC52A8BA297CD6BFA59A /* BonjourService.swift */,
 				CDF2FB1106717FF3D9D70C9B /* IconStore.swift */,
 				CDF2F94E6C78EF6CF1EBFF07 /* OutletApp.swift */,
 				CDF2F36D71F017EE670CF98E /* GlobalActions.swift */,
@@ -199,13 +196,6 @@
 				CDF2F0E133427A4E93041CCA /* TreeView */,
 			);
 			path = Component;
-			sourceTree = "<group>";
-		};
-		CDF2FCDDCFE5BFFDBDD633DD /* Common */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Common;
 			sourceTree = "<group>";
 		};
 		CDF2FD6DDB4704833FC99359 /* Window */ = {
@@ -259,13 +249,6 @@
 				D11151CC28267FF900C9D532 /* OutletCommon */,
 			);
 			name = Packages;
-			sourceTree = "<group>";
-		};
-		D1CB049C25B182A000556B28 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		D1ED5E2425C7D75D00A8E5DB /* UI */ = {
@@ -395,7 +378,6 @@
 				CDF2F4BEE6141AD2AA6428B6 /* BackendConnectionState.swift in Sources */,
 				CDF2F68CE8CE36D68EBACE51 /* Backend.swift in Sources */,
 				CDF2F6F2A11F9845287633E7 /* SignalDispatcher.swift in Sources */,
-				CDF2F5121881F0828451D058 /* BonjourService.swift in Sources */,
 				CDF2FE0E82052AA7E1E36D2D /* IconStore.swift in Sources */,
 				CDF2F615F9059EA67EB224BA /* OutletApp.swift in Sources */,
 				CDF2F3650509D3F27D800ABE /* GlobalEventMonitor.swift in Sources */,

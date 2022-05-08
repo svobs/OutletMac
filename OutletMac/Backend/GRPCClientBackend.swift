@@ -20,7 +20,7 @@ import OutletCommon
 class GRPCClientBackend: OutletBackend {
   var stub: Outlet_Grpc_OutletClient
   let app: OutletAppProtocol
-  let bonjourService = BonjourService()
+  let bonjourService = LegacyBonjourBrowser()
   let backendConnectionState: BackendConnectionState
   let dispatchListener: DispatchListener
   var grpcConverter = GRPCConverter()
@@ -183,7 +183,7 @@ class GRPCClientBackend: OutletBackend {
               return
             }
 
-            NSLog("ERROR Failed to find server via BonjourService: \(error)")
+            NSLog("ERROR Failed to find server via LegacyBonjourBrowser: \(error)")
 
             leftGroup = true
             group.leave()
@@ -194,7 +194,7 @@ class GRPCClientBackend: OutletBackend {
     }
 
     // Wait until success or failure
-    NSLog("DEBUG [SignalReceiverThread] Waiting for BonjourService service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
+    NSLog("DEBUG [SignalReceiverThread] Waiting for LegacyBonjourBrowser service discovery (timeout=\(BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC)s)...")
     if group.wait(timeout: .now() + BONJOUR_SERVICE_DISCOVERY_TIMEOUT_SEC) == .timedOut {
       NSLog("INFO  [SignalReceiverThread] Service discovery timed out. Will retry signal stream in \(SIGNAL_THREAD_SLEEP_PERIOD_SEC) sec...")
     } else {
